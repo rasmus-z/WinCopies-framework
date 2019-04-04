@@ -1,0 +1,17 @@
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\Debug\WinCopies.Util.dll.config
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\Debug\WinCopies.Util.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\Debug\WinCopies.Util.pdb
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\WinCopies.Util.csprojAssemblyReference.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\ResourceDictionary.g.cs
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\WinCopies.Util_MarkupCompile.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\WinCopies.Util_MarkupCompile.lref
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\ResourceDictionary.baml
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\WinCopies.Util.g.resources
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\WinCopies.Util.csproj.CoreCompileInputs.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\WinCopies.Util.csproj.CopyComplete
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\WinCopies.Util.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.Util\obj\Debug\WinCopies.Util.pdb
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\WinCopies.Util.dll.config
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\WinCopies.Util.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\WinCopies.Util.pdb
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\WinCopies.Util.xml

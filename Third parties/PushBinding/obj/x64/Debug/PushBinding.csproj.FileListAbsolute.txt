@@ -1,0 +1,7 @@
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\PushBinding.xml
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\PushBinding.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\PushBinding.pdb
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\Third parties\PushBinding\obj\x64\Debug\PushBinding.csprojAssemblyReference.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\Third parties\PushBinding\obj\x64\Debug\PushBinding.csproj.CoreCompileInputs.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\Third parties\PushBinding\obj\x64\Debug\PushBinding.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\Third parties\PushBinding\obj\x64\Debug\PushBinding.pdb

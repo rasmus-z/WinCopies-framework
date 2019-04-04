@@ -1,0 +1,2 @@
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.GUI.Explorer\obj\Debug\WinCopies.GUI.Explorer.csprojAssemblyReference.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.GUI.Explorer\obj\Debug\WinCopies.GUI.Explorer_MarkupCompile.cache

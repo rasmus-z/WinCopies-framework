@@ -1,0 +1,983 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WinCopies.IO</name>
+    </assembly>
+    <members>
+        <member name="P:WinCopies.IO.AppInfo.DisplayName">
+            <summary>
+            When overriden in a derived class, gets the display name of this <see cref="T:WinCopies.IO.AppInfo"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.AppInfo.Open(Microsoft.WindowsAPICodePack.Shell.ShellObject)">
+            <summary>
+            When overriden in a derived class, opens a given <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> using the application represented by this <see cref="T:WinCopies.IO.AppInfo"/>.
+            </summary>
+            <param name="shellObject">The <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> to open.</param>
+        </member>
+        <member name="M:WinCopies.IO.AppInfo.Open(Windows.Storage.StorageFile)">
+            <summary>
+            When overriden in a derived class, opens a given <see cref="T:Windows.Storage.StorageFile"/> using the application represented by this <see cref="T:WinCopies.IO.AppInfo"/>.
+            </summary>
+            <param name="storageFile">The <see cref="T:Windows.Storage.StorageFile"/> to open.</param>
+        </member>
+        <member name="M:WinCopies.IO.AppInfo.Open(System.String)">
+            <summary>
+            When overriden in a derived class, opens a given file using the application represented by this <see cref="T:WinCopies.IO.AppInfo"/>.
+            </summary>
+            <param name="fileName">The path to the file to open.</param>
+        </member>
+        <member name="P:WinCopies.IO.DesktopAppInfo.DisplayName">
+            <summary>
+            Gets the display name of this <see cref="T:WinCopies.IO.DesktopAppInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.DesktopAppInfo.Path">
+            <summary>
+            Gets the path of this <see cref="T:WinCopies.IO.DesktopAppInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.DesktopAppInfo.Command">
+            <summary>
+            Gets the full command (software path and command line args) of this <see cref="T:WinCopies.IO.DesktopAppInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.DesktopAppInfo.FileType">
+            <summary>
+            Gets the Windows Registry file type of this <see cref="T:WinCopies.IO.DesktopAppInfo"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.DesktopAppInfo.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.DesktopAppInfo"/> class for a given Windows Registry file type.
+            </summary>
+            <param name="fileType">The Windows Registry file type of the new instance of the <see cref="T:WinCopies.IO.DesktopAppInfo"/>.</param>
+        </member>
+        <member name="P:WinCopies.IO.WindowsStoreAppInfo.DisplayName">
+            <summary>
+            Gets the display name of this <see cref="T:WinCopies.IO.WindowsStoreAppInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.WindowsStoreAppInfo.AppInfo">
+            <summary>
+            Gets the <see cref="T:Windows.ApplicationModel.AppInfo"/> of this <see cref="T:WinCopies.IO.WindowsStoreAppInfo"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.WindowsStoreAppInfo.#ctor(Windows.ApplicationModel.AppInfo)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.WindowsStoreAppInfo"/> class for a given <see cref="T:Windows.ApplicationModel.AppInfo"/>.
+            </summary>
+            <param name="appInfo">The <see cref="T:Windows.ApplicationModel.AppInfo"/> of the instance of the <see cref="T:WinCopies.IO.WindowsStoreAppInfo"/>.</param>
+        </member>
+        <member name="T:WinCopies.IO.ArchiveItemInfo">
+            <summary>
+            Provides info to interact with archive items.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfo.Path">
+            <summary>
+            Gets the path of this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfo.IsBrowsable">
+            <summary>
+            When overriden in a derived class, gets a value that indicates whether this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/> is browsable.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfo.AreItemsLoaded">
+            <summary>
+            Gets a value that indicates if the items of this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/> are currently loaded.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfo.Items">
+            <summary>
+            Gets the items of this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfo.Parent">
+            <summary>
+            When overriden in a derived class, gets the <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> parent of this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfo.FileType">
+            <summary>
+            The file type of this <see cref="T:WinCopies.IO.ShellObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfo.ItemsLoader">
+            <summary>
+            Gets or sets the items loader for this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.BrowsableObjectInfo.LoadItems">
+            <summary>
+            When overriden in a derived class, loads the items of this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/> asynchronously.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.BrowsableObjectInfo.LoadItems(WinCopies.IO.BrowsableObjectInfoItemsLoader)">
+            <summary>
+            Loads the items of this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/> asynchronously using the given <see cref="T:WinCopies.IO.BrowsableObjectInfoItemsLoader"/>.
+            </summary>
+            <param name="browsableObjectInfoItemsLoader">Custom loader to load the items of this <see cref="T:WinCopies.IO.ShellObjectInfo"/>.</param>
+        </member>
+        <member name="T:WinCopies.IO.BrowsableObjectInfoItemsLoader">
+            <summary>
+            The base class for the <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> items loaders.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfoItemsLoader.Path">
+            <summary>
+            Gets the path from which load items.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfoItemsLoader.IsBusy">
+            <summary>
+            Gets a value that indicates if the thread is busy.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.BrowsableObjectInfoItemsLoader.WorkerReportsProgress">
+            <summary>
+            Gets or sets a value that indicates if the thread can notify of the progress.
+            </summary>
+        </member>
+        <member name="E:WinCopies.IO.BrowsableObjectInfoItemsLoader.DoWork">
+            <summary>
+            <para>This event is called when the background thread starts. Put your background working code here.</para>
+            <para>The event handler is running in the background thread.</para>
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.BrowsableObjectInfoItemsLoader.#ctor(System.Boolean,System.Boolean,WinCopies.IO.FileTypesFlags)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.BrowsableObjectInfoItemsLoader"/> class.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.BrowsableObjectInfoItemsLoader.OnDoWork(System.Object,System.ComponentModel.DoWorkEventArgs)">
+            <summary>
+            When overriden in a derived class, provides a handler for the <see cref="E:WinCopies.IO.BrowsableObjectInfoItemsLoader.DoWork"/> event.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:WinCopies.IO.BrowsableObjectInfoItemsLoader.LoadItems">
+            <summary>
+            Loads the items of the <see cref="P:WinCopies.IO.BrowsableObjectInfoItemsLoader.Path"/> object.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.IBrowsableObjectInfo">
+            <summary>
+            Provides info to interact with file system browsable items.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBrowsableObjectInfo.IsBrowsable">
+            <summary>
+            Gets a value that indicates whether this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> is browsable.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBrowsableObjectInfo.IsDisposing">
+            <summary>
+            Gets a value that indicates whether this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> is disposing.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBrowsableObjectInfo.Items">
+            <summary>
+            Gets the items of this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBrowsableObjectInfo.AreItemsLoaded">
+            <summary>
+            Gets a value that indicates if the items of this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> are currently loaded.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBrowsableObjectInfo.Parent">
+            <summary>
+            Gets the <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> parent of this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IBrowsableObjectInfo.ItemsLoader">
+            <summary>
+            Gets or sets the items loader for this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.IBrowsableObjectInfo.LoadItems">
+            <summary>
+            Loads the items of this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> asynchronously.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.IBrowsableObjectInfo.LoadItems(WinCopies.IO.BrowsableObjectInfoItemsLoader)">
+            <summary>
+            Loads the items of this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> asynchronously using a given items loader.
+            </summary>
+            <param name="itemsLoader"></param>
+        </member>
+        <member name="M:WinCopies.IO.LoadArchive.#ctor(System.Boolean,System.Boolean,WinCopies.IO.FileTypesFlags)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.BrowsableObjectInfoItemsLoader"/> class.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.LoadArchive.PathInfo.Path">
+            <summary>
+            Gets the path of this <see cref="T:WinCopies.IO.LoadArchive.PathInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.LoadArchive.PathInfo.FileType">
+            <summary>
+            Gets the file type of this <see cref="T:WinCopies.IO.LoadArchive.PathInfo"/>.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.LoadFolder">
+            <summary>
+            Provides a background process that can be used to load items of a folder.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.LoadFolder.#ctor(System.Boolean,System.Boolean,WinCopies.IO.FileTypesFlags)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.BrowsableObjectInfoItemsLoader"/> class.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.LoadFolder.GetLoadFolderFileSystemWatcher">
+            <summary>
+            <para>Gets the <see cref="T:WinCopies.IO.LoadFolderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="P:WinCopies.IO.BrowsableObjectInfoItemsLoader.Path"/> property.</para>
+            <para>When substituted in a derived class, provides a custom <see cref="T:WinCopies.IO.LoadFolderFileSystemWatcher"/>.</para>
+            </summary>
+            <returns>An instance of the <see cref="T:WinCopies.IO.LoadFolderFileSystemWatcher"/> class.</returns>
+        </member>
+        <member name="M:WinCopies.IO.LoadFolder.Dispose">
+            <summary>
+            Frees all resources used by this <see cref="T:WinCopies.IO.LoadFolder"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.LoadFolderFileSystemWatcher.FileSystemWatcher">
+            <summary>
+            Gets the <see cref="T:System.IO.FileSystemWatcher"/> used to listen to the file system events of the current <see cref="P:WinCopies.IO.LoadFolderFileSystemWatcher.Path"/> property.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.LoadFolderFileSystemWatcher.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.LoadFolderFileSystemWatcher"/> class.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.LoadFolderFileSystemWatcher.Dispose">
+            <summary>
+            Frees all resources used by the <see cref="P:WinCopies.IO.LoadFolderFileSystemWatcher.FileSystemWatcher"/> property.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.Registry">
+            <summary>
+            Provides some static methods to interact with the Windows registry.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.Registry.GetFileTypeByExtension(System.String)">
+            <summary>
+            Gets the Windows registry open-with file type for a given extension.
+            </summary>
+            <param name="extension">The file extension from which look for the associated file type.</param>
+            <returns>If found, the Windows registry open-with file type associated to the given extension, otherwise null.</returns>
+        </member>
+        <member name="M:WinCopies.IO.Registry.GetCommandByExtension(System.String,System.String)">
+            <summary>
+            Gets the Windows registry command associated to a given extension.
+            </summary>
+            <param name="commandName">The command name.</param>
+            <param name="extension">The extension from which look for the associated command.</param>
+            <returns>The Windows registry command associated to the given extension.</returns>
+        </member>
+        <member name="T:WinCopies.IO.Generic">
+            <summary>
+            Generic
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.Generic.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.ShellObjectInfo">
+            <summary>
+            Provides info to interact with file system items.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellObjectInfo.ShellObject">
+            <summary>
+            Gets a <see cref="P:WinCopies.IO.ShellObjectInfo.ShellObject"/> that represents this <see cref="T:WinCopies.IO.ShellObjectInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellObjectInfo.Parent">
+            <summary>
+            Gets the <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> parent of this <see cref="T:WinCopies.IO.ShellObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellObjectInfo.FileSystemInfoProperties">
+            <summary>
+            Provides info for the folders and files.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellObjectInfo.DriveInfoProperties">
+            <summary>
+            Provides info for drives.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellObjectInfo.ArchiveFileStream">
+            <summary>
+            The <see cref="T:System.IO.FileStream"/> for this <see cref="T:WinCopies.IO.ShellObjectInfo"/> when it represents an archive file system item. See the remarks section.
+            </summary>
+            <remarks>
+            This field is only used by the <see cref="T:WinCopies.IO.ShellObjectInfo"/>, <see cref="T:WinCopies.IO.LoadFolder"/> and the <see cref="T:WinCopies.IO.LoadArchive"/> classes in order to lock the file that the <see cref="T:WinCopies.IO.ShellObjectInfo"/> represents when the items of the archive are loaded.
+            </remarks>
+        </member>
+        <member name="P:WinCopies.IO.ShellObjectInfo.SpecialFolder">
+            <summary>
+            The special folder type of this <see cref="T:WinCopies.IO.ShellObjectInfo"/>. <see cref="F:WinCopies.IO.SpecialFolders.OtherFolderOrFile"/> if this <see cref="T:WinCopies.IO.ShellObjectInfo"/> is a casual file system item.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ShellObjectInfo.#ctor(Microsoft.WindowsAPICodePack.Shell.ShellObject,System.String,WinCopies.IO.FileTypes,WinCopies.IO.SpecialFolders)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ShellObjectInfo"/> class.
+            </summary>
+            <param name="shellObject">The <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="T:WinCopies.IO.ShellObjectInfo"/>.</param>
+            <param name="path">The path of this <see cref="T:WinCopies.IO.ShellObjectInfo"/>.</param>
+            <param name="fileType">The file type of this <see cref="T:WinCopies.IO.ShellObjectInfo"/>.</param>
+            <param name="specialFolder">The special folder type of this <see cref="T:WinCopies.IO.ShellObjectInfo"/>. <see cref="F:WinCopies.IO.SpecialFolders.OtherFolderOrFile"/> if this <see cref="T:WinCopies.IO.ShellObjectInfo"/> is a casual file system item.</param>
+        </member>
+        <member name="M:WinCopies.IO.ShellObjectInfo.LoadItems">
+            <summary>
+            Loads the items of this <see cref="T:WinCopies.IO.ShellObjectInfo"/> asynchronously.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ShellObjectInfo.LoadItems(WinCopies.IO.BrowsableObjectInfoItemsLoader)">
+            <summary>
+            Loads the items of this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/> asynchronously using the given <see cref="T:WinCopies.IO.BrowsableObjectInfoItemsLoader"/>.
+            </summary>
+            <param name="browsableObjectInfoItemsLoader">Custom loader to load the items of this <see cref="T:WinCopies.IO.ShellObjectInfo"/>.</param>
+        </member>
+        <member name="M:WinCopies.IO.ShellObjectInfo.Rename(System.String)">
+            <summary>
+            Renames or move to a relative path (or both) the current <see cref="T:WinCopies.IO.ShellObjectInfo"/> with the specified name. See the doc of the <see cref="M:System.IO.Directory.Move(System.String,System.String)"/>, <see cref="M:System.IO.File.Move(System.String,System.String)"/> and <see cref="P:System.IO.DriveInfo.VolumeLabel"/> for the possible exceptions.
+            </summary>
+            <param name="newValue">The new name or relative path for this <see cref="T:WinCopies.IO.ShellObjectInfo"/></param>.
+        </member>
+        <member name="T:WinCopies.IO.ShellPropertyContainer">
+            <summary>
+            Provides a container for the <see cref="T:Microsoft.WindowsAPICodePack.Shell.PropertySystem.IShellProperty"/> interface that notifies when the property has changed.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellPropertyContainer.PropertyKey">
+            <summary>
+            Gets the property key that identifies this property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellPropertyContainer.Description">
+            <summary>
+            Get the property description object.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellPropertyContainer.CanonicalName">
+            <summary>
+            Gets the case-sensitive name of the property as it is known to the system, regardless of its localized name.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellPropertyContainer.HasChanged">
+            <summary>
+            Gets or sets a value that indicates whether this property has changed.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellPropertyContainer.IconReference">
+            <summary>
+            Gets the image reference path and icon index associated with a property value. This API is only available in Windows 7.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellPropertyContainer.ValueAsObject">
+            <summary>
+            Gets the value for this property using the generic Object type.
+            </summary>
+            <remarks>To obtain a specific type for this value, use the more strongly-typed <see cref="T:Microsoft.WindowsAPICodePack.Shell.PropertySystem.ShellProperty`1" /> class. You can only set a value for this type using the <see cref="T:Microsoft.WindowsAPICodePack.Shell.PropertySystem.ShellProperty`1" /> class.</remarks>
+        </member>
+        <member name="P:WinCopies.IO.ShellPropertyContainer.ValueType">
+            <summary>
+            Gets the <see cref="T:System.Type" /> value for this property.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ShellPropertyContainer.FormatForDisplay(Microsoft.WindowsAPICodePack.Shell.PropertySystem.PropertyDescriptionFormatOptions)">
+            <summary>
+            Gets a formatted, Unicode string representation of a property value.
+            </summary>
+            <param name="format">One or more PropertyDescriptionFormat flags chosen to produce the desired display format.</param>
+            <returns>The formatted value as a string.</returns>
+        </member>
+        <member name="T:WinCopies.IO.SizeUnit">
+            <summary>
+            Defines the unit of a size.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SizeUnit.Byte">
+            <summary>
+            A size given in bytes.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SizeUnit.KiloByte">
+            <summary>
+            A size given in kilobytes.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SizeUnit.MegaByte">
+            <summary>
+            A size given in megabytes.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SizeUnit.GigaByte">
+            <summary>
+            A size given in gigabytes.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SizeUnit.TeraByte">
+            <summary>
+            A size given in terabytes.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SizeUnit.YotaByte">
+            <summary>
+            A size given in yotabytes.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.Size">
+            <summary>
+            Represent a file size in byte-based unit.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.Size.Value">
+            <summary>
+            The value as numeric.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.Size.GetValueInUnit(WinCopies.IO.SizeUnit)">
+            <summary>
+            Returns the size value in given unit.
+            </summary>
+            <param name="unit">The unit to which one return the size</param>
+            <returns>The size as the given unit</returns>
+        </member>
+        <member name="P:WinCopies.IO.Size.SizeUnit">
+            <summary>
+            The unit of this <see cref="T:WinCopies.IO.Size"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.Size.#ctor(System.Double,WinCopies.IO.SizeUnit)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.Size"/> structure without performing value check for the unit given. For value checking initialization of the <see cref="T:WinCopies.IO.Size"/> structure, see the <see cref="M:WinCopies.IO.Size.Create(System.Double)"/> function.
+            </summary>
+            <param name="value">The value as numeric of the size</param>
+            <param name="sizeUnit">The unit of the size</param>
+        </member>
+        <member name="M:WinCopies.IO.Size.Create(System.Double)">
+            <summary>
+            Create a new <see cref="T:WinCopies.IO.Size"/> object with the value given in bytes.
+            </summary>
+            <param name="valueInBytes">Value in bytes of the size</param>
+            <returns>A new <see cref="T:WinCopies.IO.Size"/> object with the value given in bytes</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.ToString">
+            <summary>
+            Returns a string with the size value and unit.
+            </summary>
+            <returns>A string with the size value and unit</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThan(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Checks if s1 is less than s2.
+            </summary>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns><see langword="true"/> if s1 is less than s2, <see langword="false"/> in the other way</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThan(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Checkes if s1 is greater than s2.
+            </summary>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns><see langword="true"/> if s1 is greater than s2, <see langword="false"/> in the other way</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThanOrEqual(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Checks if s1 is less than or equal to s2.
+            </summary>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns><see langword="true"/> if s1 is less than or equal to s2, <see langword="false"/> in the other way</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThanOrEqual(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Checks if s1 is greater than or equal to s2.
+            </summary>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns><see langword="true"/> if s1 is greater than or equal to s2, <see langword="false"/> in the other way</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Equality(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Checks if s1 equals s2.
+            </summary>
+            <remarks>This comparison method is based on size value, as like as for other structure types.</remarks>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns><see langword="true"/> if s1 is equal to s2, <see langword="false"/> in the other way</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Inequality(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Checks if s1 doesn't equal s2.
+            </summary>
+            <remarks>This comparison method is based on the size value, as like as for other structure types.</remarks>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns><see langword="true"/> if s1 is not equal to s2, <see langword="false"/> in the other way</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThan(WinCopies.IO.Size,System.Int32)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int32"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int32"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser than i, <see langword="false"/> if s equals or is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThan(WinCopies.IO.Size,System.Int32)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int32"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int32"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather than i, <see langword="false"/> if s equals or is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThanOrEqual(WinCopies.IO.Size,System.Int32)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int32"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int32"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser or equals i, <see langword="false"/> if s is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThanOrEqual(WinCopies.IO.Size,System.Int32)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int32"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int32"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather or equals i, <see langword="false"/> if s is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Equality(WinCopies.IO.Size,System.Int32)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int32"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int32"/> to compare.</param>
+            <returns><see langword="true"/> if s equals i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Inequality(WinCopies.IO.Size,System.Int32)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int32"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int32"/> to compare.</param>
+            <returns><see langword="true"/> if s doesn't equal i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThan(WinCopies.IO.Size,System.Int64)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int64"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int64"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser than i, <see langword="false"/> if s equals or is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThan(WinCopies.IO.Size,System.Int64)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int64"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int64"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather than i, <see langword="false"/> if s equals or is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThanOrEqual(WinCopies.IO.Size,System.Int64)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int64"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int64"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser or equals i, <see langword="false"/> if s is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThanOrEqual(WinCopies.IO.Size,System.Int64)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int64"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int64"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather or equals i, <see langword="false"/> if s is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Equality(WinCopies.IO.Size,System.Int64)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int64"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int64"/> to compare.</param>
+            <returns><see langword="true"/> if s equals i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Inequality(WinCopies.IO.Size,System.Int64)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int64"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int64"/> to compare.</param>
+            <returns><see langword="true"/> if s doesn't equal i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThan(WinCopies.IO.Size,System.Int16)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int16"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int16"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser than i, <see langword="false"/> if s equals or is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThan(WinCopies.IO.Size,System.Int16)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int16"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int16"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather than i, <see langword="false"/> if s equals or is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThanOrEqual(WinCopies.IO.Size,System.Int16)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int16"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int16"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser or equals i, <see langword="false"/> if s is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThanOrEqual(WinCopies.IO.Size,System.Int16)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int16"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int16"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather or equals i, <see langword="false"/> if s is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Equality(WinCopies.IO.Size,System.Int16)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int16"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int16"/> to compare.</param>
+            <returns><see langword="true"/> if s equals i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Inequality(WinCopies.IO.Size,System.Int16)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Int16"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Int16"/> to compare.</param>
+            <returns><see langword="true"/> if s doesn't equal i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThan(WinCopies.IO.Size,System.Single)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Single"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Single"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser than i, <see langword="false"/> if s equals or is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThan(WinCopies.IO.Size,System.Single)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Single"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Single"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather than i, <see langword="false"/> if s equals or is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThanOrEqual(WinCopies.IO.Size,System.Single)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Single"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Single"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser or equals i, <see langword="false"/> if s is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThanOrEqual(WinCopies.IO.Size,System.Single)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Single"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Single"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather or equals i, <see langword="false"/> if s is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Equality(WinCopies.IO.Size,System.Single)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Single"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Single"/> to compare.</param>
+            <returns><see langword="true"/> if s equals i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Inequality(WinCopies.IO.Size,System.Single)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Single"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Single"/> to compare.</param>
+            <returns><see langword="true"/> if s doesn't equal i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThan(WinCopies.IO.Size,System.Double)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Double"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Double"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser than i, <see langword="false"/> if s equals or is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThan(WinCopies.IO.Size,System.Double)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Double"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Double"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather than i, <see langword="false"/> if s equals or is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThanOrEqual(WinCopies.IO.Size,System.Double)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Double"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Double"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser or equals i, <see langword="false"/> if s is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThanOrEqual(WinCopies.IO.Size,System.Double)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Double"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Double"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather or equals i, <see langword="false"/> if s is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Equality(WinCopies.IO.Size,System.Double)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Double"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Double"/> to compare.</param>
+            <returns><see langword="true"/> if s equals i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Inequality(WinCopies.IO.Size,System.Double)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Double"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Double"/> to compare.</param>
+            <returns><see langword="true"/> if s doesn't equal i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThan(WinCopies.IO.Size,System.Decimal)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Decimal"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Decimal"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser than i, <see langword="false"/> if s equals or is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThan(WinCopies.IO.Size,System.Decimal)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Decimal"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Decimal"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather than i, <see langword="false"/> if s equals or is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThanOrEqual(WinCopies.IO.Size,System.Decimal)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Decimal"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Decimal"/> to compare.</param>
+            <returns><see langword="true"/> if s is lesser or equals i, <see langword="false"/> if s is greather than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_GreaterThanOrEqual(WinCopies.IO.Size,System.Decimal)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Decimal"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Decimal"/> to compare.</param>
+            <returns><see langword="true"/> if s is greather or equals i, <see langword="false"/> if s is lesser than i.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Equality(WinCopies.IO.Size,System.Decimal)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Decimal"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Decimal"/> to compare.</param>
+            <returns><see langword="true"/> if s equals i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Inequality(WinCopies.IO.Size,System.Decimal)">
+            <summary>
+            Compares a <see cref="T:WinCopies.IO.Size"/> to a <see cref="T:System.Decimal"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <param name="i">The <see cref="T:System.Decimal"/> to compare.</param>
+            <returns><see langword="true"/> if s doesn't equal i, <see langword="false"/> in the other way.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_LessThan(System.Int64,WinCopies.IO.Size)">
+            <summary>
+            Compares a <see cref="T:System.Int64"/> to a <see cref="T:WinCopies.IO.Size"/> value.
+            </summary>
+            <param name="i">The <see cref="T:System.Int64"/> to compare.</param>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to compare.</param>
+            <returns><see langword="true"/> if i is lesser than s, <see langword="false"/> if i equals or is greather than s.</returns>
+            <remarks>i must be in byte unit.</remarks>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Addition(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Returns a <see cref="T:WinCopies.IO.Size"/> with the addition of s1 and s2.
+            </summary>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns>A <see cref="T:WinCopies.IO.Size"/> with the addition of s1 and s2</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Subtraction(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Returns a <see cref="T:WinCopies.IO.Size"/> with the substraction of s2 from s1.
+            </summary>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns>A <see cref="T:WinCopies.IO.Size"/> with the substraction of s2 from s1</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Multiply(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Returns a <see cref="T:WinCopies.IO.Size"/> with the multiplication of s1 by s2.
+            </summary>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns>A <see cref="T:WinCopies.IO.Size"/> with the multiplication of s1 by s2</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Division(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Returns a <see cref="T:WinCopies.IO.Size"/> with the division of s1 by s2.
+            </summary>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns>A <see cref="T:WinCopies.IO.Size"/> with the division of s1 by s2</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Modulus(WinCopies.IO.Size,WinCopies.IO.Size)">
+            <summary>
+            Returns a <see cref="T:WinCopies.IO.Size"/> with the remainder of s1 by s2.
+            </summary>
+            <param name="s1">Left size</param>
+            <param name="s2">Right size</param>
+            <returns>A <see cref="T:WinCopies.IO.Size"/> with the remainder of s1 by s2</returns>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_UnaryPlus(WinCopies.IO.Size)">
+            <summary>
+            Returns the size.
+            </summary>
+            <param name="s">Size to return</param>
+            <returns>The size value</returns> 
+        </member>
+        <member name="M:WinCopies.IO.Size.op_UnaryNegation(WinCopies.IO.Size)">
+            <summary>
+            Returns the size opposite.
+            </summary>
+            <param name="s">Size for which one return the opposite</param>
+            <returns>The opposite of the size value</returns> 
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Explicit(System.Int64)~WinCopies.IO.Size">
+            <summary>
+            Converts a <see cref="T:System.Int64"/> value to a <see cref="T:WinCopies.IO.Size"/> value.
+            </summary>
+            <param name="i">The <see cref="T:System.Int64"/> to convert.</param>
+        </member>
+        <member name="M:WinCopies.IO.Size.op_Explicit(WinCopies.IO.Size)~System.Int64">
+            <summary>
+            Converts a <see cref="T:WinCopies.IO.Size"/> value to a <see cref="T:System.Int64"/> value.
+            </summary>
+            <param name="s">The <see cref="T:WinCopies.IO.Size"/> to convert.</param>
+        </member>
+        <member name="T:WinCopies.IO.SpecialFolders">
+            <summary>
+            The special folder types.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SpecialFolders.OtherFolderOrFile">
+            <summary>
+            A casual file system item.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SpecialFolders.Desktop">
+            <summary>
+            The <see cref="P:Microsoft.WindowsAPICodePack.Shell.KnownFolders.Desktop"/> known folder.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SpecialFolders.UsersLibraries">
+            <summary>
+            The <see cref="P:Microsoft.WindowsAPICodePack.Shell.KnownFolders.UsersLibraries"/> known folder.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SpecialFolders.DocumentsLibrary">
+            <summary>
+            The <see cref="P:Microsoft.WindowsAPICodePack.Shell.KnownFolders.DocumentsLibrary"/> known folder.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.SpecialFolders.Computer">
+            <summary>
+            The item is the <see cref="P:Microsoft.WindowsAPICodePack.Shell.KnownFolders.Computer"/> known folder.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.IFileSystemObject">
+            <summary>
+            Provides data about file system items.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IFileSystemObject.Path">
+            <summary>
+            Gets the path of this <see cref="T:WinCopies.IO.IFileSystemObject"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.IFileSystemObject.FileType">
+            <summary>
+            Gets the file type of this <see cref="T:WinCopies.IO.IFileSystemObject"/>.
+            </summary>
+        </member>
+        <member name="T:WinCopies.IO.Util">
+            <summary>
+            Provides static methods to interact with file system items.
+            </summary>
+        </member>
+    </members>
+</doc>

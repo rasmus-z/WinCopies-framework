@@ -1,0 +1,31 @@
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\ResourceDictionary.g.cs
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\WinCopies.IO_MarkupCompile.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\WinCopies.IO_MarkupCompile.lref
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\bin\x64\Debug\WinCopies.IO.xml
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\bin\x64\Debug\WinCopies.IO.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\bin\x64\Debug\WinCopies.IO.pdb
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\ResourceDictionary.baml
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\WinCopies.IO.g.resources
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\WinCopies.IO.csproj.CoreCompileInputs.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\WinCopies.IO.csproj.CopyComplete
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\WinCopies.IO.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\WinCopies.IO.pdb
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies.IO\obj\x64\Debug\WinCopies.IO.csprojAssemblyReference.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\Interop.AppxManagerLib.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\Interop.IWshRuntimeLibrary.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\Interop.WSHControllerLibrary.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\Interop.WUApiLib.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\WinCopies.IO.csproj.ResolveComReference.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\WinCopies.IO_MarkupCompile.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\WinCopies.IO_MarkupCompile.lref
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\WinCopies.IO.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\WinCopies.IO.pdb
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\WinCopies.IO.xml
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\WinCopies.IO.dll
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\WinCopies.IO.pdb
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\WinCopies.IO.g.resources
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\WinCopies.IO.csproj.CoreCompileInputs.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\WinCopies.IO.csproj.CopyComplete
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\WinCopies.IO.csprojAssemblyReference.cache
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\Generic.g.cs
+C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\x64\Debug\Generic.baml

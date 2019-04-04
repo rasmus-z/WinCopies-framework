@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WinCopies.GUI</name>
+    </assembly>
+    <members>
+        <member name="T:WinCopies.GUI.Windows.Dialogs.DialogWindow">
+            <summary>
+            Logique d'interaction pour DialogBase.xaml. See the remarks section.
+            </summary>
+            <remarks>
+            This class implements the <see cref="P:WinCopies.Util.Util.CommonCommand"/> with the following string parameters: OK, Apply, Cancel, Yes, No. For more information about this behavior/design pattern, see the WinCopies website.
+            </remarks>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogWindow.DialogButtonProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.DialogButton"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.DialogButton">
+            <summary>
+            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.DialogButton"/>. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogWindow.ButtonAlignmentProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.ButtonAlignment"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.ButtonAlignment">
+            <summary>
+            Gets or sets the <see cref="T:WinCopies.GUI.Windows.Dialogs.HorizontalAlignment"/> for the button alignment. This is a dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.MessageBoxResult">
+            <summary>
+            Gets the <see cref="T:System.Windows.MessageBoxResult"/>.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogWindow.CommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.Command"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.Command">
+            <summary>
+            Gets or sets the command that will be executed when the command source is invoked.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogWindow.CommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.CommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.CommandParameter">
+            <summary>
+            Gets or sets a value that represents a user defined data value that can be passed to the command when it is executed.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.DialogWindow.CommandTargetProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.CommandTarget"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.DialogWindow.CommandTarget">
+            <summary>
+            Gets or sets a value that represents the object that the command is being executed on.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Window.ShowHelpButtonProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Window.ShowHelpButton"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Window.IsInHelpModeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Window.IsInHelpMode"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Window.HelpButtonClickEvent">
+            <summary>
+            Identifies the <see cref="E:WinCopies.GUI.Windows.Window.HelpButtonClick"/> routed event.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.Properties.Resources">
+            <summary>
+              Une classe de ressource fortement typée destinée, entre autres, à la consultation des chaînes localisées.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Properties.Resources.ResourceManager">
+            <summary>
+              Retourne l'instance ResourceManager mise en cache utilisée par cette classe.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Properties.Resources.Culture">
+            <summary>
+              Remplace la propriété CurrentUICulture du thread actuel pour toutes
+              les recherches de ressources à l'aide de cette classe de ressource fortement typée.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.ResourcesHelper.Ok">
+            <summary>
+            Gets the Ok resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.ResourcesHelper.Apply">
+            <summary>
+            Gets the Apply resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.ResourcesHelper.Yes">
+            <summary>
+            Gets the Yes resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.ResourcesHelper.No">
+            <summary>
+            Gets the No resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.ResourcesHelper.Cancel">
+            <summary>
+            Gets the Cancel resource.
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
+            </summary>
+        </member>
+    </members>
+</doc>

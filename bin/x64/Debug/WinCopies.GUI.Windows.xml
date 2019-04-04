@@ -1,0 +1,310 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WinCopies.GUI.Windows</name>
+    </assembly>
+    <members>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.SourcePathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.SourcePath"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.SourcePath">
+            <summary>
+            Gets or sets the SourcePath. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.DestPathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.DestPath"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.DestPath">
+            <summary>
+            Gets or sets the DestPath. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.PathsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.Paths"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.Paths">
+            <summary>
+            Gets the paths to compress. Note that this property is only here for information and the paths can be modified until the compress process has finished.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.ArchiveFormatProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.ArchiveFormat"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.ArchiveFormat">
+            <summary>
+            Gets or sets the <see cref="T:SevenZip.OutArchiveFormat"/> in which compress the paths to. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.CompressionLevelProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.CompressionLevel"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.CompressionMethodProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.CompressionMethod"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.CompressionModeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.CompressionMode"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.DirectoryStructureProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.DirectoryStructure"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.IncludeEmptyDirectoriesProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.ArchiveCompression.IncludeEmptyDirectories"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ComboInputBox.AlternationCount">
+            <summary>
+            Gets or sets the number of alternating item containers in the <see cref="T:System.Windows.Controls.ItemsControl" />,
+                which enables alternating containers to have a unique appearance.
+            </summary>
+            <value>The number of alternating item containers in the <see cref="T:System.Windows.Controls.ItemsControl" />.</value>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ComboInputBox.GroupStyleSelector">
+            <summary>
+            Gets or sets a method that enables you to provide custom selection logic for
+                a <see cref="T:System.Windows.Controls.GroupStyle" /> to apply to each group in a collection.
+            </summary>
+            <value>A method that enables you to provide custom selection logic for a <see cref="T:System.Windows.Controls.GroupStyle" />
+                to apply to each group in a collection.</value>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ComboInputBox.IsTextSearchCaseSensitive">
+            <summary>
+            Gets or sets a value that indicates whether case is a condition when searching
+                for items.
+            </summary>
+            <value><see langword="true" /> if text searches are case-sensitive; otherwise, <see langword="false" />.</value>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.ComboInputBox.ItemsSource">
+            <summary>
+            Gets or sets a collection used to generate the content of the <see cref="T:System.Windows.Controls.ItemsControl" />.
+            </summary>
+            <value>A collection that is used to generate the content of the <see cref="T:System.Windows.Controls.ItemsControl" />.
+                The default is null.</value>
+        </member>
+        <member name="T:WinCopies.GUI.Windows.Dialogs.InputBox">
+            <summary>
+            Interaction logic for InputBox.xaml
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.InputBox.OrientationProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.InputBox.Orientation"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.InputBox.Orientation">
+            <summary>
+            Gets or sets the <see cref="T:System.Windows.Controls.Orientation"/> of the label and the text box. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.InputBox.LabelProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.InputBox.Label"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.InputBox.Label">
+            <summary>
+            Gets or sets the label text for the user. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.InputBox.TextProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.InputBox.Text"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.InputBox.Text">
+            <summary>
+            Gets or sets the text of the text box. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.InputBox.PlaceholderModeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.InputBox.PlaceholderMode"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.InputBox.PlaceholderMode">
+            <summary>
+            Gets or sets the <see cref="T:WinCopies.GUI.Controls.PlaceholderMode"/> for the text box. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.InputBox.PlaceholderProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.InputBox.Placeholder"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.InputBox.Placeholder">
+            <summary>
+            Gets or sets the <see cref="T:WinCopies.GUI.Controls.PlaceholderProperties"/> for the text box. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.InputBox.ErrorTextProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Windows.Dialogs.InputBox.ErrorText"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Dialogs.InputBox.ErrorText">
+            <summary>
+            Gets or sets the error text. This is a dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Windows.Dialogs.InputBox.TextChangedEvent">
+            <summary>
+            Identifies the <see cref="E:WinCopies.GUI.Windows.Dialogs.InputBox.TextChanged"/> routed event.
+            </summary>
+        </member>
+        <member name="E:WinCopies.GUI.Windows.Dialogs.InputBox.TextChanged">
+            <summary>
+            Occurs when content changes in the text element.
+            </summary>
+            <remarks>
+            This event occurs when the text changes and it does not take care of the formatting.
+            </remarks>
+        </member>
+        <member name="M:WinCopies.GUI.Windows.Dialogs.InputBox.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Windows.Dialogs.InputBox"/> class.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Windows.Dialogs.InputBox.OnTextChanged(System.Windows.Controls.TextChangedEventArgs)">
+            <summary>
+            Is called when content in this editing control changes.
+            </summary>
+            <param name="e">The arguments that are associated with the <see cref="E:WinCopies.GUI.Windows.Dialogs.InputBox.TextChanged"/> event.</param>
+            <remarks>
+            This method raises a <see cref="E:WinCopies.GUI.Windows.Dialogs.InputBox.TextChanged"/> event.
+            </remarks>
+        </member>
+        <member name="T:WinCopies.GUI.Windows.Properties.Resources">
+            <summary>
+              Une classe de ressource fortement typée destinée, entre autres, à la consultation des chaînes localisées.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Properties.Resources.ResourceManager">
+            <summary>
+              Retourne l'instance ResourceManager mise en cache utilisée par cette classe.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Properties.Resources.Culture">
+            <summary>
+              Remplace la propriété CurrentUICulture du thread actuel pour toutes
+              les recherches de ressources à l'aide de cette classe de ressource fortement typée.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.SourceAndDestPaths">
+            <summary>
+            Gets the SourceAndDestPaths resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.SourcePath">
+            <summary>
+            Gets the SourcePath resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.DestPath">
+            <summary>
+            Gets the DestPath resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.SelectPath">
+            <summary>
+            Gets the SelectPath resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.SelectPathDialogDescription">
+            <summary>
+            Gets the SelectPathDialogDescription resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.ArchiveFileProperties">
+            <summary>
+            Gets the ArchiveFileProperties resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.ArchiveFormat">
+            <summary>
+            Gets the ArchiveFormat resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.ArchiveFormats">
+            <summary>
+            Gets the ArchiveFormats resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.CompressionLevel">
+            <summary>
+            Gets the CompressionLevel resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.CompressionLevels">
+            <summary>
+            Gets the CompressionLevels resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.CompressionMethod">
+            <summary>
+            Gets the CompressionMethod resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.CompressionMethods">
+            <summary>
+            Gets the CompressionMethods resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.CompressionMode">
+            <summary>
+            Gets the CompressionMode resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.CompressionModes">
+            <summary>
+            Gets the CompressionModes resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.PreserveDirectoryStructure">
+            <summary>
+            Gets the PreserveDirectoryStructure resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.IncludeEmptyDirectories">
+            <summary>
+            Gets the IncludeEmptyDirectories resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.PathsToIncludeToTheArchive">
+            <summary>
+            Gets the PathsToIncludeToTheArchive resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Windows.Themes.Generic.ItemsAreOnlyThereForInformation">
+            <summary>
+            Gets the ItemsAreOnlyThereForInformation resource.
+            </summary>
+        </member>
+        <member name="T:Generic">
+            <summary>
+            Generic
+            </summary>
+        </member>
+        <member name="M:Generic.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+    </members>
+</doc>
