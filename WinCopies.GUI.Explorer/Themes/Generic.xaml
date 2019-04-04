@@ -4,7 +4,6 @@
     xmlns:local="clr-namespace:WinCopies.GUI.Explorer"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:windows="clr-namespace:System.Windows;assembly=PresentationCore"
-    xmlns:pushBindings="clr-namespace:PushBindingExtension;assembly=PushBinding"
     xmlns:e="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
     xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util"
