@@ -14,7 +14,6 @@ using WinCopies.IO;
 using WinCopies.Util;
 using BackgroundWorker = WinCopies.Util.BackgroundWorker;
 using NotifyCollectionChangedEventArgs = System.Collections.Specialized.NotifyCollectionChangedEventArgs;
-using WinCopies.GUI.Explorer.Themes;
 using Generic = WinCopies.GUI.Explorer.Themes.Generic;
 
 namespace WinCopies.GUI.Explorer
@@ -32,7 +31,7 @@ namespace WinCopies.GUI.Explorer
 
         private List<ShellFile> PathsToOpen = null;
 
-        private FileSystemWatcher fsw = new FileSystemWatcher();
+        private readonly FileSystemWatcher fsw = new FileSystemWatcher();
 
         /// <summary>
         /// Identifies the <see cref="Command"/> dependency property.

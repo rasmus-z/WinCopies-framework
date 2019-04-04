@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.489
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Data", "WinCopies.Data\WinCopies.Data.csproj", "{4178EAA3-FF93-4234-BF86-5E88D5B063B7}"
 EndProject
@@ -32,6 +32,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttachedCommandBehavior", "..\..\..\Resources\other repositories\AttachedCommandBehavior v2.0\AttachedCommandBehavior\AttachedCommandBehavior.csproj", "{BA852758-6682-4878-906A-917A1E75DE16}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI", "WinCopies.GUI\WinCopies.GUI.csproj", "{8917A829-3028-4118-A1A2-798E80CA73C8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3515170A-66DB-408B-8C19-B33FA763CE13}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
