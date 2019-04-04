@@ -16,3 +16,21 @@ C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinC
 C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\Debug\WinCopies.IO.dll
 C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO\obj\Debug\WinCopies.IO.pdb
 C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\bin\x64\Debug\WinCopies.IO.xml
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\WinCopies.IO.csprojAssemblyReference.cache
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\Interop.AppxManagerLib.dll
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\Interop.IWshRuntimeLibrary.dll
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\Interop.WSHControllerLibrary.dll
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\Interop.WUApiLib.dll
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\WinCopies.IO.csproj.ResolveComReference.cache
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\Generic.g.cs
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\WinCopies.IO_MarkupCompile.cache
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\WinCopies.IO_MarkupCompile.lref
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\WinCopies.IO.dll
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\WinCopies.IO.pdb
+C:\Users\pierr\source\repository\WinCopies-framework\bin\x64\Debug\WinCopies.IO.xml
+C:\Users\pierr\source\repository\WinCopies-framework\bin\x64\Debug\WinCopies.IO.dll
+C:\Users\pierr\source\repository\WinCopies-framework\bin\x64\Debug\WinCopies.IO.pdb
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\Generic.baml
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\WinCopies.IO.g.resources
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\WinCopies.IO.csproj.CoreCompileInputs.cache
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO\obj\Debug\WinCopies.IO.csproj.CopyComplete

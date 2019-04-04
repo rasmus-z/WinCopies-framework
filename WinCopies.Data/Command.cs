@@ -19,7 +19,7 @@ namespace WinCopies.Data
 
             if (string.IsNullOrWhiteSpace(query))
 
-                throw new ArgumentException(string.Format(WinCopies.Util.ResourcesHelper.StringParameterEmptyOrWhiteSpaces, nameof(query)));
+                throw new ArgumentException(string.Format(WinCopies.Util.Generic.StringParameterEmptyOrWhiteSpaces, nameof(query)));
 
             Query = query;
 

@@ -8,11 +8,11 @@ using System.Windows;
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
 [assembly: AssemblyTitle("WinCopies.GUI.Explorer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("WinCopies framework file explorer controls and dialog windows")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("WinCopies.GUI.Explorer")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyProduct("WinCopies framework")]
+[assembly: AssemblyCopyright("Copyright © 2019 Pierre Sprimont")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -53,3 +53,6 @@ using System.Windows;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: Guid("de46adfc-534c-4a62-ab80-d77751869953")]
+[assembly: NeutralResourcesLanguage("fr")]
+

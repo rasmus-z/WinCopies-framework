@@ -8,11 +8,11 @@ using System.Windows;
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
 [assembly: AssemblyTitle("WinCopies.GUI.Controls")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Some WPF controls")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("WinCopies.GUI.Controls")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyProduct("WinCopies framework")]
+[assembly: AssemblyCopyright("Copyright © 2019 Pierre Sprimont")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -54,4 +54,5 @@ using System.Windows;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: NeutralResourcesLanguage("fr")]
+[assembly: Guid("885de4c5-c40a-4419-a78e-cfb06c5a0d35")]
 
