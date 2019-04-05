@@ -139,6 +139,26 @@
             Gets or sets a value that indicates whether to show the items check boxes when multi-selection is available. This is a dependency property.
             </summary>
         </member>
+        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.ShowHiddenItemsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.ShowHiddenItems"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Explorer.ExplorerControl.ShowHiddenItems">
+            <summary>
+            Gets or sets a value that indicates whether to show the hidden items.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.ShowSystemItemsProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.ShowSystemItems"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Explorer.ExplorerControl.ShowSystemItems">
+            <summary>
+            Gets or sets a value that indicates whether to show the system items.
+            </summary>
+        </member>
         <member name="F:WinCopies.GUI.Explorer.ExplorerControl.TreeViewSelectedItemProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.TreeViewSelectedItem"/> dependency property.
@@ -242,6 +262,11 @@
         <member name="P:WinCopies.GUI.Explorer.ExplorerControl.VisibleItemsCount">
             <summary>
             Gets the visible items count.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.ItemContextMenuProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.ItemContextMenu"/> dependency property.
             </summary>
         </member>
         <member name="E:WinCopies.GUI.Explorer.ExplorerControl.PathChanged">

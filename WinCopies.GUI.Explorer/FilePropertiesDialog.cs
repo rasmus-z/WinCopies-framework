@@ -153,7 +153,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             DataContext = shellObject;
 
-            CommandBindings.Add(new System.Windows.Input.CommandBinding(DefineOpenWithSoftware, (object sender, System.Windows.Input.ExecutedRoutedEventArgs e) =>
+            CommandBindings.Add(new CommandBinding(DefineOpenWithSoftware, (object sender, ExecutedRoutedEventArgs e) =>
            {
 
                FoldersBrowserDialog foldersBrowserDialog = new FoldersBrowserDialog();
@@ -242,11 +242,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 #if DEBUG
 
-                if(kinds!=null)
+                if (kinds != null)
 
-                foreach (string kind in kinds)
+                    foreach (string kind in kinds)
 
-                    Debug.WriteLine($"{System_Kind}: " + kind);
+                        Debug.WriteLine($"{System_Kind}: " + kind);
 
 #endif
 

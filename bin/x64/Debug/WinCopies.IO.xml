@@ -377,7 +377,7 @@
         </member>
         <member name="P:WinCopies.IO.ShellPropertyContainer.HasChanged">
             <summary>
-            Gets or sets a value that indicates whether this property has changed.
+            Gets a value that indicates whether this property has changed.
             </summary>
         </member>
         <member name="P:WinCopies.IO.ShellPropertyContainer.IconReference">
@@ -396,11 +396,17 @@
             Gets the <see cref="T:System.Type" /> value for this property.
             </summary>
         </member>
+        <member name="M:WinCopies.IO.ShellPropertyContainer.#ctor(Microsoft.WindowsAPICodePack.Shell.PropertySystem.IShellProperty)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ShellPropertyContainer"/> class.
+            </summary>
+            <param name="property">The <see cref="T:Microsoft.WindowsAPICodePack.Shell.PropertySystem.IShellProperty"/> to handle.</param>
+        </member>
         <member name="M:WinCopies.IO.ShellPropertyContainer.FormatForDisplay(Microsoft.WindowsAPICodePack.Shell.PropertySystem.PropertyDescriptionFormatOptions)">
             <summary>
             Gets a formatted, Unicode string representation of a property value.
             </summary>
-            <param name="format">One or more PropertyDescriptionFormat flags chosen to produce the desired display format.</param>
+            <param name="format">One or more <see cref="T:Microsoft.WindowsAPICodePack.Shell.PropertySystem.PropertyDescriptionFormatOptions"/> flags chosen to produce the desired display format.</param>
             <returns>The formatted value as a string.</returns>
         </member>
         <member name="T:WinCopies.IO.SizeUnit">

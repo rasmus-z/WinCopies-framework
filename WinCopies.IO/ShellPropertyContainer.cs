@@ -28,7 +28,7 @@ namespace WinCopies.IO
         public string CanonicalName => Property.CanonicalName;
 
         /// <summary>
-        /// Gets or sets a value that indicates whether this property has changed.
+        /// Gets a value that indicates whether this property has changed.
         /// </summary>
         public bool HasChanged { get; private set; } = false;
 
@@ -62,7 +62,7 @@ namespace WinCopies.IO
 
                 {
 
-                    this.valueAsObject = value;
+                    valueAsObject = value;
 
                     PropertyChanged?.Invoke(this, new WinCopies.Util.PropertyChangedEventArgs(nameof(ValueAsObject), previous_Value, value));
 
@@ -97,6 +97,10 @@ namespace WinCopies.IO
 
         //}
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ShellPropertyContainer"/> class.
+            /// </summary>
+            /// <param name="property">The <see cref="IShellProperty"/> to handle.</param>
         public ShellPropertyContainer(IShellProperty property)
 
         {
@@ -112,7 +116,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a formatted, Unicode string representation of a property value.
         /// </summary>
-        /// <param name="format">One or more PropertyDescriptionFormat flags chosen to produce the desired display format.</param>
+        /// <param name="format">One or more <see cref="PropertyDescriptionFormatOptions"/> flags chosen to produce the desired display format.</param>
         /// <returns>The formatted value as a string.</returns>
         public string FormatForDisplay(PropertyDescriptionFormatOptions format) => Property.FormatForDisplay(format);
 

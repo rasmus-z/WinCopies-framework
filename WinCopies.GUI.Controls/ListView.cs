@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace WinCopies.GUI.Controls
 {
-    public class ListView : System.Windows.Controls.ListView, IScrollable
+    public class ListView : System.Windows.Controls.ListView, IScrollable, ISettableSelector
     {
         public ScrollViewer ScrollHost { get; private set; } = null;
 

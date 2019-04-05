@@ -5,6 +5,7 @@ using System.Windows.Input;
 using WinCopies.GUI.Explorer.Data;
 using WinCopies.GUI.Windows.Dialogs;
 using BooleanToVisibilityConverter = WinCopies.Util.DataConverters.BooleanToVisibilityConverter;
+using WinCopies.Util;
 
 namespace WinCopies.GUI.Explorer.Themes
 {
@@ -184,7 +185,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
         public static FileSystemInfoAttributesToVisibilityConverter FileSystemInfoAttributesToVisibilityConverter => GetResource<FileSystemInfoAttributesToVisibilityConverter>(nameof(FileSystemInfoAttributesToVisibilityConverter));
 
-        public static FileSystemInfoAttributesToOpacityConverter FileSystemInfoAttributesToOpacityConverter => GetResource< FileSystemInfoAttributesToOpacityConverter>(nameof(FileSystemInfoAttributesToOpacityConverter));
+        public static FileSystemInfoAttributesToOpacityConverter FileSystemInfoAttributesToOpacityConverter => GetResource<FileSystemInfoAttributesToOpacityConverter>(nameof(FileSystemInfoAttributesToOpacityConverter));
 
         #endregion
 
@@ -278,7 +279,14 @@ namespace WinCopies.GUI.Explorer.Themes
 
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).OnListViewMouseDoubleClickInternal(e);
 
+        private void ListViewItem_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
 
+            ListView listView = (ListView)((FrameworkElement)sender).GetParent(typeof(ListView), false);
+
+            ((ExplorerControl)listView.GetParent(typeof(ExplorerControl), false)).OnItemsControlContextMenuOpening( (FrameworkElement) sender, listView, e);    
+
+        }
     }
 
 }

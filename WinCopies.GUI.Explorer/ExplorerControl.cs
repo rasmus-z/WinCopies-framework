@@ -15,6 +15,9 @@ using WinCopies.Util;
 using BackgroundWorker = WinCopies.Util.BackgroundWorker;
 using NotifyCollectionChangedEventArgs = System.Collections.Specialized.NotifyCollectionChangedEventArgs;
 using Generic = WinCopies.GUI.Explorer.Themes.Generic;
+using WinCopies.GUI.Controls;
+using TreeView = WinCopies.GUI.Controls.TreeView;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace WinCopies.GUI.Explorer
 {
@@ -176,8 +179,14 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public bool ShowItemsCheckBox { get => (bool)GetValue(ShowItemsCheckBoxProperty); set => SetValue(ShowItemsCheckBoxProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="ShowHiddenItems"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty ShowHiddenItemsProperty = DependencyProperty.Register(nameof(ShowHiddenItems), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(null));
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether to show the hidden items.
+        /// </summary>
         public bool ShowHiddenItems
 
         {
@@ -186,8 +195,14 @@ namespace WinCopies.GUI.Explorer
 
         }
 
+        /// <summary>
+        /// Identifies the <see cref="ShowSystemItems"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty ShowSystemItemsProperty = DependencyProperty.Register(nameof(ShowSystemItems), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(null));
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether to show the system items.
+        /// </summary>
         public bool ShowSystemItems
 
         {
@@ -336,9 +351,12 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public int VisibleItemsCount => (int)GetValue(VisibleItemsCountProperty);
 
-        public static readonly DependencyProperty ContextMenusProperty = DependencyProperty.Register(nameof(ContextMenus), typeof(IEnumerable<WinCopies.Util.MenuItem>), typeof(ExplorerControl));
+        /// <summary>
+        /// Identifies the <see cref="ItemContextMenu"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ItemContextMenuProperty = DependencyProperty.Register(nameof(ItemContextMenu), typeof(ContextMenu), typeof(ExplorerControl));
 
-        public IEnumerable<Util.MenuItem> ContextMenus { get => (IEnumerable<WinCopies.Util.MenuItem>)GetValue(ContextMenusProperty); set => SetValue(ContextMenusProperty, value); }
+        public ContextMenu ItemContextMenu { get => (ContextMenu)GetValue(ItemContextMenuProperty); set => SetValue(ItemContextMenuProperty, value); }
 
         public static readonly DependencyProperty FilterProperty = DependencyProperty.Register(nameof(Filter), typeof(IEnumerable<string>), typeof(ExplorerControl));
 
@@ -401,7 +419,7 @@ namespace WinCopies.GUI.Explorer
 
             }
 
-            Open(path );    
+            Open(path);
 
             history.CollectionChanged += History_CollectionChanged;
 
@@ -505,6 +523,38 @@ namespace WinCopies.GUI.Explorer
 
         }
 
+        protected internal virtual void OnItemsControlContextMenuOpening(FrameworkElement sender, ISelector source, ContextMenuEventArgs e)
+
+        {
+
+            // if (ItemContextMenu.PlacementTarget == null) return;
+            //focused
+            //if (ListView.IsAncestorOf(((FrameworkElement)ContextMenu.PlacementTarget)))
+
+            //void callBack()
+
+            //{
+
+            if (source is ListView)
+
+                if (((ListView)source).SelectedItems.Count > 1) { }
+
+                else if (((ListView)source).SelectedItem != null)
+
+                    sender.ContextMenu.ItemsSource = GetDefaultListViewItemContextMenu();
+
+            //}
+
+            //if (!Dispatcher.CheckAccess())
+
+            //    Dispatcher.InvokeAsync(callBack);
+
+            //else
+
+            //    callBack();
+
+        }
+
         private void Open(object value) => Open();
 
         public List<Util.MenuItem> GetDefaultListViewItemContextMenu()
@@ -549,9 +599,24 @@ namespace WinCopies.GUI.Explorer
 
                 {
 
-                    foreach (AppInfo value in winShellAppInfoInterop.OpenWithAppInfos)
+                    void callBack()
 
-                        menuItem.Items.Add(new Util.MenuItem(value.DisplayName, null, null, null, null));
+                    {
+
+                        foreach (AppInfo value in winShellAppInfoInterop.OpenWithAppInfos)
+
+                            menuItem.Items.Add(new Util.MenuItem(value.DisplayName, null, null, null, null));
+
+                    }
+
+                    if (Dispatcher.CheckAccess())
+
+                        callBack();
+
+                    else
+
+                        Dispatcher.InvokeAsync(callBack);
+
 
                 };
 
@@ -560,16 +625,6 @@ namespace WinCopies.GUI.Explorer
             }
 
             return menuItems;
-
-        }
-
-        protected virtual void OnListViewSelectionChanged(System.Windows.Controls.SelectionChangedEventArgs e)
-
-        {
-
-            if (ListView.SelectedItems.Count > 0)
-
-                ContextMenus = GetDefaultListViewItemContextMenu();
 
         }
 
@@ -631,7 +686,7 @@ namespace WinCopies.GUI.Explorer
 
                 ListView.ParentExplorerControl = this;
 
-                ListView.SelectionChanged += (object sender, System.Windows.Controls.SelectionChangedEventArgs e) => OnListViewSelectionChanged(e);
+                // ListView.SelectionChanged += (object sender, System.Windows.Controls.SelectionChangedEventArgs e) => OnListViewSelectionChanged(e);
 
                 SetValue(ListViewSelectedItemsPropertyKey, new ObservableListBoxSelectedItems(ListView));
 

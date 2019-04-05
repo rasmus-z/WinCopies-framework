@@ -315,7 +315,7 @@ namespace WinCopies.Util
 
             }
 
-            _SyncContext.Send(ThreadCompleted, new ValueTuple<Object, Exception, bool>(e.Result, error, IsCancelled || CancellationPending || e.Cancel));
+            _SyncContext.Send(ThreadCompleted, new ValueTuple<object, Exception, bool>(e.Result, error, IsCancelled || CancellationPending || e.Cancel));
 
         }
 
@@ -370,6 +370,8 @@ namespace WinCopies.Util
 
             if (!WorkerSupportsCancellation)
 
+                // todo:
+
                 throw new InvalidOperationException("Ce traitement ne supporte pas l'annulation.");
 
 
@@ -381,6 +383,8 @@ namespace WinCopies.Util
 
 
             CancellationPending = true;
+
+
 
             if (abort)
             {

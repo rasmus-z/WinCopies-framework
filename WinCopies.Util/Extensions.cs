@@ -257,7 +257,7 @@ namespace WinCopies.Util
 
             //#endif
 
-            string methodName ;
+            string methodName;
 
             // var objectType = obj.GetType();
 
@@ -670,17 +670,56 @@ namespace WinCopies.Util
                 ? ((RoutedCommand)command).CanExecute(commandParameter, commandTarget)
                 : command.CanExecute(commandParameter);
 
-        public static T GetParent<T>(this FrameworkElement source, bool typeEquality) where T : DependencyObject
+        ///// <summary>
+        ///// Checks if an object is a <see cref="FrameworkElement.Parent"/> or a <see cref="FrameworkElement.TemplatedParent"/> of an another object.
+        ///// </summary>
+        ///// <param name="source">The source object</param>
+        ///// <param name="obj">The object to search in</param>
+        ///// <returns><see langword="true"/> if 'obj' is a parent of the current object, otherwise <see langword="false"/>.</returns>
+        //public static bool IsParent(this DependencyObject source, FrameworkElement obj)
+
+        //{
+
+        //    DependencyObject parent = obj.Parent ?? obj.TemplatedParent;
+
+        //    while (parent != null && parent is FrameworkElement)
+
+        //    {
+
+        //        if (parent == source)
+
+        //            return true;
+
+        //        parent = ((FrameworkElement)parent).Parent ?? ((FrameworkElement)parent).TemplatedParent;
+
+        //    }
+
+        //    return false;
+
+        //}
+
+        /// <summary>
+        /// Searches for the first parent of an object which is assignable from a given type.
+        /// </summary>
+        /// <param name="source">The source object</param>
+        /// <param name="type">The type to search</param>
+        /// <param name="typeEquality">Indicates whether to check for the exact type equality. <see langword="true"/> to only search for objects with same type than the given type, <see langword="false"/> to search for all objects of type for which the given type is assignable from.</param>
+        /// <returns>The first object that was found, if any, otherwise null.</returns>
+        public static DependencyObject GetParent(this DependencyObject source, Type type, bool typeEquality)
 
         {
 
-            var parent = source.Parent ?? source.TemplatedParent;
+            if (!typeof(DependencyObject).IsAssignableFrom(type))
 
-            while (parent != null && parent is FrameworkElement && (typeEquality ? parent.GetType() != typeof(T) : typeof(T).IsAssignableFrom(parent.GetType())))
+                throw new ArgumentException($"The DependencyObject type must be assignable from '{nameof(type)}'.");
 
-                parent = ((FrameworkElement)parent).Parent ?? ((FrameworkElement)parent).TemplatedParent;
+            do
 
-            return (T)parent;
+                source = (source is FrameworkElement frameworkElement ? frameworkElement.Parent ?? frameworkElement.TemplatedParent : null) ?? VisualTreeHelper.GetParent(source);
+
+            while (source != null && source is FrameworkElement && (typeEquality ? source.GetType() != type : !type.IsAssignableFrom(source.GetType())));
+
+            return source;
 
         }
 

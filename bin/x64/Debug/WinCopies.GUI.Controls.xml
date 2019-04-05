@@ -139,7 +139,7 @@
         </member>
         <member name="T:WinCopies.GUI.Controls.TabControl">
             <summary>
-            A <see cref="T:System.Windows.Controls.TabControl"/> with advanced multiple items gesture.
+            Represents a control that contains multiple items that share the same space on the screen.
             </summary>
         </member>
         <member name="F:WinCopies.GUI.Controls.TabControl.CanScrollToLeftProperty">

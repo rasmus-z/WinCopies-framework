@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IScrollable.cs" />
+    <Compile Include="ISelector.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Link.cs" />
     <Compile Include="LinkRun.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="Themes\Generic.xaml.cs">
       <DependentUpon>Generic.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TreeView.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

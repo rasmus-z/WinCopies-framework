@@ -196,7 +196,7 @@
                             </Button>
                         </Grid>
 
-                        <TreeView x:Name="PART_TreeView" Grid.Row="1" ItemsSource="{Binding TreeViewItems, RelativeSource={RelativeSource Mode=TemplatedParent}}" >
+                        <controls:TreeView x:Name="PART_TreeView" Grid.Row="1" ItemsSource="{Binding TreeViewItems, RelativeSource={RelativeSource Mode=TemplatedParent}}" >
                             <TreeView.ItemContainerStyle>
                                 <Style TargetType="{x:Type TreeViewItem}" >
                                     <Setter Property="HeaderTemplate" >
@@ -241,12 +241,11 @@
                                     </Setter>
                                 </Style>
                             </TreeView.ItemContainerStyle>
-                        </TreeView>
+                        </controls:TreeView>
 
                         <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="5" ></GridSplitter>
 
-                        <Grid Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" >
-                            <local:ListView x:Name="PART_ListView" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding ListViewSelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding AllowMultipleSelection, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={data:BooleanToSelectionModeConverter}}" >
+                        <local:ListView x:Name="PART_ListView" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding ListViewSelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding AllowMultipleSelection, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={data:BooleanToSelectionModeConverter}}" >
                                 <local:ListView.Style>
                                     <Style TargetType="{x:Type ListView}" >
 
@@ -275,6 +274,10 @@
                                                             </MultiBinding>
                                                         </Setter.Value>
                                                     </Setter>
+
+                                                    <Setter Property="ContextMenu" Value="{Binding ItemContextMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" />
+
+                                                    <EventSetter Event="ContextMenuOpening" Handler="ListViewItem_ContextMenuOpening" />
                                                     <!--</DataTrigger>
                                                     </Style.Triggers>-->
                                                 </Style>
@@ -461,10 +464,6 @@
                                         </Style.Triggers>
                                     </Style>
                                 </local:ListView.Style>
-                                <local:ListView.ContextMenu>
-                                    <ContextMenu ItemsSource="{Binding PlacementTarget.Parent.Parent.TemplatedParent.ContextMenus, RelativeSource={RelativeSource Mode=Self}}" ItemContainerStyle="{StaticResource MenuItemStyle}">
-                                    </ContextMenu>
-                                </local:ListView.ContextMenu>
                                 <!--<ListView.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel></WrapPanel>
@@ -478,7 +477,6 @@
                             </local:ListView>
                             <!--<StaticResource ResourceKey="bidule" />-->
                             <!--SelectedItems="{Binding Mode=OneWay}"-->
-                        </Grid>
 
                         <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="5" ></GridSplitter>
 
@@ -497,6 +495,13 @@
                     </Grid>
 
                 </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="ItemContextMenu">
+            <Setter.Value>
+                <ContextMenu ItemContainerStyle="{StaticResource MenuItemStyle}">
+                </ContextMenu>
             </Setter.Value>
         </Setter>
     </Style>
