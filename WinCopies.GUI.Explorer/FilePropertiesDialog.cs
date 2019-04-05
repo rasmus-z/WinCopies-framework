@@ -242,6 +242,8 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 #if DEBUG
 
+                if(kinds!=null)
+
                 foreach (string kind in kinds)
 
                     Debug.WriteLine($"{System_Kind}: " + kind);

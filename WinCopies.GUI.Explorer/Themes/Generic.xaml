@@ -705,26 +705,26 @@
                                                         <Control x:Name="textboxPresenter" >
                                                             <Control.Template>
                                                                 <ControlTemplate>
-                                                                    <TextBox Text="{Binding Value.Value, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}" />
+                                                                    <TextBox Text="{Binding Value.ValueAsObject, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}" />
                                                                 </ControlTemplate>
                                                             </Control.Template>
                                                         </Control>
-                                                        <!--<TextBox x:Name="textbox" Text="{Binding Value.Value, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True" Style="{StaticResource ReadOnlyTextBoxStyle}" />-->
+                                                        <!--<TextBox x:Name="textbox" Text="{Binding Value.ValueAsObject, Mode=OneWay}" IsReadOnly="True" IsReadOnlyCaretVisible="True" Style="{StaticResource ReadOnlyTextBoxStyle}" />-->
                                                         <ControlTemplate.Triggers>
-                                                            <!--<DataTrigger Binding="{Binding Value.Property, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=IsReadOnly}" Value="true">
+                                                            <!--<DataTrigger Binding="{Binding Value, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=IsReadOnly}" Value="true">
                                                                 <Setter TargetName="textboxPresenter" Property="Template">
                                                                     <Setter.Value>
                                                                         <ControlTemplate>
-                                                                            <TextBox Text="{Binding Value.Value, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}" />
+                                                                            <TextBox Text="{Binding Value.ValueAsObject, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}" />
                                                                         </ControlTemplate>
                                                                     </Setter.Value>
                                                                 </Setter>
                                                             </DataTrigger>-->
-                                                            <DataTrigger Binding="{Binding Value.Property, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=IsReadOnly}" Value="false">
+                                                            <DataTrigger Binding="{Binding Value, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=IsReadOnly}" Value="false">
                                                                 <Setter TargetName="textboxPresenter" Property="Template">
                                                                     <Setter.Value>
                                                                         <ControlTemplate>
-                                                                            <controls:TextBox x:Name="textbox" Text="{Binding Value.Value}" PlaceholderMode="OnFocus" >
+                                                                            <controls:TextBox x:Name="textbox" Text="{Binding Value.ValueAsObject}" PlaceholderMode="OnFocus" >
                                                                                 <controls:TextBox.PlaceholderProperties>
                                                                                     <MultiBinding Converter="{controls:PlaceholderPropertiesConverter}" ConverterParameter="{x:Static controls:PlaceholderPropertiesConverterEnum.Text}" >
                                                                                         <Binding Path="Value.Description.EditInvitation" Mode="OneWay" />
@@ -733,7 +733,7 @@
                                                                             </controls:TextBox>
 
                                                                             <!--<ControlTemplate.Triggers>
-                                                                                <DataTrigger Binding="{Binding Value.Value}" Value="{x:Null}" >
+                                                                                <DataTrigger Binding="{Binding Value.ValueAsObject}" Value="{x:Null}" >
                                                                                     <Setter TargetName="textbox" Property="Text" Value="{Binding Value.Description.EditInvitation, Mode=OneWay}" />
                                                                                 </DataTrigger>
                                                                             </ControlTemplate.Triggers>-->
@@ -747,11 +747,11 @@
                                             </Setter>
 
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Value.Property, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=IsEnum}" Value="true" >
+                                                <DataTrigger Binding="{Binding Value, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=IsEnum}" Value="true" >
                                                     <Setter Property="Template">
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                                                <ComboBox ItemsSource="{Binding Value.Property, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=EnumValues}" SelectedItem="{Binding Value.Value}" >
+                                                                <ComboBox ItemsSource="{Binding Value, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=EnumValues}" SelectedItem="{Binding Value.ValueAsObject}" >
                                                                     <ComboBox.ItemContainerStyle>
                                                                         <Style TargetType="{x:Type ComboBoxItem}" >
                                                                             <Setter Property="Content" Value="{Binding DisplayText}" />
@@ -762,7 +762,7 @@
                                                         </Setter.Value>
                                                     </Setter>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding Value.Property, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=IsArray}" Value="true" >
+                                                <DataTrigger Binding="{Binding Value, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=IsArray}" Value="true" >
                                                     <Setter Property="Template">
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="{x:Type DataGridCell}" >
@@ -779,7 +779,7 @@
 
                             <DataGrid.ItemContainerStyle>
                                 <Style TargetType="{x:Type DataGridRow}">
-                                    <Setter Property="Visibility" Value="{Binding Value.Property, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=Visibility}" />
+                                    <Setter Property="Visibility" Value="{Binding Value, Converter={StaticResource ShellPropertyConverter}, ConverterParameter=Visibility}" />
                                 </Style>
                             </DataGrid.ItemContainerStyle>
                         </DataGrid>

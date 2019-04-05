@@ -28,3 +28,18 @@ C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinC
 C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.csproj.GenerateResource.cache
 C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.csproj.CoreCompileInputs.cache
 C:\Users\pierr\Documents\Visual Studio 2017\Projets\CS\WC Renewed\WinCopies\WinCopies framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.csproj.CopyComplete
+C:\Users\pierr\source\repository\WinCopies-framework\bin\x64\Debug\WinCopies.IO.FileProcesses.xml
+C:\Users\pierr\source\repository\WinCopies-framework\bin\x64\Debug\WinCopies.IO.FileProcesses.dll
+C:\Users\pierr\source\repository\WinCopies-framework\bin\x64\Debug\WinCopies.IO.FileProcesses.pdb
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.csprojAssemblyReference.cache
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\Generic.g.cs
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses_MarkupCompile.cache
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses_MarkupCompile.lref
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\Generic.baml
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.g.resources
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.Properties.Resources.resources
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.csproj.GenerateResource.cache
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.csproj.CoreCompileInputs.cache
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.csproj.CopyComplete
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.dll
+C:\Users\pierr\source\repository\WinCopies-framework\WinCopies.IO.FilesProcesses\obj\x64\Debug\WinCopies.IO.FileProcesses.pdb

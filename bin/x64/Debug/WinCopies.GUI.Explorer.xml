@@ -269,6 +269,16 @@
             Initializes a new instance of the <see cref="T:WinCopies.GUI.Explorer.ExplorerControl"/> class.
             </summary>
         </member>
+        <member name="M:WinCopies.GUI.Explorer.ExplorerControl.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Explorer.ExplorerControl"/> class using a custom path.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.Explorer.ExplorerControl.#ctor(WinCopies.GUI.Explorer.IBrowsableObjectInfo)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Explorer.ExplorerControl"/> class using a custom path.
+            </summary>
+        </member>
         <member name="M:WinCopies.GUI.Explorer.ExplorerControl.OnApplyTemplate">
             <summary>
             Is invoked whenever application code or internal processes call <see cref="M:System.Windows.FrameworkElement.ApplyTemplate" />.

@@ -10,7 +10,7 @@ namespace WinCopies.IO
     public class ShellPropertyContainer : IShellProperty, INotifyPropertyChanged
     {
 
-        private IShellProperty Property { get; set; } = null;
+        private IShellProperty Property { get; } = null;
 
         /// <summary>
         /// Gets the property key that identifies this property.
@@ -41,7 +41,9 @@ namespace WinCopies.IO
 
         public bool IsReadOnly => Property.Description.TypeFlags.HasFlag(PropertyTypeOptions.IsInnate);
 
-        private object value = null;
+        private object valueAsObject = null;
+
+        private object initialValue = null;
 
         /// <summary>
         /// Gets the value for this property using the generic Object type.
@@ -50,14 +52,25 @@ namespace WinCopies.IO
         public object ValueAsObject
         {
 
-            get => value; set
+            get => valueAsObject; set
 
             {
-                object previous_Value = value; this.value = value; PropertyChanged?.Invoke(this, new WinCopies. Util.PropertyChangedEventArgs(nameof(ValueAsObject), previous_Value, value)); 
 
-                HasChanged = (Property.ValueAsObject == null && value != null) || (Property.ValueAsObject != null && value == null) || (Property.ValueAsObject != null && !Property.ValueAsObject.Equals(value));
+                object previous_Value = ValueAsObject;
 
-                PropertyChanged?.Invoke(this, new WinCopies. Util.PropertyChangedEventArgs(nameof(HasChanged), !HasChanged, HasChanged)); 
+                if (previous_Value != value)
+
+                {
+
+                    this.valueAsObject = value;
+
+                    PropertyChanged?.Invoke(this, new WinCopies.Util.PropertyChangedEventArgs(nameof(ValueAsObject), previous_Value, value));
+
+                    HasChanged = !(value == initialValue);// = (Property.ValueAsObject == null && value != null) || (Property.ValueAsObject != null && value == null) || (Property.ValueAsObject != null && !Property.ValueAsObject.Equals(value));
+
+                    PropertyChanged?.Invoke(this, new WinCopies.Util.PropertyChangedEventArgs(nameof(HasChanged), !HasChanged, HasChanged));
+
+                }
 
             }
 
@@ -84,13 +97,15 @@ namespace WinCopies.IO
 
         //}
 
-        public ShellPropertyContainer(IShellProperty property) 
+        public ShellPropertyContainer(IShellProperty property)
 
         {
 
             Property = property;
 
-            value = property.ValueAsObject;
+            valueAsObject = property.ValueAsObject;
+
+            initialValue = property.ValueAsObject;
 
         }
 

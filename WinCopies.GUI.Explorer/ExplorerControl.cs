@@ -368,6 +368,71 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public event ValueChangedEventHandler VisibleItemsCountChanged;
 
+        static ExplorerControl() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ExplorerControl), new FrameworkPropertyMetadata(typeof(ExplorerControl)));
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExplorerControl"/> class.
+        /// </summary>
+        public ExplorerControl() => Init(null);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExplorerControl"/> class using a custom path.
+        /// </summary>
+        public ExplorerControl(string path) : this(new ShellObjectInfo(ShellObject.FromParsingName(path), path)) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExplorerControl"/> class using a custom path.
+        /// </summary>
+        public ExplorerControl(IBrowsableObjectInfo path) => Init(path);
+
+        private void Init(IBrowsableObjectInfo path)
+
+        {
+
+            SetValue(HistoryPropertyKey, new System.Collections.ObjectModel.ReadOnlyObservableCollection<IHistoryItemData>(history));
+
+            if (path == null)
+
+            {
+
+                string _path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+                path = new ShellObjectInfo(ShellObject.FromParsingName(_path), _path);
+
+            }
+
+            Open(path );    
+
+            history.CollectionChanged += History_CollectionChanged;
+
+            PathChanged += ExplorerControl_PathChanged;
+
+            TextChanged += ExplorerControl_TextChanged;
+
+            // InputBindings.Add(new MouseBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
+
+            CommandBindings.Add(new CommandBinding(Commands.Open, Open_Executed, Open_CanExecute));
+
+            #region Comments
+
+            //CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, Copy_Executed, Command_CanExecute));
+
+            //CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, Cut_Executed, Command_CanExecute));
+
+            //CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, Paste_Executed, Command_CanExecute));
+
+            //CommandBindings.Add(new CommandBinding(Commands.CreateShortcut, CreateShortcut_Executed, CanWrite_CanExecute));
+
+            //CommandBindings.Add(new CommandBinding(Commands.Rename, Rename_Executed, CanWrite_CanExecute));
+
+            //CommandBindings.Add(new CommandBinding(Commands.Delete, Delete_Executed, CanWrite_CanExecute));
+
+            //CommandBindings.Add(new CommandBinding(Commands.Properties, Properties_Executed, Command_CanExecute));
+
+            #endregion
+
+        }
+
         internal void RaiseTextChangedEvent(TextChangedEventArgs e) => TextChanged?.Invoke(this, e);
 
         internal void RaiseSelectionChangedEvent(SelectionChangedEventArgs e) => SelectionChanged?.Invoke(this, e);
@@ -437,47 +502,6 @@ namespace WinCopies.GUI.Explorer
         {
 
             // todo: checking if a display path is available, and so showing the list of the available sub-paths
-
-        }
-
-        static ExplorerControl() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ExplorerControl), new FrameworkPropertyMetadata(typeof(ExplorerControl)));
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExplorerControl"/> class.
-        /// </summary>
-        public ExplorerControl()
-
-        {
-
-            SetValue(HistoryPropertyKey, new System.Collections.ObjectModel.ReadOnlyObservableCollection<IHistoryItemData>(history));
-
-            history.CollectionChanged += History_CollectionChanged;
-
-            PathChanged += ExplorerControl_PathChanged;
-
-            TextChanged += ExplorerControl_TextChanged;
-
-            // InputBindings.Add(new MouseBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
-
-            CommandBindings.Add(new CommandBinding(Commands.Open, Open_Executed, Open_CanExecute));
-
-            #region Comments
-
-            //CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, Copy_Executed, Command_CanExecute));
-
-            //CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, Cut_Executed, Command_CanExecute));
-
-            //CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, Paste_Executed, Command_CanExecute));
-
-            //CommandBindings.Add(new CommandBinding(Commands.CreateShortcut, CreateShortcut_Executed, CanWrite_CanExecute));
-
-            //CommandBindings.Add(new CommandBinding(Commands.Rename, Rename_Executed, CanWrite_CanExecute));
-
-            //CommandBindings.Add(new CommandBinding(Commands.Delete, Delete_Executed, CanWrite_CanExecute));
-
-            //CommandBindings.Add(new CommandBinding(Commands.Properties, Properties_Executed, Command_CanExecute));
-
-            #endregion
 
         }
 
