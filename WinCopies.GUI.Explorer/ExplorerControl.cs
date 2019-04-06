@@ -277,7 +277,13 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="ViewStyle"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ViewStyleProperty = DependencyProperty.Register(nameof(ViewStyle), typeof(ViewStyles), typeof(ExplorerControl), new PropertyMetadata(ViewStyles.Tiles));
+        public static readonly DependencyProperty ViewStyleProperty = DependencyProperty.Register(nameof(ViewStyle), typeof(ViewStyles), typeof(ExplorerControl), new PropertyMetadata(ViewStyles.Tiles, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+
+        {
+
+            ((ExplorerControl)d).IsAutomaticItemContainerGeneratorStatusChange = true;
+
+        }));
 
         /// <summary>
         /// Gets or sets the view style of the ListView.
@@ -453,6 +459,8 @@ namespace WinCopies.GUI.Explorer
             #endregion
 
         }
+
+        private bool IsAutomaticItemContainerGeneratorStatusChange = false;
 
         internal void RaiseTextChangedEvent(TextChangedEventArgs e) => TextChanged?.Invoke(this, e);
 
@@ -697,17 +705,19 @@ namespace WinCopies.GUI.Explorer
 
                 {
 
+                    if (IsAutomaticItemContainerGeneratorStatusChange) return;
+
                     IBrowsableObjectInfoInternal _path = (IBrowsableObjectInfoInternal)Path;
 
                     if (e.Action == NotifyCollectionChangedAction.Add)
 
-                        foreach (var item in e.NewItems.OfType<IBrowsableObjectInfo>())
+                        foreach (IBrowsableObjectInfo item in e.NewItems.OfType<IBrowsableObjectInfo>())
 
                             _path.SelectedItems.Add(item);
 
                     else if (e.Action == NotifyCollectionChangedAction.Remove)
 
-                        foreach (var item in e.OldItems.OfType<IBrowsableObjectInfo>())
+                        foreach (IBrowsableObjectInfo item in e.OldItems.OfType<IBrowsableObjectInfo>())
 
                             _path.SelectedItems.Remove(item);
 
@@ -725,8 +735,7 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        private void Items_CollectionChanging(object sender, Util.NotifyCollectionChangedEventArgs e)
-
+        protected virtual void OnItemsCollectionChanging(Util.NotifyCollectionChangedEventArgs e)
         {
 
             if (ListView != null && ListView.ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
@@ -763,6 +772,8 @@ namespace WinCopies.GUI.Explorer
 
         }
 
+        private void Items_CollectionChanging(object sender, Util.NotifyCollectionChangedEventArgs e) => OnItemsCollectionChanging(e);
+
         private List<ListViewItem> listViewItems = new List<ListViewItem>();
 
         private void UpdateVisibleItemsCount()
@@ -772,6 +783,16 @@ namespace WinCopies.GUI.Explorer
             if (ListView.ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
 
             {
+
+                if (IsAutomaticItemContainerGeneratorStatusChange)
+
+                {
+
+                    IsAutomaticItemContainerGeneratorStatusChange = false;
+
+                    return;
+
+                }
 
                 // int count = 0;
 
@@ -827,7 +848,9 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e) => UpdateVisibleItemsCount();
+        protected virtual void OnItemContainerGeneratorStatusChanged(EventArgs e) => UpdateVisibleItemsCount();
+
+        private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e) => OnItemContainerGeneratorStatusChanged(e);
 
         internal void OnListViewMouseDoubleClickInternal(MouseButtonEventArgs e) => OnListViewMouseDoubleClick(e);
 
@@ -881,6 +904,8 @@ namespace WinCopies.GUI.Explorer
                 else if (path.FileType == FileTypes.File)
 
                     if (!(path is IO.ShellObjectInfo) || !(((IO.ShellObjectInfo)path).ShellObject is ShellFile))
+
+                        // todo:
 
                         throw new ArgumentException("path isn't a ShellObjectInfo or its ShellObject property value isn't a ShellFile.");
 
