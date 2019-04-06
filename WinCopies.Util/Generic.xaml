@@ -23,4 +23,5 @@
     <sys:String x:Key="NoValidEnumValue" >'{0}' must be one of the {1} enum values.</sys:String>
     <sys:String x:Key="StringParameterEmptyOrWhiteSpaces" >'{0}' is empty or white spaces.</sys:String>
     <sys:String x:Key="BackgroundWorkerIsBusy" >The BackgroundWorker is busy.</sys:String>
+    <sys:String x:Key="InvalidEnumValue" >The enum value is not in the enum values range. The enum value is {0}.</sys:String>
 </ResourceDictionary>

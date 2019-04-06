@@ -196,11 +196,9 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 
 
-                ShellPropertyCollection a = new ShellPropertyCollection(new_Value.ShellObject);
-
                 string[] kinds = null;
 
-                foreach (var prop in a)
+                foreach (IShellProperty prop in new ShellPropertyCollection(new_Value.ShellObject))    
 
                 {
 
@@ -252,43 +250,33 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                 PropertyInfo[] properties = typeof(ShellProperties.PropertySystem).GetProperties();
 
-                PropertyInfo[] _properties = null;
-
                 void addProperties(string propertyKind, Type propertyType, PropertyStoreItems propertyStoreItems)
 
                 {
 
-                    _properties = propertyType.GetProperties();
+                    foreach (PropertyInfo _property in propertyType.GetProperties())    
 
-                    foreach (PropertyInfo _property in _properties)
+                        specificValues.Add(new Util.NamedObject<ShellPropertyContainer>(propertyKind, new ShellPropertyContainer((IShellProperty)_property.GetValue(propertyStoreItems))));
 
-                    {
+                    #region Comments
 
-                        IShellProperty shellProperty = (IShellProperty)_property.GetValue(propertyStoreItems);
+                    // if (shellProperty.Description.DisplayName == "Mode flash")
 
-                        specificValues.Add(new Util.NamedObject<ShellPropertyContainer>(propertyKind, new ShellPropertyContainer(shellProperty)));
+                    // {
 
-                        #region Comments
+                    // MessageBox.Show(shellProperty.ValueType.ToString());
 
-                        // if (shellProperty.Description.DisplayName == "Mode flash")
+                    //foreach (ShellPropertyEnumType propertyEnumType in shellProperty.Description.PropertyEnumTypes)
 
-                        // {
+                    //    MessageBox.Show(propertyEnumType.DisplayText + " " + propertyEnumType.EnumType.ToString() + " " + propertyEnumType.ToString());
 
-                        // MessageBox.Show(shellProperty.ValueType.ToString());
+                    // MessageBox.Show(shellProperty.Description.PropertyEnumTypes[0].DisplayText + " " + shellProperty.Description.PropertyEnumTypes[0].EnumType.ToString() + " " + shellProperty.Description.PropertyEnumTypes[0].ToString());
 
-                        //foreach (ShellPropertyEnumType propertyEnumType in shellProperty.Description.PropertyEnumTypes)
+                    // MessageBox.Show(shellProperty.Description.GroupingRange.ToString());
 
-                        //    MessageBox.Show(propertyEnumType.DisplayText + " " + propertyEnumType.EnumType.ToString() + " " + propertyEnumType.ToString());
+                    // }
 
-                        // MessageBox.Show(shellProperty.Description.PropertyEnumTypes[0].DisplayText + " " + shellProperty.Description.PropertyEnumTypes[0].EnumType.ToString() + " " + shellProperty.Description.PropertyEnumTypes[0].ToString());
-
-                        // MessageBox.Show(shellProperty.Description.GroupingRange.ToString());
-
-                        // }
-
-                        #endregion
-
-                    }
+                    #endregion
 
                 }
 
@@ -367,6 +355,8 @@ namespace WinCopies.GUI.Windows.Dialogs
             }
 
             else
+
+                // todo:
 
                 throw new ArgumentException("The data context must be a ShellObjectInfo.");
 

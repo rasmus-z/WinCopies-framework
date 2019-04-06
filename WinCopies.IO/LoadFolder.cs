@@ -270,13 +270,7 @@ namespace WinCopies.IO
 
                     if (FileTypes.HasFlag(FileTypesFlags.All) || (FileTypes.HasFlag(FileTypesFlags.Folder) && System.IO.Path.GetPathRoot(pathInfo.Path) != pathInfo.Path) || (FileTypes.HasFlag(FileTypesFlags.Drive) && System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path))
 
-                        if (System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path)
-
-                            pathInfo.FileType = IO.FileTypes.Drive;
-
-                        else
-
-                            pathInfo.FileType = IO.FileTypes.Folder;
+                        pathInfo.FileType = System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path ? IO.FileTypes.Drive : IO.FileTypes.Folder;
 
                 }
 
@@ -314,11 +308,11 @@ namespace WinCopies.IO
 
                 }
 
-                    if (pathInfo.FileType != IO.FileTypes.None)
+                if (pathInfo.FileType != IO.FileTypes.None)
 
-                        // We only make a normalized path if we add the path to the paths to load.
+                    // We only make a normalized path if we add the path to the paths to load.
 
-                        AddPath(ref pathInfo);
+                    AddPath(ref pathInfo);
 
             }
 
@@ -347,9 +341,7 @@ namespace WinCopies.IO
 
                         foreach (string filter in Filter)
 
-                            if (!IO.Path.MatchToFilter(directory, filter))
-
-                                return false;
+                            if (!IO.Path.MatchToFilter(directory, filter)) return false;
 
                         return true;
 
@@ -371,13 +363,7 @@ namespace WinCopies.IO
 
                         if (checkFilter(file))
 
-                        {
-
-                            shellObject = ShellObject.FromParsingName(file);
-
-                            AddFile(new PathInfo() { Path = file, ShellObject = shellObject }, shellObject.IsLink);
-
-                        }
+                            AddFile(new PathInfo() { Path = file, ShellObject = shellObject = ShellObject.FromParsingName(file) }, shellObject.IsLink);
 
                 }
 
@@ -411,15 +397,15 @@ namespace WinCopies.IO
 
                         else if (so.GetType() == typeof(ShellLink))
 
-                           AddFile(new PathInfo() { Path = ((ShellLink)so).Path, ShellObject = so }, true);
+                            AddFile(new PathInfo() { Path = ((ShellLink)so).Path, ShellObject = so }, true);
 
                         // if (so is FileSystemKnownFolder || so is NonFileSystemKnownFolder || so is ShellNonFileSystemFolder || so is ShellLibrary)
 
-                            // if (File.Exists(_path))
+                        // if (File.Exists(_path))
 
-                            // AddFile(pathInfo, so.IsLink);
+                        // AddFile(pathInfo, so.IsLink);
 
-                            else
+                        else
 
                             AddDirectory(new PathInfo() { Path = so.ParsingName, ShellObject = so });
 

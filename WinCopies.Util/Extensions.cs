@@ -411,6 +411,11 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Determines whether the current enum value is within the enum values range.
+        /// </summary>
+        /// <param name="enum">The enum value to check.</param>
+        /// <returns><see langword="true"/> if the given value is in the enum values range, otherwise <see langword="false"/>.</returns>
         public static bool IsValidEnumValue(this Enum @enum)
 
         {
@@ -422,6 +427,14 @@ namespace WinCopies.Util
             // object _value = Convert.ChangeType(value, value.GetType().GetEnumUnderlyingType());
 
             return @enum.CompareTo(values[0]) >= 0 && @enum.CompareTo(values[values.Count - 1]) <= 0;
+
+        }
+
+        public static void ThrowIfNotValidEnumValue(this Enum @enum)
+
+        {
+
+            if (!@enum.IsValidEnumValue()) throw new ArgumentException(string.Format(InvalidEnumValue, @enum.ToString()));
 
         }
 

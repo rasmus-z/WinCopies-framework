@@ -275,7 +275,7 @@
         </member>
         <member name="T:WinCopies.Util.DataConverters.ConverterBase">
             <summary>
-            Provides a base-class for any data <see cref="T:System.Windows.Data.Binding"/> converter and can be directly use in an XAML view. This class can be used as a singleton class.
+            Provides a base-class for any data <see cref="T:System.Windows.Data.Binding"/> converter.
             </summary>
         </member>
         <member name="M:WinCopies.Util.DataConverters.ConverterBase.Convert(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
@@ -298,6 +298,13 @@
             <param name="culture">The culture to use in the converter.</param>
             <returns>A converted value. If the method returns <see langword="null"/>, the valid null value is used.</returns>
         </member>
+        <member name="M:WinCopies.Util.DataConverters.ConverterBase.ProvideValue(System.IServiceProvider)">
+            <summary>
+            Returns an object that is provided as the value of the target property for this markup extension.
+            </summary>
+            <param name="serviceProvider">A service provider helper that can provide services for the markup extension.</param>
+            <returns>The object value to set on the property where the extension is applied.</returns>
+        </member>
         <member name="T:WinCopies.Util.DataConverters.EnumToBooleanConverter">
             <summary>
             Data converter for checking wheter an enum equals a parameter.
@@ -316,7 +323,7 @@
         </member>
         <member name="T:WinCopies.Util.DataConverters.MultiConverterBase">
             <summary>
-            Provides a base-class for any data-<see cref="T:System.Windows.Data.MultiBinding"/> converter and can be directly use in an XAML view. This class can be used as a singleton class.
+            Provides a base-class for any data-<see cref="T:System.Windows.Data.MultiBinding"/> converter.
             </summary>
         </member>
         <member name="M:WinCopies.Util.DataConverters.MultiConverterBase.Convert(System.Object[],System.Type,System.Object,System.Globalization.CultureInfo)">
@@ -338,6 +345,13 @@
             <param name="parameter">The converter parameter to use.</param>
             <param name="culture">The culture to use in the converter.</param>
             <returns>An array of values that have been converted from the target value back to the source values.</returns>
+        </member>
+        <member name="M:WinCopies.Util.DataConverters.MultiConverterBase.ProvideValue(System.IServiceProvider)">
+            <summary>
+            Returns an object that is provided as the value of the target property for this markup extension.
+            </summary>
+            <param name="serviceProvider">A service provider helper that can provide services for the markup extension.</param>
+            <returns>The object value to set on the property where the extension is applied.</returns>
         </member>
         <member name="T:WinCopies.Util.Extensions">
             <summary>
@@ -374,6 +388,13 @@
             <typeparam name="T">The type of the values in the <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/>.</typeparam>
             <param name="oc">The <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/> to sort.</param>
             <param name="comparer">An <see cref="T:System.Collections.Generic.IComparer`1"/> providing comparison for sorting the <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/>.</param>
+        </member>
+        <member name="M:WinCopies.Util.Extensions.IsValidEnumValue(System.Enum)">
+            <summary>
+            Determines whether the current enum value is within the enum values range.
+            </summary>
+            <param name="enum">The enum value to check.</param>
+            <returns><see langword="true"/> if the given value is in the enum values range, otherwise <see langword="false"/>.</returns>
         </member>
         <member name="M:WinCopies.Util.Extensions.RemoveRange(System.Collections.IList,System.Int32,System.Int32)">
             <summary>
@@ -485,6 +506,16 @@
         <member name="P:WinCopies.Util.Generic.StringParameterEmptyOrWhiteSpaces">
             <summary>
             Gets the StringParameterEmptyOrWhiteSpaces resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.Util.Generic.BackgroundWorkerIsBusy">
+            <summary>
+            Gets the BackgroundWorkerIsBusy resource.
+            </summary>
+        </member>
+        <member name="P:WinCopies.Util.Generic.InvalidEnumValue">
+            <summary>
+            Gets the InvalidEnumValue resource.
             </summary>
         </member>
         <member name="M:WinCopies.Util.Generic.InitializeComponent">

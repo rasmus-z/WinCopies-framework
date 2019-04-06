@@ -30,9 +30,9 @@ namespace WinCopies.GUI.Explorer
 
         private TextBox PART_TextBox = null;
 
-        private BackgroundWorker FileOpeningBgWorker = null;
+        private BackgroundWorker fileOpeningBgWorker = null;
 
-        private List<ShellFile> PathsToOpen = null;
+        private List<ShellFile> pathsToOpen = null;
 
         private readonly FileSystemWatcher fsw = new FileSystemWatcher();
 
@@ -358,6 +358,9 @@ namespace WinCopies.GUI.Explorer
 
         public ContextMenu ItemContextMenu { get => (ContextMenu)GetValue(ItemContextMenuProperty); set => SetValue(ItemContextMenuProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="Filter"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty FilterProperty = DependencyProperty.Register(nameof(Filter), typeof(IEnumerable<string>), typeof(ExplorerControl));
 
         public IEnumerable<string> Filter { get => (IEnumerable<string>)GetValue(FilterProperty); set => SetValue(FilterProperty, value); }
@@ -409,6 +412,12 @@ namespace WinCopies.GUI.Explorer
 
             SetValue(HistoryPropertyKey, new System.Collections.ObjectModel.ReadOnlyObservableCollection<IHistoryItemData>(history));
 
+            history.CollectionChanged += History_CollectionChanged;
+
+            PathChanged += ExplorerControl_PathChanged;
+
+            TextChanged += ExplorerControl_TextChanged;
+
             if (path == null)
 
             {
@@ -420,12 +429,6 @@ namespace WinCopies.GUI.Explorer
             }
 
             Open(path);
-
-            history.CollectionChanged += History_CollectionChanged;
-
-            PathChanged += ExplorerControl_PathChanged;
-
-            TextChanged += ExplorerControl_TextChanged;
 
             // InputBindings.Add(new MouseBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
 
@@ -730,7 +733,7 @@ namespace WinCopies.GUI.Explorer
 
             {
 
-                ListViewItem item = null;
+                ListViewItem item;
 
                 if (e.OldItems != null)
 
@@ -744,9 +747,9 @@ namespace WinCopies.GUI.Explorer
 
                         {
 
-                            SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - 1);
-
                             listViewItems.Remove(item);
+
+                            SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - 1);
 
                         }
 
@@ -772,7 +775,7 @@ namespace WinCopies.GUI.Explorer
 
                 // int count = 0;
 
-                ListViewItem value = null;
+                ListViewItem value;
 
                 foreach (object item in ListView.ItemContainerGenerator.Items)
 
@@ -842,9 +845,9 @@ namespace WinCopies.GUI.Explorer
 
         {
 
-            PathsToOpen = null;
+            pathsToOpen = null;
 
-            FileOpeningBgWorker = null;
+            fileOpeningBgWorker = null;
 
             Window.GetWindow(this).Cursor = Cursors.Arrow;
 
@@ -853,9 +856,9 @@ namespace WinCopies.GUI.Explorer
         private void FileOpeningBgWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
 
-            for (int i = 0; i <= PathsToOpen.Count - 1; i++)
+            foreach (ShellFile item in pathsToOpen)
 
-                Process.Start(PathsToOpen[i].Path);
+                Process.Start(item.Path);
 
         }
 
@@ -939,6 +942,8 @@ namespace WinCopies.GUI.Explorer
 
                     if (!(path is IO.ShellObjectInfo) || !((IO.ShellObjectInfo)path).ShellObject.IsLink)
 
+                        // todo:
+
                         throw new ArgumentException("path isn't a ShellObjectInfo or path isn't a link.");
 
                     else
@@ -948,6 +953,8 @@ namespace WinCopies.GUI.Explorer
                         ShellLink shellLink = (ShellLink)ShellObject.FromParsingName(((IO.ShellObjectInfo)path).ShellObject.ParsingName);
 
                         if (shellLink.TargetShellObject.IsLink)
+
+                            // todo:
 
                             throw new InvalidOperationException("Shell link target shell object is also a link.");
 
@@ -963,35 +970,50 @@ namespace WinCopies.GUI.Explorer
 
         {
 
-            bool areFoldersSelected = false;
+            //bool areFoldersSelected = false;
 
-            bool areFilesSelected = false;
+            //bool areFilesSelected = false;
 
-            bool areOtherObjectsSelected = false;
+            //bool areOtherObjectsSelected = false;
 
-            foreach (var item in ListViewSelectedItems.ListBox.SelectedItems)
+            //foreach (var item in ListViewSelectedItems.ListBox.SelectedItems)
 
-                if (item is IBrowsableObjectInfo)
+            //    if (item is IBrowsableObjectInfo)
 
-                    if (((IBrowsableObjectInfo)item).FileType == FileTypes.Folder || ((IBrowsableObjectInfo)item).FileType == FileTypes.Drive || ((IBrowsableObjectInfo)item).FileType == FileTypes.SpecialFolder || ((IBrowsableObjectInfo)item).FileType == FileTypes.Archive)
+            //        if (((IBrowsableObjectInfo)item).FileType == FileTypes.Folder || ((IBrowsableObjectInfo)item).FileType == FileTypes.Drive || ((IBrowsableObjectInfo)item).FileType == FileTypes.SpecialFolder || ((IBrowsableObjectInfo)item).FileType == FileTypes.Archive)
 
-                        areFoldersSelected = true;
+            //        {
 
-                    else if (((IBrowsableObjectInfo)item).FileType == FileTypes.File)
+            //            areFoldersSelected = true;
 
-                        areFilesSelected = true;
+            //            break;
+            //        }
 
-                    else
+            //        else if (((IBrowsableObjectInfo)item).FileType == FileTypes.File)
 
-                        areOtherObjectsSelected = true;
+            //        {
 
-            if (!(areFoldersSelected != areFilesSelected != areOtherObjectsSelected))
+            //            areFilesSelected = true;
 
-                return;
+            //            break;
 
-            for (int i = 0; i <= ListViewSelectedItems.ListBox.SelectedItems.Count - 1; i++)
+            //        }
 
-                Open((IBrowsableObjectInfo)ListViewSelectedItems.ListBox.SelectedItems[i]);
+            //        else
+
+            //        {
+
+            //            areOtherObjectsSelected = true;
+
+            //            break;
+
+            //        }
+
+            //if (areFoldersSelected || areFilesSelected || areOtherObjectsSelected)
+
+            foreach (object item in ListViewSelectedItems.ListBox.SelectedItems)
+
+                Open((IBrowsableObjectInfo)item);
 
         }
 
@@ -1003,13 +1025,11 @@ namespace WinCopies.GUI.Explorer
 
             // SetValue(PathPropertyKey, path);
 
-            if (Path != null)
+            if (Path != null && Path.ItemsLoader.IsBusy)
 
-                if (Path.ItemsLoader.IsBusy)
+                // if (Path.ItemsLoader.WorkerSupportsCancellation)
 
-                    // if (Path.ItemsLoader.WorkerSupportsCancellation)
-
-                    Path.ItemsLoader.Cancel();
+                Path.ItemsLoader.Cancel();
 
             // else
 
@@ -1042,13 +1062,7 @@ namespace WinCopies.GUI.Explorer
 
             if (addPathToHistory)
 
-                if (ListView == null)
-
-                    history.Insert(0, new HistoryItemData(Header, path, new ScrollViewerOffset(0, 0), null));
-
-                else
-
-                    history.Insert(0, new HistoryItemData(Header, path, new ScrollViewerOffset(ListView.ScrollHost.HorizontalOffset, ListView.ScrollHost.VerticalOffset), null));
+                history.Insert(0, new HistoryItemData(Header, path, ListView == null ? new ScrollViewerOffset(0, 0) : new ScrollViewerOffset(ListView.ScrollHost.HorizontalOffset, ListView.ScrollHost.VerticalOffset), null));
 
             else
 
@@ -1056,11 +1070,7 @@ namespace WinCopies.GUI.Explorer
 
                 bool currentPathIsInHistory = false;
 
-                for (int i = 0; i < history.Count; i++)
-
-                {
-
-                    var historyItem = history[i];
+                foreach (IHistoryItemData historyItem in history)
 
                     if (historyItem is HistoryItemData && path.Path == ((HistoryItemData)historyItem).Path.Path)
 
@@ -1071,8 +1081,6 @@ namespace WinCopies.GUI.Explorer
                         currentPathIsInHistory = true;
 
                     }
-
-                }
 
                 if (!currentPathIsInHistory)
 
@@ -1100,27 +1108,27 @@ namespace WinCopies.GUI.Explorer
 
         {
 
-            if (FileOpeningBgWorker == null)
+            if (fileOpeningBgWorker == null)
 
             {
 
-                FileOpeningBgWorker = new BackgroundWorker();
+                fileOpeningBgWorker = new BackgroundWorker();
 
-                FileOpeningBgWorker.DoWork += FileOpeningBgWorker_DoWork;
+                fileOpeningBgWorker.DoWork += FileOpeningBgWorker_DoWork;
 
-                FileOpeningBgWorker.RunWorkerCompleted += FileOpeningBgWorker_RunWorkerCompleted;
+                fileOpeningBgWorker.RunWorkerCompleted += FileOpeningBgWorker_RunWorkerCompleted;
 
             }
 
-            if (PathsToOpen == null)
+            if (pathsToOpen == null)
 
-                PathsToOpen = new List<ShellFile>();
+                pathsToOpen = new List<ShellFile>();
 
-            PathsToOpen.Add(path);
+            pathsToOpen.Add(path);
 
-            if (!FileOpeningBgWorker.IsBusy)
+            if (!fileOpeningBgWorker.IsBusy)
 
-                FileOpeningBgWorker.RunWorkerAsync();
+                fileOpeningBgWorker.RunWorkerAsync();
 
             Window.GetWindow(this).Cursor = Cursors.Wait;
 
@@ -1134,7 +1142,7 @@ namespace WinCopies.GUI.Explorer
 
         private void Open_Executed(object sender, ExecutedRoutedEventArgs e) => OnOpening();
 
-        private StringCollection GetFileDropList(ActionsFromObjects copyFrom)
+        public StringCollection GetFileDropList(ActionsFromObjects copyFrom)
 
         {
 
@@ -1162,7 +1170,21 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        public void Copy(ActionsFromObjects copyFrom) => Clipboard.SetFileDropList(GetFileDropList(copyFrom));
+        /// <summary>
+        /// Set the selected items of the TreeView or the ListView in the system clipboard.
+        /// </summary>
+        /// <param name="copyFrom">Whether to look for selected items in the TreeView or the ListView.</param>
+        public void Copy(ActionsFromObjects copyFrom)
+
+        {
+
+            StringCollection sc = GetFileDropList(copyFrom);
+
+            if (sc != null)
+
+                Clipboard.SetFileDropList(sc);
+
+        }
 
         //public void Copy()
         //{
@@ -1180,10 +1202,9 @@ namespace WinCopies.GUI.Explorer
         public void Cut(ActionsFromObjects cutFrom)
         {
 
-            var sc = GetFileDropList(cutFrom);
+            StringCollection sc = GetFileDropList(cutFrom);
 
             byte moveEffect = (byte)DragDropEffects.Move; // new byte[] { 2, 0, 0, 0 };
-
 
             MemoryStream dropEffect = new MemoryStream();
             dropEffect.WriteByte(moveEffect);
@@ -1192,7 +1213,7 @@ namespace WinCopies.GUI.Explorer
             data.SetFileDropList(sc);
             data.SetData("Preferred DropEffect", dropEffect);
 
-            Clipboard.Clear();
+            // Clipboard.Clear();
             Clipboard.SetDataObject(data, true);
 
         }
@@ -1219,8 +1240,6 @@ namespace WinCopies.GUI.Explorer
             Debug.WriteLine("Is a file moving: " + isAFileMoving.ToString());
 #endif
 
-            Process process = new Process();
-
             string args = null;
 
             args += isAFileMoving ? "\"FileMoving\" " : "\"Copy\" ";
@@ -1235,15 +1254,15 @@ namespace WinCopies.GUI.Explorer
             Debug.WriteLine(args);
 #endif
 
-            process.StartInfo = new ProcessStartInfo(Generic.WinCopiesProcessesManagerPath, args);
-
-            process.Start();
+            Process.Start(new ProcessStartInfo(Generic.WinCopiesProcessesManagerPath, args));
 
         }
 
         public void Paste(ActionsFromObjects pasteTo)
 
         {
+
+            pasteTo.ThrowIfNotValidEnumValue();
 
             // if (!PART_TreeView.IsFocused && !PART_ListView.IsFocused) return;
 
@@ -1259,21 +1278,15 @@ namespace WinCopies.GUI.Explorer
 
                 path = Path.Path;
 
-            StringCollection sc = Clipboard.GetFileDropList();
-
             bool isAFileMoving = false;
 
             if (Clipboard.ContainsData("Preferred DropEffect"))
 
-            {
+                using (MemoryStream dropEffect = (MemoryStream)Clipboard.GetData("Preferred DropEffect"))
 
-                var dropEffect = (MemoryStream)Clipboard.GetData("Preferred DropEffect");
+                    isAFileMoving = (DragDropEffects)dropEffect.ReadByte() == DragDropEffects.Move;
 
-                var moveEffect = (DragDropEffects)dropEffect.ReadByte();
-
-                isAFileMoving = moveEffect == DragDropEffects.Move;
-
-            }
+            OnPaste(isAFileMoving, Clipboard.GetFileDropList(), path);
 
         }
 

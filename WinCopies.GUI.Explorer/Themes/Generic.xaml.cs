@@ -284,7 +284,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
             ListView listView = (ListView)((FrameworkElement)sender).GetParent(typeof(ListView), false);
 
-            ((ExplorerControl)listView.GetParent(typeof(ExplorerControl), false)).OnItemsControlContextMenuOpening( (FrameworkElement) sender, listView, e);    
+            ((ExplorerControl)listView.GetParent(typeof(ExplorerControl), false)).OnItemsControlContextMenuOpening((FrameworkElement)sender, listView, e);
 
         }
     }

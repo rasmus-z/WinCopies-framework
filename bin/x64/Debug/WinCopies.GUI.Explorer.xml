@@ -269,6 +269,11 @@
             Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.ItemContextMenu"/> dependency property.
             </summary>
         </member>
+        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.FilterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.Filter"/> dependency property.
+            </summary>
+        </member>
         <member name="E:WinCopies.GUI.Explorer.ExplorerControl.PathChanged">
             <summary>
             Occurs when the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.Path"/> property has changed.
@@ -320,6 +325,12 @@
             Opens a <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellFile"/> asynchronously.
             </summary>
             <param name="path">The <see cref="T:Microsoft.WindowsAPICodePack.Shell.ShellFile"/> to open.</param>
+        </member>
+        <member name="M:WinCopies.GUI.Explorer.ExplorerControl.Copy(WinCopies.GUI.Explorer.ActionsFromObjects)">
+            <summary>
+            Set the selected items of the TreeView or the ListView in the system clipboard.
+            </summary>
+            <param name="copyFrom">Whether to look for selected items in the TreeView or the ListView.</param>
         </member>
         <member name="F:WinCopies.GUI.Explorer.FilePropertyGrid.FilePropertiesProperty">
             <summary>

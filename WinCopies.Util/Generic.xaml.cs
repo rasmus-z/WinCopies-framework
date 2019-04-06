@@ -97,7 +97,15 @@ namespace WinCopies.Util
         /// </summary>
         public static string StringParameterEmptyOrWhiteSpaces => GetResource<string>(nameof(StringParameterEmptyOrWhiteSpaces));
 
+        /// <summary>
+        /// Gets the BackgroundWorkerIsBusy resource.
+        /// </summary>
         public static string BackgroundWorkerIsBusy => GetResource<string>(nameof(BackgroundWorkerIsBusy));
+
+        /// <summary>
+        /// Gets the InvalidEnumValue resource.
+        /// </summary>
+        public static string InvalidEnumValue => GetResource<string>(nameof(InvalidEnumValue));
 
         #endregion
 
