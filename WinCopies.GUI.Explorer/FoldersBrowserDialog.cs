@@ -120,7 +120,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             Mode = mode;
 
-            ExplorerControl.AllowMultipleSelection = allowMultipleSelection;
+            ExplorerControl.SelectionMode = allowMultipleSelection;
 
             Title = title;
 

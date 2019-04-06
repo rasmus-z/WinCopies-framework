@@ -117,7 +117,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionsFromObjects.cs" />
-    <Compile Include="Data\BooleanToSelectionModeConverter.cs" />
     <Compile Include="Data\FileNameConverter.cs" />
     <Compile Include="Data\FileSystemInfoAttributesToOpacityConverter.cs" />
     <Compile Include="Data\FileSystemInfoAttributesToVisibilityConverter.cs" />

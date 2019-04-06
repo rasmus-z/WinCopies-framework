@@ -119,12 +119,12 @@
             Gets the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.Path"/> header of this <see cref="T:WinCopies.GUI.Explorer.ExplorerControl"/>. This is a dependency property.
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.AllowMultipleSelectionProperty">
+        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.SelectionModeProperty">
             <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.AllowMultipleSelection"/> dependency property.
+            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.SelectionMode"/> dependency property.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Explorer.ExplorerControl.AllowMultipleSelection">
+        <member name="P:WinCopies.GUI.Explorer.ExplorerControl.SelectionMode">
             <summary>
             Gets or sets whether activate multiple selection. This is dependency property.
             </summary>

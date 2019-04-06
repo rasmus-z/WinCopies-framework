@@ -160,14 +160,14 @@ namespace WinCopies.GUI.Explorer
         public string Header => (string)GetValue(HeaderProperty);
 
         /// <summary>
-        /// Identifies the <see cref="AllowMultipleSelection"/> dependency property.
+        /// Identifies the <see cref="SelectionMode"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty AllowMultipleSelectionProperty = DependencyProperty.Register(nameof(AllowMultipleSelection), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(true));
+        public static readonly DependencyProperty SelectionModeProperty = DependencyProperty.Register(nameof(SelectionMode), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(true));
 
         /// <summary>
         /// Gets or sets whether activate multiple selection. This is dependency property.
         /// </summary>
-        public bool AllowMultipleSelection { get => (bool)GetValue(AllowMultipleSelectionProperty); set => SetValue(AllowMultipleSelectionProperty, value); }
+        public bool SelectionMode { get => (bool)GetValue(SelectionModeProperty); set => SetValue(SelectionModeProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="ShowItemsCheckBox"/> dependency property.
@@ -774,7 +774,7 @@ namespace WinCopies.GUI.Explorer
 
         private void Items_CollectionChanging(object sender, Util.NotifyCollectionChangedEventArgs e) => OnItemsCollectionChanging(e);
 
-        private List<ListViewItem> listViewItems = new List<ListViewItem>();
+        private readonly List<ListViewItem> listViewItems = new List<ListViewItem>();
 
         private void UpdateVisibleItemsCount()
 
@@ -794,15 +794,37 @@ namespace WinCopies.GUI.Explorer
 
                 }
 
+                // SetValue(VisibleItemsCountPropertyKey, 0);
+
                 // int count = 0;
+
+                object item;
 
                 ListViewItem value;
 
-                foreach (object item in ListView.ItemContainerGenerator.Items)
+                for (int i = 0; i < listViewItems.Count; i++)
 
                 {
 
-                    value = (ListViewItem)ListView.ItemContainerGenerator.ContainerFromItem(item);
+                    item = ListView.ItemContainerGenerator.ItemFromContainer(listViewItems[i]);
+
+                    if (item == null || !ListView.ItemContainerGenerator.Items.Contains(item))
+
+                    {
+
+                        listViewItems.RemoveAt(i);
+
+                        SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - 1);
+
+                    }
+
+                }
+
+                foreach (object _item in ListView.ItemContainerGenerator.Items)
+
+                {
+
+                    value = (ListViewItem)ListView.ItemContainerGenerator.ContainerFromItem(_item);
 
                     if (value == null)
 
