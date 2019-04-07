@@ -353,6 +353,31 @@
             <param name="serviceProvider">A service provider helper that can provide services for the markup extension.</param>
             <returns>The object value to set on the property where the extension is applied.</returns>
         </member>
+        <member name="T:WinCopies.Util.DataConverters.VisibilityToBooleanConverter">
+            <summary>
+            Provides a converter for conversion from a <see langword="bool"/> value to a <see cref="T:System.Windows.Visibility"/> value.
+            </summary>
+        </member>
+        <member name="M:WinCopies.Util.DataConverters.VisibilityToBooleanConverter.Convert(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            Converts a <see cref="T:System.Windows.Visibility"/> value to a <see langword="bool"/> value. If the value is <see cref="F:System.Windows.Visibility.Visible"/>, the returned value will be <see langword="true"/>, otherwise false.
+            </summary>
+            <param name="value">The <see cref="T:System.Windows.Visibility"/> value to convert.</param>
+            <param name="targetType">The target type of the value. This parameter isn't evaluated in this converter.</param>
+            <param name="parameter">The parameter of this converter. This parameter isn't evaluated in this converter.</param>
+            <param name="culture">The culture used for the conversion. This parameter isn't evaluated in this converter.</param>
+            <returns><see langword="true"/> if the value to convert is <see cref="F:System.Windows.Visibility.Visible"/>, otherwise false.</returns>
+        </member>
+        <member name="M:WinCopies.Util.DataConverters.VisibilityToBooleanConverter.ConvertBack(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            Converts a <see langword="bool"/> value to a <see cref="T:System.Windows.Visibility"/> value. If the value is <see langword="true"/>, the returned value will be the <see cref="F:System.Windows.Visibility.Visible"/> value, if not and if parameter is not null, it will be the value of the parameter, otherwise it will be <see cref="F:System.Windows.Visibility.Collapsed"/>.
+            </summary>
+            <param name="value">The <see langword="bool"/> value to convert.</param>
+            <param name="targetType">The target type of the value. This parameter isn't evaluated in this converter.</param>
+            <param name="parameter">The value to return if the value to convert is false. This parameter can't be the <see cref="F:System.Windows.Visibility.Visible"/> value. This parameter can be null.</param>
+            <param name="culture">The culture used for the conversion. This parameter isn't evaluated in this converter.</param>
+            <returns><see cref="F:System.Windows.Visibility.Visible"/> if the value to convert is <see langword="true"/>, if not, the value of the parameter if it is not null, otherwise <see cref="F:System.Windows.Visibility.Collapsed"/>.</returns>
+        </member>
         <member name="T:WinCopies.Util.Extensions">
             <summary>
             Provides some static extensions methods.

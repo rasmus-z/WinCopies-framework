@@ -109,6 +109,8 @@
     <Compile Include="DataConverters\PercentConverter.cs" />
     <Compile Include="DataConverters\ReverseBooleanConverter.cs" />
     <Compile Include="DataConverters\ReversedBooleanToVisibilityConverter.cs" />
+    <Compile Include="DataConverters\VisibilityToBooleanConverter.cs" />
+    <Compile Include="DataConverters\VisibilityToReversedBooleanConverter.cs" />
     <Compile Include="EventArgsHandler.cs" />
     <Compile Include="EventBindingExtension.cs" />
     <Compile Include="Extensions.cs" />

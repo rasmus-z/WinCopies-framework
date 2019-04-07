@@ -79,6 +79,18 @@ namespace WinCopies.GUI.Explorer
 
         public ReadOnlyObservableCollection<IBrowsableObjectInfo> SelectedItems { get; } = null;
 
+        private readonly bool isCheckBoxEnabled = false;
+
+        public bool IsCheckBoxEnabled
+
+        {
+
+            get => isCheckBoxEnabled;
+
+            set => OnPropertyChanged(nameof(IsCheckBoxEnabled), nameof(isCheckBoxEnabled), value, typeof(ShellObjectInfo));
+
+        }
+
         // public event SelectionChangedEventHandler SelectionChanged;
 
         public ShellObjectInfo(ShellObject shellObject, string path) : base(shellObject, path) =>

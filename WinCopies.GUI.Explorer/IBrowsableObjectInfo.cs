@@ -23,6 +23,8 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         ReadOnlyObservableCollection<IBrowsableObjectInfo> SelectedItems { get; } 
 
+        bool IsCheckBoxEnabled { get; set; }
+
     } 
 
     internal interface IBrowsableObjectInfoInternal

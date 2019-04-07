@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.GUI.Explorer;
 using WinCopies.IO;
@@ -104,15 +105,15 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 
 
-        public FoldersBrowserDialog() => Init(FoldersBrowserDialogMode.OpenFiles, false, System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
+        public FoldersBrowserDialog() => Init(FoldersBrowserDialogMode.OpenFiles, SelectionMode.Single, System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
 
-        public FoldersBrowserDialog(FoldersBrowserDialogMode mode, bool allowMultipleSelection) => Init(mode, allowMultipleSelection, mode == FoldersBrowserDialogMode.OpenFiles ? allowMultipleSelection ? Explorer.Themes.Generic.OpenFiles : Explorer.Themes.Generic.OpenFile : mode == FoldersBrowserDialogMode.OpenFolder ? Explorer.Themes.Generic.OpenFolder : mode == FoldersBrowserDialogMode.Save ? Explorer.Themes.Generic.Save : System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
+        public FoldersBrowserDialog(FoldersBrowserDialogMode mode, SelectionMode selectionMode) => Init(mode, selectionMode, mode == FoldersBrowserDialogMode.OpenFiles ? selectionMode != SelectionMode.Single ? Explorer.Themes.Generic.OpenFiles : Explorer.Themes.Generic.OpenFile : mode == FoldersBrowserDialogMode.OpenFolder ? Explorer.Themes.Generic.OpenFolder : mode == FoldersBrowserDialogMode.Save ? Explorer.Themes.Generic.Save : System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
 
-        public FoldersBrowserDialog(string title) => Init(FoldersBrowserDialogMode.OpenFiles, false, title);
+        public FoldersBrowserDialog(string title) => Init(FoldersBrowserDialogMode.OpenFiles, SelectionMode.Single, title);
 
-        public FoldersBrowserDialog(FoldersBrowserDialogMode mode, bool allowMultipleSelection, string title) => Init(mode, allowMultipleSelection, title);
+        public FoldersBrowserDialog(FoldersBrowserDialogMode mode, SelectionMode selectionMode, string title) => Init(mode, selectionMode, title);
 
-        private void Init(FoldersBrowserDialogMode mode, bool allowMultipleSelection, string title)
+        private void Init(FoldersBrowserDialogMode mode, SelectionMode selectionMode, string title)
 
         {
 
@@ -120,7 +121,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             Mode = mode;
 
-            ExplorerControl.SelectionMode = allowMultipleSelection;
+            ExplorerControl.SelectionMode = selectionMode;
 
             Title = title;
 

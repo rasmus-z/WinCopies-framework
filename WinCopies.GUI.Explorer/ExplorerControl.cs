@@ -162,12 +162,12 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="SelectionMode"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty SelectionModeProperty = DependencyProperty.Register(nameof(SelectionMode), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(true));
+        public static readonly DependencyProperty SelectionModeProperty = DependencyProperty.Register(nameof(SelectionMode), typeof(SelectionMode), typeof(ExplorerControl), new PropertyMetadata(SelectionMode.Extended));
 
         /// <summary>
         /// Gets or sets whether activate multiple selection. This is dependency property.
         /// </summary>
-        public bool SelectionMode { get => (bool)GetValue(SelectionModeProperty); set => SetValue(SelectionModeProperty, value); }
+        public SelectionMode SelectionMode { get => (SelectionMode)GetValue(SelectionModeProperty); set => SetValue(SelectionModeProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="ShowItemsCheckBox"/> dependency property.
