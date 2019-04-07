@@ -14,32 +14,25 @@ namespace PushBindingExtension
 {
     public class PushBinding : FreezableBinding
     {
-        #region Dependency Properties
+        #region Dependency Properties 
 
         public static DependencyProperty TargetPropertyMirrorProperty =
-            DependencyProperty.Register("TargetPropertyMirror",
+            DependencyProperty.Register(nameof(TargetPropertyMirror),
                                         typeof(object),
                                         typeof(PushBinding));
         public static DependencyProperty TargetPropertyListenerProperty =
-            DependencyProperty.Register("TargetPropertyListener",
+            DependencyProperty.Register(nameof(TargetPropertyListener),
                                         typeof(object),
                                         typeof(PushBinding),
                                         new UIPropertyMetadata(null, OnTargetPropertyListenerChanged));
 
-        private static void OnTargetPropertyListenerChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            PushBinding pushBinding = sender as PushBinding;
-            pushBinding.TargetPropertyValueChanged();
-        }
+        private static void OnTargetPropertyListenerChanged(object sender, DependencyPropertyChangedEventArgs e) => (sender as PushBinding).TargetPropertyValueChanged();
 
         #endregion // Dependency Properties
 
         #region Constructor
 
-        public PushBinding()
-        {
-            Mode = BindingMode.OneWayToSource;
-        }
+        public PushBinding() => Mode = BindingMode.OneWayToSource;
 
         #endregion // Constructor
 
@@ -47,28 +40,20 @@ namespace PushBindingExtension
 
         public object TargetPropertyMirror
         {
-            get { return GetValue(TargetPropertyMirrorProperty); }
-            set { SetValue(TargetPropertyMirrorProperty, value); }
+            get => GetValue(TargetPropertyMirrorProperty);
+            set => SetValue(TargetPropertyMirrorProperty, value);
         }
         public object TargetPropertyListener
         {
-            get { return GetValue(TargetPropertyListenerProperty); }
-            set { SetValue(TargetPropertyListenerProperty, value); }
+            get { return GetValue(dp: TargetPropertyListenerProperty); }
+            set => SetValue(TargetPropertyListenerProperty, value);
         }
 
         [DefaultValue(null)]
-        public string TargetProperty
-        {
-            get;
-            set;
-        }
+        public string TargetProperty { get; set; }
 
         [DefaultValue(null)]
-        public DependencyProperty TargetDependencyProperty
-        {
-            get;
-            set;
-        }
+        public DependencyProperty TargetDependencyProperty { get; set; }
 
         #endregion // Properties
 
@@ -77,13 +62,13 @@ namespace PushBindingExtension
         public void SetupTargetBinding(DependencyObject targetObject)
         {
             if (targetObject == null)
-            {
+
                 return;
-            }
 
             // Prevent the designer from reporting exceptions since
             // changes will be made of a Binding in use if it is set
             if (DesignerProperties.GetIsInDesignMode(this) == true)
+
                 return;
 
             // Bind to the selected TargetProperty, e.g. ActualHeight and get
@@ -93,41 +78,33 @@ namespace PushBindingExtension
                 Source = targetObject,
                 Mode = BindingMode.OneWay
             };
-            if (TargetDependencyProperty != null)
-            {
-                listenerBinding.Path = new PropertyPath(TargetDependencyProperty);
-            }
-            else
-            {
-                listenerBinding.Path = new PropertyPath(TargetProperty);
-            }
+
+            listenerBinding.Path = TargetDependencyProperty == null ? new PropertyPath(TargetProperty) : new PropertyPath(TargetDependencyProperty);
+
             BindingOperations.SetBinding(this, TargetPropertyListenerProperty, listenerBinding);
 
             // Set up a OneWayToSource Binding with the Binding declared in Xaml from
             // the Mirror property of this class. The mirror property will be updated
             // everytime the Listener property gets updated
             BindingOperations.SetBinding(this, TargetPropertyMirrorProperty, Binding);
-            
+
             TargetPropertyValueChanged();
+
             if (targetObject is FrameworkElement)
-            {
+
                 ((FrameworkElement)targetObject).Loaded += delegate { TargetPropertyValueChanged(); };
-            }
+
             else if (targetObject is FrameworkContentElement)
-            {
+
                 ((FrameworkContentElement)targetObject).Loaded += delegate { TargetPropertyValueChanged(); };
-            }
+
         }
 
         #endregion // Public Methods
 
         #region Private Methods
 
-        private void TargetPropertyValueChanged()
-        {
-            object targetPropertyValue = GetValue(TargetPropertyListenerProperty);
-            this.SetValue(TargetPropertyMirrorProperty, targetPropertyValue);
-        }
+        private void TargetPropertyValueChanged() => SetValue(TargetPropertyMirrorProperty, GetValue(TargetPropertyListenerProperty));
 
         #endregion // Private Methods
 
@@ -141,10 +118,7 @@ namespace PushBindingExtension
             base.CloneCore(sourceFreezable);
         }
 
-        protected override Freezable CreateInstanceCore()
-        {
-            return new PushBinding();
-        }
+        protected override Freezable CreateInstanceCore() => new PushBinding();
 
         #endregion // Freezable overrides
     }
