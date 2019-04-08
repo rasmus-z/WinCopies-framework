@@ -290,8 +290,8 @@
             <!--, Converter={local:ImageSourceConverter}}-->
             <StackPanel>
                 <TextBlock Text="{Binding ShellObject.Name}" />
-                <Label Content="{Binding ShellObject.Properties.System.ItemType.ValueAsObject}" />
-                <Label Content="{Binding ShellObject.Properties.System.Size.ValueAsObject}" />
+                <controls:Label Content="{Binding ShellObject.Properties.SystemItemTypeText.ValueAsObject}" Foreground="Gray" />
+                <controls:Label Content="{Binding ShellObject.Properties.System.Size.ValueAsObject}" Foreground="Gray" />
             </StackPanel>
         </StackPanel>
     </DataTemplate>
@@ -540,6 +540,17 @@
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static local:ViewStyles.Tiles}" >
                                             <Setter Property="ItemContainerStyle" Value="{StaticResource ExplorerControlTilesListViewItemStyle}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static local:ViewStyles.Details}" >
+                                            <Setter Property="View" >
+                                                <Setter.Value>
+                                                    <GridView controls:GridViewColumns.HeaderTextMember="HeaderText"
+                      controls:GridViewColumns.DisplayMemberMember="DisplayMember"
+                      controls:GridViewColumns.ColumnsSource="{Binding Columns}" >
+                                                    </GridView>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Setter Property="ItemContainerStyle" Value="{StaticResource ExplorerControlDetailsListViewItemStyle}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

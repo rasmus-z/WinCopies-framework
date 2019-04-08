@@ -83,6 +83,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GridView.cs" />
     <Compile Include="IScrollable.cs" />
     <Compile Include="ISelector.cs" />
     <Compile Include="Label.cs" />

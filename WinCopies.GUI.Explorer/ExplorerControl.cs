@@ -187,13 +187,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Gets or sets a value that indicates whether to show the hidden items.
         /// </summary>
-        public bool ShowHiddenItems
-
-        {
-
-            get => (bool)GetValue(ShowHiddenItemsProperty); set => SetValue(ShowHiddenItemsProperty, value);
-
-        }
+        public bool ShowHiddenItems { get => (bool)GetValue(ShowHiddenItemsProperty); set => SetValue(ShowHiddenItemsProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="ShowSystemItems"/> dependency property.
@@ -203,13 +197,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Gets or sets a value that indicates whether to show the system items.
         /// </summary>
-        public bool ShowSystemItems
-
-        {
-
-            get => (bool)GetValue(ShowSystemItemsProperty); set => SetValue(ShowSystemItemsProperty, value);
-
-        }
+        public bool ShowSystemItems { get => (bool)GetValue(ShowSystemItemsProperty); set => SetValue(ShowSystemItemsProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="TreeViewSelectedItem"/> dependency property.
@@ -229,12 +217,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Gets or sets the list view selected item.
         /// </summary>
-        public IBrowsableObjectInfo ListViewSelectedItem
-        {
-            get => (IBrowsableObjectInfo)GetValue(ListViewSelectedItemProperty);
-
-            set => SetValue(ListViewSelectedItemProperty, value);
-        }
+        public IBrowsableObjectInfo ListViewSelectedItem { get => (IBrowsableObjectInfo)GetValue(ListViewSelectedItemProperty); set => SetValue(ListViewSelectedItemProperty, value); }
 
         private static readonly DependencyPropertyKey ListViewSelectedItemsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(ListViewSelectedItems), typeof(ObservableListBoxSelectedItems), typeof(ExplorerControl), new PropertyMetadata(null));
 
