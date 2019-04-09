@@ -91,6 +91,15 @@ namespace WinCopies.GUI.Explorer
 
         }
 
+        public class Machin { public string Truc { get; set; } = "Bidule"; }
+
+        public Machin[] Columns
+        {
+
+            get; set;
+
+        } = new Machin[] { new Machin() { Truc = "Chose" } };
+
         // public event SelectionChangedEventHandler SelectionChanged;
 
         public ShellObjectInfo(ShellObject shellObject, string path) : base(shellObject, path) =>

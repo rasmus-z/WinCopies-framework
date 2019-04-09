@@ -1,526 +1,636 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Collections.Specialized;
+//using System.ComponentModel;
+//using System.Windows;
+//using System.Windows.Controls;
+//using System.Windows.Data;
 
-namespace WinCopies.GUI.Controls
-{
+//namespace WinCopies.GUI.Controls
+//{
 
-    public static class GridViewColumns
-    {
+//    public class GridView : System.Windows.Controls.GridView
+//    {
 
-        public static readonly DependencyProperty ColumnCollectionBehaviourProperty =
-            DependencyProperty.RegisterAttached("ColumnCollectionBehaviour", typeof(GridViewColumnCollectionBehaviour), typeof(GridViewColumns), new UIPropertyMetadata(null));
+//        private static readonly DependencyPropertyKey ListViewPropertyKey = DependencyProperty.RegisterReadOnly(nameof(ListView), typeof(ListView), typeof(GridView), new PropertyMetadata(null));
 
-        public static readonly DependencyProperty ColumnsSourceProperty =
-            DependencyProperty.RegisterAttached("ColumnsSource", typeof(object), typeof(GridViewColumns), new UIPropertyMetadata(null, ColumnsSourceChanged));
+//        public static readonly DependencyProperty ListViewProperty = ListViewPropertyKey.DependencyProperty;
 
-        public static readonly DependencyProperty DisplayMemberFormatMemberProperty =
-            DependencyProperty.RegisterAttached("DisplayMemberFormatMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null, DisplayMemberFormatMemberChanged));
+//        public ListView ListView { get => (ListView)GetValue(ListViewProperty); internal set => SetValue(ListViewPropertyKey, value); }
 
-        public static readonly DependencyProperty DisplayMemberMemberProperty =
-            DependencyProperty.RegisterAttached("DisplayMemberMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null, DisplayMemberMemberChanged));
+//    }
 
-        public static readonly DependencyProperty HeaderTextMemberProperty =
-            DependencyProperty.RegisterAttached("HeaderTextMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null, HeaderTextMemberChanged));
+//    public class GridViewColumns : DependencyObject
+//    {
 
-        public static readonly DependencyProperty WidthMemberProperty =
-            DependencyProperty.RegisterAttached("WidthMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null, WidthMemberChanged));
+//        #region Consts
 
-        [AttachedPropertyBrowsableForType(typeof(GridView))]
-        public static GridViewColumnCollectionBehaviour GetColumnCollectionBehaviour(DependencyObject obj) => (GridViewColumnCollectionBehaviour)obj.GetValue(ColumnCollectionBehaviourProperty);
+//        private const string ColumnCollectionBehaviour = "ColumnCollectionBehaviour";
 
-        public static void SetColumnCollectionBehaviour(DependencyObject obj, GridViewColumnCollectionBehaviour value) => obj.SetValue(ColumnCollectionBehaviourProperty, value);
+//        private const string ColumnsSource = "ColumnsSource";
 
-        [AttachedPropertyBrowsableForType(typeof(GridView))]
-        public static object GetColumnsSource(DependencyObject obj) => obj.GetValue(ColumnsSourceProperty);
+//        private const string CellTemplate = "CellTemplate";
 
-        public static void SetColumnsSource(DependencyObject obj, object value) => obj.SetValue(ColumnsSourceProperty, value);
+//        private const string CellTemplateSelector = "CellTemplateSelector";
 
-        [AttachedPropertyBrowsableForType(typeof(GridView))]
-        public static string GetDisplayMemberFormatMember(DependencyObject obj) => (string)obj.GetValue(DisplayMemberFormatMemberProperty);
+//        private const string DisplayMemberBinding = "DisplayMemberBinding";
 
-        public static void SetDisplayMemberFormatMember(DependencyObject obj, string value) => obj.SetValue(DisplayMemberFormatMemberProperty, value);
+//        private const string Header = "Header";
 
-        [AttachedPropertyBrowsableForType(typeof(GridView))]
-        public static string GetDisplayMemberMember(DependencyObject obj) => (string)obj.GetValue(DisplayMemberMemberProperty);
+//        //private const string HeaderContainerStyle = "HeaderContainerStyle";
 
-        public static void SetDisplayMemberMember(DependencyObject obj, string value) => obj.SetValue(DisplayMemberMemberProperty, value);
+//        //private const string HeaderStringFormat = "HeaderStringFormat";
 
-        [AttachedPropertyBrowsableForType(typeof(GridView))]
-        public static string GetHeaderTextMember(DependencyObject obj) => (string)obj.GetValue(HeaderTextMemberProperty);
+//        //private const string HeaderTemplate = "HeaderTemplate";
 
-        public static void SetHeaderTextMember(DependencyObject obj, string value) => obj.SetValue(HeaderTextMemberProperty, value);
+//        //private const string HeaderTemplateSelector = "HeaderTemplateSelector";
 
-        [AttachedPropertyBrowsableForType(typeof(GridView))]
-        public static string GetWidthMember(DependencyObject obj) => (string)obj.GetValue(WidthMemberProperty);
+//        private const string Width = "Width";
 
-        public static void SetWidthMember(DependencyObject obj, string value) => obj.SetValue(WidthMemberProperty, value);
+//        #endregion
 
-        private static void ColumnsSourceChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).ColumnsSource = e.NewValue;
+//        #region Dependency properties
 
-        private static void DisplayMemberFormatMemberChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).DisplayMemberFormatMember = e.NewValue as string;
+//        public static readonly DependencyProperty ColumnCollectionBehaviourProperty =
+//            DependencyProperty.RegisterAttached(ColumnCollectionBehaviour, typeof(GridViewColumnCollectionBehaviour), typeof(GridViewColumns), new UIPropertyMetadata(null));
 
-        private static void DisplayMemberMemberChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).DisplayMemberMember = e.NewValue as string;
+//        public static readonly DependencyProperty ColumnsSourceProperty =
+//            DependencyProperty.RegisterAttached(ColumnsSource, typeof(object), typeof(GridViewColumns), new UIPropertyMetadata(null, ColumnsSourceChanged));
 
-        private static void HeaderTextMemberChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).HeaderTextMember = e.NewValue as string;
+//        public static readonly DependencyProperty CellTemplateProperty = DependencyProperty.Register(CellTemplate, typeof(DataTemplate), typeof(GridViewColumns), new UIPropertyMetadata(null, CellTemplateChanged));
 
-        private static void WidthMemberChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).WidthMember = e.NewValue as string;
+//        public static readonly DependencyProperty CellTemplateSelectorProperty = DependencyProperty.Register(CellTemplateSelector, typeof(DataTemplateSelector), typeof(GridViewColumns), new UIPropertyMetadata(null, CellTemplateSelectorChanged));
 
-        private static GridViewColumnCollectionBehaviour GetOrCreateColumnCollectionBehaviour(DependencyObject source)
-        {
+//        //public static readonly DependencyProperty DisplayMemberFormatMemberProperty =
+//        //    DependencyProperty.RegisterAttached("DisplayMemberFormatMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null, DisplayMemberFormatMemberChanged));
 
-            GridViewColumnCollectionBehaviour behaviour = GetColumnCollectionBehaviour(source);
+//        public static readonly DependencyProperty DisplayMemberBindingProperty =
+//            DependencyProperty.RegisterAttached(DisplayMemberBinding, typeof(BindingBase), typeof(GridViewColumns), new UIPropertyMetadata(null, DisplayMemberBindingChanged));
 
-            if (behaviour == null)
-            {
+//        public static readonly DependencyProperty HeaderProperty =
+//            DependencyProperty.RegisterAttached(Header, typeof(object), typeof(GridViewColumns), new UIPropertyMetadata(null, HeaderChanged));
 
-                GridView typedSource = source as GridView;
+//        //public static readonly DependencyProperty HeaderContainerStyleProperty =
+//        //    DependencyProperty.Register(HeaderContainerStyle, typeof(Style), typeof(GridViewColumns), new UIPropertyMetadata(null, ));
 
-                if (typedSource == null)
+//        //public static readonly DependencyProperty HeaderStringFormatProperty =
+//        //    DependencyProperty.RegisterAttached(HeaderStringFormat, typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null, ));
 
-                    // todo:
+//        //public static readonly DependencyProperty HeaderTemplateProperty =
+//        //    DependencyProperty.RegisterAttached(HeaderTemplate, typeof(DataTemplate), typeof(GridViewColumns), new UIPropertyMetadata(null, ));
 
-                    throw new Exception("This property can only be set on controls deriving GridView");
+//        //public static readonly DependencyProperty HeaderTemplateSelectorProperty =
+//        //    DependencyProperty.RegisterAttached(HeaderTemplateSelector, typeof(DataTemplateSelector), typeof(GridViewColumns), new UIPropertyMetadata(null, ));
 
-                behaviour = new GridViewColumnCollectionBehaviour(typedSource);
+//        public static readonly DependencyProperty WidthProperty =
+//            DependencyProperty.RegisterAttached(Width, typeof(double), typeof(GridViewColumns), new UIPropertyMetadata(100.0, WidthChanged));
 
-                SetColumnCollectionBehaviour(typedSource, behaviour);
+//        #endregion
 
-            }
+//        #region Dependency properties methods
 
-            return behaviour;
+//        [AttachedPropertyBrowsableForType(typeof(GridView))]
+//        public static GridViewColumnCollectionBehaviour GetColumnCollectionBehaviour(DependencyObject obj) => (GridViewColumnCollectionBehaviour)obj.GetValue(ColumnCollectionBehaviourProperty);
 
-        }
+//        public static void SetColumnCollectionBehaviour(DependencyObject obj, GridViewColumnCollectionBehaviour value) => obj.SetValue(ColumnCollectionBehaviourProperty, value);
 
-    }
+//        [AttachedPropertyBrowsableForType(typeof(GridView))]
+//        public static object GetColumnsSource(DependencyObject obj) => obj.GetValue(ColumnsSourceProperty);
 
-    public class GridViewColumnCollectionBehaviour
-    {
+//        public static void SetColumnsSource(DependencyObject obj, object value) => obj.SetValue(ColumnsSourceProperty, value);
 
-        private object columnsSource;
+//        [AttachedPropertyBrowsableForType(typeof(GridView))]
+//        public static DataTemplate GetCellTemplate(DependencyObject obj) => (DataTemplate)obj.GetValue(CellTemplateProperty);
 
-        private GridView gridView;
+//        public static void SetCellTemplate(DependencyObject obj, DataTemplate value) => obj.SetValue(CellTemplateProperty, value);
 
-        public GridViewColumnCollectionBehaviour(GridView gridView) => this.gridView = gridView;
+//        [AttachedPropertyBrowsableForType(typeof(GridView))]
+//        public static DataTemplateSelector GetCellTemplateSelector(DependencyObject obj) => (DataTemplateSelector)obj.GetValue(CellTemplateSelectorProperty);
 
-        public object ColumnsSource
-        {
-            get => columnsSource;
+//        public static void SetCellTemplateSelector(DependencyObject obj, DataTemplateSelector value) => obj.SetValue(CellTemplateSelectorProperty, value);
 
-            set
-            {
-                // todo:
+//        [AttachedPropertyBrowsableForType(typeof(GridView))]
+//        public static BindingBase GetDisplayMemberBinding(DependencyObject obj) => (BindingBase)obj.GetValue(DisplayMemberBindingProperty);
 
-                object oldValue = columnsSource;
-                columnsSource = value;
-                ColumnsSourceChanged(oldValue, columnsSource);
-            }
-        }
+//        public static void SetDisplayMemberBinding(DependencyObject obj, BindingBase value) => obj.SetValue(DisplayMemberBindingProperty, value);
 
-        public string DisplayMemberFormatMember { get; set; }
+//        //[AttachedPropertyBrowsableForType(typeof(GridView))]
+//        //public static string GetDisplayMemberMember(DependencyObject obj) => (string)obj.GetValue(DisplayMemberMemberProperty);
 
-        public string DisplayMemberMember { get; set; }
+//        //public static void SetDisplayMemberMember(DependencyObject obj, string value) => obj.SetValue(DisplayMemberMemberProperty, value);
 
-        public string HeaderTextMember { get; set; }
+//        [AttachedPropertyBrowsableForType(typeof(GridView))]
+//        public static object GetHeader(DependencyObject obj) => obj.GetValue(HeaderProperty);
 
-        public string WidthMember { get; set; }
+//        public static void SetHeader(DependencyObject obj, object value) => obj.SetValue(HeaderProperty, value);
 
-        private void AddHandlers(ICollectionView collectionView) => collectionView.CollectionChanged += ColumnsSource_CollectionChanged;
+//        //[AttachedPropertyBrowsableForType(typeof(GridView))]
+//        //public static Style GetHeaderContainerStyle(DependencyObject obj) => (Style)obj.GetValue(HeaderContainerStyleProperty);
 
-        private void ColumnsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            // ICollectionView view = sender as ICollectionView;
+//        //public static void SetHeaderContainerStyle(DependencyObject obj, Style value) => obj.SetValue(HeaderContainerStyleProperty, value);
 
-            if (gridView == null)
+//        //[AttachedPropertyBrowsableForType(typeof(GridView))]
+//        //public static string GetHeaderStringFormat(DependencyObject obj) => (string)obj.GetValue(HeaderStringFormatProperty);
 
-                return;
+//        //public static void SetHeaderStringFormat(DependencyObject obj, string value) => obj.SetValue(HeaderStringFormatProperty, value);
 
-            switch (e.Action)
-            {
+//        //[AttachedPropertyBrowsableForType(typeof(GridView))]
+//        //public static DataTemplate GetHeaderTemplate(DependencyObject obj) => (DataTemplate)obj.GetValue(HeaderTemplateProperty);
 
-                case NotifyCollectionChangedAction.Add:
+//        //public static void SetHeaderTemplate(DependencyObject obj, DataTemplate value) => obj.SetValue(HeaderTemplateProperty, value);
 
-                    for (int i = 0; i < e.NewItems.Count; i++)
+//        //[AttachedPropertyBrowsableForType(typeof(GridView))]
+//        //public static DataTemplateSelector GetHeaderTemplateSelector(DependencyObject obj) => (DataTemplateSelector)obj.GetValue(HeaderTemplateSelectorProperty);
 
-                        gridView.Columns.Insert(e.NewStartingIndex + i, CreateColumn(e.NewItems[i]));
+//        //public static void SetHeaderTemplateSelector(DependencyObject obj, DataTemplateSelector value) => obj.SetValue(HeaderTemplateSelectorProperty, value);
 
-                    break;
+//        [AttachedPropertyBrowsableForType(typeof(GridView))]
+//        public static double GetWidthMember(DependencyObject obj) => (double)obj.GetValue(WidthProperty);
 
-                case NotifyCollectionChangedAction.Move:
+//        public static void SetWidthMember(DependencyObject obj, double value) => obj.SetValue(WidthProperty, value);
 
-                    List<GridViewColumn> columns = new List<GridViewColumn>();
+//        #endregion
 
-                    for (int i = 0; i < e.OldItems.Count; i++)
+//        private static void ColumnsSourceChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).ColumnsSource = e.NewValue;
 
-                        columns.Add(gridView.Columns[e.OldStartingIndex + i]);
+//        private static void CellTemplateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).CellTemplate = (DataTemplate)e.NewValue;
 
-                    for (int i = 0; i < e.NewItems.Count; i++)
+//        private static void CellTemplateSelectorChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).CellTemplateSelector = (DataTemplateSelector)e.NewValue;
 
-                        gridView.Columns.Insert(e.NewStartingIndex + i, columns[i]);
+//        private static void DisplayMemberBindingChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).DisplayMemberBinding = (BindingBase)e.NewValue;
 
-                    break;
+//        private static void HeaderChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).Header = e.NewValue;
 
-                case NotifyCollectionChangedAction.Remove:
+//        //private static void HeaderContainerStyleChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).HeaderContainerStyle = (Style)e.NewValue;
 
-                    for (int i = 0; i < e.OldItems.Count; i++)
+//        //private static void HeaderStringFormatChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).HeaderStringFormat = (string)e.NewValue;
 
-                        gridView.Columns.RemoveAt(e.OldStartingIndex);
+//        //private static void HeaderTemplateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).HeaderTemplate = (DataTemplate)e.NewValue;
 
-                    break;
+//        //private static void HeaderTemplateSelectorChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).HeaderTemplateSelector = (DataTemplateSelector)e.NewValue;
 
-                case NotifyCollectionChangedAction.Replace:
+//        private static void WidthChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) => GetOrCreateColumnCollectionBehaviour(sender).Width = (double)e.NewValue;
 
-                    for (int i = 0; i < e.NewItems.Count; i++)
+//        private static GridViewColumnCollectionBehaviour GetOrCreateColumnCollectionBehaviour(DependencyObject source)
+//        {
 
-                        gridView.Columns[e.NewStartingIndex + i] = CreateColumn(e.NewItems[i]);
+//            GridViewColumnCollectionBehaviour behaviour = GetColumnCollectionBehaviour(source);
 
-                    break;
+//            if (behaviour == null)
+//            {
 
-                case NotifyCollectionChangedAction.Reset:
+//                GridView typedSource = source as GridView;
 
-                    gridView.Columns.Clear();
+//                if (typedSource == null)
 
-                    CreateColumns(sender as ICollectionView);
+//                    // todo:
 
-                    break;
+//                    throw new Exception("This property can only be set on controls deriving GridView");
 
-                default:
+//                behaviour = new GridViewColumnCollectionBehaviour(typedSource);
 
-                    break;
+//                SetColumnCollectionBehaviour(typedSource, behaviour);
 
-            }
+//            }
 
-        }
+//            return behaviour;
 
-        private void ColumnsSourceChanged(object oldValue, object newValue)
-        {
-            if (gridView != null)
-            {
+//        }
 
-                gridView.Columns.Clear();
+//    }
 
-                if (oldValue != null)
-                {
+//    public class GridViewColumnCollectionBehaviour
+//    {
 
-                    ICollectionView view = CollectionViewSource.GetDefaultView(oldValue);
+//        private object columnsSource;
 
-                    if (view != null)
+//        private GridView gridView;
 
-                        RemoveHandlers(view);
+//        public GridViewColumnCollectionBehaviour(GridView gridView) => this.gridView = gridView;
 
-                }
+//        public object ColumnsSource
+//        {
+//            get => columnsSource;
 
-                if (newValue != null)
-                {
+//            set
+//            {
+//                // todo:
 
-                    ICollectionView view = CollectionViewSource.GetDefaultView(newValue);
+//                object oldValue = columnsSource;
+//                columnsSource = value;
+//                ColumnsSourceChanged(oldValue, columnsSource);
+//            }
+//        }
 
-                    if (view != null)
-                    {
+//        public DataTemplate CellTemplate { get; set; }
 
-                        AddHandlers(view);
+//        public DataTemplateSelector CellTemplateSelector { get; set; }
 
-                        CreateColumns(view);
+//        public BindingBase DisplayMemberBinding { get; set; }
 
-                    }
+//        public object Header { get; set; }
 
-                }
+//        //public Style HeaderContainerStyle { get; set; }
 
-            }
+//        //public string HeaderStringFormat { get; set; }
 
-        }
+//        //public DataTemplate HeaderTemplate { get; set; }
 
-        private GridViewColumn CreateColumn(object columnSource)
-        {
+//        //public DataTemplateSelector HeaderTemplateSelector { get; set; }
 
-            GridViewColumn column = new GridViewColumn();
+//        public double Width { get; set; }
 
-            if (!string.IsNullOrEmpty(HeaderTextMember))
+//        private void AddHandlers(ICollectionView collectionView) => collectionView.CollectionChanged += ColumnsSource_CollectionChanged;
 
-                column.Header = GetPropertyValue(columnSource, HeaderTextMember);
+//        private void ColumnsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+//        {
+//            // ICollectionView view = sender as ICollectionView;
 
-            if (!string.IsNullOrEmpty(DisplayMemberMember))
-            {
+//            if (gridView == null)
 
-                string propertyName = GetPropertyValue(columnSource, DisplayMemberMember) as string;
+//                return;
 
-                string format = null;
+//            switch (e.Action)
+//            {
 
-                if (!string.IsNullOrEmpty(DisplayMemberFormatMember))
+//                case NotifyCollectionChangedAction.Add:
 
-                    format = GetPropertyValue(columnSource, DisplayMemberFormatMember) as string;
+//                    for (int i = 0; i < e.NewItems.Count; i++)
 
-                if (string.IsNullOrEmpty(format))
+//                        CreateColumn(e.NewStartingIndex + i, false, e.NewItems[i]);
 
-                    format = "{0}";
+//                    break;
 
-                column.DisplayMemberBinding = new Binding(propertyName) { StringFormat = format };
+//                case NotifyCollectionChangedAction.Move:
 
-            }
+//                    List<GridViewColumn> columns = new List<GridViewColumn>();
 
-            if (!string.IsNullOrEmpty(WidthMember))
+//                    for (int i = 0; i < e.OldItems.Count; i++)
 
-                column.Width = (double)GetPropertyValue(columnSource, WidthMember);
+//                        columns.Add(gridView.Columns[e.OldStartingIndex + i]);
 
-            return column;
-        }
+//                    for (int i = 0; i < e.NewItems.Count; i++)
 
-        private void CreateColumns(ICollectionView collectionView)
-        {
+//                        gridView.Columns.Insert(e.NewStartingIndex + i, columns[i]);
 
-            foreach (object item in collectionView)
+//                    break;
 
-                gridView.Columns.Add(CreateColumn(item));
+//                case NotifyCollectionChangedAction.Remove:
 
-        }
+//                    for (int i = 0; i < e.OldItems.Count; i++)
 
-        private object GetPropertyValue(object obj, string propertyName) => obj?.GetType().GetProperty(propertyName)?.GetValue(obj, null);
+//                        gridView.Columns.RemoveAt(e.OldStartingIndex);
 
-        private void RemoveHandlers(ICollectionView collectionView) => collectionView.CollectionChanged -= ColumnsSource_CollectionChanged;
+//                    break;
 
-    }
+//                case NotifyCollectionChangedAction.Replace:
 
-    //public static class GridViewColumns
-    //{
+//                    for (int i = 0; i < e.NewItems.Count; i++)
 
-    //    [AttachedPropertyBrowsableForType(typeof(GridView))]
-    //    public static object GetColumnsSource(DependencyObject obj) => obj.GetValue(ColumnsSourceProperty);
+//                        CreateColumn(e.NewStartingIndex + i, true, e.NewItems[i]);
 
-    //    public static void SetColumnsSource(DependencyObject obj, object value) => obj.SetValue(ColumnsSourceProperty, value);
+//                    break;
 
-    //    // Using a DependencyProperty as the backing store for ColumnsSource.  This enables animation, styling, binding, etc...
-    //    public static readonly DependencyProperty ColumnsSourceProperty =
-    //            DependencyProperty.RegisterAttached(
-    //                "ColumnsSource",
-    //                typeof(object),
-    //                typeof(GridViewColumns),
-    //                new UIPropertyMetadata(
-    //                    null,
-    //                    ColumnsSourceChanged));
+//                case NotifyCollectionChangedAction.Reset:
 
+//                    gridView.Columns.Clear();
 
-    //    [AttachedPropertyBrowsableForType(typeof(GridView))]
-    //    public static string GetHeaderTextMember(DependencyObject obj) => (string)obj.GetValue(HeaderTextMemberProperty);
+//                    CreateColumns(sender as ICollectionView);
 
-    //    public static void SetHeaderTextMember(DependencyObject obj, string value) => obj.SetValue(HeaderTextMemberProperty, value);
+//                    break;
 
-    //    // Using a DependencyProperty as the backing store for HeaderTextMember.  This enables animation, styling, binding, etc...
-    //    public static readonly DependencyProperty HeaderTextMemberProperty =
-    //        DependencyProperty.RegisterAttached("HeaderTextMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
+//                default:
 
+//                    break;
 
-    //    [AttachedPropertyBrowsableForType(typeof(GridView))]
-    //    public static string GetDisplayMemberMember(DependencyObject obj) => (string)obj.GetValue(DisplayMemberMemberProperty);
+//            }
 
-    //    public static void SetDisplayMemberMember(DependencyObject obj, string value) => obj.SetValue(DisplayMemberMemberProperty, value);
+//        }
 
-    //    // Using a DependencyProperty as the backing store for DisplayMember.  This enables animation, styling, binding, etc...
-    //    public static readonly DependencyProperty DisplayMemberMemberProperty =
-    //        DependencyProperty.RegisterAttached("DisplayMemberMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
+//        private void ColumnsSourceChanged(object oldValue, object newValue)
+//        {
+//            if (gridView != null)
+//            {
 
-    //    private static void ColumnsSourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
-    //    {
+//                gridView.Columns.Clear();
 
-    //        GridView gridView = obj as GridView;
+//                if (oldValue != null)
+//                {
 
-    //        if (gridView != null)
-    //        {
+//                    ICollectionView view = CollectionViewSource.GetDefaultView(oldValue);
 
-    //            gridView.Columns.Clear();
+//                    if (view != null)
 
-    //            if (e.OldValue != null)
-    //            {
+//                        RemoveHandlers(view);
 
-    //                ICollectionView view = CollectionViewSource.GetDefaultView(e.OldValue);
+//                }
 
-    //                if (view != null)
+//                if (newValue != null)
+//                {
 
-    //                    RemoveHandlers(gridView, view);
+//                    ICollectionView view = CollectionViewSource.GetDefaultView(newValue);
 
-    //            }
+//                    if (view != null)
+//                    {
 
-    //            if (e.NewValue != null)
-    //            {
+//                        AddHandlers(view);
 
-    //                ICollectionView view = CollectionViewSource.GetDefaultView(e.NewValue);
+//                        CreateColumns(view);
 
-    //                if (view != null)
-    //                {
+//                    }
 
-    //                    AddHandlers(gridView, view);
+//                }
 
-    //                    CreateColumns(gridView, view);
+//            }
 
-    //                }
+//        }
 
-    //            }
+//        private void CreateColumn(int index, bool deletePrevious, object columnSource)
+//        {
 
-    //        }
+//            GridViewColumn column = new GridViewColumn();
 
-    //    }
+//            if (deletePrevious)
 
-    //    private static IDictionary<ICollectionView, List<GridView>> _gridViewsByColumnsSource =
-    //        new Dictionary<ICollectionView, List<GridView>>();
+//                gridView.Columns.RemoveAt(index);
 
-    //    private static List<GridView> GetGridViewsForColumnSource(ICollectionView columnSource)
-    //    {
+//            gridView.Columns.Insert(index, column);
 
-    //        List<GridView> gridViews;
+//            gridView.ListView.ApplyTemplate();
 
-    //        if (!_gridViewsByColumnsSource.TryGetValue(columnSource, out gridViews))
-    //        {
+//            #region Column properties assignments
 
-    //            gridViews = new List<GridView>();
+//            column.CellTemplate = CellTemplate;
 
-    //            _gridViewsByColumnsSource.Add(columnSource, gridViews);
+//            column.CellTemplateSelector = CellTemplateSelector;
 
-    //        }
+//            column.DisplayMemberBinding = DisplayMemberBinding;
 
-    //        return gridViews;
-    //    }
+//            column.HeaderTemplate = gridView.ColumnHeaderTemplate;
 
-    //    private static void AddHandlers(GridView gridView, ICollectionView view)
-    //    {
+//            column.HeaderTemplate.LoadContent();
 
-    //        GetGridViewsForColumnSource(view).Add(gridView);
+//            Control control = (Control)column.HeaderTemplate.na.FindName("Azerty");
+//            gridView.ListView.View
+//            control.DataContext = columnSource;
 
-    //        view.CollectionChanged += ColumnsSource_CollectionChanged;
+//            column.Header = Header;
 
-    //    }
+//            column.Width = Width;
 
-    //    private static void CreateColumns(GridView gridView, ICollectionView view)
-    //    {
+//            #endregion
 
-    //        foreach (object item in view)
+//            // return column;
+//        }
 
-    //            gridView.Columns.Add(CreateColumn(gridView, item));
+//        private void CreateColumns(ICollectionView collectionView)
+//        {
 
-    //    }
+//            foreach (object item in collectionView)
 
-    //    private static void RemoveHandlers(GridView gridView, ICollectionView view)
-    //    {
+//                CreateColumn(gridView.Columns.Count, false, item);
 
-    //        view.CollectionChanged -= ColumnsSource_CollectionChanged;
+//        }
 
-    //        GetGridViewsForColumnSource(view).Remove(gridView);
+//        // private object GetPropertyValue(object obj, string propertyName) => obj?.GetType().GetProperty(propertyName)?.GetValue(obj, null);
 
-    //    }
+//        private void RemoveHandlers(ICollectionView collectionView) => collectionView.CollectionChanged -= ColumnsSource_CollectionChanged;
 
-    //    private static void ColumnsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-    //    {
+//    }
 
-    //        ICollectionView view = sender as ICollectionView;
+//    //public static class GridViewColumns
+//    //{
 
-    //        List<GridView> gridViews = GetGridViewsForColumnSource(view);
+//    //    [AttachedPropertyBrowsableForType(typeof(GridView))]
+//    //    public static object GetColumnsSource(DependencyObject obj) => obj.GetValue(ColumnsSourceProperty);
 
-    //        if (gridViews == null || gridViews.Count == 0) return;
+//    //    public static void SetColumnsSource(DependencyObject obj, object value) => obj.SetValue(ColumnsSourceProperty, value);
 
-    //        switch (e.Action)
-    //        {
+//    //    // Using a DependencyProperty as the backing store for ColumnsSource.  This enables animation, styling, binding, etc...
+//    //    public static readonly DependencyProperty ColumnsSourceProperty =
+//    //            DependencyProperty.RegisterAttached(
+//    //                "ColumnsSource",
+//    //                typeof(object),
+//    //                typeof(GridViewColumns),
+//    //                new UIPropertyMetadata(
+//    //                    null,
+//    //                    ColumnsSourceChanged));
 
-    //            case NotifyCollectionChangedAction.Add:
 
-    //                foreach (GridView gridView in gridViews)
+//    //    [AttachedPropertyBrowsableForType(typeof(GridView))]
+//    //    public static string GetHeaderTextMember(DependencyObject obj) => (string)obj.GetValue(HeaderTextMemberProperty);
 
-    //                    for (int i = 0; i < e.NewItems.Count; i++)
+//    //    public static void SetHeaderTextMember(DependencyObject obj, string value) => obj.SetValue(HeaderTextMemberProperty, value);
 
-    //                        gridView.Columns.Insert(e.NewStartingIndex + i, CreateColumn(gridView, e.NewItems[i]));
+//    //    // Using a DependencyProperty as the backing store for HeaderTextMember.  This enables animation, styling, binding, etc...
+//    //    public static readonly DependencyProperty HeaderTextMemberProperty =
+//    //        DependencyProperty.RegisterAttached("HeaderTextMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
 
-    //                break;
 
-    //            case NotifyCollectionChangedAction.Move:
+//    //    [AttachedPropertyBrowsableForType(typeof(GridView))]
+//    //    public static string GetDisplayMemberMember(DependencyObject obj) => (string)obj.GetValue(DisplayMemberMemberProperty);
 
-    //                List<GridViewColumn> columns;
+//    //    public static void SetDisplayMemberMember(DependencyObject obj, string value) => obj.SetValue(DisplayMemberMemberProperty, value);
 
-    //                foreach (GridView gridView in gridViews)
-    //                {
+//    //    // Using a DependencyProperty as the backing store for DisplayMember.  This enables animation, styling, binding, etc...
+//    //    public static readonly DependencyProperty DisplayMemberMemberProperty =
+//    //        DependencyProperty.RegisterAttached("DisplayMemberMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
 
-    //                    columns = new List<GridViewColumn>();
+//    //    private static void ColumnsSourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+//    //    {
 
-    //                    for (int i = 0; i < e.OldItems.Count; i++)
+//    //        GridView gridView = obj as GridView;
 
-    //                        columns.Add(gridView.Columns[e.OldStartingIndex + i]);
+//    //        if (gridView != null)
+//    //        {
 
-    //                    for (int i = 0; i < e.NewItems.Count; i++)
+//    //            gridView.Columns.Clear();
 
-    //                        gridView.Columns.Insert(e.NewStartingIndex + i, columns[i]);
+//    //            if (e.OldValue != null)
+//    //            {
 
-    //                }
+//    //                ICollectionView view = CollectionViewSource.GetDefaultView(e.OldValue);
 
-    //                break;
+//    //                if (view != null)
 
-    //            case NotifyCollectionChangedAction.Remove:
+//    //                    RemoveHandlers(gridView, view);
 
-    //                foreach (GridView gridView in gridViews)
+//    //            }
 
-    //                    for (int i = 0; i < e.OldItems.Count; i++)
+//    //            if (e.NewValue != null)
+//    //            {
 
-    //                        gridView.Columns.RemoveAt(e.OldStartingIndex);
+//    //                ICollectionView view = CollectionViewSource.GetDefaultView(e.NewValue);
 
-    //                break;
+//    //                if (view != null)
+//    //                {
 
-    //            case NotifyCollectionChangedAction.Replace:
+//    //                    AddHandlers(gridView, view);
 
-    //                foreach (GridView gridView in gridViews)
+//    //                    CreateColumns(gridView, view);
 
-    //                    for (int i = 0; i < e.NewItems.Count; i++)
+//    //                }
 
-    //                        gridView.Columns[e.NewStartingIndex + i] = CreateColumn(gridView, e.NewItems[i]);
+//    //            }
 
-    //                break;
+//    //        }
 
-    //            case NotifyCollectionChangedAction.Reset:
+//    //    }
 
-    //                foreach (GridView gridView in gridViews)
-    //                {
+//    //    private static IDictionary<ICollectionView, List<GridView>> _gridViewsByColumnsSource =
+//    //        new Dictionary<ICollectionView, List<GridView>>();
 
-    //                    gridView.Columns.Clear();
+//    //    private static List<GridView> GetGridViewsForColumnSource(ICollectionView columnSource)
+//    //    {
 
-    //                    CreateColumns(gridView, sender as ICollectionView);
+//    //        List<GridView> gridViews;
 
-    //                }
+//    //        if (!_gridViewsByColumnsSource.TryGetValue(columnSource, out gridViews))
+//    //        {
 
-    //                break;
+//    //            gridViews = new List<GridView>();
 
-    //            default:
+//    //            _gridViewsByColumnsSource.Add(columnSource, gridViews);
 
-    //                break;
+//    //        }
 
-    //        }
+//    //        return gridViews;
+//    //    }
 
-    //    }
+//    //    private static void AddHandlers(GridView gridView, ICollectionView view)
+//    //    {
 
-    //    private static GridViewColumn CreateColumn(GridView gridView, object columnSource)
-    //    {
+//    //        GetGridViewsForColumnSource(view).Add(gridView);
 
-    //        GridViewColumn column = new GridViewColumn();
+//    //        view.CollectionChanged += ColumnsSource_CollectionChanged;
 
-    //        string headerTextMember = GetHeaderTextMember(gridView);
+//    //    }
 
-    //        string displayMemberMember = GetDisplayMemberMember(gridView);
+//    //    private static void CreateColumns(GridView gridView, ICollectionView view)
+//    //    {
 
-    //        if (!string.IsNullOrEmpty(headerTextMember))
+//    //        foreach (object item in view)
 
-    //            column.Header = GetPropertyValue(columnSource, headerTextMember);
+//    //            gridView.Columns.Add(CreateColumn(gridView, item));
 
-    //        if (!string.IsNullOrEmpty(displayMemberMember))
+//    //    }
 
-    //            column.DisplayMemberBinding = new Binding(GetPropertyValue(columnSource, displayMemberMember) as string);
+//    //    private static void RemoveHandlers(GridView gridView, ICollectionView view)
+//    //    {
 
-    //        return column;
+//    //        view.CollectionChanged -= ColumnsSource_CollectionChanged;
 
-    //    }
+//    //        GetGridViewsForColumnSource(view).Remove(gridView);
 
-    //    private static object GetPropertyValue(object obj, string propertyName) => obj?.GetType().GetProperty(propertyName)?.GetValue(obj, null);
+//    //    }
 
-    //}
+//    //    private static void ColumnsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+//    //    {
 
-}
+//    //        ICollectionView view = sender as ICollectionView;
+
+//    //        List<GridView> gridViews = GetGridViewsForColumnSource(view);
+
+//    //        if (gridViews == null || gridViews.Count == 0) return;
+
+//    //        switch (e.Action)
+//    //        {
+
+//    //            case NotifyCollectionChangedAction.Add:
+
+//    //                foreach (GridView gridView in gridViews)
+
+//    //                    for (int i = 0; i < e.NewItems.Count; i++)
+
+//    //                        gridView.Columns.Insert(e.NewStartingIndex + i, CreateColumn(gridView, e.NewItems[i]));
+
+//    //                break;
+
+//    //            case NotifyCollectionChangedAction.Move:
+
+//    //                List<GridViewColumn> columns;
+
+//    //                foreach (GridView gridView in gridViews)
+//    //                {
+
+//    //                    columns = new List<GridViewColumn>();
+
+//    //                    for (int i = 0; i < e.OldItems.Count; i++)
+
+//    //                        columns.Add(gridView.Columns[e.OldStartingIndex + i]);
+
+//    //                    for (int i = 0; i < e.NewItems.Count; i++)
+
+//    //                        gridView.Columns.Insert(e.NewStartingIndex + i, columns[i]);
+
+//    //                }
+
+//    //                break;
+
+//    //            case NotifyCollectionChangedAction.Remove:
+
+//    //                foreach (GridView gridView in gridViews)
+
+//    //                    for (int i = 0; i < e.OldItems.Count; i++)
+
+//    //                        gridView.Columns.RemoveAt(e.OldStartingIndex);
+
+//    //                break;
+
+//    //            case NotifyCollectionChangedAction.Replace:
+
+//    //                foreach (GridView gridView in gridViews)
+
+//    //                    for (int i = 0; i < e.NewItems.Count; i++)
+
+//    //                        gridView.Columns[e.NewStartingIndex + i] = CreateColumn(gridView, e.NewItems[i]);
+
+//    //                break;
+
+//    //            case NotifyCollectionChangedAction.Reset:
+
+//    //                foreach (GridView gridView in gridViews)
+//    //                {
+
+//    //                    gridView.Columns.Clear();
+
+//    //                    CreateColumns(gridView, sender as ICollectionView);
+
+//    //                }
+
+//    //                break;
+
+//    //            default:
+
+//    //                break;
+
+//    //        }
+
+//    //    }
+
+//    //    private static GridViewColumn CreateColumn(GridView gridView, object columnSource)
+//    //    {
+
+//    //        GridViewColumn column = new GridViewColumn();
+
+//    //        string headerTextMember = GetHeaderTextMember(gridView);
+
+//    //        string displayMemberMember = GetDisplayMemberMember(gridView);
+
+//    //        if (!string.IsNullOrEmpty(headerTextMember))
+
+//    //            column.Header = GetPropertyValue(columnSource, headerTextMember);
+
+//    //        if (!string.IsNullOrEmpty(displayMemberMember))
+
+//    //            column.DisplayMemberBinding = new Binding(GetPropertyValue(columnSource, displayMemberMember) as string);
+
+//    //        return column;
+
+//    //    }
+
+//    //    private static object GetPropertyValue(object obj, string propertyName) => obj?.GetType().GetProperty(propertyName)?.GetValue(obj, null);
+
+//    //}
+
+//}

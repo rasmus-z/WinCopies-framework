@@ -7,7 +7,7 @@ namespace WinCopies.GUI.Controls
     {
         public ScrollViewer ScrollHost { get; private set; } = null;
 
-        static ListView() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ListView), new FrameworkPropertyMetadata(typeof(ListView)));
+        static ListView() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ListView), new FrameworkPropertyMetadata(typeof(ListView)));// ViewProperty.OverrideMetadata(typeof(ListView), new FrameworkPropertyMetadata(ViewProperty.DefaultMetadata.DefaultValue, (DependencyObject d, DependencyPropertyChangedEventArgs e) => { if (e.OldValue != null) ((GridView)e.OldValue).ListView = null; ((GridView)e.NewValue).ListView = (ListView)d; }));
 
         public override void OnApplyTemplate()
         {

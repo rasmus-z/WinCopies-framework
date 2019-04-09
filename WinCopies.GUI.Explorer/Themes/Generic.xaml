@@ -64,6 +64,7 @@
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <data:FileSystemInfoAttributesToVisibilityConverter x:Key="FileSystemInfoAttributesToVisibilityConverter" />
             <data:FileSystemInfoAttributesToOpacityConverter x:Key="FileSystemInfoAttributesToOpacityConverter" />
+            <data:ViewStyleConverter x:Key="ViewStyleConverter" />
 
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
@@ -276,7 +277,7 @@
 
     <DataTemplate x:Key="ExplorerControlTilesListViewItemContentTemplate" x:Shared="false">
         <StackPanel Orientation="Horizontal" >
-            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding IsSelected}" />
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
             <Image Source="{Binding ShellObject.Thumbnail.SmallBitmapSource}" Height="32" Width="32" >
                 <Image.Opacity>
                     <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -288,10 +289,10 @@
                 </Image.Opacity>
             </Image>
             <!--, Converter={local:ImageSourceConverter}}-->
-            <StackPanel>
+            <StackPanel Margin="10,0,0,0">
                 <TextBlock Text="{Binding ShellObject.Name}" />
-                <controls:Label Content="{Binding ShellObject.Properties.SystemItemTypeText.ValueAsObject}" Foreground="Gray" />
-                <controls:Label Content="{Binding ShellObject.Properties.System.Size.ValueAsObject}" Foreground="Gray" />
+                <controls:Label Padding="0" Content="{Binding ShellObject.Properties.System.ItemTypeText.ValueAsObject}" Foreground="Gray" />
+                <controls:Label Padding="0" Content="{Binding ShellObject.Properties.System.Size.ValueAsObject}" Foreground="Gray" />
             </StackPanel>
         </StackPanel>
     </DataTemplate>
@@ -301,6 +302,8 @@
         <!--<Setter Property="Height" Value="30" ></Setter>-->
 
         <Setter Property="ContentTemplate" Value="{StaticResource ExplorerControlTilesListViewItemContentTemplate}" />
+        <Setter Property="Height" Value="64" />
+        <Setter Property="Width" Value="300" />
 
         <!--<Setter Property="VerticalContentAlignment" Value="Bottom" />-->
 
@@ -486,8 +489,18 @@
                         <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="5" ></GridSplitter>
 
                         <local:ListView x:Name="PART_ListView" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding ListViewSelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding SelectionMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" >
+                            <!--<local:ListView.Resources>
+                                <FrameworkElement x:Key="FrameworkElement" DataContext="{Binding}" />
+                            </local:ListView.Resources>-->
                             <local:ListView.Style>
                                 <Style TargetType="{x:Type ListView}" >
+                                    <Setter Property="ItemsPanel">
+                                        <Setter.Value>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="{Binding ViewStyle, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}, Converter={StaticResource ViewStyleConverter}, ConverterParameter=WrapPanelOrientation}" />
+                                            </ItemsPanelTemplate>
+                                        </Setter.Value>
+                                    </Setter>
 
                                     <!--<Setter Property="ItemTemplate">
                                             <Setter.Value>
@@ -500,27 +513,23 @@
                                     <!--<Setter Property="ItemContainerStyle" Value="{StaticResource ExplorerControlListViewItemStyle}" />-->
 
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={data:ViewStyleConverter}}" Value="SizeOneToFour" >
+                                        <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource ViewStyleConverter}, ConverterParameter=ScrollBarsVisibility}" Value="SizeOneToFourOrTiles" >
                                             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-                                            <Setter Property="ItemsPanel">
-                                                <Setter.Value>
-                                                    <ItemsPanelTemplate>
-                                                        <WrapPanel />
-                                                    </ItemsPanelTemplate>
-                                                </Setter.Value>
-                                            </Setter>
                                         </DataTrigger>
 
-                                        <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={data:ViewStyleConverter}}" Value="ListItems" >
+                                        <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource ViewStyleConverter}, ConverterParameter=ScrollBarsVisibility}" Value="ListItems" >
                                             <!--<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" ></Setter>-->
-                                            <Setter Property="ItemsPanel">
+                                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+                                        </DataTrigger>
+
+                                        <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static local:ViewStyles.Details}" >
+                                            <Setter Property="ItemsPanel" >
                                                 <Setter.Value>
                                                     <ItemsPanelTemplate>
-                                                        <WrapPanel Orientation="Vertical" />
+                                                        <StackPanel />
                                                     </ItemsPanelTemplate>
                                                 </Setter.Value>
                                             </Setter>
-                                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
                                         </DataTrigger>
 
                                         <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static local:ViewStyles.SizeOne}" >
@@ -544,13 +553,12 @@
                                         <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static local:ViewStyles.Details}" >
                                             <Setter Property="View" >
                                                 <Setter.Value>
-                                                    <GridView controls:GridViewColumns.HeaderTextMember="HeaderText"
-                      controls:GridViewColumns.DisplayMemberMember="DisplayMember"
-                      controls:GridViewColumns.ColumnsSource="{Binding Columns}" >
+                                                    <GridView x:Name="Bidule" >
+                                                        <GridViewColumn Header="FileName" DisplayMemberBinding="{Binding ShellObject.Name}" />
                                                     </GridView>
                                                 </Setter.Value>
                                             </Setter>
-                                            <Setter Property="ItemContainerStyle" Value="{StaticResource ExplorerControlDetailsListViewItemStyle}" />
+                                            <!--<Setter Property="ItemContainerStyle" Value="{StaticResource ExplorerControlDetailsListViewItemStyle}" />-->
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
