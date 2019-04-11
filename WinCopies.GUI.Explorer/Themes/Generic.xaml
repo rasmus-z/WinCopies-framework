@@ -86,7 +86,7 @@
             </Setter.Value>
         </Setter>
 
-        <Setter Property="pushBinding:PushBindingManager.StylePushBindings" >
+        <!--<Setter Property="pushBinding:PushBindingManager.StylePushBindings" >
             <Setter.Value>
                 <pushBinding:PushBindingCollection>
 
@@ -95,20 +95,21 @@
             </Setter.Value>
         </Setter>
 
-        <!--<Style.Triggers>
+        <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Converter={StaticResource FileSystemInfoConverter}, Mode=OneTime}" >-->
+        
         <Setter Property="Visibility" >
             <Setter.Value >
                 <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToVisibilityConverter}" >
                     <Binding />
                     <Binding Path="FileSystemInfoProperties.Attributes" />
-                    <Binding Path="ShowHiddenItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}" />
-                    <Binding Path="ShowSystemItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}" />
+                    <Binding Path="ParentExplorerControl.ShowHiddenItems" RelativeSource="{RelativeSource Mode=Self}" />
+                    <Binding Path="ParentExplorerControl.ShowSystemItems" RelativeSource="{RelativeSource Mode=Self}" />
                 </MultiBinding>
             </Setter.Value>
         </Setter>
 
-        <Setter Property="ContextMenu" Value="{Binding ItemContextMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" />
+        <Setter Property="ContextMenu" Value="{Binding ParentExplorerControl.ItemContextMenu, RelativeSource={RelativeSource Mode=Self}}" />
 
         <EventSetter Event="ContextMenuOpening" Handler="ListViewItem_ContextMenuOpening" />
         <!--</DataTrigger>
@@ -117,7 +118,7 @@
 
     <DataTemplate x:Key="ExplorerControlSizeOneListViewItemContentTemplate" x:Shared="false" >
         <StackPanel Orientation="Horizontal" Height="16" Width="300" >
-            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding IsSelected}" />
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ListViewItem}}}" IsChecked="{Binding IsSelected}" />
             <Image Source="{Binding ShellObject.Thumbnail.SmallBitmapSource}" Height="16" Width="16" >
                 <Image.Opacity>
                     <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -146,7 +147,7 @@
                 <RowDefinition />
                 <RowDefinition MaxHeight="32" />
             </Grid.RowDefinitions>
-            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding IsSelected}" />
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ListViewItem}}}" IsChecked="{Binding IsSelected}" />
             <Image Grid.Row="1" Source="{Binding ShellObject.Thumbnail.MediumBitmapSource}" Height="64" VerticalAlignment="Bottom" Width="64" >
                 <Image.Opacity>
                     <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -182,7 +183,7 @@
                 <RowDefinition />
                 <RowDefinition MaxHeight="32" />
             </Grid.RowDefinitions>
-            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding IsSelected}" />
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ListViewItem}}}" IsChecked="{Binding IsSelected}" />
             <Image Grid.Row="1" Source="{Binding ShellObject.Thumbnail.LargeBitmapSource}" Height="96" VerticalAlignment="Bottom" Width="96" >
                 <Image.Opacity>
                     <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -217,7 +218,7 @@
                 <RowDefinition />
                 <RowDefinition MaxHeight="32" />
             </Grid.RowDefinitions>
-            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding IsSelected}" />
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ListViewItem}}}" IsChecked="{Binding IsSelected}" />
             <Image Grid.Row="1" Source="{Binding ShellObject.Thumbnail.ExtraLargeBitmapSource}" Height="256" Width="256" >
                 <Image.Opacity>
                     <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -247,7 +248,7 @@
 
     <DataTemplate x:Key="ExplorerControlListListViewItemContentTemplate" x:Shared="false">
         <StackPanel Orientation="Horizontal" >
-            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding IsSelected}" />
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ListViewItem}}}" IsChecked="{Binding IsSelected}" />
             <Image Source="{Binding ShellObject.Thumbnail.SmallBitmapSource}" Height="16" Width="16" >
                 <Image.Opacity>
                     <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -277,7 +278,7 @@
 
     <DataTemplate x:Key="ExplorerControlTilesListViewItemContentTemplate" x:Shared="false">
         <StackPanel Orientation="Horizontal" >
-            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ListViewItem}}}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
             <Image Source="{Binding ShellObject.Thumbnail.SmallBitmapSource}" Height="32" Width="32" >
                 <Image.Opacity>
                     <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -497,7 +498,7 @@
                                     <Setter Property="ItemsPanel">
                                         <Setter.Value>
                                             <ItemsPanelTemplate>
-                                                <WrapPanel Orientation="{Binding ViewStyle, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}, Converter={StaticResource ViewStyleConverter}, ConverterParameter=WrapPanelOrientation}" />
+                                                <WrapPanel Orientation="{Binding ViewStyle, RelativeSource={RelativeSource AncestorType={x:Type local:ExplorerControl}}, Converter={StaticResource ViewStyleConverter}, ConverterParameter=WrapPanelOrientation}" />
                                             </ItemsPanelTemplate>
                                         </Setter.Value>
                                     </Setter>

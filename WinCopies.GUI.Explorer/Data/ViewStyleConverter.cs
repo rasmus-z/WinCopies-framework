@@ -23,7 +23,7 @@ namespace WinCopies.GUI.Explorer.Data
 
             string _parameter = (string)parameter;
 
-            return _parameter == "ScrollBarsVisibility" ? result : _parameter == "WrapPanelOrientation" ? result == "SizeOneToFourOrTiles" ? (object)Orientation.Horizontal : result == "ListItems" ? (object)Orientation.Vertical : null : null;
+            return _parameter == "ScrollBarsVisibility" ? result : _parameter == "WrapPanelOrientation" ? result == "SizeOneToFourOrTiles" ? Orientation.Horizontal : result == "ListItems" ? (object)Orientation.Vertical : null : null;
 
         }
 

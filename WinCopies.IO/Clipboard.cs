@@ -462,7 +462,7 @@ namespace WinCopies.IO
 
         }
         const uint CLIPBRD_E_CANT_OPEN = 0x800401D0;
-        public static void SetDataObject(WindowInteropHelper ownerWindow, IDataObject dataObject, bool copy)
+        public static void SetDataObject(IDataObject dataObject, bool copy)
 
         {
 
@@ -470,16 +470,14 @@ namespace WinCopies.IO
 
             // r = EmptyClipboard();
 
-            var t = Thread.CurrentThread.GetApartmentState();
-
             //if (OpenClipboard(ownerWindow.Handle))
 
             //{
 
             bool value = false;
-            uint result;
+            uint result = 0;
 
-            while (true)
+            for (int i = 0; i < 10; i++)
             {
                 result = OleSetClipboard(dataObject);
                 value = CLIPBRD_E_CANT_OPEN == result;
@@ -493,37 +491,37 @@ namespace WinCopies.IO
 
                 throw new Win32Exception((int)result);
 
-            // if (copy)
-
-            // {
-
-            result = (uint)OleFlushClipboard();
-
-            if (result != (int)ErrorCodes.ERROR_SUCCESS)
+            if (copy)
 
             {
 
-                CloseClipboard();
+                result = (uint)OleFlushClipboard();
 
-                throw new Win32Exception((int)result);
+                if (result != (int)ErrorCodes.ERROR_SUCCESS)
+
+                {
+
+                    // CloseClipboard();
+
+                    throw new Win32Exception((int)result);
+
+                }
 
             }
 
-        //}
+            // CloseClipboard();
 
-        CloseClipboard();
+            // }
 
-        // }
+        }
+
+        public static void SetData(WindowInteropHelper ownerWindow, string format, object data, bool copy) => SetDataObject(data is IDataObject ? (IDataObject)data : new DataObject(format, data), copy);
+
+        public static void SetData(WindowInteropHelper ownerWindow, StandardClipboardFormats format, object data, bool copy) => SetDataObject(data is IDataObject ? (IDataObject)data : new DataObject(DataFormats.GetDataFormat((int)format).Name, data), copy);
+
+        public static void SetAudio(WindowInteropHelper ownerWindow, Stream data, bool copy) => SetData(ownerWindow, StandardClipboardFormats.CF_WAVE, data, copy);
+
+        public static void SetFileDropList(WindowInteropHelper ownerWindow, StringCollection sc, bool copy) => SetData(ownerWindow, StandardClipboardFormats.CF_HDROP, sc.ToList().ToArray(typeof(string)), copy);
 
     }
-
-    public static void SetData(WindowInteropHelper ownerWindow, string format, object data, bool copy) => SetDataObject(ownerWindow, data is IDataObject ? (IDataObject)data : new DataObject(format, data), copy);
-
-    public static void SetData(WindowInteropHelper ownerWindow, StandardClipboardFormats format, object data, bool copy) => SetDataObject(ownerWindow, data is IDataObject ? (IDataObject)data : new DataObject(DataFormats.GetDataFormat((int)format).Name, data), copy);
-
-    public static void SetAudio(WindowInteropHelper ownerWindow, Stream data, bool copy) => SetData(ownerWindow, StandardClipboardFormats.CF_WAVE, data, copy);
-
-    public static void SetFileDropList(WindowInteropHelper ownerWindow, StringCollection sc, bool copy) => SetData(ownerWindow, StandardClipboardFormats.CF_HDROP, sc.ToList().ToArray(typeof(string)), copy);
-
-}
 }
