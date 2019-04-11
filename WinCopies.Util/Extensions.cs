@@ -12,6 +12,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using static WinCopies.Util.Generic;
+using static WinCopies.Util.Win32Interop.NativeMethods;
 
 namespace WinCopies.Util
 {
@@ -498,7 +499,7 @@ namespace WinCopies.Util
                 Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions());
 
-            if (!Util.DeleteObject(hBitmap))
+            if (!DeleteObject(hBitmap))
 
                 throw new Win32Exception();
 

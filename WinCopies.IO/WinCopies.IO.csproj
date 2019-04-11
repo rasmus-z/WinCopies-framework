@@ -94,6 +94,7 @@
     <Compile Include="ArchiveItemInfo.cs" />
     <Compile Include="BrowsableObjectInfo.cs" />
     <Compile Include="BrowsableObjectInfoItemsLoader.cs" />
+    <Compile Include="Clipboard.cs" />
     <Compile Include="FileOperations.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="IBrowsableObjectInfo.cs" />

@@ -11,9 +11,6 @@ namespace WinCopies.Util
 
         public static RoutedCommand CommonCommand { get; } = new RoutedCommand(nameof(CommonCommand), typeof(Util));
 
-        [DllImport("gdi32.dll", SetLastError = true)]
-        public static extern bool DeleteObject(IntPtr hObject);
-
         public static Predicate<T> GetCommonPredicate<T>() => (T value) => true;
 
         // public static KeyValuePair<TKey, Func<bool>>[] GetIfKeyValuePairPredicateArray<TKey>(params KeyValuePair<TKey, Func<bool>>[] keyValuePairs) => keyValuePairs;
@@ -860,7 +857,7 @@ namespace WinCopies.Util
 
                 throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
 
-            int result = 0;
+            int result ;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -3133,7 +3130,7 @@ namespace WinCopies.Util
 
             {
 
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value = default;
+                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value ;
 
                 TValue __value = default;
 
@@ -3523,8 +3520,8 @@ namespace WinCopies.Util
 
         {
             // /// <param name="elementType">The type of the items inside the tables.</param>
-
-            T[] newArray = null;
+            
+            T[] newArray ;
 
             int totalArraysLength = 0;
 
@@ -3573,7 +3570,7 @@ namespace WinCopies.Util
 
             // /// <param name="elementType">The type of the items inside the tables.</param>
 
-            T[] newArray = null;
+            T[] newArray ;
 
             long totalArraysLength = 0;
 
@@ -3582,6 +3579,8 @@ namespace WinCopies.Util
             foreach (T[] array in arrays)
 
             {
+
+                // todo:
 
                 if (array.Rank != 1) throw new ArgumentException("Arrays must have only one dimension.");
 

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using WinCopies.Util;
+using WinCopies.Util.Win32Interop;
 
 namespace WinCopies.IO.FileProcesses
 {
@@ -502,7 +502,7 @@ namespace WinCopies.IO.FileProcesses
    CopyFileFlags dwCopyFlags)
 
         {
-            Win32ErrorCodes error_Code = 0;
+            ErrorCodes error_Code = 0;
 
             Exceptions ex = Exceptions.None;
 
@@ -513,7 +513,7 @@ namespace WinCopies.IO.FileProcesses
             if (!copy_result)
             {
 
-                error_Code = (Win32ErrorCodes)Marshal.GetLastWin32Error();
+                error_Code = (ErrorCodes)Marshal.GetLastWin32Error();
 
 #if DEBUG
                 Debug.WriteLine("error_Code: " + error_Code.ToString());
@@ -527,19 +527,19 @@ namespace WinCopies.IO.FileProcesses
 
                     {
 
-                        case Win32ErrorCodes.ERROR_FILE_NOT_FOUND:
+                        case ErrorCodes.ERROR_FILE_NOT_FOUND:
 
                             ex = Exceptions.FileNotFound;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_PATH_NOT_FOUND:
+                        case ErrorCodes.ERROR_PATH_NOT_FOUND:
 
                             ex = Exceptions.PathNotFound;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_ACCESS_DENIED:
+                        case ErrorCodes.ERROR_ACCESS_DENIED:
 
                             if (Directory.Exists(lpNewFileName))
                                 ex = Exceptions.FileAlreadyExists;
@@ -550,99 +550,99 @@ namespace WinCopies.IO.FileProcesses
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_CURRENT_DIRECTORY:
+                        case ErrorCodes.ERROR_CURRENT_DIRECTORY:
 
                             ex = Exceptions.DirectoryCannotBeRemoved;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_WRITE_PROTECT:
+                        case ErrorCodes.ERROR_WRITE_PROTECT:
 
                             ex = Exceptions.WriteProtect;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_INVALID_DRIVE:
-                        case Win32ErrorCodes.ERROR_BAD_UNIT:
-                        case Win32ErrorCodes.ERROR_SEEK:
-                        case Win32ErrorCodes.ERROR_NOT_DOS_DISK:
-                        case Win32ErrorCodes.ERROR_SECTOR_NOT_FOUND:
-                        case Win32ErrorCodes.ERROR_WRITE_FAULT:
-                        case Win32ErrorCodes.ERROR_READ_FAULT:
-                        case Win32ErrorCodes.ERROR_WRONG_DISK:
+                        case ErrorCodes.ERROR_INVALID_DRIVE:
+                        case ErrorCodes.ERROR_BAD_UNIT:
+                        case ErrorCodes.ERROR_SEEK:
+                        case ErrorCodes.ERROR_NOT_DOS_DISK:
+                        case ErrorCodes.ERROR_SECTOR_NOT_FOUND:
+                        case ErrorCodes.ERROR_WRITE_FAULT:
+                        case ErrorCodes.ERROR_READ_FAULT:
+                        case ErrorCodes.ERROR_WRONG_DISK:
 
                             ex = Exceptions.ExceptionOnDeviceUnit;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_NOT_READY:
+                        case ErrorCodes.ERROR_NOT_READY:
 
                             ex = Exceptions.DiskNotReady;
 
                             break;
 
 
-                        case WinCopies.Util.Win32ErrorCodes.ERROR_ALREADY_EXISTS:
-                        case Win32ErrorCodes.ERROR_FILE_EXISTS:
+                        case ErrorCodes.ERROR_ALREADY_EXISTS:
+                        case ErrorCodes.ERROR_FILE_EXISTS:
 
                             ex = Exceptions.FileAlreadyExists;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_BUFFER_OVERFLOW:
-                        case Win32ErrorCodes.ERROR_FILENAME_EXCED_RANGE:
+                        case ErrorCodes.ERROR_BUFFER_OVERFLOW:
+                        case ErrorCodes.ERROR_FILENAME_EXCED_RANGE:
 
                             ex = Exceptions.FileNameTooLong;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_DISK_FULL:
-                        case Win32ErrorCodes.ERROR_HANDLE_DISK_FULL:
+                        case ErrorCodes.ERROR_DISK_FULL:
+                        case ErrorCodes.ERROR_HANDLE_DISK_FULL:
 
                             ex = Exceptions.DiskFull;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_INVALID_NAME:
-                        case Win32ErrorCodes.ERROR_DIRECTORY:
+                        case ErrorCodes.ERROR_INVALID_NAME:
+                        case ErrorCodes.ERROR_DIRECTORY:
 
                             ex = Exceptions.InvalidName;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_FILE_CHECKED_OUT:
-                        case Win32ErrorCodes.ERROR_SHARING_VIOLATION:
-                        case Win32ErrorCodes.ERROR_LOCK_VIOLATION:
+                        case ErrorCodes.ERROR_FILE_CHECKED_OUT:
+                        case ErrorCodes.ERROR_SHARING_VIOLATION:
+                        case ErrorCodes.ERROR_LOCK_VIOLATION:
 
                             ex = Exceptions.FileCheckedOut;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_FILE_TOO_LARGE:
+                        case ErrorCodes.ERROR_FILE_TOO_LARGE:
 
                             ex = Exceptions.FileTooLarge;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_DISK_TOO_FRAGMENTED:
+                        case ErrorCodes.ERROR_DISK_TOO_FRAGMENTED:
 
                             ex = Exceptions.DiskTooFragmented;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_DELETE_PENDING:
+                        case ErrorCodes.ERROR_DELETE_PENDING:
 
                             ex = Exceptions.DeletePending;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_NOT_ALLOWED_ON_SYSTEM_FILE:
+                        case ErrorCodes.ERROR_NOT_ALLOWED_ON_SYSTEM_FILE:
 
                             ex = Exceptions.NotAllowedOnSystemFile;
 
                             break;
 
-                        case Win32ErrorCodes.ERROR_REQUEST_ABORTED:
+                        case ErrorCodes.ERROR_REQUEST_ABORTED:
 
                             ex = Exceptions.RequestCancelled;
 

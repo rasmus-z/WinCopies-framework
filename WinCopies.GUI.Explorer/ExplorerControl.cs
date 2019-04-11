@@ -18,6 +18,9 @@ using Generic = WinCopies.GUI.Explorer.Themes.Generic;
 using WinCopies.GUI.Controls;
 using TreeView = WinCopies.GUI.Controls.TreeView;
 using TextBox = System.Windows.Controls.TextBox;
+using Clipboard = WinCopies.IO.Clipboard;
+using System.Windows.Interop;
+using System.ComponentModel;
 
 namespace WinCopies.GUI.Explorer
 {
@@ -1192,7 +1195,7 @@ namespace WinCopies.GUI.Explorer
 
                     sc.Add(shellObjectInfo.Path);
 
-                Clipboard.SetFileDropList(sc);
+                // Clipboard.SetFileDropList(sc);
 
             }
 
@@ -1212,7 +1215,26 @@ namespace WinCopies.GUI.Explorer
 
             if (sc != null)
 
-                Clipboard.SetFileDropList(sc);
+                // Clipboard.EmptyClipboard();
+
+                //while (true)
+
+                //    try
+                //    {
+
+                Clipboard.SetFileDropList(new WindowInteropHelper(Window.GetWindow(this)), sc, false);
+
+            //    break;
+
+            //}
+
+            //catch (Win32Exception ex)
+
+            //{
+
+
+
+            //}
 
         }
 
@@ -1244,7 +1266,7 @@ namespace WinCopies.GUI.Explorer
             data.SetData("Preferred DropEffect", dropEffect);
 
             // Clipboard.Clear();
-            Clipboard.SetDataObject(data, true);
+            System.Windows.Clipboard.SetDataObject(data, true);
 
         }
 
@@ -1294,9 +1316,13 @@ namespace WinCopies.GUI.Explorer
 
             pasteTo.ThrowIfNotValidEnumValue();
 
+            WindowInteropHelper windowHandle = new WindowInteropHelper(Window.GetWindow(this));
+
             // if (!PART_TreeView.IsFocused && !PART_ListView.IsFocused) return;
 
-            if (!Clipboard.ContainsFileDropList()) return;
+            StandardClipboardFormats standardClipboardFormat;
+
+            if (!Clipboard.Contains(windowHandle, CommonClipboardFormats.FileDropList, out standardClipboardFormat)) return;
 
             string path = null;
 
@@ -1310,13 +1336,13 @@ namespace WinCopies.GUI.Explorer
 
             bool isAFileMoving = false;
 
-            if (Clipboard.ContainsData("Preferred DropEffect"))
+            if (Clipboard.Contains(windowHandle, "Preferred DropEffect"))
 
-                using (MemoryStream dropEffect = (MemoryStream)Clipboard.GetData("Preferred DropEffect"))
+                using (MemoryStream dropEffect = (MemoryStream)Clipboard.GetData(windowHandle, "Preferred DropEffect"))
 
                     isAFileMoving = (DragDropEffects)dropEffect.ReadByte() == DragDropEffects.Move;
 
-            OnPaste(isAFileMoving, Clipboard.GetFileDropList(), path);
+            OnPaste(isAFileMoving, Clipboard.GetFileDropList(new WindowInteropHelper(Window.GetWindow(this))), path);
 
         }
 

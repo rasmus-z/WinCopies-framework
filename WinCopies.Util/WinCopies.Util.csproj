@@ -134,7 +134,8 @@
     <Compile Include="Util.cs" />
     <Compile Include="ValueChangedEventArgs.cs" />
     <Compile Include="ValueObject.cs" />
-    <Compile Include="Win32ErrorCodes.cs" />
+    <Compile Include="Win32Interop\NativeMethods.cs" />
+    <Compile Include="Win32Interop\ErrorCodes.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

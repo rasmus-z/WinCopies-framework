@@ -1,6 +1,9 @@
-﻿namespace WinCopies.Util
+﻿namespace WinCopies.Util.Win32Interop
 {
-    public enum Win32ErrorCodes
+
+    // todo: add the other codes
+
+    public enum ErrorCodes
     {
 
         /// <summary>
