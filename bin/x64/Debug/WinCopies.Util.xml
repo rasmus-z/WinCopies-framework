@@ -439,7 +439,7 @@
             This method only evaluates the commands of the common <see cref="T:System.Windows.Input.ICommand"/> type. To evaluate a command of the <see cref="T:System.Windows.Input.RoutedCommand"/> type, consider using the <see cref="M:WinCopies.Util.Extensions.TryExecute(System.Windows.Input.RoutedCommand,System.Object,System.Windows.IInputElement)"/> method. If you are not sure of the type of your command, so consider using the <see cref="!:ExecuteCommand(ICommandSource, ICommand, object, IInputElement)"/> method.
             </remarks>
         </member>
-        <member name="M:WinCopies.Util.Extensions.GetParent(System.Windows.DependencyObject,System.Type,System.Boolean)">
+        <member name="M:WinCopies.Util.Extensions.GetParent``1(System.Windows.DependencyObject,System.Boolean)">
             <summary>
             Searches for the first parent of an object which is assignable from a given type.
             </summary>

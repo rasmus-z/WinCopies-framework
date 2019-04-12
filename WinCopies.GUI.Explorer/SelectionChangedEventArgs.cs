@@ -5,8 +5,7 @@ namespace WinCopies.GUI.Explorer
 {
     public class SelectionChangedEventArgs : System.Windows.Controls.SelectionChangedEventArgs
     {
-
-        ActionsFromObjects SelectionSource { get; }
+        private ActionsFromObjects SelectionSource { get; }
 
         private SelectionChangedEventArgs(RoutedEvent id, IList addedItems, IList removedItems) : base(id, addedItems, removedItems) { }
 

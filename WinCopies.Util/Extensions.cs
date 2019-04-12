@@ -382,7 +382,7 @@ namespace WinCopies.Util
 
             bool alreadyFoundAFlag = false;
 
-            Enum enumValue = null;
+            Enum enumValue;
 
             // FieldInfo field = null;
 
@@ -392,7 +392,7 @@ namespace WinCopies.Util
 
             {
 
-                enumValue = ((Enum)Enum.Parse(type, s));
+                enumValue = (Enum)Enum.Parse(type, s);
 
 
 
@@ -719,13 +719,15 @@ namespace WinCopies.Util
         /// <param name="type">The type to search</param>
         /// <param name="typeEquality">Indicates whether to check for the exact type equality. <see langword="true"/> to only search for objects with same type than the given type, <see langword="false"/> to search for all objects of type for which the given type is assignable from.</param>
         /// <returns>The first object that was found, if any, otherwise null.</returns>
-        public static DependencyObject GetParent(this DependencyObject source, Type type, bool typeEquality)
+        public static T GetParent<T>(this DependencyObject source, bool typeEquality) where T : DependencyObject
 
         {
 
+            Type type = typeof(T);
+
             if (!typeof(DependencyObject).IsAssignableFrom(type))
 
-                throw new ArgumentException($"The DependencyObject type must be assignable from '{nameof(type)}'.");
+                throw new InvalidOperationException($"The DependencyObject type must be assignable from the type parameter.");
 
             do
 
@@ -733,7 +735,7 @@ namespace WinCopies.Util
 
             while (source != null && source is FrameworkElement && (typeEquality ? source.GetType() != type : !type.IsAssignableFrom(source.GetType())));
 
-            return source;
+            return (T) source;
 
         }
 

@@ -3,9 +3,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.GUI.Explorer.Data;
-using WinCopies.GUI.Windows.Dialogs;
 using BooleanToVisibilityConverter = WinCopies.Util.DataConverters.BooleanToVisibilityConverter;
 using WinCopies.Util;
+using System;
 
 namespace WinCopies.GUI.Explorer.Themes
 {
@@ -221,16 +221,37 @@ namespace WinCopies.GUI.Explorer.Themes
 
         {
 
-            if (((ExplorerControl)((FrameworkElement)sender).TemplatedParent).ListViewSelectedItem is IO.IBrowsableObjectInfo)
+            if (((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Path.SelectedItem is IO.IBrowsableObjectInfo)
 
                 ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).OnOpeningInternal();
 
         }
 
-        private void Navigate(object sender) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Open(new ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(
-                ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Text)
-                , ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Text)
-                );
+        private void Navigate(object sender)
+
+        {
+
+            ExplorerControl explorerControl = ((ExplorerControl)((FrameworkElement)sender).TemplatedParent);
+
+            try
+
+            {
+
+                explorerControl.Open(new ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(
+                    explorerControl.Text)
+                    , explorerControl.Text)
+                    );
+
+            }
+            catch (Exception ex) // when (ex is IOException || ex is UnauthorizedAccessException)
+
+            {
+
+                explorerControl.OnItemsLoadException(ex);
+
+            }
+
+        }
 
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
@@ -282,9 +303,22 @@ namespace WinCopies.GUI.Explorer.Themes
         private void ListViewItem_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
 
-            ListView listView = (ListView)((FrameworkElement)sender).GetParent(typeof(ListView), false);
+            ListView listView = ((FrameworkElement)sender).GetParent<ListView>(false);
 
-            ((ExplorerControl)listView.GetParent(typeof(ExplorerControl), false)).OnItemsControlContextMenuOpening((FrameworkElement)sender, listView, e);
+            listView.GetParent<ExplorerControl>(false).OnItemsControlContextMenuOpening((FrameworkElement)sender, listView, e);
+
+        }
+
+        // private void Button_Click_1(object sender, RoutedEventArgs e) => ((DependencyObject)sender).GetParent<TreeViewItem>(false).IsSelected = true;
+
+        private void TreeViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+
+            ExplorerControl explorerControl = ((DependencyObject)sender).GetParent<ExplorerControl>(false);
+
+            IO. IBrowsableObjectInfo browsableObjectInfo = explorerControl.TreeViewSelectedItem is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : explorerControl.TreeViewSelectedItem is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.ArchiveItemRelativePath, archiveItemInfo.FileType) : null;
+
+            explorerControl.Navigate( (IBrowsableObjectInfo) browsableObjectInfo, true);
 
         }
     }

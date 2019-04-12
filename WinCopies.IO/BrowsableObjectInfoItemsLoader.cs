@@ -21,9 +21,9 @@ namespace WinCopies.IO
 
         {
 
-            var result = (this).SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = (this).SetProperty(propertyName, fieldName, newValue, declaringType);
 
-            if (result.propertyChanged) OnPropertyChanged(propertyName, result.oldValue, newValue);
+            if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
         }
 

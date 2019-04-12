@@ -97,7 +97,7 @@
 
         <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Converter={StaticResource FileSystemInfoConverter}, Mode=OneTime}" >-->
-        
+
         <Setter Property="Visibility" >
             <Setter.Value >
                 <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToVisibilityConverter}" >
@@ -364,8 +364,6 @@
 
     <Style TargetType="{x:Type local:ExplorerControl}" >
 
-        <Setter Property="ListViewSelectedItem" Value="{Binding Path.SelectedItem, RelativeSource={RelativeSource Mode=Self}, Mode=TwoWay}" />
-
         <Setter Property="Template" >
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ExplorerControl}">
@@ -435,19 +433,33 @@
                                             </Style>
                                         </Image.Style>
                                     </Image>
-                                    <Label>Lancer</Label>
+                                    <Label>Go</Label>
                                 </StackPanel>
                             </Button>
                         </Grid>
 
                         <controls:TreeView x:Name="PART_TreeView" Grid.Row="1" ItemsSource="{Binding TreeViewItems, RelativeSource={RelativeSource Mode=TemplatedParent}}" >
+                            <controls:TreeView.Style>
+                                <Style TargetType="{x:Type controls:TreeView}" BasedOn="{StaticResource {x:Type controls:TreeView}}">
+                                    <Setter Property="pushBinding:PushBindingManager.StylePushBindings">
+                                        <Setter.Value>
+                                            <pushBinding:PushBindingCollection >
+                                                <pushBinding:PushBinding TargetProperty="SelectedItem" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}" Path="TreeViewSelectedItem" />
+                                            </pushBinding:PushBindingCollection>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </controls:TreeView.Style>
                             <TreeView.ItemContainerStyle>
                                 <Style TargetType="{x:Type TreeViewItem}" >
                                     <Setter Property="HeaderTemplate" >
                                         <Setter.Value>
 
                                             <DataTemplate >
-                                                <StackPanel Orientation="Horizontal">
+                                                <!--<Button Click="Button_Click_1">
+                                                    <Button.Template>
+                                                        <ControlTemplate>-->
+                                                <StackPanel Orientation="Horizontal" Background="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TreeViewItem}}}">
                                                     <Image Source="{Binding ShellObject.Thumbnail.SmallBitmapSource}" >
                                                         <Image.Opacity>
                                                             <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -458,14 +470,18 @@
                                                             </MultiBinding>
                                                         </Image.Opacity>
                                                     </Image>
-                                                    <controls:Label RecognizesAccessKey="False" Content="{Binding ShellObject.Properties.System.ItemNameDisplay.Value}" />
+                                                    <controls:Label RecognizesAccessKey="False" Content="{Binding ShellObject.Properties.System.ItemNameDisplay.Value}" Foreground="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TreeViewItem}}}" />
                                                 </StackPanel>
+                                                <!--</ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>-->
                                             </DataTemplate>
 
                                         </Setter.Value>
                                     </Setter>
                                     <Setter Property="ItemsSource" Value="{Binding Items}" />
                                     <Setter Property="commandBehavior:CommandBehavior.Event" Value="Loaded" />
+                                    <!--todo:-->
                                     <Setter Property="commandBehavior:CommandBehavior.Command" Value="{x:Static local:Commands.TrucMuche}" />
                                     <Setter Property="commandBehavior:CommandBehavior.CommandParameter" Value="{Binding}" />
 
@@ -483,13 +499,15 @@
                                             </MultiBinding>
                                         </Setter.Value>
                                     </Setter>
+
+                                    <EventSetter Event="Selected" Handler="TreeViewItem_Selected" />
                                 </Style>
                             </TreeView.ItemContainerStyle>
                         </controls:TreeView>
 
                         <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="5" ></GridSplitter>
 
-                        <local:ListView x:Name="PART_ListView" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding ListViewSelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding SelectionMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" >
+                        <local:ListView x:Name="PART_ListView" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding ListViewSelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding SelectionMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" Focusable="True" >
                             <!--<local:ListView.Resources>
                                 <FrameworkElement x:Key="FrameworkElement" DataContext="{Binding}" />
                             </local:ListView.Resources>-->
@@ -604,6 +622,7 @@
                 </ContextMenu>
             </Setter.Value>
         </Setter>
+
     </Style>
 
     <Style TargetType="{x:Type local:FilePropertyGrid}">

@@ -75,6 +75,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\PushBinding.dll</HintPath>
     </Reference>
+    <Reference Include="SevenZipSharp, Version=1.1.136.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -117,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionsFromObjects.cs" />
+    <Compile Include="ArchiveItemInfo.cs" />
     <Compile Include="Data\FileNameConverter.cs" />
     <Compile Include="Data\FileSystemInfoAttributesToOpacityConverter.cs" />
     <Compile Include="Data\FileSystemInfoAttributesToVisibilityConverter.cs" />

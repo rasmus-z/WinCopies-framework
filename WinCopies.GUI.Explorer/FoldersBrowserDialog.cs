@@ -141,7 +141,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             {
 
-                Explorer.IBrowsableObjectInfo selectedItem = ExplorerControl.ListViewSelectedItem;
+                Explorer.IBrowsableObjectInfo selectedItem = ExplorerControl.Path.SelectedItem;
 
                 if (result && selectedItem != null && (selectedItem.FileType == FileTypes.Folder || (selectedItem.FileType == FileTypes.SpecialFolder && selectedItem is Explorer.ShellObjectInfo so && so.ShellObject.IsFileSystemObject) || selectedItem.FileType == FileTypes.Drive))
 
@@ -179,7 +179,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         {
 
-            if ((If(ComparisonType.Or, Comparison.Equals, Mode, FoldersBrowserDialogMode.OpenFiles, FoldersBrowserDialogMode.Save) && If(ComparisonType.Or, Comparison.Equals, ExplorerControl.ListViewSelectedItem.FileType, FileTypes.Folder, FileTypes.SpecialFolder, FileTypes.Link)) || Mode == FoldersBrowserDialogMode.OpenFolder)
+            if ((If(ComparisonType.Or, Comparison.Equals, Mode, FoldersBrowserDialogMode.OpenFiles, FoldersBrowserDialogMode.Save) && If(ComparisonType.Or, Comparison.Equals, ExplorerControl.Path.SelectedItem.FileType, FileTypes.Folder, FileTypes.SpecialFolder, FileTypes.Link)) || Mode == FoldersBrowserDialogMode.OpenFolder)
 
                 ExplorerControl.Open();
 

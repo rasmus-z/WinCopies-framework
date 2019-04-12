@@ -205,22 +205,22 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="TreeViewSelectedItem"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty TreeViewSelectedItemProperty = DependencyProperty.Register(nameof(TreeViewSelectedItem), typeof(IO.IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null));
+        public static readonly DependencyProperty TreeViewSelectedItemProperty = DependencyProperty.Register(nameof(TreeViewSelectedItem), typeof(IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets the tree view selected item.
         /// </summary>
-        public IO.IBrowsableObjectInfo TreeViewSelectedItem { get => (IO.IBrowsableObjectInfo)GetValue(TreeViewSelectedItemProperty); set => SetValue(TreeViewSelectedItemProperty, value); }
+        public IBrowsableObjectInfo TreeViewSelectedItem { get => (IBrowsableObjectInfo)GetValue(TreeViewSelectedItemProperty); set => SetValue(TreeViewSelectedItemProperty, value); }
 
-        /// <summary>
-        /// Identifies the <see cref="ListViewSelectedItem"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ListViewSelectedItemProperty = DependencyProperty.Register(nameof(ListViewSelectedItem), typeof(IO.IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null));
+        ///// <summary>
+        ///// Identifies the <see cref="ListViewSelectedItem"/> dependency property.
+        ///// </summary>
+        //public static readonly DependencyProperty ListViewSelectedItemProperty = DependencyProperty.Register(nameof(ListViewSelectedItem), typeof(IO.IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null));
 
-        /// <summary>
-        /// Gets or sets the list view selected item.
-        /// </summary>
-        public IBrowsableObjectInfo ListViewSelectedItem { get => (IBrowsableObjectInfo)GetValue(ListViewSelectedItemProperty); set => SetValue(ListViewSelectedItemProperty, value); }
+        ///// <summary>
+        ///// Gets or sets the list view selected item.
+        ///// </summary>
+        //public IBrowsableObjectInfo ListViewSelectedItem { get => (IBrowsableObjectInfo)GetValue(ListViewSelectedItemProperty); set => SetValue(ListViewSelectedItemProperty, value); }
 
         private static readonly DependencyPropertyKey ListViewSelectedItemsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(ListViewSelectedItems), typeof(ObservableListBoxSelectedItems), typeof(ExplorerControl), new PropertyMetadata(null));
 
@@ -560,15 +560,15 @@ namespace WinCopies.GUI.Explorer
 
             List<Util.MenuItem> menuItems = new List<Util.MenuItem>();
 
-            Util.MenuItem menuItem = new Util.MenuItem(Generic.Open, null, new DelegateCommand(Open), ListViewSelectedItem, null);
+            Util.MenuItem menuItem = new Util.MenuItem(Generic.Open, null, new DelegateCommand(Open), Path.SelectedItem, null);
 
-            string extension = System.IO.Path.GetExtension(ListViewSelectedItem.Path);
+            string extension = System.IO.Path.GetExtension(Path.SelectedItem.Path);
 
-            if (!(ListViewSelectedItem.FileType == FileTypes.Archive && LoadArchive.IsSupportedArchiveFormat(extension)) && extension.Length > 0)
+            if (!(Path.SelectedItem.FileType == FileTypes.Archive && LoadArchive.IsSupportedArchiveFormat(extension)) && extension.Length > 0)
 
             {
 
-                string command = Registry.GetCommandByExtension("open", System.IO.Path.GetExtension(ListViewSelectedItem.Path));
+                string command = Registry.GetCommandByExtension("open", System.IO.Path.GetExtension(Path.SelectedItem.Path));
 
                 if (command != null) menuItem.Icon = System.Drawing.Icon.ExtractAssociatedIcon(Registry.GetOpenWithSoftwarePathFromCommand(command)).ToBitmap().ToImageSource();
 
@@ -577,12 +577,12 @@ namespace WinCopies.GUI.Explorer
             menuItems.AddRange(new Util.MenuItem[] {menuItem,
                 new Util.MenuItem(Generic.Copy, Properties.Resources.page_copy.ToImageSource(), new DelegateCommand(o => Copy(ActionsFromObjects.ListView)), null, null),
                 new Util.MenuItem(Generic.Cut, Properties.Resources.cut.ToImageSource(), new DelegateCommand(o => Cut(ActionsFromObjects.ListView)), null, null),
-                new Util.MenuItem(Generic.CreateShortcut, null, new DelegateCommand<ShellObjectInfo>(o => new ShellLink(o.Path, System.IO.Path.GetDirectoryName(o.Path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(o.Path) + ".lnk")), ListViewSelectedItem, null),
+                new Util.MenuItem(Generic.CreateShortcut, null, new DelegateCommand<ShellObjectInfo>(o => new ShellLink(o.Path, System.IO.Path.GetDirectoryName(o.Path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(o.Path) + ".lnk")), Path.SelectedItem, null),
                 new Util.MenuItem(Generic.Rename),
                 new Util.MenuItem(Generic.Delete),
                 new Util.MenuItem(Generic.Properties) });
 
-            if (System.IO.Path.HasExtension(ListViewSelectedItem.Path))
+            if (System.IO.Path.HasExtension(Path.SelectedItem.Path))
 
             {
 
@@ -590,7 +590,7 @@ namespace WinCopies.GUI.Explorer
 
                 menuItems.Insert(1, menuItem);
 
-                WinShellAppInfoInterop winShellAppInfoInterop = new WinShellAppInfoInterop(System.IO.Path.GetExtension(ListViewSelectedItem.Path));
+                WinShellAppInfoInterop winShellAppInfoInterop = new WinShellAppInfoInterop(System.IO.Path.GetExtension(Path.SelectedItem.Path));
 
                 winShellAppInfoInterop.OpenWithAppInfosLoaded += (object sender, EventArgs e) =>
 
@@ -1085,13 +1085,26 @@ namespace WinCopies.GUI.Explorer
 
             SetValue(CanMoveToParentPathPropertyKey, path.Parent != null);
 
-            if (browsableObjectInfoItemsLoader == null)
+            try
+            {
 
-                path.LoadItems();
+                if (browsableObjectInfoItemsLoader == null)
 
-            else
+                    browsableObjectInfoItemsLoader = path.FileType == FileTypes.Archive ? (BrowsableObjectInfoItemsLoader)new LoadArchive(true, true, FileTypesFlags.All) : (BrowsableObjectInfoItemsLoader)new LoadFolder(true, true, FileTypesFlags.All);
+
+                browsableObjectInfoItemsLoader.RunWorkerCompleted += BrowsableObjectInfoItemsLoader_RunWorkerCompleted;
 
                 path.LoadItems(browsableObjectInfoItemsLoader);
+
+            }
+
+            catch (IOException ex)
+
+            {
+
+                MessageBox.Show(ex.Message);
+
+            }
 
             if (addPathToHistory)
 
@@ -1130,6 +1143,27 @@ namespace WinCopies.GUI.Explorer
             SetValue(CanMoveToPreviousPathPropertyKey, history.Count > 1 && HistorySelectedIndex < history.Count - 1);
 
             SetValue(CanMoveToNextPathPropertyKey, history.Count > 1 && HistorySelectedIndex > 0);
+
+        }
+
+        protected internal virtual void OnItemsLoadException(Exception ex)
+
+        {
+            Debug.WriteLine(ex?.GetType().ToString());
+            if (ex != null)
+                MessageBox.Show((ex is IOException || ex is UnauthorizedAccessException ? "The load can't be performed because the path was not found or you don't have access rights to this path." : "The load can't be performed because of an unkown exception.") + " Path is: " + Path);
+
+        }
+
+        protected virtual void OnBrowsableObjectInfoItemsLoaderRunWorkerCompleted(RunWorkerCompletedEventArgs e) => OnItemsLoadException(e.Error);
+
+        private void BrowsableObjectInfoItemsLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+
+        {
+
+            ((BrowsableObjectInfoItemsLoader)sender).RunWorkerCompleted -= BrowsableObjectInfoItemsLoader_RunWorkerCompleted;
+
+            OnBrowsableObjectInfoItemsLoaderRunWorkerCompleted(e);
 
         }
 
@@ -1318,11 +1352,7 @@ namespace WinCopies.GUI.Explorer
 
             WindowInteropHelper windowHandle = new WindowInteropHelper(Window.GetWindow(this));
 
-            // if (!PART_TreeView.IsFocused && !PART_ListView.IsFocused) return;
-
-            StandardClipboardFormats standardClipboardFormat;
-
-            if (!Clipboard.Contains(windowHandle, CommonClipboardFormats.FileDropList, out standardClipboardFormat)) return;
+            if (!Clipboard.Contains(windowHandle, CommonClipboardFormats.FileDropList, out _)) return;
 
             string path = null;
 
@@ -1414,7 +1444,7 @@ namespace WinCopies.GUI.Explorer
 
         public static DelegateCommand TrucMuche { get; } = new DelegateCommand((object obj) =>
           {
-              var _obj = (IBrowsableObjectInfo)obj;
+              IBrowsableObjectInfo _obj = (IBrowsableObjectInfo)obj;
 
               if (!_obj.AreItemsLoaded)
 

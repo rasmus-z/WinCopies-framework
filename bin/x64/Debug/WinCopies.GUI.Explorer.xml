@@ -169,16 +169,6 @@
             Gets or sets the tree view selected item.
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.ListViewSelectedItemProperty">
-            <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.ListViewSelectedItem"/> dependency property.
-            </summary>
-        </member>
-        <member name="P:WinCopies.GUI.Explorer.ExplorerControl.ListViewSelectedItem">
-            <summary>
-            Gets or sets the list view selected item.
-            </summary>
-        </member>
         <member name="F:WinCopies.GUI.Explorer.ExplorerControl.ListViewSelectedItemsProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.ListViewSelectedItems"/> dependency property.

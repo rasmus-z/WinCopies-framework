@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
+using SevenZip;
 using System.Collections.ObjectModel;
 using WinCopies.IO;
 
@@ -77,7 +78,7 @@ namespace WinCopies.GUI.Explorer
 
         ObservableCollection<IBrowsableObjectInfo> IBrowsableObjectInfoInternal.SelectedItems { get; set; } = new ObservableCollection<IBrowsableObjectInfo>();
 
-        public ReadOnlyObservableCollection<IBrowsableObjectInfo> SelectedItems { get; } = null;
+        public ReadOnlyObservableCollection<IBrowsableObjectInfo> SelectedItems { get; internal set; } = null;
 
         private readonly bool isCheckBoxEnabled = false;
 
@@ -91,28 +92,34 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        public class Machin { public string Truc { get; set; } = "Bidule"; }
+        //public class Machin { public string Truc { get; set; } = "Bidule"; }
 
-        public Machin[] Columns
-        {
+        //public Machin[] Columns
+        //{
 
-            get; set;
+        //    get; set;
 
-        } = new Machin[] { new Machin() { Truc = "Chose" } };
+        //} = new Machin[] { new Machin() { Truc = "Chose" } };
 
         // public event SelectionChangedEventHandler SelectionChanged;
+
+        private void Init() => SelectedItems = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(((IBrowsableObjectInfoInternal)this).SelectedItems);
 
         public ShellObjectInfo(ShellObject shellObject, string path) : base(shellObject, path) =>
 
             // ((INotifyCollectionChanged)Items).CollectionChanged += (object sender, NotifyCollectionChangedEventArgs e) => OnItemsCollectionChanged(e);
 
-            SelectedItems = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(((IBrowsableObjectInfoInternal)this).SelectedItems);
+            Init();
 
-        public ShellObjectInfo(ShellObject shellObject, string path, FileTypes fileType, SpecialFolders specialFolder) : base(shellObject, path, fileType, specialFolder) => SelectedItems = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(((IBrowsableObjectInfoInternal)this).SelectedItems);
+        public ShellObjectInfo(ShellObject shellObject, string path, FileTypes fileType, SpecialFolders specialFolder) : base(shellObject, path, fileType, specialFolder) => Init();
+
+        public ShellObjectInfo(IO.ShellObjectInfo shellObjectInfo) : this(shellObjectInfo.ShellObject, shellObjectInfo.Path, shellObjectInfo.FileType, shellObjectInfo.SpecialFolder) { }
 
         public override IO.IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path) => new ShellObjectInfo(shellObject, path);
 
         public override IO.IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileTypes fileType, SpecialFolders specialFolder) => new ShellObjectInfo(shellObject, path, fileType, specialFolder);
+
+        public override IO.IBrowsableObjectInfo GetBrowsableObjectInfo(IO.ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileTypes fileType) => new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, archiveItemRelativePath, fileType);
 
     }
 

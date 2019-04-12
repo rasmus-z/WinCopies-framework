@@ -348,7 +348,7 @@ namespace WinCopies.IO
                     }
 
                     string[] directories = Directory.GetDirectories(Path.Path);
-
+                    
                     ShellObject shellObject = null;
 
                     foreach (string directory in directories)
@@ -415,11 +415,14 @@ namespace WinCopies.IO
 
 #if DEBUG
 
-            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            catch (IOException ex)
+            {
 
-#else
+                Debug.WriteLine(ex.GetType().ToString() + " " + ex.Message);
 
-            catch (IOException) { }    
+                throw;
+
+            }
 
 #endif
 

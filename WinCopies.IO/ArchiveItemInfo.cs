@@ -32,8 +32,6 @@ namespace WinCopies.IO
 
         public string ArchiveItemRelativePath { get; } = null;
 
-        private bool areItemsLoaded = false;
-
         // public bool AreItemsLoaded { get => areItemsLoaded; private set => OnPropertyChanged(nameof(AreItemsLoaded), nameof(areItemsLoaded), value); }
 
         // private ReadOnlyObservableCollection<IBrowsableObjectInfo> items = null;
@@ -185,7 +183,7 @@ namespace WinCopies.IO
 
         public override string ToString() => System.IO.Path.GetFileName(Path);
 
-        public IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileTypes fileType) =>
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileTypes fileType) =>
 
             new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, archiveItemRelativePath, fileType);
 

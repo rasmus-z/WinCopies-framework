@@ -3,6 +3,9 @@ using System.Windows.Controls;
 
 namespace WinCopies.Util
 {
+
+    // todo: use PushBinding
+
     /// <summary>
     /// Allows the user to be notified when the selection of a <see cref="System.Windows.Controls.ListBox"/> has changed.
     /// </summary>
