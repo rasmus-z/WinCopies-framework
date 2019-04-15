@@ -159,22 +159,22 @@
             Gets or sets a value that indicates whether to show the system items.
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.TreeViewSelectedItemProperty">
+        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.SelectedItemProperty">
             <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.TreeViewSelectedItem"/> dependency property.
+            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.SelectedItem"/> dependency property.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Explorer.ExplorerControl.TreeViewSelectedItem">
+        <member name="P:WinCopies.GUI.Explorer.ExplorerControl.SelectedItem">
             <summary>
-            Gets or sets the tree view selected item.
+            Gets or sets the list view selected item.
             </summary>
         </member>
-        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.ListViewSelectedItemsProperty">
+        <member name="F:WinCopies.GUI.Explorer.ExplorerControl.SelectedItemsProperty">
             <summary>
-            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.ListViewSelectedItems"/> dependency property.
+            Identifies the <see cref="P:WinCopies.GUI.Explorer.ExplorerControl.SelectedItems"/> dependency property.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.Explorer.ExplorerControl.ListViewSelectedItems">
+        <member name="P:WinCopies.GUI.Explorer.ExplorerControl.SelectedItems">
             <summary>
             Gets the list view selected items.
             </summary>
@@ -291,7 +291,7 @@
         </member>
         <member name="M:WinCopies.GUI.Explorer.ExplorerControl.#ctor(System.String)">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.GUI.Explorer.ExplorerControl"/> class using a custom path.
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.Explorer.ExplorerControl"/> class using a custom shell object path.
             </summary>
         </member>
         <member name="M:WinCopies.GUI.Explorer.ExplorerControl.#ctor(WinCopies.GUI.Explorer.IBrowsableObjectInfo)">
