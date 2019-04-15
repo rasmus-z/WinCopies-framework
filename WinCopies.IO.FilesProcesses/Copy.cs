@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using WinCopies.Util.Win32Interop;
+using WinCopies.Win32NativeInterop;
 
 namespace WinCopies.IO.FileProcesses
 {

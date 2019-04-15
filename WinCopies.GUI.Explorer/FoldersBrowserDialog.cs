@@ -179,7 +179,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         {
 
-            if ((If(ComparisonType.Or, Comparison.Equals, Mode, FoldersBrowserDialogMode.OpenFiles, FoldersBrowserDialogMode.Save) && If(ComparisonType.Or, Comparison.Equals, ExplorerControl.Path.SelectedItem.FileType, FileType.Folder, FileType.SpecialFolder, FileType.Link)) || Mode == FoldersBrowserDialogMode.OpenFolder)
+            if ((If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, Mode, FoldersBrowserDialogMode.OpenFiles, FoldersBrowserDialogMode.Save) && If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, ExplorerControl.Path.SelectedItem.FileType, FileType.Folder, FileType.SpecialFolder, FileType.Link)) || Mode == FoldersBrowserDialogMode.OpenFolder)
 
                 ExplorerControl.Open();
 

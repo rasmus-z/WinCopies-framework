@@ -58,10 +58,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\Windows-API-Code-Pack\source\WindowsAPICodePack\Core\bin\x64\Debug\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Resources\git\aybe\Windows-API-Code-Pack-1.1-master\source\WindowsAPICodePack\Shell\bin\x64\Debug\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+      <HintPath>..\..\Windows-API-Code-Pack\source\WindowsAPICodePack\Shell\bin\x64\Debug\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -87,6 +89,10 @@
     <Reference Include="WinCopies.Win32Interop, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\WinCopies.Win32Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="WinCopies.Win32NativeInterop, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\x64\Debug\WinCopies.Win32NativeInterop.dll</HintPath>
     </Reference>
     <Reference Include="Windows.ApplicationModel" />
     <Reference Include="Windows.Foundation" />

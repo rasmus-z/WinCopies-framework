@@ -36,7 +36,7 @@
   <ItemGroup>
     <Reference Include="AttachedCommandBehavior, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\x64\Debug\AttachedCommandBehavior.dll</HintPath>
+      <HintPath>..\Third parties\AttachedCommandBehavior v3.0\AttachedCommandBehavior\bin\x64\Debug\AttachedCommandBehavior.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

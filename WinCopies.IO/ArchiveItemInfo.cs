@@ -37,22 +37,22 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource SmallBitmapSource => Imaging.CreateBitmapSourceFromHIcon(WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.Small), Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        public override BitmapSource SmallBitmapSource => Imaging.CreateBitmapSourceFromHIcon(IntPtr.Zero/*WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.Small)*/, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         /// <summary>
         /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource MediumBitmapSource => Imaging.CreateBitmapSourceFromHIcon(WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.Medium), Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        public override BitmapSource MediumBitmapSource => Imaging.CreateBitmapSourceFromHIcon(IntPtr.Zero/*WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.Medium)*/, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         /// <summary>
         /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource LargeBitmapSource => Imaging.CreateBitmapSourceFromHIcon(WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.Large), Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        public override BitmapSource LargeBitmapSource => Imaging.CreateBitmapSourceFromHIcon(IntPtr.Zero/*WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.Large)*/, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         /// <summary>
         /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource ExtraLargeBitmapSource => Imaging.CreateBitmapSourceFromHIcon(WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.ExtraLarge), Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        public override BitmapSource ExtraLargeBitmapSource => Imaging.CreateBitmapSourceFromHIcon(IntPtr.Zero/*WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.ExtraLarge)*/, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         public override bool IsBrowsable => FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.Archive;
 

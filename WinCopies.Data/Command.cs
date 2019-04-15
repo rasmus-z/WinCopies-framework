@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+ * Authors: Khun Ly, Pierre Sprimont
+ */
+
+using System;
 using System.Collections.Generic;
 
 namespace WinCopies.Data

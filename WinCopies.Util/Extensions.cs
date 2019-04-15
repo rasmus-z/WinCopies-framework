@@ -12,7 +12,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using static WinCopies.Util.Generic;
-using static WinCopies.Win32Interop.NativeMethods;
+using static WinCopies.Win32NativeInterop.NativeMethods;
 
 namespace WinCopies.Util
 {

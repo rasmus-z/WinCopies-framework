@@ -15,7 +15,7 @@ namespace WinCopies.GUI.Explorer.Data
             //            Console.WriteLine("ViewStyleConverter value: "+value);
             //#endif
 
-            string result = If(ComparisonType.Or, Comparison.Equals, (ViewStyles)value, ViewStyles.SizeOne,
+            string result = If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, (ViewStyles)value, ViewStyles.SizeOne,
                 ViewStyles.SizeTwo,
                 ViewStyles.SizeThree,
                 ViewStyles.SizeFour,

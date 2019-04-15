@@ -80,6 +80,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\WinCopies.Util.dll</HintPath>
     </Reference>
+    <Reference Include="WinCopies.Win32NativeInterop, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\x64\Debug\WinCopies.Win32NativeInterop.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>

@@ -33,6 +33,15 @@ namespace WinCopies.Util
 
         }
 
+        public enum ComparisonMode
+        {
+
+            Binary = 0,
+
+            Logical = 1
+
+        }
+
         public enum Comparison
 
         {
@@ -51,6 +60,24 @@ namespace WinCopies.Util
 
         }
 
+        private static void ThrowIfNotValidEnumValue(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison)
+
+        {
+
+            comparisonType.ThrowIfNotValidEnumValue();
+
+            comparisonMode.ThrowIfNotValidEnumValue();
+
+            comparison.ThrowIfNotValidEnumValue();
+
+        }
+
+        private static bool CheckIfComparison(Comparison comparison, bool predicateResult, int result) => predicateResult && ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
+                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
+                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)));//: comparisonType == ComparisonType.Or ?//(result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||//    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||//    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))
+
+        private static bool CheckIfEqualityComparison(Comparison comparison, bool predicateResult, bool result) => (!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual);
+
         // todo: factoriser au maximum
 
         #region Non generic methods
@@ -65,7 +92,7 @@ namespace WinCopies.Util
         /// <param name="value">The value to compare the values of the table with.</param>
         /// <param name="values">The values to compare.</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, Comparison comparison, object value, params object[] values) => If(comparisonType, comparison, EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
@@ -77,21 +104,15 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, Comparison comparison, IComparer<object> comparer, Predicate<object> predicate, object value, params object[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<object> comparer, Predicate<object> predicate, object value, params object[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -99,25 +120,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (object _value in values)
 
-                {
+                    if (!CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
 
-                    if (!predicate(_value))
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = comparer.Compare(_value, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -127,29 +144,29 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (object _value in values)
 
-                    if (predicate(_value))
+                    if (CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
 
                     {
 
-                        result = comparer.Compare(_value, value);
+                        result = true;
 
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
             else
 
             {
+
+                result = false;
 
                 object _value;
 
@@ -160,63 +177,51 @@ namespace WinCopies.Util
 
                     _value = values[i];
 
-                    if (predicate(_value))
+                    result = true;
+
+                    if (CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
 
                     {
 
-                        result = comparer.Compare(_value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, predicate(__value), comparer.Compare(__value, value)))
 
                             {
 
-                                __value = values[j];
+                                result = false;
 
-                                result = comparer.Compare(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If(ComparisonType comparisonType, Comparison comparison, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params object[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params object[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -224,25 +229,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (object _value in values)
 
-                {
+                    if (!CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
 
-                    if (!predicate(_value))
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = comparisonDelegate(_value, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -252,29 +253,29 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (object _value in values)
 
-                    if (predicate(_value))
+                    if (CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
 
                     {
 
-                        result = comparisonDelegate(_value, value);
+                        result = true;
 
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
             else
 
             {
+
+                result = false;
 
                 object _value;
 
@@ -285,57 +286,51 @@ namespace WinCopies.Util
 
                     _value = values[i];
 
-                    if (predicate(_value))
+                    result = true;
+
+                    if (CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
 
                     {
 
-                        result = comparisonDelegate(_value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, predicate(__value), comparisonDelegate(__value, value)))
 
                             {
 
-                                __value = values[j];
+                                result = false;
 
-                                result = comparisonDelegate(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If(ComparisonType comparisonType, Comparison comparison, IEqualityComparer<object> equalityComparer, Predicate<object> predicate, object value, params object[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<object> equalityComparer, Predicate<object> predicate, object value, params object[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            comparisonType.ThrowIfNotValidEnumValue();
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
+            comparisonMode.ThrowIfNotValidEnumValue();
 
             if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
 
@@ -351,23 +346,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (object _value in values)
 
-                {
+                    if (!CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
-                    if (!predicate(_value))
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = equalityComparer.Equals(_value, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if ((!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -377,27 +370,29 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (object _value in values)
 
-                    if (predicate(_value))
+                    if (CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value, value);
+                        result = true;
 
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
             else
 
             {
+
+                result = false;
 
                 object _value;
 
@@ -408,59 +403,51 @@ namespace WinCopies.Util
 
                     _value = values[i];
 
-                    if (predicate(_value))
+                    result = true;
+
+                    if (CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value, value);
-
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfEqualityComparison(comparison, predicate(__value), equalityComparer.Equals(_value, value)))
 
                             {
 
-                                __value = values[j];
+                                result = false;
 
-                                result = equalityComparer.Equals(__value, value);
-
-                                if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If(ComparisonType comparisonType, Comparison comparison, IComparer<object> comparer, object value, params KeyValuePair<object, Func<bool>>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<object> comparer, object value, params KeyValuePair<object, Func<bool>>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result = 0;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -468,25 +455,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                {
+                    if (!CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
 
-                    if (!_value.Value())
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = comparer.Compare(_value.Key, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -496,23 +479,21 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                    if (_value.Value())
+                    if (CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
 
                     {
 
-                        result = comparer.Compare(_value.Key, value);
+                        result = true;
 
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
@@ -520,72 +501,62 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 KeyValuePair<object, Func<bool>> _value;
 
-                object __value = null;
+                KeyValuePair<object, Func<bool>> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value())
+                    result = true;
+
+                    if (CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
 
                     {
 
-                        result = comparer.Compare(_value.Key, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, __value.Value(), comparer.Compare(__value.Key, value)))
 
                             {
 
-                                __value = values[j].Key;
+                                result = false;
 
-                                result = comparer.Compare(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If(ComparisonType comparisonType, Comparison comparison, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int i = 0;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -593,25 +564,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                {
+                    if (!CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
 
-                    if (!_value.Value())
+                    {
 
-                        return false;
+                        result = false;
 
-                    i = comparisonDelegate(_value.Key, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if (!((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -621,27 +588,21 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                {
-
-                    if (_value.Value())
+                    if (CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
 
                     {
 
-                        i = comparisonDelegate(_value.Key, value);
+                        result = true;
 
-                        if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                }
-
-                return false;
+                return result;
 
             }
 
@@ -649,66 +610,62 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 KeyValuePair<object, Func<bool>> _value;
 
-                object __value = null;
+                KeyValuePair<object, Func<bool>> __value;
 
-                for (int _i = 0; _i < values.Length; _i++)
+                for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value())
+                    result = true;
+
+                    if (CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
 
                     {
 
-                        i = comparisonDelegate(_value.Key, value);
-
-                        if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = _i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, __value.Value(), comparisonDelegate(__value.Key, value)))
 
                             {
 
-                                __value = values[j].Key;
+                                result = false;
 
-                                i = comparisonDelegate(__value, value);
-
-                                if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If(ComparisonType comparisonType, Comparison comparison, IEqualityComparer<object> equalityComparer, object value, params KeyValuePair<object, Func<bool>>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<object> equalityComparer, object value, params KeyValuePair<object, Func<bool>>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            comparisonType.ThrowIfNotValidEnumValue();
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
+            comparisonMode.ThrowIfNotValidEnumValue();
 
             if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
 
@@ -716,7 +673,7 @@ namespace WinCopies.Util
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
 
-            bool result = false;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -724,23 +681,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                {
+                    if (!CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
-                    if (!_value.Value())
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = equalityComparer.Equals(_value.Key, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if ((!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -750,21 +705,21 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                    if (_value.Value())
+                    if (CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Key, value);
+                        result = true;
 
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
@@ -772,48 +727,48 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 KeyValuePair<object, Func<bool>> _value;
 
-                object __value = null;
+                KeyValuePair<object, Func<bool>> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value())
+                    result = true;
+
+                    if (CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Key, value);
-
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfEqualityComparison(comparison, __value.Value(), equalityComparer.Equals(__value.Key, value)))
 
                             {
 
-                                __value = values[j].Key;
+                                result = false;
 
-                                result = equalityComparer.Equals(__value, value);
-
-                                if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
@@ -831,7 +786,7 @@ namespace WinCopies.Util
         /// <param name="value">The value to compare the values of the table with.</param>
         /// <param name="values">The values to compare.</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, Comparison comparison, out object key, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparison, out key, EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
@@ -843,335 +798,15 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, Comparison comparison, out object key, IComparer<object> comparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer<object> comparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result ;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                {
-
-                    if (!predicate(_value.Value))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    result = comparer.Compare(_value.Value, value);
-
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                }
-
-                key = null;
-
-                return true;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                    if (predicate(_value.Value))
-
-                    {
-
-                        result = comparer.Compare(_value.Value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                key = null;
-
-                return false;
-
-            }
-
-            else
-
-            {
-
-                KeyValuePair<object, object> _value;
-
-                object __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    if (predicate(_value.Value))
-
-                    {
-
-                        result = comparer.Compare(_value.Value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            for (int j = i + 1; j < values.Length; j++)
-
-                            {
-
-                                __value = values[j].Value;
-
-                                result = comparer.Compare(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                {
-
-                                    key = null;
-
-                                    return false;
-
-                                }
-
-                            }
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-                key = null;
-
-                return false;
-
-            }
-
-        }
-
-        public static bool If(ComparisonType comparisonType, Comparison comparison, out object key, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            if (!comparisonType.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                {
-
-                    if (!predicate(_value.Value))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    result = comparisonDelegate(_value.Value, value);
-
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                }
-
-                key = null;
-
-                return true;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                    if (predicate(_value.Value))
-
-                    {
-
-                        result = comparisonDelegate(_value.Value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                key = null;
-
-                return false;
-
-            }
-
-            else
-
-            {
-
-                KeyValuePair<object, object> _value;
-
-                object __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    if (predicate(_value.Value))
-
-                    {
-
-                        result = comparisonDelegate(_value.Value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            for (int j = i + 1; j < values.Length; j++)
-
-                            {
-
-                                __value = values[j].Value;
-
-                                result = comparisonDelegate(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                {
-
-                                    key = null;
-
-                                    return false;
-
-                                }
-
-                            }
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-                key = null;
-
-                return false;
-
-            }
-
-        }
-
-        public static bool If(ComparisonType comparisonType, Comparison comparison, out object key, IEqualityComparer<object> equalityComparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            if (!comparisonType.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+            object _key = null;
 
             bool result;
 
@@ -1181,37 +816,25 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (KeyValuePair<object, object> _value in values)
 
-                {
-
-                    if (!predicate(_value.Value))
+                    if (!CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
 
                     {
 
-                        key = _value.Key;
+                        _key = _value.Key;
 
-                        return false;
+                        result = false;
 
-                    }
-
-                    result = equalityComparer.Equals(_value.Value, value);
-
-                    if ((!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                }
+                key = _key;
 
-                key = null;
-
-                return true;
+                return result;
 
             }
 
@@ -1221,80 +844,70 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (KeyValuePair<object, object> _value in values)
 
-                    if (predicate(_value.Value))
+                    if (CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Value, value);
+                        _key = _value.Key;
 
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        result = true;
 
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                key = null;
+                key = _key;
 
-                return false;
+                return result;
 
             }
 
             else
 
             {
+
+                result = false;
 
                 KeyValuePair<object, object> _value;
 
-                object __value;
+                KeyValuePair<object, object> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (predicate(_value.Value))
+                    result = true;
+
+                    if (CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Value, value);
-
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, predicate(__value.Value), comparer.Compare(__value.Value, value)))
 
                             {
 
-                                __value = values[j].Value;
+                                result = false;
 
-                                result = equalityComparer.Equals(__value, value);
-
-                                if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                                {
-
-                                    key = null;
-
-                                    return false;
-
-                                }
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            key = _value.Key;
-
-                            return true;
-
                         }
+
+                        key = result ? _value.Key : null;
+
+                        return result;
 
                     }
 
@@ -1302,27 +915,23 @@ namespace WinCopies.Util
 
                 key = null;
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If(ComparisonType comparisonType, Comparison comparison, out object key, IComparer<object> comparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
+            object _key = null;
 
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result = 0;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -1330,39 +939,25 @@ namespace WinCopies.Util
 
             {
 
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+                result = true;
 
-                {
+                foreach (KeyValuePair<object, object> _value in values)
 
-                    if (!_value.Value.Value())
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    result = comparer.Compare(_value.Value.Key, value);
-
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    if (!CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
 
                     {
 
-                        key = _value.Key;
+                        _key = _value.Key;
 
-                        return false;
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                }
+                key = _key;
 
-                key = null;
-
-                return true;
+                return result;
 
             }
 
@@ -1372,31 +967,25 @@ namespace WinCopies.Util
 
             {
 
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+                result = false;
 
-                    if (_value.Value.Value())
+                foreach (KeyValuePair<object, object> _value in values)
+
+                    if (CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
 
                     {
 
-                        result = comparer.Compare(_value.Value.Key, value);
+                        _key = _value.Key;
 
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        result = true;
 
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                key = null;
+                key = _key;
 
-                return false;
+                return result;
 
             }
 
@@ -1404,54 +993,44 @@ namespace WinCopies.Util
 
             {
 
-                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
+                result = false;
 
-                object __value = null;
+                KeyValuePair<object, object> _value;
+
+                KeyValuePair<object, object> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value.Value())
+                    result = true;
+
+                    if (CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
 
                     {
 
-                        result = comparer.Compare(_value.Value.Key, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, predicate(__value.Value), comparisonDelegate(__value.Value, value)))
 
                             {
 
-                                __value = values[j].Value.Key;
+                                result = false;
 
-                                result = comparer.Compare(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                {
-
-                                    key = null;
-
-                                    return false;
-
-                                }
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            key = _value.Key;
-
-                            return true;
-
                         }
+
+                        key = result ? _value.Key : null;
+
+                        return result;
 
                     }
 
@@ -1459,182 +1038,21 @@ namespace WinCopies.Util
 
                 key = null;
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If(ComparisonType comparisonType, Comparison comparison, out object key, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer<object> equalityComparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            comparisonType.ThrowIfNotValidEnumValue();
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int i = 0;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
-
-                {
-
-                    if (!_value.Value.Value())
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    i = comparisonDelegate(_value.Value.Key, value);
-
-                    if (!((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                }
-
-                key = null;
-
-                return true;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
-
-                {
-
-                    if (_value.Value.Value())
-
-                    {
-
-                        i = comparisonDelegate(_value.Value.Key, value);
-
-                        if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-                key = null;
-
-                return false;
-
-            }
-
-            else
-
-            {
-
-                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
-
-                object __value = null;
-
-                for (int _i = 0; _i < values.Length; _i++)
-                {
-
-                    _value = values[i];
-
-                    if (_value.Value.Value())
-
-                    {
-
-                        i = comparisonDelegate(_value.Value.Key, value);
-
-                        if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            for (int j = _i + 1; j < values.Length; j++)
-
-                            {
-
-                                __value = values[j].Value.Key;
-
-                                i = comparisonDelegate(__value, value);
-
-                                if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                {
-
-                                    key = null;
-
-                                    return false;
-
-                                }
-
-                            }
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-                key = null;
-
-                return false;
-
-            }
-
-        }
-
-        public static bool If(ComparisonType comparisonType, Comparison comparison, out object key, IEqualityComparer<object> equalityComparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            if (!comparisonType.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
+            comparisonMode.ThrowIfNotValidEnumValue();
 
             if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
 
@@ -1642,7 +1060,9 @@ namespace WinCopies.Util
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
 
-            bool result = false;
+            object _key = null;
+
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -1650,37 +1070,25 @@ namespace WinCopies.Util
 
             {
 
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+                result = true;
 
-                {
+                foreach (KeyValuePair<object, object> _value in values)
 
-                    if (!_value.Value.Value())
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    result = equalityComparer.Equals(_value.Value.Key, value);
-
-                    if ((!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual))
+                    if (!CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
-                        key = _value.Key;
+                        _key = _value.Key;
 
-                        return false;
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                }
+                key = _key;
 
-                key = null;
-
-                return true;
+                return result;
 
             }
 
@@ -1690,29 +1098,25 @@ namespace WinCopies.Util
 
             {
 
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+                result = false;
 
-                    if (_value.Value.Value())
+                foreach (KeyValuePair<object, object> _value in values)
+
+                    if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Value.Key, value);
+                        _key = _value.Key;
 
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        result = true;
 
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                key = null;
+                key = _key;
 
-                return false;
+                return result;
 
             }
 
@@ -1720,50 +1124,44 @@ namespace WinCopies.Util
 
             {
 
-                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
+                result = false;
 
-                object __value = null;
+                KeyValuePair<object, object> _value;
+
+                KeyValuePair<object, object> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value.Value())
+                    result = true;
+
+                    if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Value.Key, value);
-
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                             {
 
-                                __value = values[j].Value.Key;
+                                result = false;
 
-                                result = equalityComparer.Equals(__value, value);
-
-                                if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                                {
-
-                                    key = null;
-
-                                    return false;
-
-                                }
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            key = _value.Key;
-
-                            return true;
-
                         }
+
+                        key = result ? _value.Key : null;
+
+                        return result;
 
                     }
 
@@ -1771,7 +1169,384 @@ namespace WinCopies.Util
 
                 key = null;
 
-                return false;
+                return result;
+
+            }
+
+        }
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer<object> comparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            object _key = null;
+
+            bool result;
+
+            // If they are, we check the comparison type for the 'and' comparison.
+
+            if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                    if (!CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                    if (CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = true;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
+
+                KeyValuePair<object, KeyValuePair<object, Func<bool>>> __value;
+
+                for (int i = 0; i < values.Length; i++)
+                {
+
+                    _value = values[i];
+
+                    result = true;
+
+                    if (CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
+
+                    {
+
+                        for (int j = i + 1; j < values.Length; j++)
+
+                        {
+
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, __value.Value.Value(), comparer.Compare(__value.Value.Key, value)))
+
+                            {
+
+                                result = false;
+
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                            }
+
+                        }
+
+                        key = result ? _value.Key : null;
+
+                        return result;
+
+                    }
+
+                }
+
+                key = null;
+
+                return result;
+
+            }
+
+        }
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            object _key = null;
+
+            bool result;
+
+            // If they are, we check the comparison type for the 'and' comparison.
+
+            if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                    if (!CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                    if (CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = true;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
+
+                KeyValuePair<object, KeyValuePair<object, Func<bool>>> __value;
+
+                for (int i = 0; i < values.Length; i++)
+                {
+
+                    _value = values[i];
+
+                    result = true;
+
+                    if (CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
+
+                    {
+
+                        for (int j = i + 1; j < values.Length; j++)
+
+                        {
+
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, __value.Value.Value(), comparisonDelegate(__value.Value.Key, value)))
+
+                            {
+
+                                result = false;
+
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                            }
+
+                        }
+
+                        key = result ? _value.Key : null;
+
+                        return result;
+
+                    }
+
+                }
+
+                key = null;
+
+                return result;
+
+            }
+
+        }
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer<object> equalityComparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            comparisonType.ThrowIfNotValidEnumValue();
+
+            comparisonMode.ThrowIfNotValidEnumValue();
+
+            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+
+                // todo:
+
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+
+            object _key = null;
+
+            bool result;
+
+            // If they are, we check the comparison type for the 'and' comparison.
+
+            if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                    if (!CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                    if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = true;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
+
+                KeyValuePair<object, KeyValuePair<object, Func<bool>>> __value;
+
+                for (int i = 0; i < values.Length; i++)
+                {
+
+                    _value = values[i];
+
+                    result = true;
+
+                    if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+
+                    {
+
+                        for (int j = i + 1; j < values.Length; j++)
+
+                        {
+
+                            __value = values[j];
+
+                            if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+
+                            {
+
+                                result = false;
+
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                            }
+
+                        }
+
+                        key = result ? _value.Key : null;
+
+                        return result;
+
+                    }
+
+                }
+
+                key = null;
+
+                return result;
 
             }
 
@@ -1793,7 +1568,7 @@ namespace WinCopies.Util
         /// <param name="value">The value to compare the values of the table with.</param>
         /// <param name="values">The values to compare.</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If<T>(ComparisonType comparisonType, Comparison comparison, T value, params T[] values) => If(comparisonType, comparison, EqualityComparer<T>.Default, GetCommonPredicate<T>(), value, values);
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, T value, params T[] values) => If(comparisonType, comparisonMode, comparison, EqualityComparer<T>.Default, GetCommonPredicate<T>(), value, values);
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
@@ -1805,21 +1580,15 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If<T>(ComparisonType comparisonType, Comparison comparison, IComparer<T> comparer, Predicate<T> predicate, T value, params T[] values)
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<T> comparer, Predicate<T> predicate, T value, params T[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -1827,25 +1596,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (T _value in values)
 
-                {
+                    if (!CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
 
-                    if (!predicate(_value))
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = comparer.Compare(_value, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -1855,29 +1620,29 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (T _value in values)
 
-                    if (predicate(_value))
+                    if (CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
 
                     {
 
-                        result = comparer.Compare(_value, value);
+                        result = true;
 
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
             else
 
             {
+
+                result = false;
 
                 T _value;
 
@@ -1888,63 +1653,51 @@ namespace WinCopies.Util
 
                     _value = values[i];
 
-                    if (predicate(_value))
+                    result = true;
+
+                    if (CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
 
                     {
 
-                        result = comparer.Compare(_value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, predicate(__value), comparer.Compare(__value, value)))
 
                             {
 
-                                __value = values[j];
+                                result = false;
 
-                                result = comparer.Compare(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If<T>(ComparisonType comparisonType, Comparison comparison, Comparison<T> comparisonDelegate, Predicate<T> predicate, T value, params T[] values)
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<T> comparisonDelegate, Predicate<T> predicate, T value, params T[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -1952,25 +1705,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (T _value in values)
 
-                {
+                    if (!CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
 
-                    if (!predicate(_value))
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = comparisonDelegate(_value, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -1980,29 +1729,29 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (T _value in values)
 
-                    if (predicate(_value))
+                    if (CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
 
                     {
 
-                        result = comparisonDelegate(_value, value);
+                        result = true;
 
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
             else
 
             {
+
+                result = false;
 
                 T _value;
 
@@ -2013,59 +1762,55 @@ namespace WinCopies.Util
 
                     _value = values[i];
 
-                    if (predicate(_value))
+                    result = true;
+
+                    if (CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
 
                     {
 
-                        result = comparisonDelegate(_value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, predicate(__value), comparisonDelegate(__value, value)))
 
                             {
 
-                                __value = values[j];
+                                result = false;
 
-                                result = comparisonDelegate(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If<T>(ComparisonType comparisonType, Comparison comparison, IEqualityComparer<T> equalityComparer, Predicate<T> predicate, T value, params T[] values)
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<T> equalityComparer, Predicate<T> predicate, T value, params T[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            comparisonType.ThrowIfNotValidEnumValue();
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
+            comparisonMode.ThrowIfNotValidEnumValue();
 
             if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+
+                // todo:
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
 
@@ -2077,23 +1822,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (T _value in values)
 
-                {
+                    if (!CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
-                    if (!predicate(_value))
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = equalityComparer.Equals(_value, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if ((!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -2103,27 +1846,29 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (T _value in values)
 
-                    if (predicate(_value))
+                    if (CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value, value);
+                        result = true;
 
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
             else
 
             {
+
+                result = false;
 
                 T _value;
 
@@ -2134,59 +1879,51 @@ namespace WinCopies.Util
 
                     _value = values[i];
 
-                    if (predicate(_value))
+                    result = true;
+
+                    if (CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value, value);
-
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfEqualityComparison(comparison, predicate(__value), equalityComparer.Equals(_value, value)))
 
                             {
 
-                                __value = values[j];
+                                result = false;
 
-                                result = equalityComparer.Equals(__value, value);
-
-                                if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If<T>(ComparisonType comparisonType, Comparison comparison, IComparer<T> comparer, T value, params KeyValuePair<T, Func<bool>>[] values)
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<T> comparer, T value, params KeyValuePair<T, Func<bool>>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result = 0;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -2194,25 +1931,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                {
+                    if (!CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
 
-                    if (!_value.Value())
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = comparer.Compare(_value.Key, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -2222,23 +1955,21 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                    if (_value.Value())
+                    if (CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
 
                     {
 
-                        result = comparer.Compare(_value.Key, value);
+                        result = true;
 
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
@@ -2246,72 +1977,62 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 KeyValuePair<T, Func<bool>> _value;
 
-                T __value = default;
+                KeyValuePair<T, Func<bool>> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value())
+                    result = true;
+
+                    if (CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
 
                     {
 
-                        result = comparer.Compare(_value.Key, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, __value.Value(), comparer.Compare(__value.Key, value)))
 
                             {
 
-                                __value = values[j].Key;
+                                result = false;
 
-                                result = comparer.Compare(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If<T>(ComparisonType comparisonType, Comparison comparison, Comparison<T> comparisonDelegate, T value, params KeyValuePair<T, Func<bool>>[] values)
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<T> comparisonDelegate, T value, params KeyValuePair<T, Func<bool>>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int i = 0;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -2319,25 +2040,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                {
+                    if (!CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
 
-                    if (!_value.Value())
+                    {
 
-                        return false;
+                        result = false;
 
-                    i = comparisonDelegate(_value.Key, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if (!((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -2347,27 +2064,21 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                {
-
-                    if (_value.Value())
+                    if (CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
 
                     {
 
-                        i = comparisonDelegate(_value.Key, value);
+                        result = true;
 
-                        if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                }
-
-                return false;
+                return result;
 
             }
 
@@ -2375,66 +2086,62 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 KeyValuePair<T, Func<bool>> _value;
 
-                T __value = default;
+                KeyValuePair<T, Func<bool>> __value;
 
-                for (int _i = 0; _i < values.Length; _i++)
+                for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value())
+                    result = true;
+
+                    if (CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
 
                     {
 
-                        i = comparisonDelegate(_value.Key, value);
-
-                        if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = _i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, __value.Value(), comparisonDelegate(__value.Key, value)))
 
                             {
 
-                                __value = values[j].Key;
+                                result = false;
 
-                                i = comparisonDelegate(__value, value);
-
-                                if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If<T>(ComparisonType comparisonType, Comparison comparison, IEqualityComparer<T> equalityComparer, T value, params KeyValuePair<T, Func<bool>>[] values)
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<T> equalityComparer, T value, params KeyValuePair<T, Func<bool>>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            comparisonType.ThrowIfNotValidEnumValue();
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
+            comparisonMode.ThrowIfNotValidEnumValue();
 
             if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
 
@@ -2442,7 +2149,7 @@ namespace WinCopies.Util
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
 
-            bool result = false;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -2450,23 +2157,21 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                {
+                    if (!CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
-                    if (!_value.Value())
+                    {
 
-                        return false;
+                        result = false;
 
-                    result = equalityComparer.Equals(_value.Key, value);
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
-                    if ((!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual))
+                    }
 
-                        return false;
-
-                }
-
-                return true;
+                return result;
 
             }
 
@@ -2476,21 +2181,21 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                    if (_value.Value())
+                    if (CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Key, value);
+                        result = true;
 
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                            return true;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                return false;
+                return result;
 
             }
 
@@ -2498,48 +2203,48 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 KeyValuePair<T, Func<bool>> _value;
 
-                T __value = default;
+                KeyValuePair<T, Func<bool>> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value())
+                    result = true;
+
+                    if (CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Key, value);
-
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfEqualityComparison(comparison, __value.Value(), equalityComparer.Equals(__value.Key, value)))
 
                             {
 
-                                __value = values[j].Key;
+                                result = false;
 
-                                result = equalityComparer.Equals(__value, value);
-
-                                if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                                    return false;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            return true;
-
                         }
+
+                        return result;
 
                     }
 
                 }
 
-                return false;
+                return result;
 
             }
 
@@ -2557,7 +2262,7 @@ namespace WinCopies.Util
         /// <param name="value">The value to compare the values of the table with.</param>
         /// <param name="values">The values to compare.</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, Comparison comparison, out TKey key, TValue value, params KeyValuePair<TKey, TValue>[] values) => If(comparisonType, comparison, out key, EqualityComparer<TValue>.Default, GetCommonPredicate<TValue>(), value, values);
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, TValue value, params KeyValuePair<TKey, TValue>[] values) => If(comparisonType, comparisonMode, comparison, out key, EqualityComparer<TValue>.Default, GetCommonPredicate<TValue>(), value, values);
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
@@ -2569,335 +2274,15 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, Comparison comparison, out TKey key, IComparer<TValue> comparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IComparer<TValue> comparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                {
-
-                    if (!predicate(_value.Value))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    result = comparer.Compare(_value.Value, value);
-
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                }
-
-                key = default;
-
-                return true;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                    if (predicate(_value.Value))
-
-                    {
-
-                        result = comparer.Compare(_value.Value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                key = default;
-
-                return false;
-
-            }
-
-            else
-
-            {
-
-                KeyValuePair<TKey, TValue> _value;
-
-                TValue __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    if (predicate(_value.Value))
-
-                    {
-
-                        result = comparer.Compare(_value.Value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            for (int j = i + 1; j < values.Length; j++)
-
-                            {
-
-                                __value = values[j].Value;
-
-                                result = comparer.Compare(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                {
-
-                                    key = default;
-
-                                    return false;
-
-                                }
-
-                            }
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-                key = default;
-
-                return false;
-
-            }
-
-        }
-
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, Comparison comparison, out TKey key, Comparison<TValue> comparisonDelegate, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            if (!comparisonType.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                {
-
-                    if (!predicate(_value.Value))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    result = comparisonDelegate(_value.Value, value);
-
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                }
-
-                key = default;
-
-                return true;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                    if (predicate(_value.Value))
-
-                    {
-
-                        result = comparisonDelegate(_value.Value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                key = default;
-
-                return false;
-
-            }
-
-            else
-
-            {
-
-                KeyValuePair<TKey, TValue> _value;
-
-                TValue __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    if (predicate(_value.Value))
-
-                    {
-
-                        result = comparisonDelegate(_value.Value, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            for (int j = i + 1; j < values.Length; j++)
-
-                            {
-
-                                __value = values[j].Value;
-
-                                result = comparisonDelegate(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                {
-
-                                    key = default;
-
-                                    return false;
-
-                                }
-
-                            }
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-                key = default;
-
-                return false;
-
-            }
-
-        }
-
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, Comparison comparison, out TKey key, IEqualityComparer<TValue> equalityComparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            if (!comparisonType.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+            TKey _key = default;
 
             bool result;
 
@@ -2907,37 +2292,25 @@ namespace WinCopies.Util
 
             {
 
+                result = true;
+
                 foreach (KeyValuePair<TKey, TValue> _value in values)
 
-                {
-
-                    if (!predicate(_value.Value))
+                    if (!CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
 
                     {
 
-                        key = _value.Key;
+                        _key = _value.Key;
 
-                        return false;
+                        result = false;
 
-                    }
-
-                    result = equalityComparer.Equals(_value.Value, value);
-
-                    if ((!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                }
+                key = _key;
 
-                key = default;
-
-                return true;
+                return result;
 
             }
 
@@ -2947,80 +2320,70 @@ namespace WinCopies.Util
 
             {
 
+                result = false;
+
                 foreach (KeyValuePair<TKey, TValue> _value in values)
 
-                    if (predicate(_value.Value))
+                    if (CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Value, value);
+                        _key = _value.Key;
 
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        result = true;
 
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                key = default;
+                key = _key;
 
-                return false;
+                return result;
 
             }
 
             else
 
             {
+
+                result = false;
 
                 KeyValuePair<TKey, TValue> _value;
 
-                TValue __value;
+                KeyValuePair<TKey, TValue> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (predicate(_value.Value))
+                    result = true;
+
+                    if (CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Value, value);
-
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, predicate(__value.Value), comparer.Compare(__value.Value, value)))
 
                             {
 
-                                __value = values[j].Value;
+                                result = false;
 
-                                result = equalityComparer.Equals(__value, value);
-
-                                if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                                {
-
-                                    key = default;
-
-                                    return false;
-
-                                }
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            key = _value.Key;
-
-                            return true;
-
                         }
+
+                        key = result ? _value.Key : default;
+
+                        return result;
 
                     }
 
@@ -3028,27 +2391,23 @@ namespace WinCopies.Util
 
                 key = default;
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, Comparison comparison, out TKey key, IComparer<TValue> comparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, Comparison<TValue> comparisonDelegate, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
+            TKey _key = default;
 
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int result = 0;
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -3056,39 +2415,25 @@ namespace WinCopies.Util
 
             {
 
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+                result = true;
 
-                {
+                foreach (KeyValuePair<TKey, TValue> _value in values)
 
-                    if (!_value.Value.Value())
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    result = comparer.Compare(_value.Value.Key, value);
-
-                    if (!((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
+                    if (!CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
 
                     {
 
-                        key = _value.Key;
+                        _key = _value.Key;
 
-                        return false;
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                }
+                key = _key;
 
-                key = default;
-
-                return true;
+                return result;
 
             }
 
@@ -3098,31 +2443,25 @@ namespace WinCopies.Util
 
             {
 
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+                result = false;
 
-                    if (_value.Value.Value())
+                foreach (KeyValuePair<TKey, TValue> _value in values)
+
+                    if (CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
 
                     {
 
-                        result = comparer.Compare(_value.Value.Key, value);
+                        _key = _value.Key;
 
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        result = true;
 
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                key = default;
+                key = _key;
 
-                return false;
+                return result;
 
             }
 
@@ -3130,54 +2469,44 @@ namespace WinCopies.Util
 
             {
 
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value ;
+                result = false;
 
-                TValue __value = default;
+                KeyValuePair<TKey, TValue> _value;
+
+                KeyValuePair<TKey, TValue> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value.Value())
+                    result = true;
+
+                    if (CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
 
                     {
 
-                        result = comparer.Compare(_value.Value.Key, value);
-
-                        if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, predicate(__value.Value), comparisonDelegate(__value.Value, value)))
 
                             {
 
-                                __value = values[j].Value.Key;
+                                result = false;
 
-                                result = comparer.Compare(__value, value);
-
-                                if ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                {
-
-                                    key = default;
-
-                                    return false;
-
-                                }
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            key = _value.Key;
-
-                            return true;
-
                         }
+
+                        key = result ? _value.Key : default;
+
+                        return result;
 
                     }
 
@@ -3185,182 +2514,21 @@ namespace WinCopies.Util
 
                 key = default;
 
-                return false;
+                return result;
 
             }
 
         }
 
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, Comparison comparison, out TKey key, Comparison<TValue> comparisonDelegate, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IEqualityComparer<TValue> equalityComparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            if (!comparisonType.IsValidEnumValue())
+            comparisonType.ThrowIfNotValidEnumValue();
 
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
-
-            if (!comparison.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparison), nameof(Comparison)));
-
-            int i = 0;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
-
-                {
-
-                    if (!_value.Value.Value())
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    i = comparisonDelegate(_value.Value.Key, value);
-
-                    if (!((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))))
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                }
-
-                key = default;
-
-                return true;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
-
-                {
-
-                    if (_value.Value.Value())
-
-                    {
-
-                        i = comparisonDelegate(_value.Value.Key, value);
-
-                        if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-                key = default;
-
-                return false;
-
-            }
-
-            else
-
-            {
-
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
-
-                TValue __value = default;
-
-                for (int _i = 0; _i < values.Length; _i++)
-                {
-
-                    _value = values[i];
-
-                    if (_value.Value.Value())
-
-                    {
-
-                        i = comparisonDelegate(_value.Value.Key, value);
-
-                        if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                            (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                            (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                        {
-
-                            for (int j = _i + 1; j < values.Length; j++)
-
-                            {
-
-                                __value = values[j].Value.Key;
-
-                                i = comparisonDelegate(__value, value);
-
-                                if ((i == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                                    (i < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                                    (i > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)))
-
-                                {
-
-                                    key = default;
-
-                                    return false;
-
-                                }
-
-                            }
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-                key = default;
-
-                return false;
-
-            }
-
-        }
-
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, Comparison comparison, out TKey key, IEqualityComparer<TValue> equalityComparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            if (!comparisonType.IsValidEnumValue())
-
-                throw new ArgumentException(string.Format(NoValidEnumValue, nameof(comparisonType), nameof(ComparisonType)));
+            comparisonMode.ThrowIfNotValidEnumValue();
 
             if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
 
@@ -3368,7 +2536,9 @@ namespace WinCopies.Util
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
 
-            bool result = false;
+            TKey _key = default;
+
+            bool result;
 
             // If they are, we check the comparison type for the 'and' comparison.
 
@@ -3376,37 +2546,25 @@ namespace WinCopies.Util
 
             {
 
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+                result = true;
 
-                {
+                foreach (KeyValuePair<TKey, TValue> _value in values)
 
-                    if (!_value.Value.Value())
-
-                    {
-
-                        key = _value.Key;
-
-                        return false;
-
-                    }
-
-                    result = equalityComparer.Equals(_value.Value.Key, value);
-
-                    if ((!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual))
+                    if (!CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
-                        key = _value.Key;
+                        _key = _value.Key;
 
-                        return false;
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                }
+                key = _key;
 
-                key = default;
-
-                return true;
+                return result;
 
             }
 
@@ -3416,29 +2574,25 @@ namespace WinCopies.Util
 
             {
 
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+                result = false;
 
-                    if (_value.Value.Value())
+                foreach (KeyValuePair<TKey, TValue> _value in values)
+
+                    if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Value.Key, value);
+                        _key = _value.Key;
 
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        result = true;
 
-                        {
-
-                            key = _value.Key;
-
-                            return true;
-
-                        }
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                     }
 
-                key = default;
+                key = _key;
 
-                return false;
+                return result;
 
             }
 
@@ -3446,50 +2600,44 @@ namespace WinCopies.Util
 
             {
 
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
+                result = false;
 
-                TValue __value = default;
+                KeyValuePair<TKey, TValue> _value;
+
+                KeyValuePair<TKey, TValue> __value;
 
                 for (int i = 0; i < values.Length; i++)
                 {
 
                     _value = values[i];
 
-                    if (_value.Value.Value())
+                    result = true;
+
+                    if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
-                        result = equalityComparer.Equals(_value.Value.Key, value);
-
-                        if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
+                        for (int j = i + 1; j < values.Length; j++)
 
                         {
 
-                            for (int j = i + 1; j < values.Length; j++)
+                            __value = values[j];
+
+                            if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                             {
 
-                                __value = values[j].Value.Key;
+                                result = false;
 
-                                result = equalityComparer.Equals(__value, value);
-
-                                if ((result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual))
-
-                                {
-
-                                    key = default;
-
-                                    return false;
-
-                                }
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
 
                             }
 
-                            key = _value.Key;
-
-                            return true;
-
                         }
+
+                        key = result ? _value.Key : default;
+
+                        return result;
 
                     }
 
@@ -3497,7 +2645,384 @@ namespace WinCopies.Util
 
                 key = default;
 
-                return false;
+                return result;
+
+            }
+
+        }
+
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IComparer<TValue> comparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            TKey _key = default;
+
+            bool result;
+
+            // If they are, we check the comparison type for the 'and' comparison.
+
+            if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                    if (!CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                    if (CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = true;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
+
+                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> __value;
+
+                for (int i = 0; i < values.Length; i++)
+                {
+
+                    _value = values[i];
+
+                    result = true;
+
+                    if (CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
+
+                    {
+
+                        for (int j = i + 1; j < values.Length; j++)
+
+                        {
+
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, __value.Value.Value(), comparer.Compare(__value.Value.Key, value)))
+
+                            {
+
+                                result = false;
+
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                            }
+
+                        }
+
+                        key = result ? _value.Key : default;
+
+                        return result;
+
+                    }
+
+                }
+
+                key = default;
+
+                return result;
+
+            }
+
+        }
+
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, Comparison<TValue> comparisonDelegate, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            TKey _key = default;
+
+            bool result;
+
+            // If they are, we check the comparison type for the 'and' comparison.
+
+            if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                    if (!CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                    if (CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = true;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
+
+                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> __value;
+
+                for (int i = 0; i < values.Length; i++)
+                {
+
+                    _value = values[i];
+
+                    result = true;
+
+                    if (CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
+
+                    {
+
+                        for (int j = i + 1; j < values.Length; j++)
+
+                        {
+
+                            __value = values[j];
+
+                            if (CheckIfComparison(comparison, __value.Value.Value(), comparisonDelegate(__value.Value.Key, value)))
+
+                            {
+
+                                result = false;
+
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                            }
+
+                        }
+
+                        key = result ? _value.Key : default;
+
+                        return result;
+
+                    }
+
+                }
+
+                key = default;
+
+                return result;
+
+            }
+
+        }
+
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IEqualityComparer<TValue> equalityComparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            comparisonType.ThrowIfNotValidEnumValue();
+
+            comparisonMode.ThrowIfNotValidEnumValue();
+
+            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+
+                // todo:
+
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+
+            TKey _key = default;
+
+            bool result;
+
+            // If they are, we check the comparison type for the 'and' comparison.
+
+            if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                    if (!CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = false;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                    if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+
+                    {
+
+                        _key = _value.Key;
+
+                        result = true;
+
+                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                    }
+
+                key = _key;
+
+                return result;
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
+
+                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> __value;
+
+                for (int i = 0; i < values.Length; i++)
+                {
+
+                    _value = values[i];
+
+                    result = true;
+
+                    if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+
+                    {
+
+                        for (int j = i + 1; j < values.Length; j++)
+
+                        {
+
+                            __value = values[j];
+
+                            if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+
+                            {
+
+                                result = false;
+
+                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+
+                            }
+
+                        }
+
+                        key = result ? _value.Key : default;
+
+                        return result;
+
+                    }
+
+                }
+
+                key = default;
+
+                return result;
 
             }
 
@@ -3520,8 +3045,8 @@ namespace WinCopies.Util
 
         {
             // /// <param name="elementType">The type of the items inside the tables.</param>
-            
-            T[] newArray ;
+
+            T[] newArray;
 
             int totalArraysLength = 0;
 
@@ -3570,7 +3095,7 @@ namespace WinCopies.Util
 
             // /// <param name="elementType">The type of the items inside the tables.</param>
 
-            T[] newArray ;
+            T[] newArray;
 
             long totalArraysLength = 0;
 

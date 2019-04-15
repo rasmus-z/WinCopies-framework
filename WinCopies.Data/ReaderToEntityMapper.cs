@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+﻿/*
+ * Authors: Khun Ly, Pierre Sprimont
+ */
+
+using Newtonsoft.Json.Linq;
 using System;
 using System.Data;
 using System.Reflection;
