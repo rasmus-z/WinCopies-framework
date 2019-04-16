@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -37,22 +38,34 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource SmallBitmapSource => Imaging.CreateBitmapSourceFromHIcon(IntPtr.Zero/*WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.Small)*/, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        public override BitmapSource SmallBitmapSource => Imaging.CreateBitmapSourceFromHIcon(WinCopies.Win32Interop.Icon.Icon.getFileIcon(".txt", Win32Interop.Icon.IconSize.Small, true, true).Ptr, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         /// <summary>
         /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource MediumBitmapSource => Imaging.CreateBitmapSourceFromHIcon(IntPtr.Zero/*WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.Medium)*/, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        public override BitmapSource MediumBitmapSource => Imaging.CreateBitmapSourceFromHIcon(WinCopies.Win32Interop.Icon.Icon.getFileIcon(".txt", Win32Interop.Icon.IconSize.Medium, true, true).Ptr, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         /// <summary>
         /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource LargeBitmapSource => Imaging.CreateBitmapSourceFromHIcon(IntPtr.Zero/*WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.Large)*/, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        public override BitmapSource LargeBitmapSource { get
+
+            {
+
+                IntPtr ptr = WinCopies.Win32Interop.Icon.Icon.getFileIcon(".txt", Win32Interop.Icon.IconSize.Large, true, true).Ptr;
+
+                Icon icon = Icon.FromHandle(ptr);
+
+               return Imaging.CreateBitmapSourceFromHIcon( ptr, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromEmptyOptions());
+
+            }
+
+        }
 
         /// <summary>
         /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource ExtraLargeBitmapSource => Imaging.CreateBitmapSourceFromHIcon(IntPtr.Zero/*WinCopies.Win32Interop.Icon.getFileIcon(".zip", Win32Interop.IconSize.ExtraLarge)*/, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        public override BitmapSource ExtraLargeBitmapSource => Imaging.CreateBitmapSourceFromHIcon(WinCopies.Win32Interop.Icon.Icon.getFileIcon(".txt", Win32Interop.Icon.IconSize.ExtraLarge, true, true).Ptr, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         public override bool IsBrowsable => FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.Archive;
 
@@ -101,7 +114,7 @@ namespace WinCopies.IO
         public ArchiveItemInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileType fileType) : base(path, fileType)
 
         {
-
+            
             if (fileType == FileType.SpecialFolder)
 
                 throw new ArgumentException("'fileType' can't be a SpecialFolder.");
