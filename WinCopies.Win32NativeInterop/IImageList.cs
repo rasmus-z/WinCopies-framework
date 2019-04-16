@@ -1,4 +1,6 @@
-﻿//using System;
+﻿// todo: to try this API with the IconExtractor.IconUtil methods to split the icon this API retrieves.
+
+//using System;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Runtime.InteropServices;

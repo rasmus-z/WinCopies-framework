@@ -7,6 +7,9 @@ using System.Linq;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 using static WinCopies.Util.Generic;
+using System.Drawing;
+using TsudaKageyu;
+using System.Text;
 
 namespace WinCopies.IO
 {
@@ -236,7 +239,7 @@ namespace WinCopies.IO
 
             RegistryKey[] subKeys = { Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Classes\\"), Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\"), Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE\\Classes\\") };
 
-            RegistryKey _registryKey ;
+            RegistryKey _registryKey;
 
             List<DesktopAppInfo> fileTypes = new List<DesktopAppInfo>();
 
@@ -417,11 +420,11 @@ namespace WinCopies.IO
 
         {
 
-            RegistryKey registryKey ;
+            RegistryKey registryKey;
 
-            int result ;
+            int result;
 
-            string registryKeyName ;
+            string registryKeyName;
 
             if (path.Contains("\\", out result))
 
@@ -454,6 +457,116 @@ namespace WinCopies.IO
                 return path.Length > 0 ? registryKey.OpenSubKey(path) : registryKey;
 
             else throw new IOException(string.Format(Generic.RegistryKeyNotExists, path));
+
+        }
+
+        public static Icon[] GetIconVariationsFromFileType(string fileType) => GetIconVariationsFromFileTypeRegistryKey(GetFileTypeRegistryKey(fileType));
+
+        public static Icon[] GetIconVariationsFromFileType(string fileType, RegistryKey registryKey) => GetIconVariationsFromFileTypeRegistryKey(GetFileTypeRegistryKey(fileType, registryKey));
+
+        public static Icon[] GetIconVariationsFromFileTypeRegistryKey(RegistryKey registryKey)
+
+        {
+
+            RegistryKey _registryKey;
+
+            string defaultIconPath;
+
+            int iconIndex;
+
+            if ((_registryKey = registryKey.OpenSubKey("DefaultIcon")) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null)
+
+            {
+
+                if ((_registryKey = registryKey.OpenSubKey("shell\\open\\command")) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null)
+
+                {
+
+                    defaultIconPath = "%SystemRoot%\\System32\\SHELL32.dll";
+
+                    iconIndex = 0;
+
+                }
+
+                else
+
+                {
+
+                    defaultIconPath = GetOpenWithSoftwarePathFromCommand(defaultIconPath);
+
+                    iconIndex = 0;
+
+                }
+
+            }
+
+            else
+
+            {
+
+                string[] subPaths = null;
+
+                if (defaultIconPath.Contains(','))
+
+                {
+
+                    subPaths = defaultIconPath.Split(',');
+
+                    if (int.TryParse(subPaths[subPaths.Length - 1], out iconIndex))
+
+                    {
+
+                        bool ok = false;
+
+                        for (int i = 0; i < subPaths.Length - 1; i++)
+
+                            if (subPaths[i] != "")
+
+                            {
+
+                                ok = true;
+
+                                break;
+
+                            }
+
+                        if (ok)
+
+                        {
+
+                            StringBuilder stringBuilder = new StringBuilder();
+
+                            for (int i = 0; i < subPaths.Length - 1; i++)
+
+                                stringBuilder.Append(subPaths[i]);
+
+                            defaultIconPath = stringBuilder.ToString();
+
+                        }
+
+                        else
+
+                            throw new RegistryException("Invalid DefaultIcon registry value.", null, registryKey.Name);
+
+                    }
+
+                    else
+
+                        iconIndex = 0;
+
+                }
+
+                else
+
+                    iconIndex = 0;
+
+            }
+
+            defaultIconPath = Path.GetRealPathFromEnvironmentVariables(defaultIconPath);
+
+            IconExtractor iconExtractor = new IconExtractor(defaultIconPath);
+
+            return iconExtractor.GetIcon(iconIndex).Split();
 
         }
 

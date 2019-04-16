@@ -279,7 +279,7 @@
     <DataTemplate x:Key="ExplorerControlTilesListViewItemContentTemplate" x:Shared="false">
         <StackPanel Orientation="Horizontal" >
             <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ListViewItem}}}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
-            <Image Source="{Binding SmallBitmapSource}" Height="32" Width="32" >
+            <Image Source="{Binding SmallBitmapSource}" Height="48" Width="48" >
                 <Image.Opacity>
                     <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
                         <Binding />

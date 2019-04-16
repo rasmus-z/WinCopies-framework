@@ -9,23 +9,23 @@ namespace WinCopies.Win32NativeInterop
         [DllImport("gdi32.dll", SetLastError = true)]
         public static extern bool DeleteObject(IntPtr hObject);
 
-        [DllImport("shell32.dll")]
-        public static extern IntPtr SHGetFileInfo(
-      string pszPath,
-      uint dwFileAttributes,
-      ref SHFILEINFO psfi,
-      uint cbfileInfo,
-      SHGFI uFlags);
+        //  [DllImport("shell32.dll")]
+        //  public static extern IntPtr SHGetFileInfo(
+        //string pszPath,
+        //uint dwFileAttributes,
+        //ref SHFILEINFO psfi,
+        //uint cbfileInfo,
+        //SHGFI uFlags);
 
-        /// <summary>
-        /// Retrieves COM <see cref="IImageList"/> Interface which contains Image List.
-        /// </summary>
-        /// <param name="iImageList">The image type contained in the list.</param>
-        /// <param name="riid">Reference to the image list interface identifier, normally IID_IImageList.</param>
-        /// <param name="ppv">When this method returns, contains the interface pointer requested in riid. This is typically IImageList.</param>
-        /// <returns>If this function succeeds, it returns <see cref="HResult.Ok"/>. Otherwise, it returns an <see cref="HResult"/> error code.</returns>
-        [DllImport("shell32.dll", EntryPoint = "#727")]
-        public extern static HResult SHGetImageList(SHIL iImageList, ref Guid riid, out IImageList ppv);
+        ///// <summary>
+        ///// Retrieves COM <see cref="IImageList"/> Interface which contains Image List.
+        ///// </summary>
+        ///// <param name="iImageList">The image type contained in the list.</param>
+        ///// <param name="riid">Reference to the image list interface identifier, normally IID_IImageList.</param>
+        ///// <param name="ppv">When this method returns, contains the interface pointer requested in riid. This is typically IImageList.</param>
+        ///// <returns>If this function succeeds, it returns <see cref="HResult.Ok"/>. Otherwise, it returns an <see cref="HResult"/> error code.</returns>
+        //[DllImport("shell32.dll", EntryPoint = "#727")]
+        //public extern static HResult SHGetImageList(SHIL iImageList, ref Guid riid, out IImageList ppv);
 
         /// <summary>
         /// Destroys an icon and frees any memory the icon occupied. See the Remarks section.

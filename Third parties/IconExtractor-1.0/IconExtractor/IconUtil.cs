@@ -44,11 +44,11 @@ namespace TsudaKageyu
         {
             // Create a dynamic method to access Icon.iconData private field.
 
-            var dm = new DynamicMethod(
+            DynamicMethod dm = new DynamicMethod(
                 "GetIconData", typeof(byte[]), new Type[] { typeof(Icon) }, typeof(Icon));
-            var fi = typeof(Icon).GetField(
+            FieldInfo fi = typeof(Icon).GetField(
                 "iconData", BindingFlags.Instance | BindingFlags.NonPublic);
-            var gen = dm.GetILGenerator();
+            ILGenerator gen = dm.GetILGenerator();
             gen.Emit(OpCodes.Ldarg_0);
             gen.Emit(OpCodes.Ldfld, fi);
             gen.Emit(OpCodes.Ret);
@@ -57,21 +57,21 @@ namespace TsudaKageyu
         }
 
         /// <summary>
-        /// Split an Icon consists of multiple icons into an array of Icon each
-        /// consists of single icons.
+        /// Splitting an <see cref="Icon"/> consists of multiple icons into an array of <see cref="Icon"/> each
+        /// consists of single icon.
         /// </summary>
-        /// <param name="icon">A System.Drawing.Icon to be split.</param>
-        /// <returns>An array of System.Drawing.Icon.</returns>
-        public static Icon[] Split(Icon icon)
+        /// <param name="icon">A <see cref="System.Drawing.Icon"/> to be split.</param>
+        /// <returns>An array of <see cref="System.Drawing.Icon"/>.</returns>
+        public static Icon[] Split(this Icon icon)
         {
             if (icon == null)
                 throw new ArgumentNullException(nameof(icon));
 
             // Get an .ico file in memory, then split it into separate icons.
 
-            var src = GetIconData(icon);
+            byte[] src = GetIconData(icon);
 
-            var splitIcons = new List<Icon>();
+            List<Icon> splitIcons = new List<Icon>();
             {
                 int count = BitConverter.ToUInt16(src, 4);
 
@@ -80,7 +80,7 @@ namespace TsudaKageyu
                     int length = BitConverter.ToInt32(src, 6 + 16 * i + 8);    // ICONDIRENTRY.dwBytesInRes
                     int offset = BitConverter.ToInt32(src, 6 + 16 * i + 12);   // ICONDIRENTRY.dwImageOffset
 
-                    using (var dst = new BinaryWriter(new MemoryStream(6 + 16 + length)))
+                    using (BinaryWriter dst = new BinaryWriter(new MemoryStream(6 + 16 + length)))
                     {
                         // Copy ICONDIR and set idCount to 1.
 
@@ -105,6 +105,24 @@ namespace TsudaKageyu
             }
 
             return splitIcons.ToArray();
+        }
+
+        public static Icon TryGetIcon(this Icon icon, Size size) => icon.Split().TryGetIcon(size);
+
+        public static Icon TryGetIcon(this Icon[] icons, Size size)
+
+        {
+
+            //Icon[] icons = icon.Split();
+
+            foreach (Icon i in icons)
+
+                if (i.Size == size)
+
+                    return i;
+
+            return null;
+
         }
 
         /// <summary>

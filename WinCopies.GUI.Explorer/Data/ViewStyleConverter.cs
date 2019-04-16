@@ -22,7 +22,7 @@ namespace WinCopies.GUI.Explorer.Data
                 ViewStyles.Tiles) ? "SizeOneToFourOrTiles" : (ViewStyles)value == ViewStyles.List ? "ListItems" : null;
 
             string _parameter = (string)parameter;
-
+            object r = _parameter == "ScrollBarsVisibility" ? result : _parameter == "WrapPanelOrientation" ? result == "SizeOneToFourOrTiles" ? Orientation.Horizontal : result == "ListItems" ? (object)Orientation.Vertical : null : null;
             return _parameter == "ScrollBarsVisibility" ? result : _parameter == "WrapPanelOrientation" ? result == "SizeOneToFourOrTiles" ? Orientation.Horizontal : result == "ListItems" ? (object)Orientation.Vertical : null : null;
 
         }

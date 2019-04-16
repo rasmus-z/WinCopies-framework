@@ -469,6 +469,45 @@ namespace WinCopies.IO
 
         }
 
+        public static string GetRealPathFromEnvironmentVariables(string path)
+
+        {
+
+            string[] subPaths = path.Split('\\');
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            int count = 0;
+
+            foreach (string subPath in subPaths)
+
+            {
+
+                count++;
+
+                if (subPath.StartsWith("%"))
+
+                    if (subPath.EndsWith("%"))
+
+                        stringBuilder.Append(Environment.GetEnvironmentVariable(subPath.Substring(1, subPath.Length - 1)));
+
+                    else
+
+                        throw new ArgumentException("'path' is not a well-formatted environment variables path.");
+
+                else
+
+                    stringBuilder.Append(subPath);
+
+                if (count < subPaths.Length)
+
+                    stringBuilder.Append('\\');
+
+            }
+
+            return stringBuilder.ToString();
+
+        }
 
     }
 }

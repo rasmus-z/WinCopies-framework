@@ -76,7 +76,7 @@ namespace WinCopies.Util
                         (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
                         (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)));//: comparisonType == ComparisonType.Or ?//(result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||//    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||//    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))
 
-        private static bool CheckIfEqualityComparison(Comparison comparison, bool predicateResult, bool result) => (!result && comparison == Comparison.Equals) || (result && comparison == Comparison.DoesNotEqual);
+        private static bool CheckIfEqualityComparison(Comparison comparison, bool predicateResult, bool result) => (result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual);
 
         // todo: factoriser au maximum
 

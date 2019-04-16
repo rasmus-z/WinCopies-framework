@@ -115,6 +115,7 @@
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registry.cs" />
+    <Compile Include="RegistryException.cs" />
     <Compile Include="RegistryInterop.cs" />
     <Compile Include="Generic.xaml.cs" />
     <Compile Include="ResourcesHelper.cs" />
@@ -171,6 +172,12 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Third parties\IconExtractor-1.0\IconExtractor\IconExtractor.csproj">
+      <Project>{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}</Project>
+      <Name>IconExtractor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
