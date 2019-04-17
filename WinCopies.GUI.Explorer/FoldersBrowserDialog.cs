@@ -147,7 +147,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                 {
 
-                    ExplorerControl.Open(selectedItem);
+                    ExplorerControl.Open( new Explorer.IBrowsableObjectInfo[] { selectedItem });
 
                     return;
 

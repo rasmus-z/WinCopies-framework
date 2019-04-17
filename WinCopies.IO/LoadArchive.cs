@@ -117,9 +117,9 @@ namespace WinCopies.IO
 
                 throw new ArgumentException("'Path' is null or isn't a ShellObjectInfo or an ArchiveItemInfo.");
 
-            else if (_path.FileType != IO.FileType.Archive)
+            else if (_path.FileType != FileType.Folder && _path.FileType != IO.FileType.Archive)
 
-                throw new ArgumentException("'Path' isn't an Archive.");
+                throw new ArgumentException("'Path' is not an Archive or a Folder.");
 
             // _Paths = new ObservableCollection<IBrowsableObjectInfo>();
 
@@ -229,47 +229,75 @@ namespace WinCopies.IO
 
                     ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
 
-                    string _path = "";
-
                     string fileName = "";
 
-                    string relativePath = "";
+                    string relativePath = Path is ShellObjectInfo ? "" : Path.Path.Substring(archiveShellObject.Path.Length + 1);
+
+                    PathInfo path;
+
+                    foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
+
+                        Debug.WriteLine(archiveFileInfo.FileName);
+
+                    void addPath(ArchiveFileInfo archiveFileInfo)
+
+                    {
+
+                        if (archiveFileInfo.FileName.StartsWith(relativePath) && archiveFileInfo.FileName.Length > relativePath.Length)
+
+                        {
+
+                            fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
+
+                            if (fileName.Contains("\\"))
+
+                                fileName = fileName.Substring(0, fileName.IndexOf("\\"));
+
+                            /*if (!archiveFileInfo.FileName.Substring(archiveFileInfo.FileName.Length).Contains("\\"))*/
+
+                            // {
+
+                            foreach (IFileSystemObject pathInfo in paths)
+
+                                if (pathInfo.Path == fileName)
+
+                                    return;
+
+                            path = new PathInfo() { Path = fileName };
+
+                            if (fileName == archiveFileInfo.FileName)
+
+                            {
+
+                                path.ArchiveFileInfo = archiveFileInfo;
+
+                                if (archiveFileInfo.IsDirectory)
+
+                                    AddDirectory(path);
+
+                                else if (CheckFilter(archiveFileInfo.FileName))
+
+                                    AddFile(path, archiveFileInfo.FileName.Substring(archiveFileInfo.FileName.Length).EndsWith(".lnk"));
+
+                            }
+
+                            else
+
+                                AddDirectory(path);
+
+                            // }
+
+                        }
+
+                    }
 
                     foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
 
                     {
 
-                        _path = archiveFileInfo.FileName.Replace('/', '\\');
+                        // _path = archiveFileInfo.FileName.Replace('/', '\\');
 
-                        if (_path.StartsWith(relativePath) && _path.Length > relativePath.Length)
-
-                        {
-
-                            fileName = _path.Substring(_path.Length);
-
-                            if (!fileName.Contains("\\"))
-
-                            {
-
-                                if (CheckFilter(_path))
-
-                                {
-
-                                    PathInfo path = new PathInfo() { Path = _path };
-
-                                    if (archiveFileInfo.IsDirectory)
-
-                                        AddDirectory(path);
-
-                                    else
-
-                                        AddFile(path, fileName.EndsWith(".lnk"));
-
-                                }
-
-                            }
-
-                        }
+                        addPath(archiveFileInfo);
 
                     }
 
@@ -281,7 +309,7 @@ namespace WinCopies.IO
 
                             relativePath = "\\";
 
-                        relativePath += ((ArchiveItemInfo)Path).ArchiveItemRelativePath.Replace('/', '\\');
+                        relativePath += ((ArchiveItemInfo)Path).ArchiveFileInfo.FileName/*.Replace('/', '\\')*/;
 
                     }
 
@@ -379,12 +407,12 @@ namespace WinCopies.IO
             //foreach (LoadFolder.PathInfo path_ in files)
 
             //    reportProgressAndAddNewPathToObservableCollection(path_);
-            
+
         }
 
         protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path) =>
 
-            ((IArchiveItemInfoProvider)Path).GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, path.Path, Path.Path, path.FileType);
+            ((IArchiveItemInfoProvider)Path).GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType);
 
         // todo: really needed? :
 
@@ -399,9 +427,9 @@ namespace WinCopies.IO
 
             public string Normalized_Path { get; set; }
 
-            public ArchiveFileInfo ArchiveFileInfo { get; set; }
+            public ArchiveFileInfo? ArchiveFileInfo { get; set; }
 
-            public string LocalizedPath => Path;
+            public string LocalizedName => Path;
 
             public string Name { get; set; }
 

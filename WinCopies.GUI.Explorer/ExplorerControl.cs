@@ -388,6 +388,11 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public event ValueChangedEventHandler VisibleItemsCountChanged;
 
+        /// <summary>
+        /// Occurs when an array of paths have been requested for opening. When the <see cref="ExplorerControl"/> raises this event, it has also tried to open the first path of the <see cref="MultiplePathsOpenRequestedEventArgs.Paths"/> array.
+        /// </summary>
+        public event MultiplePathsOpenRequestedEventHandler MultiplePathsOpenRequested;
+
         static ExplorerControl() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ExplorerControl), new FrameworkPropertyMetadata(typeof(ExplorerControl)));
 
         /// <summary>
@@ -427,7 +432,7 @@ namespace WinCopies.GUI.Explorer
 
             }
 
-            Open(path);
+            Open(new IBrowsableObjectInfo[] { path });
 
             // InputBindings.Add(new MouseBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
 
@@ -900,19 +905,39 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        internal bool OpenInternal(IBrowsableObjectInfo path)
+        internal bool? OpenInternal(IBrowsableObjectInfo path, bool firstItem)
 
         {
 
-            if (path is ShellObjectInfo)
+            if (firstItem && path is ArchiveItemInfo && path.FileType == FileType.Archive)
+
+            {
+
+                MessageBox.Show("The 'Open Archive in Archive' feature isn't currently supported by WinCopies. This feature will come with next updates.");
+
+                return false;
+
+            }
+
+            if (path is ShellObjectInfo || path is ArchiveItemInfo)
+
+            {
 
                 if (path.FileType == FileType.Folder || path.FileType == FileType.Drive || path.FileType == FileType.SpecialFolder || path.FileType == FileType.Archive)
 
                 {
 
-                    Navigate(path, true);
+                    if (firstItem)
 
-                    return true;
+                    {
+
+                        Navigate(path, true);
+
+                        return true;
+
+                    }
+
+                    else return null;
 
                 }
 
@@ -934,11 +959,13 @@ namespace WinCopies.GUI.Explorer
 
                     }
 
+            }
+
             return false;
 
         }
 
-        internal void OpenLinkInternal(ShellLink path)
+        internal bool OpenLinkInternal(ShellLink path, bool firstItem)
 
         {
 
@@ -946,7 +973,17 @@ namespace WinCopies.GUI.Explorer
 
             if (_path.FileType == FileType.Folder || _path.FileType == FileType.Drive || _path.FileType == FileType.SpecialFolder || _path.FileType == FileType.Archive)
 
-                Navigate(_path, true);
+                if (firstItem)
+
+                {
+
+                    Navigate(_path, true);
+
+                    return true;
+
+                }
+
+                else return false;
 
             else if (_path.FileType == FileType.File)
 
@@ -960,51 +997,85 @@ namespace WinCopies.GUI.Explorer
 
                     OpenFile((ShellFile)_path.ShellObject);
 
+            return true;
+
         }
 
         /// <summary>
-        /// Opens a path.
+        /// Opens a path array.
         /// </summary>
-        /// <param name="path">The <see cref="IBrowsableObjectInfo"/> path as to open.</param>
-        public void Open(IBrowsableObjectInfo path)
+        /// <param name="paths">The <see cref="IBrowsableObjectInfo"/> paths array to open.</param>
+        public void Open(IEnumerable<IBrowsableObjectInfo> paths)
 
         {
 
+            IBrowsableObjectInfo path;
+
+            List<IBrowsableObjectInfo> _paths = Enumerable.ToList(paths);
+
+            List<IBrowsableObjectInfo> nonOpenedPaths = new List<IBrowsableObjectInfo>();
+
+            for (int i = 0; i < _paths.Count; i++)
+
+            {
+
+                path = _paths[i];
+
 #if DEBUG
 
-            Debug.WriteLine("ExplorerControl Open");
+                Debug.WriteLine("ExplorerControl Open");
 
-            Debug.WriteLine((!(path is IO.ShellObjectInfo)).ToString() + " " + ((IO.ShellObjectInfo)path).ShellObject.GetType().ToString());
+                if (path is IO.ShellObjectInfo)
+
+                    Debug.WriteLine((!(path is IO.ShellObjectInfo)).ToString() + " " + ((IO.ShellObjectInfo)path).ShellObject.GetType().ToString());
 
 #endif
 
-            if (!OpenInternal(path))
+                bool? result = OpenInternal(path, i == 0);
 
-                if (path.FileType == FileType.Link)
+                if (result.HasValue)
 
-                    if (!(path is IO.ShellObjectInfo) || !((IO.ShellObjectInfo)path).ShellObject.IsLink)
+                {
 
-                        // todo:
+                    if (!result.Value)
 
-                        throw new ArgumentException("path isn't a ShellObjectInfo or path isn't a link.");
+                        if (path.FileType == FileType.Link)
 
-                    else
+                            if (!(path is IO.ShellObjectInfo) || !((IO.ShellObjectInfo)path).ShellObject.IsLink)
 
-                    {
+                                // todo:
 
-                        ShellLink shellLink = (ShellLink)ShellObject.FromParsingName(((IO.ShellObjectInfo)path).ShellObject.ParsingName);
+                                throw new ArgumentException("path isn't a ShellObjectInfo or path isn't a link.");
 
-                        if (shellLink.TargetShellObject.IsLink)
+                            else
 
-                            // todo:
+                            {
 
-                            throw new InvalidOperationException("Shell link target shell object is also a link.");
+                                ShellLink shellLink = (ShellLink)ShellObject.FromParsingName(((IO.ShellObjectInfo)path).ShellObject.ParsingName);
 
-                        else
+                                if (shellLink.TargetShellObject.IsLink)
 
-                            OpenLinkInternal(shellLink);
+                                    // todo:
 
-                    }
+                                    throw new InvalidOperationException("Shell link target shell object is also a link.");
+
+                                else
+
+                                    if (!OpenLinkInternal(shellLink, i == 0))
+
+                                    nonOpenedPaths.Add(path);
+
+                            }
+
+                }
+
+                else
+
+                    nonOpenedPaths.Add(path);
+
+            }
+
+            MultiplePathsOpenRequested?.Invoke(this, new MultiplePathsOpenRequestedEventArgs(paths));
 
         }
 
@@ -1053,9 +1124,13 @@ namespace WinCopies.GUI.Explorer
 
             //if (areFoldersSelected || areFilesSelected || areOtherObjectsSelected)
 
-            foreach (object item in SelectedItems.ListBox.SelectedItems)
+            List<IBrowsableObjectInfo> paths = new List<IBrowsableObjectInfo>();
 
-                Open((IBrowsableObjectInfo)item);
+            foreach (object path in SelectedItems.ListBox.SelectedItems)
+
+                paths.Add((IBrowsableObjectInfo)path);
+
+            Open(paths);
 
         }
 
@@ -1085,7 +1160,7 @@ namespace WinCopies.GUI.Explorer
 
             // BrowsableObjectInfoItemsLoader = new LoadFolder((ShellObjectInfo)path);
 
-            SetValue(HeaderPropertyKey, ((ShellObjectInfo)path).ShellObject.GetDisplayName(DisplayNameType.Default));
+            SetValue(HeaderPropertyKey, path.LocalizedName);
 
 
             // loadFolder.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) =>
@@ -1098,7 +1173,7 @@ namespace WinCopies.GUI.Explorer
 
             if (browsableObjectInfoItemsLoader == null)
 
-                browsableObjectInfoItemsLoader = path.FileType == FileType.Archive ? (BrowsableObjectInfoItemsLoader)new LoadArchive(true, true, FileTypesFlags.All) : (BrowsableObjectInfoItemsLoader)new LoadFolder(true, true, FileTypesFlags.All);
+                browsableObjectInfoItemsLoader = path is ArchiveItemInfo || path.FileType == FileType.Archive ? (BrowsableObjectInfoItemsLoader)new LoadArchive(true, true, FileTypesFlags.All) : (BrowsableObjectInfoItemsLoader)new LoadFolder(true, true, FileTypesFlags.All);
 
             browsableObjectInfoItemsLoader.RunWorkerCompleted += BrowsableObjectInfoItemsLoader_RunWorkerCompleted;
 

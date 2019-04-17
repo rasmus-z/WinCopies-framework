@@ -32,7 +32,7 @@ namespace WinCopies.IO
         /// <summary>
         /// When overriden in a derived class, gets the localized path of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        public abstract string LocalizedPath { get; }
+        public abstract string LocalizedName { get; }
 
         /// <summary>
         /// When overriden in a derived class, gets the name of this <see cref="BrowsableObjectInfo"/>.

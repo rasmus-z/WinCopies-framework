@@ -29,10 +29,10 @@ namespace WinCopies.GUI.Explorer
 
         ObservableCollection<IBrowsableObjectInfo> IBrowsableObjectInfoInternal.SelectedItems { get; set; } = new ObservableCollection<IBrowsableObjectInfo>();
 
-        public ArchiveItemInfo(IO.ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileType fileType) : base(archiveShellObject, archiveFileInfo, path, archiveItemRelativePath, fileType) => BrowsableObjectInfoHelper.Init(this);
+        public ArchiveItemInfo(IO.ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) : base(archiveShellObject, archiveFileInfo, path, fileType) => BrowsableObjectInfoHelper.Init(this);
 
-        public ArchiveItemInfo(IO.ArchiveItemInfo archiveItemInfo) : this(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.ArchiveItemRelativePath, archiveItemInfo.FileType) => BrowsableObjectInfoHelper.Init(this);
+        public ArchiveItemInfo(IO.ArchiveItemInfo archiveItemInfo) : this(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) => BrowsableObjectInfoHelper.Init(this);
 
-        public override IO.IBrowsableObjectInfo GetBrowsableObjectInfo(IO.ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileType fileType) => new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, archiveItemRelativePath, fileType);
+        public override IO.IBrowsableObjectInfo GetBrowsableObjectInfo(IO.ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) => new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
     }
 }

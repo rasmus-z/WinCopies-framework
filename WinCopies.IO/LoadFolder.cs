@@ -269,7 +269,7 @@ namespace WinCopies.IO
 
                     foreach (string directory in directories)
 
-                        if (CheckFilter(directory))
+                        // if (CheckFilter(directory))
 
                             AddDirectory(new PathInfo() { Path = directory, ShellObject = ShellObject.FromParsingName(directory) });
 
@@ -385,7 +385,7 @@ namespace WinCopies.IO
 
             public ShellObject ShellObject { get; set; }
 
-            public string LocalizedPath { get => ShellObject.GetDisplayName(DisplayNameType.Default); }
+            public string LocalizedName { get => ShellObject.GetDisplayName(DisplayNameType.Default); }
 
             public string Name { get; set; }
 
@@ -428,7 +428,7 @@ namespace WinCopies.IO
             }
 
             public override int Compare(IFileSystemObject x, IFileSystemObject y) => x.FileType == y.FileType || (x.FileType == IO.FileType.File && (y.FileType == IO.FileType.Link || y.FileType == IO.FileType.Archive)) || (y.FileType == IO.FileType.File && (x.FileType == IO.FileType.Link || x.FileType == IO.FileType.Archive))
-                    ? bidule.Compare(IO.Path.GetNormalizedPath(x.LocalizedPath), IO.Path.GetNormalizedPath(y.LocalizedPath))
+                    ? bidule.Compare(IO.Path.GetNormalizedPath(x.LocalizedName), IO.Path.GetNormalizedPath(y.LocalizedName))
                     : (x.FileType == IO.FileType.Folder || x.FileType == IO.FileType.Drive) && (y.FileType == IO.FileType.File || y.FileType == IO.FileType.Archive || y.FileType == IO.FileType.Link)
                     ? -1
                     : (x.FileType == IO.FileType.File || x.FileType == IO.FileType.Archive || x.FileType == IO.FileType.Link) && (y.FileType == IO.FileType.Folder || y.FileType == IO.FileType.Drive)

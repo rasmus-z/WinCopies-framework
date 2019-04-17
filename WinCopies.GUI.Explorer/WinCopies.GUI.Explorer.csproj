@@ -139,6 +139,7 @@
     <Compile Include="IBrowsableObjectInfoHelper.cs" />
     <Compile Include="ListView.cs" />
     <Compile Include="ListViewItem.cs" />
+    <Compile Include="MultiplePathsOpenRequestedEventArgs.cs" />
     <Compile Include="ResourcesHelper.cs" />
     <Compile Include="SelectionChangedEventArgs.cs" />
     <Compile Include="ShellObjectInfo.cs" />

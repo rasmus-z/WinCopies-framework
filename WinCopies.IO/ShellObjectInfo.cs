@@ -26,9 +26,9 @@ namespace WinCopies.IO
         ShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => this;
 
         /// <summary>
-        /// Gets the localized path of this <see cref="ShellObjectInfo"/> depending the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details..
+        /// Gets the localized name of this <see cref="ShellObjectInfo"/> depending the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details..
         /// </summary>
-        public override string LocalizedPath => ShellObject.GetDisplayName(DisplayNameType.Default);
+        public override string LocalizedName => ShellObject.GetDisplayName(DisplayNameType.Default);
 
         /// <summary>
         /// Gets the name of this <see cref="ShellObjectInfo"/> depending of the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
@@ -454,9 +454,9 @@ namespace WinCopies.IO
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolders specialFolder) => new ShellObjectInfo(shellObject, path, fileType, specialFolder);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileType fileType) =>
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) =>
 
-            new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, archiveItemRelativePath, fileType);
+            new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
 
         /// <summary>
         /// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.

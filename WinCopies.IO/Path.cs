@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 using MS.WindowsAPICodePack.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -489,7 +490,7 @@ namespace WinCopies.IO
 
                     if (subPath.EndsWith("%"))
 
-                        stringBuilder.Append(Environment.GetEnvironmentVariable(subPath.Substring(1, subPath.Length - 1)));
+                        stringBuilder.Append(Environment.GetEnvironmentVariable(subPath.Substring(1, subPath.Length - 2)));
 
                     else
 

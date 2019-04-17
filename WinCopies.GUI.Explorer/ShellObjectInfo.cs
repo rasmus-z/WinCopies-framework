@@ -95,7 +95,7 @@ namespace WinCopies.GUI.Explorer
 
         public override IO.IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolders specialFolder) => new ShellObjectInfo(shellObject, path, fileType, specialFolder);
 
-        public override IO.IBrowsableObjectInfo GetBrowsableObjectInfo(IO.ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileType fileType) => new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, archiveItemRelativePath, fileType);
+        public override IO.IBrowsableObjectInfo GetBrowsableObjectInfo(IO.ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) => new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
 
     }
 

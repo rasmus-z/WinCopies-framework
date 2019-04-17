@@ -107,9 +107,9 @@ namespace TsudaKageyu
             return splitIcons.ToArray();
         }
 
-        public static Icon TryGetIcon(this Icon icon, Size size) => icon.Split().TryGetIcon(size);
+        public static Icon TryGetIcon(this Icon icon, Size size, bool tryResize) => icon.Split().TryGetIcon(size, tryResize);
 
-        public static Icon TryGetIcon(this Icon[] icons, Size size)
+        public static Icon TryGetIcon(this Icon[] icons, Size size, bool tryResize)
 
         {
 
@@ -120,6 +120,22 @@ namespace TsudaKageyu
                 if (i.Size == size)
 
                     return i;
+
+            if (tryResize)
+
+            {
+
+                Icon icon = null;
+
+                foreach (Icon i in icons)
+
+                    if (i.Size.Height > size.Height && (icon == null || i.Size.Height > icon.Size.Height))
+
+                        icon = i;
+
+                return icon;
+
+            }
 
             return null;
 

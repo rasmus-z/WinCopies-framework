@@ -478,25 +478,11 @@ namespace WinCopies.IO
 
             {
 
-                if ((_registryKey = registryKey.OpenSubKey("shell\\open\\command")) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null)
+                defaultIconPath = (_registryKey = registryKey.OpenSubKey("shell\\open\\command")) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null
+                    ? "%SystemRoot%\\System32\\SHELL32.dll"
+                    : GetOpenWithSoftwarePathFromCommand(defaultIconPath);
 
-                {
-
-                    defaultIconPath = "%SystemRoot%\\System32\\SHELL32.dll";
-
-                    iconIndex = 0;
-
-                }
-
-                else
-
-                {
-
-                    defaultIconPath = GetOpenWithSoftwarePathFromCommand(defaultIconPath);
-
-                    iconIndex = 0;
-
-                }
+                iconIndex = 0;
 
             }
 
@@ -504,7 +490,7 @@ namespace WinCopies.IO
 
             {
 
-                string[] subPaths = null;
+                string[] subPaths;
 
                 if (defaultIconPath.Contains(','))
 
@@ -562,11 +548,7 @@ namespace WinCopies.IO
 
             }
 
-            defaultIconPath = Path.GetRealPathFromEnvironmentVariables(defaultIconPath);
-
-            IconExtractor iconExtractor = new IconExtractor(defaultIconPath);
-
-            return iconExtractor.GetIcon(iconIndex).Split();
+            return new IconExtractor(Path.GetRealPathFromEnvironmentVariables(defaultIconPath)).GetIcon(iconIndex).Split();
 
         }
 

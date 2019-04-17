@@ -93,7 +93,7 @@ namespace WinCopies.IO
         /// </summary>
         string Path { get; }
 
-        string LocalizedPath { get; }
+        string LocalizedName { get; }
 
         string Name { get; }
 

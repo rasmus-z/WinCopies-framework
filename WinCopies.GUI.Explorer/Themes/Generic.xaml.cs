@@ -237,10 +237,10 @@ namespace WinCopies.GUI.Explorer.Themes
 
             {
 
-                explorerControl.Open(new ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(
+                explorerControl.Open(new ShellObjectInfo[] { new ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(
                     explorerControl.Text)
                     , explorerControl.Text)
-                    );
+                });
 
             }
             catch (Exception ex) // when (ex is IOException || ex is UnauthorizedAccessException)
@@ -324,7 +324,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
             // explorerControl.TreeViewSelectedItem = browsableObjectInfo;
 
-            browsableObjectInfo = (IBrowsableObjectInfo)(browsableObjectInfo is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.ArchiveItemRelativePath, archiveItemInfo.FileType) : null);
+            browsableObjectInfo = (IBrowsableObjectInfo)(browsableObjectInfo is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
 
             explorerControl.Navigate(browsableObjectInfo, true);
 

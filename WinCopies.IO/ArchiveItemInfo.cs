@@ -19,7 +19,7 @@ namespace WinCopies.IO
 
     {
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileType fileType);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType);
 
         ShellObjectInfo ArchiveShellObject { get; }
 
@@ -33,11 +33,13 @@ namespace WinCopies.IO
 
         public ShellObjectInfo ArchiveShellObject { get; } = null;
 
-        public override string LocalizedPath => ArchiveShellObject.LocalizedPath;
+        public override string LocalizedName => ArchiveShellObject.LocalizedName;
 
         public override string Name => System.IO.Path.GetFileName(Path);
 
-        private Icon TryGetIcon(System.Drawing.Size size) => Registry.GetIconVariationsFromFileType(Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path)))?.TryGetIcon(size);
+        private Icon TryGetIcon(System.Drawing.Size size) => System.IO.Path.HasExtension(Path)
+                ? Registry.GetIconVariationsFromFileType(Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path)))?.TryGetIcon(size, true)
+                : new IconExtractor( WinCopies.IO.Path.GetRealPathFromEnvironmentVariables( "%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, true);
 
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
@@ -81,7 +83,7 @@ namespace WinCopies.IO
 
                 using (Icon icon = TryGetIcon(new System.Drawing.Size(128, 128)))
 
-                    return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0,0,icon.Width, icon.Height), BitmapSizeOptions.FromWidthAndHeight(icon.Width, icon.Height));
+                    return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromWidthAndHeight(icon.Width, icon.Height));
 
             }
 
@@ -105,7 +107,7 @@ namespace WinCopies.IO
 
         public override bool IsBrowsable => FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.Archive;
 
-        public string ArchiveItemRelativePath { get; } = null;
+        // public ArchiveFileInfo ArchiveFileInfo { get; } = null;
 
         // public bool AreItemsLoaded { get => areItemsLoaded; private set => OnPropertyChanged(nameof(AreItemsLoaded), nameof(areItemsLoaded), value); }
 
@@ -147,13 +149,17 @@ namespace WinCopies.IO
 
         //}
 
-        public ArchiveItemInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileType fileType) : base(path, fileType)
+        public ArchiveItemInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) : base(path, fileType)
 
         {
 
             if (fileType == FileType.SpecialFolder)
 
                 throw new ArgumentException("'fileType' can't be a SpecialFolder.");
+
+            if (archiveFileInfo.HasValue && !path.EndsWith(archiveFileInfo.Value.FileName))
+
+                throw new ArgumentException($"'{nameof(path)}' must end with '{nameof(archiveFileInfo.Value.FileName)}'");
 
             ArchiveShellObject = archiveShellObject;
 
@@ -165,57 +171,49 @@ namespace WinCopies.IO
 
             // Path = path;
 
-            ArchiveItemRelativePath = archiveItemRelativePath;
+            if (archiveFileInfo.HasValue)
 
-            if (path.Contains("\\"))
+                ArchiveFileInfo = archiveFileInfo.Value;
 
-            {
+            Debug.WriteLine("path: " + path);
 
-                string parent = path.Substring(0, path.LastIndexOf('\\'));
+            Parent = path.Length > archiveShellObject.Path.Length && path.Contains("\\") ? GetBrowsableObjectInfo(archiveShellObject, null/*archiveParentFileInfo.Value*/, path.Substring(0, path.LastIndexOf('\\')), FileType.Folder) : archiveShellObject;
 
-                ArchiveFileInfo? archiveParentFileInfo = null;
+            #region Comments
 
-                FileType _fileType = FileType.None;
+            // ArchiveFileInfo? archiveParentFileInfo = null;
 
-                SevenZipExtractor archiveExtractor = new SevenZipExtractor(archiveFileInfo.FileName);
+            // FileType _fileType = FileType.None;
 
-                System.Collections.ObjectModel.ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
+            // SevenZipExtractor archiveExtractor = new SevenZipExtractor(archiveShellObject.Path);
 
-                foreach (ArchiveFileInfo _archiveFileInfo in archiveFileData)
+            // System.Collections.ObjectModel.ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
 
-                {
+            //foreach (ArchiveFileInfo _archiveFileInfo in archiveFileData)
 
-#if DEBUG 
+            //{
 
-                    Debug.WriteLine("_archiveFileInfo.FileName: " + _archiveFileInfo.FileName);
+            //if (_archiveFileInfo.FileName.Substring(0, path.LastIndexOf('\\')) == parent)
 
-#endif 
+            //{
 
-                    if (_archiveFileInfo.FileName == parent)
+            // archiveParentFileInfo = _archiveFileInfo;
 
-                    {
+            //_fileType = _archiveFileInfo.IsDirectory ? FileType.Folder : FileType.File;
 
-                        archiveParentFileInfo = _archiveFileInfo;
+            //break;
 
-                        if (_archiveFileInfo.IsDirectory)
+            //}
 
-                            _fileType = FileType.Folder;
+            //else
 
-                        else
+            // todo:
 
-                            _fileType = FileType.File;
+            //throw new Exception("");
 
-                    }
+            //}
 
-                }
-
-                Parent = GetBrowsableObjectInfo(archiveShellObject, archiveParentFileInfo.Value, path, parent, _fileType);
-
-            }
-
-            else
-
-                Parent = archiveShellObject;
+            #endregion
 
         }
 
@@ -258,9 +256,9 @@ namespace WinCopies.IO
 
         public override string ToString() => System.IO.Path.GetFileName(Path);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo archiveFileInfo, string path, string archiveItemRelativePath, FileType fileType) =>
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) =>
 
-            new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, archiveItemRelativePath, fileType);
+            new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
 
         public override void Rename(string newValue)
 
