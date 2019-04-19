@@ -39,7 +39,7 @@ namespace WinCopies.IO
 
         private Icon TryGetIcon(System.Drawing.Size size) => System.IO.Path.HasExtension(Path)
                 ? Registry.GetIconVariationsFromFileType(Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path)))?.TryGetIcon(size, true)
-                : new IconExtractor( WinCopies.IO.Path.GetRealPathFromEnvironmentVariables( "%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, true);
+                : new IconExtractor(WinCopies.IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, true);
 
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
@@ -134,7 +134,7 @@ namespace WinCopies.IO
 
         //}
 
-        public ArchiveFileInfo ArchiveFileInfo { get; }
+        public ArchiveFileInfo? ArchiveFileInfo { get; }
 
         public override IBrowsableObjectInfo Parent { get; protected set; } = null;
 
@@ -266,13 +266,17 @@ namespace WinCopies.IO
 
             // string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
 
-            SevenZipCompressor a = new SevenZipCompressor();
+            //SevenZipCompressor a = new SevenZipCompressor();
 
-            Dictionary<int, string> dico = new Dictionary<int, string>();
+            //Dictionary<int, string> dico = new Dictionary<int, string>();
 
-            dico.Add(ArchiveFileInfo.Index, ArchiveFileInfo.FileName);
+            //dico.Add(ArchiveFileInfo.Index, ArchiveFileInfo.FileName);
 
-            a.ModifyArchive(ArchiveShellObject.Path, dico);
+            //a.ModifyArchive(ArchiveShellObject.Path, dico);
+
+            // todo:
+
+            throw new NotSupportedException("This feature is currently not supported for the content archive items.");
 
         }
     }

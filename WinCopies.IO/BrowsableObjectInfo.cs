@@ -78,7 +78,7 @@ namespace WinCopies.IO
         /// </summary>
         public bool AreItemsLoaded { get => areItemsLoaded; internal set => OnPropertyChanged(nameof(AreItemsLoaded), nameof(areItemsLoaded), value, typeof(BrowsableObjectInfo)); }
 
-        public WinCopies.Util.ObservableCollection<IBrowsableObjectInfo> items = new WinCopies.Util.ObservableCollection<IBrowsableObjectInfo>();
+        internal readonly WinCopies.Util.ObservableCollection<IBrowsableObjectInfo> items = new WinCopies.Util.ObservableCollection<IBrowsableObjectInfo>();
 
         /// <summary>
         /// Gets the items of this <see cref="BrowsableObjectInfo"/>.
@@ -203,6 +203,8 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="newValue">The new name or relative path for this <see cref="ShellObjectInfo"/>.</param>
         public abstract void Rename(string newValue);
+
+        public override string ToString() => Name;
 
     }
 }

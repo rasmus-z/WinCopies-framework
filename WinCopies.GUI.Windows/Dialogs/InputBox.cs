@@ -30,7 +30,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         /// <summary>
         /// Gets or sets the label text for the user. This is a dependency property.
         /// </summary>
-        public object Label { get => GetValue(LabelProperty); set => SetValue(LabelProperty, value); } 
+        public object Label { get => GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="Text"/> dependency property.
@@ -77,14 +77,12 @@ namespace WinCopies.GUI.Windows.Dialogs
         /// <summary>
         /// Identifies the <see cref="ErrorText"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ErrorTextProperty = DependencyProperty.Register(nameof(ErrorText), typeof(string), typeof(InputBox), new PropertyMetadata(null));    
+        public static readonly DependencyProperty ErrorTextProperty = DependencyProperty.Register(nameof(ErrorText), typeof(string), typeof(InputBox), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets the error text. This is a dependency property.
         /// </summary>
-        public string ErrorText { get => (string)GetValue(ErrorTextProperty); set => SetValue(ErrorTextProperty, value);
-
-        }
+        public string ErrorText { get => (string)GetValue(ErrorTextProperty); set => SetValue(ErrorTextProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="TextChanged"/> routed event.
@@ -112,10 +110,10 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             DefaultStyleKeyProperty.OverrideMetadata(typeof(InputBox), new FrameworkPropertyMetadata(typeof(InputBox)));// InputBox.StyleProperty.OverrideMetadata(typeof(InputBox), new FrameworkPropertyMetadata((Style) Application.Current. Resources["abcd"]));
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InputBox"/> class.
-        /// </summary>
-        public InputBox() => Content = /*new Label { Content = "a" };*/ new Control { Template = (ControlTemplate)ResourcesHelper.Instance.ResourceDictionary["InputBoxTemplate"] };
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="InputBox"/> class.
+        ///// </summary>
+        //public InputBox() => Content = /*new Label { Content = "a" }; new Control { Template = (ControlTemplate)ResourcesHelper.Instance.ResourceDictionary["InputBoxTemplate"] };*/
 
         // /// <summary>
         // /// Initialize a new instance of the <see cref="InputBox"/> window.
@@ -140,22 +138,22 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             e.RoutedEvent = TextChangedEvent;
 
-            RaiseEvent(e);    
+            RaiseEvent(e);
 
-        } 
+        }
 
-        protected override void OnCommandExecuted(object sender, ExecutedRoutedEventArgs e)    
+        protected override void OnCommandExecuted(object sender, ExecutedRoutedEventArgs e)
 
         {
 
-            if (e.Parameter is TextChangedEventArgs _e) 
+            if (e.Parameter is TextChangedEventArgs _e)
 
-                OnTextChanged(_e); 
+                OnTextChanged(_e);
 
             else
 
                 base.OnCommandExecuted(sender, e);
 
-        } 
+        }
     }
 }

@@ -41,9 +41,15 @@ namespace WinCopies.GUI.Explorer
 
                 ObservableCollection<ShellPropertyContainer> properties = new ObservableCollection<ShellPropertyContainer>();
 
-                foreach (IShellProperty property in selectedItem.ShellObject.Properties.DefaultPropertyCollection)
+                if (selectedItem.ShellObject.Properties.DefaultPropertyCollection != null)
 
-                    properties.Add(new ShellPropertyContainer(property));
+                {
+
+                    foreach (IShellProperty property in selectedItem.ShellObject.Properties.DefaultPropertyCollection)
+
+                        properties.Add(new ShellPropertyContainer(property));
+
+                }
 
                 FileProperties = new ReadOnlyObservableCollection<ShellPropertyContainer>(properties);
 

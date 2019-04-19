@@ -1,20 +1,177 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 using MS.WindowsAPICodePack.Internal;
+using SevenZip;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
     public static class Path
 
     {
+
+        public static BrowsableObjectInfo GetBrowsableObjectInfoFromPath(string path)
+
+        {
+
+            path = path.Replace('/', '\\');
+
+            if (path.EndsWith("\\") && !path.EndsWith(":\\") && !path.EndsWith(":\\\\"))
+
+                path = path.Substring(0, path.LastIndexOf("\\"));
+
+            path = GetRealPathFromEnvironmentVariables(path);
+
+            List<string> paths = path.Split('\\').ToList();
+
+            BrowsableObjectInfo browsableObjectInfo;
+
+            ShellObject shellObject = ShellObject.FromParsingName(paths[0]);
+
+            browsableObjectInfo = Directory.Exists(paths[0])
+                ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolders.OtherFolderOrFile)
+                : File.Exists(paths[0])
+                ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolders.OtherFolderOrFile)
+                : new ShellObjectInfo(shellObject, paths[0], FileType.SpecialFolder, ShellObjectInfo.GetSpecialFolderType(shellObject));
+
+            if (paths.Count == 1)
+
+                return browsableObjectInfo;
+
+            bool ok;
+
+            LoadArchive loadArchive = null;
+
+            // int archiveSubpathsCount = 0;
+
+            for (int i = 1; i < paths.Count; i++)
+
+            {
+
+                ok = false;
+
+                if (browsableObjectInfo.FileType == FileType.Archive || browsableObjectInfo is ArchiveItemInfo)
+
+                {
+
+                    // archiveSubpathsCount++;
+
+                    if (browsableObjectInfo.FileType == FileType.Archive)
+
+                        loadArchive = new LoadArchive(true, false, FileTypesFlags.All);
+
+                    loadArchive.Path = browsableObjectInfo;
+
+                    loadArchive.OnDoWork();
+
+                    string s = paths[i].ToLower();
+
+                    foreach (BrowsableObjectInfo _browsableObjectInfo in browsableObjectInfo.Items)
+
+                        if (_browsableObjectInfo.Path.Substring(_browsableObjectInfo.Path.LastIndexOf('\\') + 1).ToLower() == s)
+
+                        {
+
+                            browsableObjectInfo = _browsableObjectInfo;
+
+                            ok = true;
+
+                            break;
+
+                        }
+
+                    if (ok)
+
+                    {
+
+                        if (browsableObjectInfo.FileType == FileType.Archive && loadArchive != null)
+
+                            throw new IOException("The 'Open archive in archive' feature is currently not supported by the WinCopies framework.");
+
+                    }
+
+                    else
+
+                        throw new FileNotFoundException("The path could not be found.");
+
+                }
+
+                else
+
+                {
+
+                    shellObject = ((ShellObjectInfo)browsableObjectInfo).ShellObject;
+
+                    string s = shellObject.ParsingName;
+
+                    if (!s.EndsWith("\\"))
+
+                        s += "\\";
+
+                    s += paths[i];
+
+                    string _s = s.Replace("\\", "\\\\");
+
+                    if (shellObject.IsFileSystemObject)
+
+                        if (Directory.Exists(_s) || File.Exists(_s)) // We also check the files because the path can be an archive.
+
+                            browsableObjectInfo = new ShellObjectInfo(ShellObject.FromParsingName(s), s);
+
+                        else
+
+                        {
+
+                            foreach (ShellObject _shellObject in (ShellContainer)shellObject)
+
+                            {
+
+                                Debug.WriteLine(_shellObject.GetDisplayName(DisplayNameType.RelativeToParent));
+
+                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, paths[i], _shellObject.Name, _shellObject.GetDisplayName(DisplayNameType.RelativeToParent)))
+
+                                {
+
+                                    shellObject = _shellObject;
+
+                                    ok = true;
+
+                                    break;
+
+                                }
+
+                            }
+
+                            if (ok)
+
+                                browsableObjectInfo = new ShellObjectInfo(shellObject, s);
+
+                            else
+
+                                throw new FileNotFoundException("The path could not be found.");
+
+                        }
+
+                }
+
+                if (!browsableObjectInfo.IsBrowsable && i < paths.Count - 1)
+
+                    throw new DirectoryNotFoundException("The path isn't a directory.");
+
+            }
+
+            return browsableObjectInfo;
+
+        }
 
         public static bool MatchToFilter(string path, string filter)
 
@@ -124,11 +281,11 @@ namespace WinCopies.IO
 
                 basePath = basePath.Substring(0, basePath.Length - 1);
 
-#if DEBUG 
+#if DEBUG
 
             Debug.WriteLine(basePath);
 
-#endif 
+#endif
 
             if (basePath.EndsWith(":"))
 
@@ -214,7 +371,7 @@ namespace WinCopies.IO
 
             }
 
-#if DEBUG 
+#if DEBUG
 
             Debug.WriteLine("Path: " + path);
 
@@ -234,11 +391,11 @@ namespace WinCopies.IO
 
             if (path.EndsWith("\\")) path = path.Substring(0, path.Length - 1);
 
-#if DEBUG 
+#if DEBUG
 
             Debug.WriteLine(path);
 
-#endif 
+#endif
 
             if (path.EndsWith(":"))
 

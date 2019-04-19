@@ -136,49 +136,47 @@
                 </controls:TextBox>
             </ControlTemplate>
 
-            <ControlTemplate x:Key="InputBoxTemplate">
-                <Grid >
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" ></RowDefinition>
-                        <RowDefinition ></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Control Focusable="False">
-                        <Control.Style>
-                            <Style TargetType="{x:Type Control}">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type Control}">
-                                            <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:InputBox}, Mode=FindAncestor}}" >
-                                                <Control Template="{StaticResource InputBoxContentLabelTemplate}"></Control>
-                                                <Control Template="{StaticResource InputBoxContentTextBoxTemplate}"></Control>
-                                            </StackPanel>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Orientation, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static sys_windows_controls:Orientation.Horizontal}" >
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate>
-                                                    <Grid VerticalAlignment="Top">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" ></ColumnDefinition>
-                                                            <ColumnDefinition ></ColumnDefinition>
-                                                        </Grid.ColumnDefinitions>
-                                                        <Control Template="{StaticResource InputBoxContentLabelTemplate}"></Control>
-                                                        <Control Template="{StaticResource InputBoxContentTextBoxTemplate}"></Control>
-                                                    </Grid>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Control.Style>
-                    </Control>
-                    <Label Grid.Row="1" Content="{Binding ErrorText, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:InputBox}}}" Visibility="{Binding ErrorText, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:InputBox}}, Converter={ dialogs:ErrorLabelVisibilityConverter}}" Foreground="Red" ></Label>
-                </Grid>
-            </ControlTemplate>
+            <Grid x:Key="InputBoxContent" x:Shared="false" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" ></RowDefinition>
+                    <RowDefinition ></RowDefinition>
+                </Grid.RowDefinitions>
+                <Control Focusable="False">
+                    <Control.Style>
+                        <Style TargetType="{x:Type Control}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Control}">
+                                        <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:InputBox}, Mode=FindAncestor}}" >
+                                            <Control Template="{StaticResource InputBoxContentLabelTemplate}"></Control>
+                                            <Control Template="{StaticResource InputBoxContentTextBoxTemplate}"></Control>
+                                        </StackPanel>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Orientation, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static sys_windows_controls:Orientation.Horizontal}" >
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Grid VerticalAlignment="Top">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" ></ColumnDefinition>
+                                                        <ColumnDefinition ></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Control Template="{StaticResource InputBoxContentLabelTemplate}"></Control>
+                                                    <Control Template="{StaticResource InputBoxContentTextBoxTemplate}"></Control>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Control.Style>
+                </Control>
+                <Label Grid.Row="1" Content="{Binding ErrorText, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:InputBox}}}" Visibility="{Binding ErrorText, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:InputBox}}, Converter={ dialogs:ErrorLabelVisibilityConverter}}" Foreground="Red" ></Label>
+            </Grid>
 
             <ControlTemplate x:Key="ComboInputBoxContentComboBoxTemplate">
                 <ComboBox FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:InputBox}, Mode=FindAncestor}}" TabIndex="1" VerticalContentAlignment="Center" >
@@ -261,7 +259,9 @@
         </Setter>
     </Style>-->
 
-    <Style BasedOn="{StaticResource {x:Type guiDialogs:DialogWindow}}" TargetType="{x:Type dialogs:InputBox}" />
+    <Style BasedOn="{StaticResource {x:Type guiDialogs:DialogWindow}}" TargetType="{x:Type dialogs:InputBox}">
+        <Setter Property="Content" Value="{StaticResource InputBoxContent}" />
+    </Style>
 
     <Style BasedOn="{ StaticResource {x:Type dialogs:InputBox}}" TargetType="{x:Type dialogs:ComboInputBox}" />
 

@@ -145,7 +145,8 @@ namespace WinCopies.IO
 
         }
 
-        protected override void OnDoWork(object sender, DoWorkEventArgs e)
+        public virtual void OnDoWork()
+
         {
 
 #if DEBUG
@@ -191,7 +192,7 @@ namespace WinCopies.IO
 
                     {
 
-                        if (pathInfo.FileType == IO.FileType.None || (FileTypes != FileTypesFlags.All && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
+                        if (pathInfo.FileType == FileType.None || (FileTypes != FileTypesFlags.All && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
 
                         // We only make a normalized path if we add the path to the paths to load.
 
@@ -207,19 +208,19 @@ namespace WinCopies.IO
 
                         // if (FileTypes.HasFlag(FileTypesFlags.All) || (FileTypes.HasFlag(FileTypesFlags.Folder) && System.IO.Path.GetPathRoot(pathInfo.Path) != pathInfo.Path) || (FileTypes.HasFlag(FileTypesFlags.Drive) && System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path))
 
-                        pathInfo.FileType = IO.FileType.Folder;
+                        pathInfo.FileType = FileType.Folder;
 
                         AddPath(ref pathInfo);
 
                     }
 
-                    void AddFile(PathInfo pathInfo, bool isLink)
+                    void AddFile(PathInfo pathInfo)
 
                     {
 
-                        pathInfo.FileType = isLink
-                            ? IO.FileType.Link
-                            : IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? IO.FileType.Archive : IO.FileType.File;
+                        pathInfo.FileType = pathInfo.Path.Substring(pathInfo.Path.Length).EndsWith(".lnk")
+                            ? FileType.Link
+                            : IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
 
                         // We only make a normalized path if we add the path to the paths to load.
 
@@ -249,6 +250,10 @@ namespace WinCopies.IO
 
                             fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
 
+                            if (fileName.StartsWith("\\"))
+
+                                fileName = fileName.Substring(1);
+
                             if (fileName.Contains("\\"))
 
                                 fileName = fileName.Substring(0, fileName.IndexOf("\\"));
@@ -265,7 +270,7 @@ namespace WinCopies.IO
 
                             path = new PathInfo() { Path = fileName };
 
-                            if (fileName == archiveFileInfo.FileName)
+                            if (fileName.ToLower() == archiveFileInfo.FileName.ToLower())
 
                             {
 
@@ -277,7 +282,7 @@ namespace WinCopies.IO
 
                                 else if (CheckFilter(archiveFileInfo.FileName))
 
-                                    AddFile(path, archiveFileInfo.FileName.Substring(archiveFileInfo.FileName.Length).EndsWith(".lnk"));
+                                    AddFile(path);
 
                             }
 
@@ -301,17 +306,17 @@ namespace WinCopies.IO
 
                     }
 
-                    if (Path is ArchiveItemInfo)
+                    //if (Path is ArchiveItemInfo)
 
-                    {
+                    //{
 
-                        if (relativePath != "")
+                    //    if (relativePath != "")
 
-                            relativePath = "\\";
+                    //        relativePath = "\\";
 
-                        relativePath += ((ArchiveItemInfo)Path).ArchiveFileInfo.FileName/*.Replace('/', '\\')*/;
+                    //    relativePath += ((ArchiveItemInfo)Path).Path/*.Replace('/', '\\')*/;
 
-                    }
+                    //}
 
 #if DEBUG
 
@@ -409,6 +414,8 @@ namespace WinCopies.IO
             //    reportProgressAndAddNewPathToObservableCollection(path_);
 
         }
+
+        protected override void OnDoWork(object sender, DoWorkEventArgs e) => OnDoWork();
 
         protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path) =>
 

@@ -6,6 +6,7 @@ using WinCopies.GUI.Explorer.Data;
 using BooleanToVisibilityConverter = WinCopies.Util.DataConverters.BooleanToVisibilityConverter;
 using WinCopies.Util;
 using System;
+using System.IO;
 
 namespace WinCopies.GUI.Explorer.Themes
 {
@@ -231,23 +232,30 @@ namespace WinCopies.GUI.Explorer.Themes
 
         {
 
-            ExplorerControl explorerControl = ((ExplorerControl)((FrameworkElement)sender).TemplatedParent);
+            ExplorerControl explorerControl = (ExplorerControl)((FrameworkElement)sender).TemplatedParent;
 
             try
 
             {
 
-                explorerControl.Open(new ShellObjectInfo[] { new ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(
+                IO.BrowsableObjectInfo path = IO.Path.GetBrowsableObjectInfoFromPath(explorerControl.Text);
+
+                IBrowsableObjectInfo _path = path is IO.ShellObjectInfo shellObjectInfo
+                    ? new ShellObjectInfo(shellObjectInfo)
+                    : (IBrowsableObjectInfo)new ArchiveItemInfo((IO.ArchiveItemInfo)path);
+
+                explorerControl.Open(_path /*new ShellObjectInfo[] { new ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(
                     explorerControl.Text)
                     , explorerControl.Text)
-                });
+
+                }*/);
 
             }
-            catch (Exception ex) // when (ex is IOException || ex is UnauthorizedAccessException)
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
 
             {
 
-                explorerControl.OnItemsLoadException(ex);
+                explorerControl.OnItemsLoadException( explorerControl.Text, ex);
 
             }
 
@@ -257,7 +265,13 @@ namespace WinCopies.GUI.Explorer.Themes
         {
             if (e.Key == Key.Enter)
 
+            {
+
                 Navigate(sender);
+
+                e.Handled = true;
+
+            }
             // SelectedItem.ExplorerControl.Open(WinCopies.IO.Util.GetNormalizedOSPath(SelectedItem.ExplorerControl.CurrentPath));)
             // new WinCopies.IO.ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(WinCopies.IO.Util.GetNormalizedOSPath(ExplorerControl.CurrentPath)), WinCopies.IO.Util.GetNormalizedOSPath(ExplorerControl.CurrentPath), WinCopies.IO.SpecialFolders)
         }
@@ -311,22 +325,41 @@ namespace WinCopies.GUI.Explorer.Themes
 
         // private void Button_Click_1(object sender, RoutedEventArgs e) => ((DependencyObject)sender).GetParent<TreeViewItem>(false).IsSelected = true;
 
-        private void TreeViewItem_Selected(object sender, RoutedEventArgs e)
-        {
+        //private void TreeViewItem_Selected(object sender, RoutedEventArgs e)
+        //{
 
-            e.Handled = true;
+        //   IBrowsableObjectInfo browsableObjectInfo = (IBrowsableObjectInfo)((TreeViewItem)sender).DataContext;
+
+        //   ExplorerControl explorerControl = ((DependencyObject)sender).GetParent<ExplorerControl>(false);
+
+        //   // // todo: to use data binding
+
+        //   // // explorerControl.TreeViewSelectedItem = browsableObjectInfo;
+
+        //   browsableObjectInfo = (IBrowsableObjectInfo)(browsableObjectInfo is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
+
+        //   explorerControl.Navigate(browsableObjectInfo, true);
+
+        //   e.Handled = true;
+
+        //}
+
+        private void TreeViewItem_Selected(object sender, MouseButtonEventArgs e)
+        {
 
             IBrowsableObjectInfo browsableObjectInfo = (IBrowsableObjectInfo)((TreeViewItem)sender).DataContext;
 
             ExplorerControl explorerControl = ((DependencyObject)sender).GetParent<ExplorerControl>(false);
 
-            // todo: to use data binding
+            // // todo: to use data binding
 
-            // explorerControl.TreeViewSelectedItem = browsableObjectInfo;
+            // // explorerControl.TreeViewSelectedItem = browsableObjectInfo;
 
             browsableObjectInfo = (IBrowsableObjectInfo)(browsableObjectInfo is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
 
             explorerControl.Navigate(browsableObjectInfo, true);
+
+            e.Handled = true;
 
         }
     }

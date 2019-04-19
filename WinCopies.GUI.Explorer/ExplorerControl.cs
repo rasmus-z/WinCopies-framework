@@ -21,6 +21,7 @@ using TextBox = System.Windows.Controls.TextBox;
 using Clipboard = WinCopies.IO.Clipboard;
 using System.Windows.Interop;
 using System.ComponentModel;
+using System.Collections;
 
 namespace WinCopies.GUI.Explorer
 {
@@ -55,7 +56,7 @@ namespace WinCopies.GUI.Explorer
         public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(ExplorerControl), new PropertyMetadata(null));
 
         /// <summary>
-        /// Gets or sets the command parameter for the <see cref="Command"/> property. This property is used to pass to the <see cref="Command"/> property. This is a dependency property.
+        /// Gets or sets the command parameter for the <see cref="Command"/> property. This is a dependency property.
         /// </summary>
         public object CommandParameter { get => GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
 
@@ -432,11 +433,13 @@ namespace WinCopies.GUI.Explorer
 
             }
 
-            Open(new IBrowsableObjectInfo[] { path });
+            Open(path);
 
             // InputBindings.Add(new MouseBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
 
             CommandBindings.Add(new CommandBinding(Commands.Open, Open_Executed, Open_CanExecute));
+
+            // CommandBindings.Add(new CommandBinding(Util.Util.CommonCommand, Open_Execute, Open_CanExecute));
 
             #region Comments
 
@@ -1009,17 +1012,13 @@ namespace WinCopies.GUI.Explorer
 
         {
 
-            IBrowsableObjectInfo path;
-
-            List<IBrowsableObjectInfo> _paths = Enumerable.ToList(paths);
-
             List<IBrowsableObjectInfo> nonOpenedPaths = new List<IBrowsableObjectInfo>();
 
-            for (int i = 0; i < _paths.Count; i++)
+            bool firstBrowsableItem = true;
+
+            foreach (IBrowsableObjectInfo path in paths)
 
             {
-
-                path = _paths[i];
 
 #if DEBUG
 
@@ -1031,7 +1030,11 @@ namespace WinCopies.GUI.Explorer
 
 #endif
 
-                bool? result = OpenInternal(path, i == 0);
+                bool? result = OpenInternal(path, firstBrowsableItem);
+
+                if (path.IsBrowsable)
+
+                    firstBrowsableItem = false;
 
                 if (result.HasValue)
 
@@ -1061,7 +1064,7 @@ namespace WinCopies.GUI.Explorer
 
                                 else
 
-                                    if (!OpenLinkInternal(shellLink, i == 0))
+                                    if (!OpenLinkInternal(shellLink, firstBrowsableItem))
 
                                     nonOpenedPaths.Add(path);
 
@@ -1078,6 +1081,8 @@ namespace WinCopies.GUI.Explorer
             MultiplePathsOpenRequested?.Invoke(this, new MultiplePathsOpenRequestedEventArgs(paths));
 
         }
+
+        public void Open(params IBrowsableObjectInfo[] paths) => Open((IEnumerable<IBrowsableObjectInfo>)paths);
 
         public void Open()
 
@@ -1221,17 +1226,17 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        protected internal virtual void OnItemsLoadException(Exception ex)
+        protected internal virtual void OnItemsLoadException(string path, Exception ex)
 
         {
 
             if (ex != null)
 
-                MessageBox.Show((ex is IOException || ex is UnauthorizedAccessException ? "The load can't be performed because the path was not found or you don't have access rights to this path." : "The load can't be performed because of an unkown exception.") + " Path is: " + Path);
+                MessageBox.Show((ex is IOException || ex is UnauthorizedAccessException ? "The load can't be performed because the path was not found or you don't have access rights to this path." : "The load can't be performed because of an unkown exception.") + " Path is: " + path);
 
         }
 
-        protected virtual void OnBrowsableObjectInfoItemsLoaderRunWorkerCompleted(RunWorkerCompletedEventArgs e) => OnItemsLoadException(e.Error);
+        protected virtual void OnBrowsableObjectInfoItemsLoaderRunWorkerCompleted(RunWorkerCompletedEventArgs e) => OnItemsLoadException(Path.Path, e.Error);
 
         private void BrowsableObjectInfoItemsLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 
@@ -1277,13 +1282,63 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        protected virtual void OnOpening() => Open();
+        protected virtual void OnOpening(params IBrowsableObjectInfo[] paths)
+        {
 
-        internal void OnOpeningInternal() => OnOpening();
+            if (paths == null) return;
+
+            IBrowsableObjectInfo path;
+
+            for (int i = 0; i < paths.Length; i++)
+            {
+                path = paths[i];
+                paths[i] = (IBrowsableObjectInfo)(path is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : path is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
+            }
+
+            Open(paths);
+        }
+
+        internal void OnOpeningInternal(params IBrowsableObjectInfo[] paths) => OnOpening(paths);
 
         private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
 
-        private void Open_Executed(object sender, ExecutedRoutedEventArgs e) => OnOpening();
+        private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
+
+        {
+
+            if (e.Parameter is null)
+
+                OnOpening(null);
+
+            else if (e.Parameter is IEnumerable paths)
+
+            {
+
+                IBrowsableObjectInfo[] _paths = new IBrowsableObjectInfo[paths.ToList().Count];
+
+                int i = -1;
+
+                foreach (object path in paths)
+
+                {
+
+                    i++;
+
+                    Debug.WriteLine(path.GetType().ToString());
+
+                    _paths[i] = (IBrowsableObjectInfo)path;
+
+                }
+
+                OnOpening(_paths);
+
+            }
+
+            else if (e.Parameter is IBrowsableObjectInfo path)
+
+                OnOpening(path);
+
+        }
 
         public StringCollection GetFileDropList(ActionsFromObjects copyFrom)
 

@@ -438,13 +438,13 @@
                             </Button>
                         </Grid>
 
-                        <controls:TreeView x:Name="PART_TreeView" Grid.Row="1" ItemsSource="{Binding TreeViewItems, RelativeSource={RelativeSource Mode=TemplatedParent}}" >
+                        <controls:TreeView x:Name="PART_TreeView" Grid.Row="1" ItemsSource="{Binding TreeViewItems, RelativeSource={RelativeSource Mode=TemplatedParent}}" Command="{Binding Command, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}"        CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource Mode=Self}}" >
                             <controls:TreeView.ItemTemplate>
                                 <HierarchicalDataTemplate ItemsSource="{Binding Items}" >
                                     <!--<Button Click="Button_Click_1">
                                                     <Button.Template>
                                                         <ControlTemplate>-->
-                                    <StackPanel Orientation="Horizontal" Background="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TreeViewItem}}}">
+                                    <StackPanel Orientation="Horizontal">
                                         <Image Source="{Binding ShellObject.Thumbnail.SmallBitmapSource}" >
                                             <Image.Opacity>
                                                 <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -484,7 +484,7 @@
                                         </Setter.Value>
                                     </Setter>
 
-                                    <EventSetter Event="Selected" Handler="TreeViewItem_Selected" />
+                                    <!--<EventSetter Event="MouseUp" Handler="TreeViewItem_Selected" />-->
                                 </Style>
                             </controls:TreeView.ItemContainerStyle>
                             <!--<controls:TreeView.Style>
@@ -502,12 +502,13 @@
 
                         <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="5" ></GridSplitter>
 
-                        <local:ListView x:Name="PART_ListView" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding SelectionMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" Focusable="True" >
+                        <local:ListView x:Name="PART_ListView" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding SelectionMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" Focusable="True" CommandParameter="{Binding SelectedItems, RelativeSource={RelativeSource Self}}" Command="{Binding Command, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}"        >
                             <!--<local:ListView.Resources>
                                 <FrameworkElement x:Key="FrameworkElement" DataContext="{Binding}" />
                             </local:ListView.Resources>-->
                             <local:ListView.Style>
                                 <Style TargetType="{x:Type ListView}" >
+
                                     <Setter Property="ItemsPanel">
                                         <Setter.Value>
                                             <ItemsPanelTemplate>

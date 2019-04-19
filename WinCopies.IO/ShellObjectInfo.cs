@@ -199,6 +199,10 @@ namespace WinCopies.IO
 
                 value = SpecialFolders.Libraries;
 
+            else if (shellObject.ParsingName == KnownFolders.Computer.ParsingName)
+
+                value = SpecialFolders.Computer;
+
             else
 
                 value = SpecialFolders.OtherFolderOrFile;

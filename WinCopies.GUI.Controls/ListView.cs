@@ -1,13 +1,65 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using WinCopies.Util;
 
 namespace WinCopies.GUI.Controls
 {
-    public class ListView : System.Windows.Controls.ListView, IScrollable, ISettableSelector
+    public class ListView : System.Windows.Controls.ListView, IScrollable, ISettableSelector, ICommandSource
     {
         public ScrollViewer ScrollHost { get; private set; } = null;
 
+        /// <summary>
+        /// Identifies the <see cref="Command"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(ListView), new PropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the command of this <see cref="ListView"/>. This is a dependency property.
+        /// </summary>
+        public ICommand Command { get => (ICommand)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
+
+        /// <summary>
+        /// Identifies the <see cref="CommandParameter"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(ListView), new PropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the command parameter for the <see cref="Command"/> property. This is a dependency property.
+        /// </summary>
+        public object CommandParameter { get => GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
+
+        /// <summary>
+        /// Identifies the <see cref="CommandTarget"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CommandTargetProperty = DependencyProperty.Register(nameof(CommandTarget), typeof(IInputElement), typeof(ListView), new PropertyMetadata(null));
+
+        public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
+
         static ListView() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ListView), new FrameworkPropertyMetadata(typeof(ListView)));// ViewProperty.OverrideMetadata(typeof(ListView), new FrameworkPropertyMetadata(ViewProperty.DefaultMetadata.DefaultValue, (DependencyObject d, DependencyPropertyChangedEventArgs e) => { if (e.OldValue != null) ((GridView)e.OldValue).ListView = null; ((GridView)e.NewValue).ListView = (ListView)d; }));
+
+        public ListView()
+        {
+            MouseDoubleClick += ListView_MouseDoubleClick;
+
+            KeyDown += ListView_KeyDown;
+        }
+
+        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (Command == null) return;
+
+            Command.TryExecute(CommandParameter, CommandTarget);
+        }
+
+        private void ListView_KeyDown(object sender, KeyEventArgs e)
+        {
+
+            if (Command == null) return;
+
+            KeyDownCommandHelper.TryRaiseCommand(this, e);
+
+        }
 
         public override void OnApplyTemplate()
         {
