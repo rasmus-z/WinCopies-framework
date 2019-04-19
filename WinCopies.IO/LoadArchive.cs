@@ -173,9 +173,9 @@ namespace WinCopies.IO
 
 #endif
 
-            ShellObjectInfo archiveShellObject = Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject;
+            // ShellObjectInfo archiveShellObject = Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject;
 
-            string archiveFileName = archiveShellObject.Path;
+            string archiveFileName = (Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject).Path;
 
             using (FileStream archiveFileStream = new FileStream(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
             {
@@ -232,7 +232,7 @@ namespace WinCopies.IO
 
                     string fileName = "";
 
-                    string relativePath = Path is ShellObjectInfo ? "" : Path.Path.Substring(archiveShellObject.Path.Length + 1);
+                    string relativePath = Path is ShellObjectInfo ? "" : Path.Path.Substring(archiveFileName.Length + 1);
 
                     PathInfo path;
 
@@ -417,9 +417,19 @@ namespace WinCopies.IO
 
         protected override void OnDoWork(object sender, DoWorkEventArgs e) => OnDoWork();
 
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path) =>
+        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path)
 
-            ((IArchiveItemInfoProvider)Path).GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType);
+        {
+
+            IBrowsableObjectInfo browsableObjectInfo = ((IArchiveItemInfoProvider)Path).GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType);
+
+            if (browsableObjectInfo is BrowsableObjectInfo _browsableObjectInfo)
+
+                _browsableObjectInfo.Parent = Path;
+
+            return browsableObjectInfo;
+
+        }
 
         // todo: really needed? :
 

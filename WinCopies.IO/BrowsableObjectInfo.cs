@@ -85,13 +85,30 @@ namespace WinCopies.IO
         /// </summary>
         public WinCopies.Util.ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; } = null;
 
-        /// <summary>
-        /// When overriden in a derived class, gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
-        /// </summary>
-        public abstract IBrowsableObjectInfo Parent { get; protected set; }
+        private IBrowsableObjectInfo _parent = null;
 
         /// <summary>
-        /// The file type of this <see cref="ShellObjectInfo"/>.
+        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+        /// </summary>
+        public IBrowsableObjectInfo Parent
+        {
+            get
+
+            {
+
+                if (_parent == null)
+
+                    _parent = GetParent();
+
+                return _parent;
+
+            }
+
+            protected internal set => OnPropertyChanged(nameof(Parent), nameof(_parent), value, typeof(BrowsableObjectInfo));
+        }
+
+        /// <summary>
+        /// The file type of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         public FileType FileType { get; private set; } = FileType.None;
 
@@ -125,6 +142,10 @@ namespace WinCopies.IO
 
         }
 
+        private bool _considerAsPathRoot = false;
+
+        public bool ConsiderAsPathRoot { get => _considerAsPathRoot; set => OnPropertyChanged(nameof(ConsiderAsPathRoot), nameof(_considerAsPathRoot), value, typeof(BrowsableObjectInfo)); }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
@@ -143,6 +164,8 @@ namespace WinCopies.IO
             Items = new WinCopies.Util.ReadOnlyObservableCollection<IBrowsableObjectInfo>(items);
 
         }
+
+        public abstract IBrowsableObjectInfo GetParent();
 
         // protected abstract IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileTypes fileType);
 

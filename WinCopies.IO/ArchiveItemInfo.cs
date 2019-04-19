@@ -136,8 +136,6 @@ namespace WinCopies.IO
 
         public ArchiveFileInfo? ArchiveFileInfo { get; }
 
-        public override IBrowsableObjectInfo Parent { get; protected set; } = null;
-
         // public FileTypes FileType { get; } = FileTypes.None;
 
         //public BrowsableObjectInfoItemsLoader ItemsLoader
@@ -177,8 +175,6 @@ namespace WinCopies.IO
 
             Debug.WriteLine("path: " + path);
 
-            Parent = path.Length > archiveShellObject.Path.Length && path.Contains("\\") ? GetBrowsableObjectInfo(archiveShellObject, null/*archiveParentFileInfo.Value*/, path.Substring(0, path.LastIndexOf('\\')), FileType.Folder) : archiveShellObject;
-
             #region Comments
 
             // ArchiveFileInfo? archiveParentFileInfo = null;
@@ -216,6 +212,8 @@ namespace WinCopies.IO
             #endregion
 
         }
+
+        public override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length && Path.Contains("\\") ? GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 

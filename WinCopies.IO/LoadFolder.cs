@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using WinCopies.Util;
 
@@ -154,9 +155,21 @@ namespace WinCopies.IO
 
         }
 
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(ShellObject shellObject, string path) => ((ShellObjectInfo)Path).GetBrowsableObjectInfo(shellObject, path);
+        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo)
 
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path) => ((ShellObjectInfo)Path).GetBrowsableObjectInfo(path.ShellObject, path.Path, path.FileType, ShellObjectInfo.GetFileType(path.Path, path.ShellObject).specialFolder);
+        {
+
+            if (browsableObjectInfo is BrowsableObjectInfo _browsableObjectInfo)
+
+                _browsableObjectInfo.Parent = Path;
+
+            return browsableObjectInfo;
+
+        }
+
+        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(ShellObject shellObject, string path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).GetBrowsableObjectInfo(shellObject, path));
+
+        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).GetBrowsableObjectInfo(path.ShellObject, path.Path, path.FileType, ShellObjectInfo.GetFileType(path.Path, path.ShellObject).specialFolder));
 
         protected virtual void OnShellObjectRenamed(string oldPath, string newPath)
 
@@ -220,11 +233,96 @@ namespace WinCopies.IO
 
             {
 
+                if (pathInfo.Path.EndsWith(".lnk"))
+
+                    Debug.WriteLine("");
+
                 if (pathInfo.FileType == FileType.None || (pathInfo.FileType != FileType.SpecialFolder && FileTypes != FileTypesFlags.All && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
 
                 // We only make a normalized path if we add the path to the paths to load.
 
+                if (pathInfo.Path.StartsWith("::"))
+
+                {
+
+                    //try
+
+                    //{
+
+                    //    using (IKnownFolder knownFolder = KnownFolderHelper.FromKnownFolderId(Guid.Parse(pathInfo.Path.Substring(3, pathInfo.Path.IndexOf('}') - 3))))
+
+                    //    {
+
+                    //        string path = pathInfo.Path;
+
+                    //        path = knownFolder.Path;
+
+                    //        if (pathInfo.Path.Contains("\\"))
+
+                    //            path += pathInfo.Path.Substring(pathInfo.Path.IndexOf('\\')) + 1;
+
+                    //    }
+
+                    //}
+
+                    //catch (ShellException) { }
+
+                    string path = Path.Name;
+
+                    IBrowsableObjectInfo browsableObjectInfo = Path;
+
+                    do
+
+                    {
+
+                        path = browsableObjectInfo.Name + path;
+
+                        browsableObjectInfo = browsableObjectInfo.Parent;
+
+                    }
+
+                    while (browsableObjectInfo != null);
+
+                    pathInfo.Path = path;
+
+                }
+
+                //PropertyInfo[] props = typeof(KnownFolders).GetProperties();
+
+                //string path = pathInfo.Path;
+
+                //if (path.Contains("\\"))
+
+                //    path = path.Substring(0, path.IndexOf("\\"));
+
+                //foreach (PropertyInfo prop in props)
+
+                //    using (IKnownFolder knownFolder = (IKnownFolder)prop.GetValue(null))
+                //    {
+
+                //        string displayPath = 
+
+                //        if (path == knownFolder.LocalizedName)
+
+                //            ok = true;
+
+                //        else
+
+                //            using (ShellObject shellObject = ShellObject.FromParsingName(knownFolder.ParsingName))
+
+                //                if (path == shellObject.Name)
+
+                //                    ok = true;
+
+                //        if (ok)
+
+                //    }
+
                 pathInfo.Normalized_Path = IO.Path.GetNormalizedPath(pathInfo.Path);
+
+                if (pathInfo.Path.Contains("105"))
+
+                    Debug.WriteLine("");
 
                 paths.Add(pathInfo);
 
@@ -271,7 +369,7 @@ namespace WinCopies.IO
 
                         // if (CheckFilter(directory))
 
-                            AddDirectory(new PathInfo() { Path = directory, ShellObject = ShellObject.FromParsingName(directory) });
+                        AddDirectory(new PathInfo() { Path = directory, ShellObject = ShellObject.FromParsingName(directory) });
 
                     string[] files = Directory.GetFiles(Path.Path);
 
@@ -309,7 +407,11 @@ namespace WinCopies.IO
 
                         if (so is ShellFile)
 
-                            AddFile(new PathInfo() { Path = ((ShellFile)so).Path, ShellObject = so }, so is ShellLink);
+                            AddFile(new PathInfo() { Path = ((ShellFile)so).Path, ShellObject = so }, so.IsLink);
+
+                        else if (so is ShellLink)
+
+                            AddFile(new PathInfo() { Path = ((ShellLink)so).Path, ShellObject = so }, so.IsLink);
 
                         // if (so is FileSystemKnownFolder || so is NonFileSystemKnownFolder || so is ShellNonFileSystemFolder || so is ShellLibrary)
 

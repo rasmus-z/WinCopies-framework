@@ -61,11 +61,6 @@ namespace WinCopies.IO
         public override bool IsBrowsable => (ShellObject is IEnumerable<ShellObject> || FileType == FileType.Archive) && (FileType != FileType.File && FileType != FileType.Link); // FileType == FileTypes.Folder || FileType == FileTypes.Drive || (FileType == FileTypes.SpecialFolder && SpecialFolder != SpecialFolders.Computer) || FileType == FileTypes.Archive;
 
         /// <summary>
-        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="ShellObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
-        /// </summary>
-        public override IBrowsableObjectInfo Parent { get; protected set; } = null;
-
-        /// <summary>
         /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a folder, drive or file. See the <see cref="BrowsableObjectInfo.FileType"/> property for more details.
         /// </summary>
         public FileSystemInfo FileSystemInfoProperties { get; private set; } = null;
@@ -211,15 +206,13 @@ namespace WinCopies.IO
 
         }
 
-        public ShellObjectInfo(ShellObject shellObject, string path) : base(path, GetFileType(path, shellObject).fileType)
+        public ShellObjectInfo(ShellObject shellObject, string path) : base(path, GetFileType(path, shellObject).fileType) =>
 
-        {
+            //#if DEBUG
 
-#if DEBUG
+            //            Debug.WriteLine("ShellObjectInfo(ShellObject shellObject, string path): shellObject == null: " + (shellObject == null).ToString());
 
-            Debug.WriteLine("ShellObjectInfo(ShellObject shellObject, string path) : shellObject == null: " + (shellObject == null).ToString());
-
-#endif
+            //#endif
 
             // void checkFileType()
 
@@ -249,8 +242,6 @@ namespace WinCopies.IO
 
             Init(shellObject, nameof(FileType), GetFileType(path, shellObject).specialFolder);
 
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class.
         /// </summary>
@@ -258,23 +249,15 @@ namespace WinCopies.IO
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolders.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
-        public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolders specialFolder) : base(path, fileType)
+        public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolders specialFolder) : base(path, fileType) =>
 
-        {
+            //#if DEBUG
 
-#if DEBUG
+            //            Debug.WriteLine("ShellObjectInfo(ShellObject shellObject, string path, FileTypes fileType, WinCopies.IO.SpecialFolders specialFolder): shellObject == null: " + (shellObject == null).ToString());
 
-            Debug.WriteLine("ShellObjectInfo(ShellObject shellObject, string path, FileTypes fileType, WinCopies.IO.SpecialFolders specialFolder) : shellObject == null: " + (shellObject == null).ToString());
+            //#endif
 
-#endif
-
-            Init(shellObject, nameof(fileType), specialFolder);
-
-            // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;
-
-            // PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
-
-        }
+            Init(shellObject, nameof(fileType), specialFolder);// string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
 
         private void Init(ShellObject shellObject, string fileTypeParameterName, SpecialFolders specialFolder)
 
@@ -289,36 +272,6 @@ namespace WinCopies.IO
             // LocalizedPath = shellObject.GetDisplayName(DisplayNameType.RelativeToDesktop);
 
             // NormalizedPath = Util.GetNormalizedPath(path);
-
-            IBrowsableObjectInfo parent = null;
-
-            if ((FileType == FileType.Folder || FileType == FileType.Archive || (FileType == FileType.SpecialFolder && shellObject.IsFileSystemObject)))
-
-            {
-
-                DirectoryInfo parentDirectoryInfo = FileType == FileType.Archive ? new DirectoryInfo(System.IO.Path.GetDirectoryName(Path)) : Directory.GetParent(Path);
-
-                if (parentDirectoryInfo != null)
-
-                {
-
-                    string _parent = parentDirectoryInfo.FullName;
-
-                    parent = GetBrowsableObjectInfo(ShellObject.FromParsingName(_parent), _parent);
-
-                }
-
-            }
-
-            else if (FileType == FileType.Drive)
-
-                parent = GetBrowsableObjectInfo(shellObject.Parent, KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolders.Computer);
-
-            else if (FileType == FileType.SpecialFolder && specialFolder != SpecialFolders.Computer)
-
-                parent = GetBrowsableObjectInfo(shellObject.Parent, KnownFolderHelper.FromParsingName(shellObject.Parent.ParsingName).Path);
-
-            Parent = parent;
 
             SpecialFolder = specialFolder;
 
@@ -343,6 +296,41 @@ namespace WinCopies.IO
             else if (FileType == FileType.SpecialFolder)
 
                 KnownFolderInfo = KnownFolderHelper.FromParsingName(shellObject.ParsingName);
+
+        }
+
+        public override IBrowsableObjectInfo GetParent()
+        {
+
+            IBrowsableObjectInfo parent = null;
+
+            if (FileType == FileType.Folder || FileType == FileType.Archive || (FileType == FileType.SpecialFolder && ShellObject.IsFileSystemObject))
+
+            {
+
+                DirectoryInfo parentDirectoryInfo = FileType == FileType.Archive ? new DirectoryInfo(System.IO.Path.GetDirectoryName(Path)) : Directory.GetParent(Path);
+
+                if (parentDirectoryInfo != null)
+
+                {
+
+                    string _parent = parentDirectoryInfo.FullName;
+
+                    parent = GetBrowsableObjectInfo(ShellObject.FromParsingName(_parent), _parent);
+
+                }
+
+            }
+
+            else if (FileType == FileType.Drive)
+
+                parent = GetBrowsableObjectInfo(ShellObject.Parent, KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolders.Computer);
+
+            else if (FileType == FileType.SpecialFolder && SpecialFolder != SpecialFolders.Computer)
+
+                parent = GetBrowsableObjectInfo(ShellObject.Parent, KnownFolderHelper.FromParsingName(ShellObject.Parent.ParsingName).Path);
+
+            return parent;
 
         }
 
