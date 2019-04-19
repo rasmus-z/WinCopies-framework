@@ -290,13 +290,13 @@ namespace WinCopies.GUI.Explorer.Themes
 #if DEBUG
             Debug.WriteLine(string.Format("Added items: {0}, Removed items: {1}", e.AddedItems.Count, e.RemovedItems.Count));
 
-            if (((ExplorerControl)((FrameworkElement)sender).TemplatedParent).SelectedItems != null)
+            if (((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Path.SelectedItems != null)
 
             {
 
-                Debug.WriteLine(((ExplorerControl)((FrameworkElement)sender).TemplatedParent).SelectedItems.ListBox.SelectedItems.Count.ToString());
+                Debug.WriteLine(((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Path.SelectedItems.Count.ToString());
 
-                foreach (object @object in ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).SelectedItems.ListBox.SelectedItems)
+                foreach (object @object in ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Path.SelectedItems)
 
                     Debug.WriteLine("@object.GetType().ToString(): " + @object.GetType().ToString());
 

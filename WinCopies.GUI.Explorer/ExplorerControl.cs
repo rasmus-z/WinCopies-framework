@@ -220,27 +220,27 @@ namespace WinCopies.GUI.Explorer
         ///// </summary>
         //public IBrowsableObjectInfo TreeViewSelectedItem { get => (IBrowsableObjectInfo)GetValue(TreeViewSelectedItemProperty); internal set => SetValue(TreeViewSelectedItemPropertyKey, value); }
 
-        /// <summary>
-        /// Identifies the <see cref="SelectedItem"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(IO.IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null));
+        ///// <summary>
+        ///// Identifies the <see cref="SelectedItem"/> dependency property.
+        ///// </summary>
+        //public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(IO.IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null));
 
-        /// <summary>
-        /// Gets or sets the list view selected item.
-        /// </summary>
-        public IBrowsableObjectInfo SelectedItem { get => (IBrowsableObjectInfo)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
+        ///// <summary>
+        ///// Gets or sets the list view selected item.
+        ///// </summary>
+        //public IBrowsableObjectInfo SelectedItem { get => (IBrowsableObjectInfo)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
-        private static readonly DependencyPropertyKey SelectedItemsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(SelectedItems), typeof(ObservableListBoxSelectedItems), typeof(ExplorerControl), new PropertyMetadata(null));
+        //private static readonly DependencyPropertyKey SelectedItemsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(SelectedItems), typeof(ObservableListBoxSelectedItems), typeof(ExplorerControl), new PropertyMetadata(null));
 
-        /// <summary>
-        /// Identifies the <see cref="SelectedItems"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty SelectedItemsProperty = SelectedItemsPropertyKey.DependencyProperty;
+        ///// <summary>
+        ///// Identifies the <see cref="SelectedItems"/> dependency property.
+        ///// </summary>
+        //public static readonly DependencyProperty SelectedItemsProperty = SelectedItemsPropertyKey.DependencyProperty;
 
-        /// <summary>
-        /// Gets the list view selected items.
-        /// </summary>
-        public ObservableListBoxSelectedItems SelectedItems => (ObservableListBoxSelectedItems)GetValue(SelectedItemsProperty);
+        ///// <summary>
+        ///// Gets the list view selected items.
+        ///// </summary>
+        //public ObservableListBoxSelectedItems SelectedItems => (ObservableListBoxSelectedItems)GetValue(SelectedItemsProperty);
 
         private System.Collections.ObjectModel.ObservableCollection<IHistoryItemData> history = new System.Collections.ObjectModel.ObservableCollection<IHistoryItemData>();
 
@@ -680,6 +680,8 @@ namespace WinCopies.GUI.Explorer
 
         private void ExplorerControl_TextChanged(object sender, TextChangedEventArgs e) => OnTextChanged(e);
 
+        private ObservableListBoxSelectedItems _observableListBoxSelectedItems = null;
+
         /// <summary>
         /// Is invoked whenever application code or internal processes call <see cref="FrameworkElement.ApplyTemplate" />.
         /// </summary>
@@ -700,9 +702,7 @@ namespace WinCopies.GUI.Explorer
 
                 // ListView.SelectionChanged += (object sender, System.Windows.Controls.SelectionChangedEventArgs e) => OnListViewSelectionChanged(e);
 
-                SetValue(SelectedItemsPropertyKey, new ObservableListBoxSelectedItems(ListView));
-
-                SelectedItems.CollectionChanged += (object sender, NotifyCollectionChangedEventArgs e) =>
+                (_observableListBoxSelectedItems = new ObservableListBoxSelectedItems(ListView)).CollectionChanged += (object sender, NotifyCollectionChangedEventArgs e) =>
 
                 {
 
@@ -1131,7 +1131,7 @@ namespace WinCopies.GUI.Explorer
 
             List<IBrowsableObjectInfo> paths = new List<IBrowsableObjectInfo>();
 
-            foreach (object path in SelectedItems.ListBox.SelectedItems)
+            foreach (object path in _observableListBoxSelectedItems.ListBox.SelectedItems)
 
                 paths.Add((IBrowsableObjectInfo)path);
 
@@ -1356,7 +1356,7 @@ namespace WinCopies.GUI.Explorer
 
                 sc = new StringCollection();
 
-                foreach (IO.ShellObjectInfo shellObjectInfo in SelectedItems.ListBox.SelectedItems)
+                foreach (IO.ShellObjectInfo shellObjectInfo in _observableListBoxSelectedItems.ListBox.SelectedItems)
 
                     sc.Add(shellObjectInfo.Path);
 
