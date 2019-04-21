@@ -446,4 +446,18 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+
+    <Style TargetType="{x:Type local:TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}" >
+        <!--<Setter Property="Background" Value="AliceBlue" />-->
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsMouseOver" Value="true" />
+                    <Condition Property="IsSelected" Value="false" />
+                </MultiTrigger.Conditions>
+                <!--todo: put this in a static resource-->
+                <Setter Property="Background" Value="AliceBlue" />
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

@@ -267,21 +267,23 @@ namespace WinCopies.IO
 
                     //catch (ShellException) { }
 
-                    string path = Path.Name;
+                    string path = null /*= Path.Name*/;
 
                     IBrowsableObjectInfo browsableObjectInfo = Path;
 
-                    do
+                    path = browsableObjectInfo.Name;
+
+                    browsableObjectInfo = browsableObjectInfo.Parent;
+
+                    while (browsableObjectInfo != null) 
 
                     {
 
-                        path = browsableObjectInfo.Name + path;
+                        path = browsableObjectInfo.Name + "\\" + path;
 
                         browsableObjectInfo = browsableObjectInfo.Parent;
 
                     }
-
-                    while (browsableObjectInfo != null);
 
                     pathInfo.Path = path;
 

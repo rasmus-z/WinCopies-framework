@@ -7,6 +7,8 @@ using System.Windows;
 using System.Windows.Input;
 using WinCopies.Util;
 
+// todo: to add command input gesture for mouse actions
+
 namespace WinCopies.GUI.Controls
 {
     public class TreeView : System.Windows.Controls.TreeView, ISelector, ICommandSource
@@ -41,22 +43,38 @@ namespace WinCopies.GUI.Controls
 
         public int SelectedIndex => ItemsSource == null ? Items.IndexOf(SelectedItem) : ItemsSource.ToList().IndexOf(SelectedItem);
 
+        //public static readonly RoutedEvent ClickEvent = EventManager.RegisterRoutedEvent(nameof(Click), RoutingStrategy.Bubble, typeof(RoutedEventArgs), typeof(TreeView));
+
+        //public event RoutedEventHandler Click { add => AddHandler(ClickEvent, value); remove => RemoveHandler(ClickEvent, value); }
+
         public TreeView()
         {
-            MouseDoubleClick += TreeView_MouseDoubleClick;
 
-            KeyDown += TreeView_KeyDown;
+            // MouseDoubleClick += TreeView_MouseDoubleClick;
+
+            EventManager.RegisterClassHandler(typeof(TreeView), TreeViewItem.ClickEvent, new RoutedEventHandler(TreeView_Click));
+
         }
 
-        private void TreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (Command == null) return;
+        protected virtual void OnClick(RoutedEventArgs e) => Command?.TryExecute(CommandParameter, CommandTarget);
 
-            Command.TryExecute(CommandParameter, CommandTarget);
-        }
+        private void TreeView_Click(object sender, RoutedEventArgs e) => OnClick(e);
 
-        private void TreeView_KeyDown(object sender, KeyEventArgs e)
+        protected override DependencyObject GetContainerForItemOverride() => new TreeViewItem();
+
+        //private void TreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        //{
+
+        //    if (Command == null) return;
+
+        //    Command.TryExecute(CommandParameter, CommandTarget);
+
+        //}
+
+        protected override void OnKeyDown(KeyEventArgs e)
         {
+
+            base.OnKeyDown(e);
 
             if (Command == null) return;
 

@@ -255,7 +255,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
             {
 
-                explorerControl.OnItemsLoadException( explorerControl.Text, ex);
+                explorerControl.OnItemsLoadException(explorerControl.Text, ex);
 
             }
 

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace WinCopies.GUI.Controls
 {
+
+    // todo: to add this interface to the other FrameworkElements to which they applies.
+
     public interface ISelector
     {
 
@@ -21,6 +24,14 @@ namespace WinCopies.GUI.Controls
         object SelectedItem { set; }
 
         int SelectedIndex { set; }
+
+    }
+
+    public interface ISelectable
+
+    {
+
+        bool IsFocusSelection { get; }
 
     }
 }

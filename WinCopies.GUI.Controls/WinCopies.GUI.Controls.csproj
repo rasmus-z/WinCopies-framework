@@ -103,6 +103,7 @@
       <DependentUpon>Generic.xaml</DependentUpon>
     </Compile>
     <Compile Include="TreeView.cs" />
+    <Compile Include="TreeViewItem.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

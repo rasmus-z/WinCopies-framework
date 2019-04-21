@@ -263,6 +263,10 @@ namespace WinCopies.IO
 
         {
 
+            if (shellObject.ParsingName != Path)
+
+                Debug.WriteLine("");
+
             if ((FileType == FileType.SpecialFolder && specialFolder == SpecialFolders.OtherFolderOrFile) || (FileType != FileType.SpecialFolder && specialFolder != SpecialFolders.OtherFolderOrFile))
 
                 throw new ArgumentException(string.Format(Generic.FileTypeAndSpecialFolderNotCorrespond, fileTypeParameterName, nameof(specialFolder), FileType, specialFolder));

@@ -444,7 +444,7 @@
                                     <!--<Button Click="Button_Click_1">
                                                     <Button.Template>
                                                         <ControlTemplate>-->
-                                    <StackPanel Orientation="Horizontal">
+                                    <StackPanel Orientation="Horizontal" Background="{Binding Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TreeViewItem}}}">
                                         <Image Source="{Binding ShellObject.Thumbnail.SmallBitmapSource}" >
                                             <Image.Opacity>
                                                 <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
@@ -463,7 +463,7 @@
                                 </HierarchicalDataTemplate>
                             </controls:TreeView.ItemTemplate>
                             <controls:TreeView.ItemContainerStyle>
-                                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                                <Style TargetType="{x:Type controls:TreeViewItem}" BasedOn="{StaticResource {x:Type controls:TreeViewItem}}">
                                     <Setter Property="commandBehavior:CommandBehavior.Event" Value="Loaded" />
                                     <!--todo:-->
                                     <Setter Property="commandBehavior:CommandBehavior.Command" Value="{x:Static local:Commands.TrucMuche}" />
@@ -484,6 +484,12 @@
                                         </Setter.Value>
                                     </Setter>
 
+                                    <Style.Triggers>
+                                        <Trigger Property="IsFocusSelection" Value="true">
+                                            <Setter Property="Background" Value="AliceBlue" />
+                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                        </Trigger></Style.Triggers>
+
                                     <!--<EventSetter Event="MouseUp" Handler="TreeViewItem_Selected" />-->
                                 </Style>
                             </controls:TreeView.ItemContainerStyle>
@@ -500,7 +506,7 @@
                             </controls:TreeView.Style>-->
                         </controls:TreeView>
 
-                        <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="5" ></GridSplitter>
+                        <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="5" />
 
                         <local:ListView x:Name="PART_ListView" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding Path.SelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding SelectionMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" Focusable="True" CommandParameter="{Binding SelectedItems, RelativeSource={RelativeSource Self}}" Command="{Binding Command, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}"        >
                             <!--<local:ListView.Resources>
