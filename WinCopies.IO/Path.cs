@@ -439,9 +439,7 @@ namespace WinCopies.IO
 
             string newPath = destPath + "\\" + System.IO.Path.GetFileName(path);
 
-            if (!(System.IO.Directory.Exists(newPath) || System.IO.File.Exists(newPath)))
-
-            {
+            if (!(Directory.Exists(newPath) || File.Exists(newPath)))
 
                 //if (System.IO.Directory.Exists(path))
 
@@ -452,8 +450,6 @@ namespace WinCopies.IO
                 //    System.IO.File.Move(path, newPath);
 
                 return newPath;
-
-            }
 
 
 
@@ -473,19 +469,13 @@ namespace WinCopies.IO
 
                     string parenthesesContent = fileName.Substring(index + 2, fileName.Length - (index + 3));
 
-                    if (parenthesesContent.Length > 0 && long.TryParse(parenthesesContent, out parenthesesNumber) && parenthesesNumber >= 0 && parenthesesNumber < long.MaxValue)
+                    if (/*parenthesesContent.Length > 0 &&*/ long.TryParse(parenthesesContent, out parenthesesNumber) && parenthesesNumber >= 0)
 
-                        fileName = fileName.Substring(0, index);
-
-                    else
-
-                        parenthesesNumber = -1;
+                        return fileName.Substring(0, index);
 
                 }
 
-                else
-
-                    parenthesesNumber = -1;
+                parenthesesNumber = -1;
 
                 return fileName;
 
@@ -503,9 +493,9 @@ namespace WinCopies.IO
 
             // We get all items that are in the same folder as the destPath parameter.
 
-            string[] directories = System.IO.Directory.GetDirectories(destPath);
+            string[] directories = Directory.GetDirectories(destPath);
 
-            string[] files = System.IO.Directory.GetFiles(destPath);
+            string[] files = Directory.GetFiles(destPath);
 
 
 
@@ -591,7 +581,10 @@ namespace WinCopies.IO
 
 
 
-            string new_Name = destPath + "\\" + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
+            return destPath + "\\" + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
+
+
+            // string new_Name = destPath + "\\" + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
 
 
 
@@ -599,21 +592,20 @@ namespace WinCopies.IO
 
 
 
-            if (System.IO.Directory.Exists(path))
+            // if (Directory.Exists(path) || File.Exists(path))
 
-                // System.IO.Directory.Move(path, new_Name);
+            // System.IO.Directory.Move(path, new_Name);
 
-                return new_Name;
 
             // DirectoryInfo.MoveTo(Rename_Window.NewFullName)
 
-            else if (System.IO.File.Exists(path))
+            // else if (File.Exists(path))
 
-                // System.IO.File.Move(path, new_Name);
+            // System.IO.File.Move(path, new_Name);
 
-                return new_Name;
+            // return new_Name;
 
-            return null;
+            // return null;
 
             // FileInfo.MoveTo(
 

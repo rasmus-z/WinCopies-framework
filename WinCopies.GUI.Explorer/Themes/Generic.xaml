@@ -485,10 +485,7 @@
                                     </Setter>
 
                                     <Style.Triggers>
-                                        <Trigger Property="IsFocusSelection" Value="true">
-                                            <Setter Property="Background" Value="AliceBlue" />
-                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                                        </Trigger></Style.Triggers>
+                                    </Style.Triggers>
 
                                     <!--<EventSetter Event="MouseUp" Handler="TreeViewItem_Selected" />-->
                                 </Style>

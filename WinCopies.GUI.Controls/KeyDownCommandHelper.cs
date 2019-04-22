@@ -11,7 +11,7 @@ namespace WinCopies.GUI.Controls
     public static class KeyDownCommandHelper
     {
 
-        public static bool TryRaiseCommand(ICommandSource commandSource, KeyEventArgs e)
+        public static bool CanRaiseCommand(ICommandSource commandSource, KeyEventArgs e)
 
         {
 
@@ -25,7 +25,7 @@ namespace WinCopies.GUI.Controls
 
                     if (inputGesture is KeyGesture keyGesture && e.Key == keyGesture.Key && e.KeyboardDevice.Modifiers == keyGesture.Modifiers)
 
-                        return commandSource.Command.TryExecute(commandSource.CommandParameter, commandSource.CommandTarget);
+                        return commandSource.Command.CanExecute(commandSource.CommandParameter, commandSource.CommandTarget);
 
             }
 

@@ -57,7 +57,9 @@ namespace WinCopies.GUI.Controls
 
             if (Command == null) return;
 
-            KeyDownCommandHelper.TryRaiseCommand(this, e);
+            if ( KeyDownCommandHelper.CanRaiseCommand(this, e))
+
+                Command.Execute(CommandParameter, CommandTarget);
 
         }
 
