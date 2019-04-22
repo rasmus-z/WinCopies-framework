@@ -484,9 +484,6 @@
                                         </Setter.Value>
                                     </Setter>
 
-                                    <Style.Triggers>
-                                    </Style.Triggers>
-
                                     <!--<EventSetter Event="MouseUp" Handler="TreeViewItem_Selected" />-->
                                 </Style>
                             </controls:TreeView.ItemContainerStyle>

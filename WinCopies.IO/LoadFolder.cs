@@ -322,10 +322,6 @@ namespace WinCopies.IO
 
                 pathInfo.Normalized_Path = IO.Path.GetNormalizedPath(pathInfo.Path);
 
-                if (pathInfo.Path.Contains("105"))
-
-                    Debug.WriteLine("");
-
                 paths.Add(pathInfo);
 
             }

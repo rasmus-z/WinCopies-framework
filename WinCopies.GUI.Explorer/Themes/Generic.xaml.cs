@@ -344,24 +344,24 @@ namespace WinCopies.GUI.Explorer.Themes
 
         //}
 
-        private void TreeViewItem_Selected(object sender, MouseButtonEventArgs e)
-        {
+        //private void TreeViewItem_Selected(object sender, MouseButtonEventArgs e)
+        //{
 
-            IBrowsableObjectInfo browsableObjectInfo = (IBrowsableObjectInfo)((TreeViewItem)sender).DataContext;
+        //    IBrowsableObjectInfo browsableObjectInfo = (IBrowsableObjectInfo)((TreeViewItem)sender).DataContext;
 
-            ExplorerControl explorerControl = ((DependencyObject)sender).GetParent<ExplorerControl>(false);
+        //    ExplorerControl explorerControl = ((DependencyObject)sender).GetParent<ExplorerControl>(false);
 
-            // // todo: to use data binding
+        //    // // todo: to use data binding
 
-            // // explorerControl.TreeViewSelectedItem = browsableObjectInfo;
+        //    // // explorerControl.TreeViewSelectedItem = browsableObjectInfo;
 
-            browsableObjectInfo = (IBrowsableObjectInfo)(browsableObjectInfo is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
+        //    browsableObjectInfo = (IBrowsableObjectInfo)(browsableObjectInfo is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
 
-            explorerControl.Navigate(browsableObjectInfo, true);
+        //    explorerControl.Navigate(browsableObjectInfo, true);
 
-            e.Handled = true;
+        //    e.Handled = true;
 
-        }
+        //}
     }
 
 }

@@ -1292,7 +1292,10 @@ namespace WinCopies.GUI.Explorer
             for (int i = 0; i < paths.Length; i++)
             {
                 path = paths[i];
-                paths[i] = (IBrowsableObjectInfo)(path is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : path is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
+                var bidule = (IBrowsableObjectInfo)(path is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(ShellObject.FromParsingName(shellObjectInfo.ShellObject.ParsingName), shellObjectInfo.Path, shellObjectInfo.FileType, shellObjectInfo.SpecialFolder) : path is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
+
+                var chose = bidule == paths[i];
+                paths[i] = bidule;
             }
 
             Open(paths);

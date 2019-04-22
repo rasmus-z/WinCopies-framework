@@ -62,6 +62,9 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public static readonly DependencyProperty PreviouslySelectedItemProperty = PreviouslySelectedItemPropertyKey.DependencyProperty;
 
+        /// <summary>
+        /// Gets the previously selected <see cref="TreeViewItem"/> when a <see cref="TreeViewItem"/> item is selected by focus.
+        /// </summary>
         public TreeViewItem PreviouslySelectedItem => (TreeViewItem)GetValue(PreviouslySelectedItemProperty);
 
         internal bool _isFocusSelection = false;
@@ -137,8 +140,7 @@ namespace WinCopies.GUI.Controls
 
             if (e.Key == Key.Enter) OnClick(e);
 
-            else
-            if (Command != null && KeyDownCommandHelper.CanRaiseCommand(this, e))
+            else            if (Command != null && KeyDownCommandHelper.CanRaiseCommand(this, e))
 
             {
 
@@ -152,6 +154,7 @@ namespace WinCopies.GUI.Controls
 
         protected override void OnSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
         {
+
             base.OnSelectedItemChanged(e);
 
             //if (_isFocusSelection)
@@ -166,11 +169,7 @@ namespace WinCopies.GUI.Controls
 
                 if (treeViewItem != null)
 
-                {
-
                     treeViewItem.SetValue(TreeViewItem.IsPreviouslySelectedItemPropertyKey, true);
-
-                }
 
                 SetValue(PreviouslySelectedItemPropertyKey, treeViewItem);
 
@@ -178,17 +177,6 @@ namespace WinCopies.GUI.Controls
 
             _isFocusSelection = false;
 
-            //}
-
-            //    else
-
-            //    {
-
-
-
-
-
-            //}
         }
     }
 }
