@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.Util;
 
@@ -55,7 +56,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public int SelectedIndex => ItemsSource == null ? Items.IndexOf(SelectedItem) : ItemsSource.ToList().IndexOf(SelectedItem);
 
-        private static readonly DependencyPropertyKey PreviouslySelectedItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(PreviouslySelectedItem), typeof(TreeViewItem), typeof(TreeView), new PropertyMetadata());
+        internal static readonly DependencyPropertyKey PreviouslySelectedItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(PreviouslySelectedItem), typeof(TreeViewItem), typeof(TreeView), new PropertyMetadata());
 
         /// <summary>
         /// Identifies the <see cref="PreviouslySelectedItem"/> dependency property.
@@ -66,6 +67,8 @@ namespace WinCopies.GUI.Controls
         /// Gets the previously selected <see cref="TreeViewItem"/> when a <see cref="TreeViewItem"/> item is selected by focus.
         /// </summary>
         public TreeViewItem PreviouslySelectedItem => (TreeViewItem)GetValue(PreviouslySelectedItemProperty);
+
+        // internal TreeViewItem _selectedTreeViewItem = null;
 
         internal bool _isFocusSelection = false;
 
@@ -117,7 +120,7 @@ namespace WinCopies.GUI.Controls
         /// Creates a <see cref="TreeViewItem"/> to use to display content.
         /// </summary>
         /// <returns>A new <see cref="TreeViewItem"/> to use as a container for content.</returns>
-        protected override DependencyObject GetContainerForItemOverride() => new TreeViewItem() { _parentTreeView = this };
+        protected override DependencyObject GetContainerForItemOverride() => new TreeViewItem() { ParentTreeView = this };
 
         //private void TreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         //{
@@ -140,7 +143,7 @@ namespace WinCopies.GUI.Controls
 
             if (e.Key == Key.Enter) OnClick(e);
 
-            else            if (Command != null && KeyDownCommandHelper.CanRaiseCommand(this, e))
+            else if (Command != null && KeyDownCommandHelper.CanRaiseCommand(this, e))
 
             {
 
@@ -160,20 +163,6 @@ namespace WinCopies.GUI.Controls
             //if (_isFocusSelection)
 
             //{
-
-            if (PreviouslySelectedItem == null)
-
-            {
-
-                TreeViewItem treeViewItem = ItemsSource == null ? e.OldValue as TreeViewItem : ItemContainerGenerator.ContainerFromItem(e.OldValue) as TreeViewItem;
-
-                if (treeViewItem != null)
-
-                    treeViewItem.SetValue(TreeViewItem.IsPreviouslySelectedItemPropertyKey, true);
-
-                SetValue(PreviouslySelectedItemPropertyKey, treeViewItem);
-
-            }
 
             _isFocusSelection = false;
 

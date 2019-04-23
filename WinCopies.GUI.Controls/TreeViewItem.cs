@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 using WinCopies.Util;
@@ -33,6 +34,12 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public bool IsFocusSelection => (bool)GetValue(IsFocusSelectionProperty);
 
+        //private static readonly DependencyPropertyKey IsRealSelectionPropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsRealSelection), typeof(bool), typeof(TreeViewItem), new PropertyMetadata());
+
+        //public static readonly DependencyProperty IsRealSelectionProperty = IsRealSelectionPropertyKey.DependencyProperty;
+
+        //public bool IsRealSelection => (bool)GetValue(IsRealSelectionProperty);
+
         internal static readonly DependencyPropertyKey IsPreviouslySelectedItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsPreviouslySelectedItem), typeof(bool), typeof(TreeViewItem), new PropertyMetadata());
 
         /// <summary>
@@ -55,7 +62,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public event RoutedEventHandler Click { add => AddHandler(ClickEvent, value); remove => RemoveHandler(ClickEvent, value); }
 
-        internal TreeView _parentTreeView = null;
+        public TreeView ParentTreeView { get; internal set; } = null;
 
         static TreeViewItem() => DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeViewItem), new FrameworkPropertyMetadata(typeof(TreeViewItem)));
 
@@ -72,7 +79,7 @@ namespace WinCopies.GUI.Controls
 
             // this.GetParent<TreeView>(false)._isFocusSelection = false;
 
-            SetValue(IsFocusSelectionPropertyKey, false);
+            SetValue(IsFocusSelectionPropertyKey, false);// SetValue(IsRealSelectionPropertyKey, true);
 
         private void TreeViewItem_Click(object sender, RoutedEventArgs e) => OnClick(e);
 
@@ -80,7 +87,7 @@ namespace WinCopies.GUI.Controls
         /// Creates a new <see cref="TreeViewItem"/> to use to display the object.
         /// </summary>
         /// <returns>A new <see cref="TreeViewItem"/> to use to display the object.</returns>
-        protected override DependencyObject GetContainerForItemOverride() => new TreeViewItem();
+        protected override DependencyObject GetContainerForItemOverride() => new TreeViewItem() { ParentTreeView = ParentTreeView };
 
         /// <summary>
         /// Raises the <see cref="System.Windows.Controls.TreeViewItem.Selected"/> routed event when the
@@ -91,17 +98,35 @@ namespace WinCopies.GUI.Controls
         protected override void OnSelected(RoutedEventArgs e)
         {
 
+            // ParentTreeView._selectedTreeViewItem = this;
+
             base.OnSelected(e);
 
-            if (_parentTreeView != null)
+            if (ParentTreeView != null)
 
-            {
+                // {
 
-                SetValue(IsFocusSelectionPropertyKey, _parentTreeView._isFocusSelection);
+                if (IsPreviouslySelectedItem)
 
-                // _parentTreeView._isFocusSelection = false;
+                {
 
-            }
+                    SetValue(IsPreviouslySelectedItemPropertyKey, false);
+
+                    ParentTreeView.SetValue(TreeView.PreviouslySelectedItemPropertyKey, null);
+
+                    SetValue(IsFocusSelectionPropertyKey, false);
+
+                }
+
+                else
+
+                    SetValue(IsFocusSelectionPropertyKey, ParentTreeView._isFocusSelection);
+
+            // SetValue(IsRealSelectionPropertyKey, !ParentTreeView._isFocusSelection);
+
+            // }
+
+            // ParentTreeView._isFocusSelection = false;
 
         }
 
@@ -118,6 +143,8 @@ namespace WinCopies.GUI.Controls
 
             SetValue(IsFocusSelectionPropertyKey, false);
 
+            // SetValue(IsRealSelectionPropertyKey, false);
+
         }
 
         /// <summary>
@@ -127,13 +154,71 @@ namespace WinCopies.GUI.Controls
         protected override void OnKeyDown(KeyEventArgs e)
         {
 
-            if (_parentTreeView != null)
+            if (e.Key == Key.Enter)
+
+                OnClick(e);
+
+            else if (ParentTreeView != null && (e.Key == Key.Up || e.Key == Key.Down))
 
             {
 
-                _parentTreeView._isFocusSelection = e.Key != Key.Enter;
+                // var truc = this.SelectedValue;
+                // var machin = this.SelectedValuePath;
+                // if (treeViewItem != null)
 
-                SetValue(IsFocusSelectionPropertyKey, _parentTreeView._isFocusSelection);
+                if (ParentTreeView.PreviouslySelectedItem == null)
+
+                {
+
+                    SetValue(TreeViewItem.IsPreviouslySelectedItemPropertyKey, true);
+
+                    // TreeViewItem treeViewItem = null;
+
+                    // if (ItemsSource == null)
+
+                    // treeViewItem = e.OldValue as TreeViewItem;
+
+                    // else
+
+                    // {
+
+                    // if (_selectedTreeViewItem != null)
+
+                    // {
+
+                    // ItemsControl parentItemsControl = ItemsControlFromItemContainer(this); // _selectedTreeViewItem.GetParent<TreeViewItem>(false) as ItemsControl;
+
+                    //if (treeViewItemParent == null)
+
+                    //{
+
+                    //    ItemsControl _treeViewItemParent = _selectedTreeViewItem.GetParent<TreeView>(false) as ItemsControl;
+
+                    //    if (_treeViewItemParent == this)
+
+                    //        treeViewItemParent = _treeViewItemParent;
+
+                    //}
+
+                    // if (parentItemsControl != null && !(parentItemsControl is TreeView && parentItemsControl != ParentTreeView))
+
+                    // treeViewItem = parentItemsControl.ItemContainerGenerator.ContainerFromItem(e.OldValue) as TreeViewItem;
+
+                    // }
+
+                    // if (parentItemsControl != null && !(parentItemsControl is TreeView && parentItemsControl != ParentTreeView))
+
+                    ParentTreeView.SetValue(TreeView.PreviouslySelectedItemPropertyKey, this);
+
+                    // }
+
+                }
+
+                // todo: really needed?
+
+                ParentTreeView._isFocusSelection = true;
+
+                // SetValue(IsFocusSelectionPropertyKey, true);
 
             }
 
@@ -154,9 +239,9 @@ namespace WinCopies.GUI.Controls
 
             base.OnMouseDown(e);
 
-            if (_parentTreeView != null)
+            if (ParentTreeView != null)
 
-                _parentTreeView._isFocusSelection = true;
+                ParentTreeView._isFocusSelection = true;
 
             CaptureMouse();
 
