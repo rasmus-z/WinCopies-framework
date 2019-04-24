@@ -15,6 +15,8 @@ namespace WinCopies.IO.FileProcesses
 
         //TODO: pbCancel ==> bool ?
 
+            // todo: to move in the win32interop dll and check comments
+
         /// <summary>
         /// <para>Copies an existing file to a new file, notifying the application of its progress through a callback function.</para>
         ///

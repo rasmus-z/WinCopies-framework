@@ -110,7 +110,7 @@ namespace WinCopies.IO
 
             // todo : making a function for both fileType and specialFolder variables
 
-            else if (shellObject is FileSystemKnownFolder && LoadArchive.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) && shellObject is ShellFile)
+            else if (shellObject is FileSystemKnownFolder && ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) && shellObject is ShellFile)
 
                 fileType = FileType.Archive;
 
@@ -132,7 +132,7 @@ namespace WinCopies.IO
 
                 // todo: add other 'in' archive supported formats
 
-                else if (LoadArchive.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)))
+                else if (ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)))
 
                     fileType = FileType.Archive;
 
@@ -374,17 +374,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItems(new LoadFolder(true, true, fileTypes));
+                    LoadItems(new FolderLoader(true, true, fileTypes));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItems(new LoadArchive(true, true, fileTypes));
+                    LoadItems(new ArchiveLoader(true, true, fileTypes));
 
             }
 
             else
 
-                LoadItems(new LoadFolder(true, true, fileTypes));
+                LoadItems(new FolderLoader(true, true, fileTypes));
 
             //else
 

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace WinCopies.IO
 {
-    public class LoadFolderFileSystemWatcher : IDisposable
+    public class FolderLoaderFileSystemWatcher : IDisposable
     {
 
         /// <summary>
@@ -28,9 +28,9 @@ namespace WinCopies.IO
         public event FileSystemEventHandler Deleted;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LoadFolderFileSystemWatcher"/> class.
+        /// Initializes a new instance of the <see cref="FolderLoaderFileSystemWatcher"/> class.
         /// </summary>
-        public LoadFolderFileSystemWatcher() => Init();
+        public FolderLoaderFileSystemWatcher() => Init();
 
         protected virtual void Init()
 

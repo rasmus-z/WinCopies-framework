@@ -579,7 +579,7 @@ namespace WinCopies.GUI.Explorer
 
             string extension = System.IO.Path.GetExtension(Path.SelectedItem.Path);
 
-            if (!(Path.SelectedItem.FileType == FileType.Archive && LoadArchive.IsSupportedArchiveFormat(extension)) && extension.Length > 0)
+            if (!(Path.SelectedItem.FileType == FileType.Archive && ArchiveLoader.IsSupportedArchiveFormat(extension)) && extension.Length > 0)
 
             {
 
@@ -1178,7 +1178,7 @@ namespace WinCopies.GUI.Explorer
 
             if (browsableObjectInfoItemsLoader == null)
 
-                browsableObjectInfoItemsLoader = path is ArchiveItemInfo || path.FileType == FileType.Archive ? (BrowsableObjectInfoItemsLoader)new LoadArchive(true, true, FileTypesFlags.All) : (BrowsableObjectInfoItemsLoader)new LoadFolder(true, true, FileTypesFlags.All);
+                browsableObjectInfoItemsLoader = path is ArchiveItemInfo || path.FileType == FileType.Archive ? (BrowsableObjectInfoItemsLoader)new ArchiveLoader(true, true, FileTypesFlags.All) : (BrowsableObjectInfoItemsLoader)new FolderLoader(true, true, FileTypesFlags.All);
 
             browsableObjectInfoItemsLoader.RunWorkerCompleted += BrowsableObjectInfoItemsLoader_RunWorkerCompleted;
 

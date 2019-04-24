@@ -176,10 +176,7 @@ namespace WinCopies.Util
 
         }
 
-        public const BindingFlags DefaultBindingFlagsForPropertySet = BindingFlags.Public | BindingFlags.NonPublic |
-                         BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-
-        public static bool CheckPropertySetIntegrity(Type propertyObjectType, string propertyName, out string methodName, int skipFramesForStackFrame, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet)
+        public static bool CheckPropertySetIntegrity(Type propertyObjectType, string propertyName, out string methodName, int skipFramesForStackFrame, BindingFlags bindingFlags = Util. DefaultBindingFlagsForPropertySet)
 
         {
 
@@ -205,7 +202,7 @@ namespace WinCopies.Util
 
         }
 
-        private static FieldInfo GetField(string fieldName, Type objectType, BindingFlags bindingFlags)
+        internal static FieldInfo GetField(string fieldName, Type objectType, BindingFlags bindingFlags)
 
         {
 
@@ -223,7 +220,7 @@ namespace WinCopies.Util
 
         }
 
-        public static (bool propertyChanged, object oldValue) SetProperty(this INotifyPropertyChanged obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet)
+        public static (bool propertyChanged, object oldValue) SetProperty(this INotifyPropertyChanged obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util. DefaultBindingFlagsForPropertySet)
 
         {
 
@@ -288,26 +285,6 @@ namespace WinCopies.Util
             else
 
                 return (false, previousValue);
-
-        }
-
-        public static (bool propertyChanged, object oldValue) SetPropertyWhenNotBusy<T>(T bgWorker, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet, bool throwIfBusy = true) where T : IBackgroundWorker, INotifyPropertyChanged
-
-        {
-
-            if (bgWorker.IsBusy)
-
-                if (throwIfBusy)
-
-                    throw new InvalidOperationException("Cannot change property value when BackgroundWorker is busy.");
-
-                else
-
-                    return (false, GetField(fieldName, declaringType, bindingFlags).GetValue(bgWorker));
-
-            else
-
-                return bgWorker.SetProperty(propertyName, fieldName, newValue, declaringType, performIntegrityCheck, bindingFlags);
 
         }
 

@@ -93,7 +93,7 @@ namespace WinCopies.IO
 
                 if (IsBusy)
 
-                    throw new InvalidOperationException("The " + nameof(LoadFolder) + " is busy.");
+                    throw new InvalidOperationException("The " + nameof(FolderLoader) + " is busy.");
 
                 _filter = value;
 

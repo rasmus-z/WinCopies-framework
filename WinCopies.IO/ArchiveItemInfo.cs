@@ -231,7 +231,7 @@ namespace WinCopies.IO
 
         }
 
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) => LoadItems(new LoadArchive(true, true, fileTypes));
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) => LoadItems(new ArchiveLoader(true, true, fileTypes));
 
         public override void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 

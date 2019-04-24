@@ -25,7 +25,7 @@ using System.IO;
 namespace WinCopies.IO
 {
 
-    public class LoadArchive : BrowsableObjectInfoItemsLoader, INotifyPropertyChanged
+    public class ArchiveLoader : BrowsableObjectInfoItemsLoader, INotifyPropertyChanged
     {
 
         private static Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();
@@ -34,7 +34,7 @@ namespace WinCopies.IO
 
         // public new event PropertyChangedEventHandler PropertyChanged;
 
-        static LoadArchive()
+        static ArchiveLoader()
 
         {
 
@@ -91,7 +91,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
         /// </summary>
-        public LoadArchive(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes) { }
+        public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes) { }
 
         protected override void Init()
 
@@ -161,7 +161,7 @@ namespace WinCopies.IO
 
             List<IFileSystemObject> paths = new List<IFileSystemObject>();
 
-            LoadFolder.comp comp = LoadFolder.comp.GetInstance();
+            FolderLoader.comp comp = FolderLoader.comp.GetInstance();
 
 #if DEBUG
 

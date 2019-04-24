@@ -103,15 +103,15 @@
   <ItemGroup>
     <Compile Include="AppInfo.cs" />
     <Compile Include="ArchiveItemInfo.cs" />
+    <Compile Include="ArchiveLoader.cs" />
     <Compile Include="BrowsableObjectInfo.cs" />
     <Compile Include="BrowsableObjectInfoItemsLoader.cs" />
     <Compile Include="Clipboard.cs" />
     <Compile Include="FileOperations.cs" />
     <Compile Include="FileTypes.cs" />
+    <Compile Include="FolderLoader.cs" />
+    <Compile Include="FolderLoaderFileSystemWatcher.cs" />
     <Compile Include="IBrowsableObjectInfo.cs" />
-    <Compile Include="LoadArchive.cs" />
-    <Compile Include="LoadFolder.cs" />
-    <Compile Include="LoadFolderFileSystemWatcher.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registry.cs" />

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using static WinCopies.Util.Generic;
@@ -10,6 +12,29 @@ namespace WinCopies.Util
     {
 
         public static RoutedCommand CommonCommand { get; } = new RoutedCommand(nameof(CommonCommand), typeof(Util));
+
+        public const BindingFlags DefaultBindingFlagsForPropertySet = BindingFlags.Public | BindingFlags.NonPublic |
+                         BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+        public static (bool propertyChanged, object oldValue) SetPropertyWhenNotBusy<T>(T bgWorker, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet, bool throwIfBusy = true) where T : IBackgroundWorker, INotifyPropertyChanged
+
+        {
+
+            if (bgWorker.IsBusy)
+
+                if (throwIfBusy)
+
+                    throw new InvalidOperationException("Cannot change property value when BackgroundWorker is busy.");
+
+                else
+
+                    return (false, Extensions. GetField(fieldName, declaringType, bindingFlags).GetValue(bgWorker));
+
+            else
+
+                return bgWorker.SetProperty(propertyName, fieldName, newValue, declaringType, performIntegrityCheck, bindingFlags);
+
+        }
 
         public static Predicate<T> GetCommonPredicate<T>() => (T value) => true;
 

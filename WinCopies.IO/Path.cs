@@ -49,7 +49,7 @@ namespace WinCopies.IO
 
             bool ok;
 
-            LoadArchive loadArchive = null;
+            ArchiveLoader loadArchive = null;
 
             // int archiveSubpathsCount = 0;
 
@@ -67,7 +67,7 @@ namespace WinCopies.IO
 
                     if (browsableObjectInfo.FileType == FileType.Archive)
 
-                        loadArchive = new LoadArchive(true, false, FileTypesFlags.All);
+                        loadArchive = new ArchiveLoader(true, false, FileTypesFlags.All);
 
                     loadArchive.Path = browsableObjectInfo;
 

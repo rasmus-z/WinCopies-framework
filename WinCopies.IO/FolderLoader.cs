@@ -32,17 +32,17 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides a background process that can be used to load items of a folder.
     /// </summary>
-    public class LoadFolder : BrowsableObjectInfoItemsLoader
+    public class FolderLoader : BrowsableObjectInfoItemsLoader
     {
 
         // todo: to turn on ShellObjectWatcher for better compatibility
 
-        public LoadFolderFileSystemWatcher FileSystemWatcher { get; private set; } = null;
+        public FolderLoaderFileSystemWatcher FileSystemWatcher { get; private set; } = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
         /// </summary>
-        public LoadFolder(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes)
+        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes)
 
         {
 
@@ -104,14 +104,14 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// <para>Gets the <see cref="LoadFolderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoItemsLoader.Path"/> property.</para>
-        /// <para>When substituted in a derived class, provides a custom <see cref="LoadFolderFileSystemWatcher"/>.</para>
+        /// <para>Gets the <see cref="FolderLoaderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoItemsLoader.Path"/> property.</para>
+        /// <para>When substituted in a derived class, provides a custom <see cref="FolderLoaderFileSystemWatcher"/>.</para>
         /// </summary>
-        /// <returns>An instance of the <see cref="LoadFolderFileSystemWatcher"/> class.</returns>
-        protected virtual LoadFolderFileSystemWatcher GetLoadFolderFileSystemWatcher() => new LoadFolderFileSystemWatcher();
+        /// <returns>An instance of the <see cref="FolderLoaderFileSystemWatcher"/> class.</returns>
+        protected virtual FolderLoaderFileSystemWatcher GetLoadFolderFileSystemWatcher() => new FolderLoaderFileSystemWatcher();
 
         /// <summary>
-        /// Frees all resources used by this <see cref="LoadFolder"/>.
+        /// Frees all resources used by this <see cref="FolderLoader"/>.
         /// </summary>
         public override void Dispose()
 
@@ -227,7 +227,7 @@ namespace WinCopies.IO
 
             List<IFileSystemObject> paths = new List<IFileSystemObject>();
 
-            var comp = LoadFolder.comp.GetInstance();
+            var comp = FolderLoader.comp.GetInstance();
 
             void AddPath(ref PathInfo pathInfo)
 
@@ -344,7 +344,7 @@ namespace WinCopies.IO
 
                 pathInfo.FileType = isLink
                     ? IO.FileType.Link
-                    : LoadArchive.IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
+                    : ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
 
                 // We only make a normalized path if we add the path to the paths to load.
 

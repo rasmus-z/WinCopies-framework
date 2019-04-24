@@ -32,29 +32,29 @@ namespace WinCopies.IO.FileProcesses
         /// <summary>
         /// Gets the <see cref="System.Threading.ApartmentState"/> of this thread.
         /// </summary>
-        public ApartmentState ApartmentState { get => _bgWorker.ApartmentState; }
+        public ApartmentState ApartmentState => _bgWorker.ApartmentState;
 
         /// <summary>
         /// Gets a value that indicates if the thread must try to cancel before finished the background tasks.
         /// </summary>
-        public bool CancellationPending { get => _bgWorker.CancellationPending; }
+        public bool CancellationPending => _bgWorker.CancellationPending;
 
         /// <summary>
         /// Gets a value that indicates if the thread is busy.
         /// </summary>
-        public bool IsBusy { get => _bgWorker.IsBusy; }
+        public bool IsBusy => _bgWorker.IsBusy;
 
         /// <summary>
         /// Gets a value that indicates if the working is cancelled.
         /// </summary>
-        public bool IsCancelled { get => _bgWorker.IsCancelled; }
+        public bool IsCancelled => _bgWorker.IsCancelled;
 
         /// <summary>
         /// Gets the current progress of the working in percent.
         /// </summary>
-        public int Progress { get => _bgWorker.Progress; }
+        public int Progress => _bgWorker.Progress;
 
-        public ISite Site { get => _bgWorker.Site; set => _bgWorker.Site = value; } 
+        public ISite Site { get => _bgWorker.Site; set => _bgWorker.Site = value; }
 
         /// <summary>
         /// Gets or sets a value that indicates if the thread can notify of the progress.
@@ -160,56 +160,52 @@ namespace WinCopies.IO.FileProcesses
         /// </summary>
         public event RunWorkerCompletedEventHandler RunWorkerCompleted;
 
-        public event EventHandler Disposed;    
+        public event EventHandler Disposed;
 
-        #endregion    
+        #endregion
 
         // todo:
 
         /// <summary>
         /// Gets the source path for all the files and folders in this process.
         /// </summary>
-        public string SourcePath
-        {
-
-            get
-            {
-
-                if (Paths[0].FileSystemInfoProperties.FullName.EndsWith(":") || Paths[0].FileSystemInfoProperties.FullName.EndsWith(":\\") || Paths[0].FileSystemInfoProperties.FullName.EndsWith(":\\\\"))
-
-                    return new DriveInfo(Paths[0].FileSystemInfoProperties.FullName).VolumeLabel;
-
-                else return System.IO.Path.GetDirectoryName(Paths[0].FileSystemInfoProperties.FullName);
-
-            }
-
-        }
+        public string SourcePath => Paths[0].FileSystemInfoProperties.FullName.EndsWith(":")
+                                    || Paths[0].FileSystemInfoProperties.FullName.EndsWith(":\\")
+                                    || Paths[0].FileSystemInfoProperties.FullName.EndsWith(":\\\\")
+                    ? new DriveInfo(Paths[0].FileSystemInfoProperties.FullName).VolumeLabel
+                    : System.IO.Path.GetDirectoryName(Paths[0].FileSystemInfoProperties.FullName);
 
         //TODO: Remplacer par un BG Worker personnalisé ? - OK.
-        public List<string> Hidden_Folders_With_Subpaths = new List<string>();
+        //public List<string> Hidden_Folders_With_Subpaths = new List<string>();
 
         private readonly ActionType actionType = ActionType.Unknown;
 
         /// <summary>
-        /// Gets or sets the <see cref="FileProcesses. ActionType"/> to set this <see cref="LoadFilesInfo"/> to.
+        /// Gets or sets the <see cref="FileProcesses. ActionType"/> of this <see cref="LoadFilesInfo"/>.
         /// </summary>
         public ActionType ActionType
         {
-            get => actionType; set => OnPropertyChangedWhenNotBusy(nameof(ActionType), nameof(actionType), value, typeof(LoadFilesInfo), true);
+
+            get => actionType;
+
+            set => OnPropertyChangedWhenNotBusy(nameof(ActionType), nameof(actionType), value, typeof(LoadFilesInfo));
 
         }
 
-        private readonly Search_Terms_Properties search_Terms = null;
+        //private readonly Search_Terms_Properties search_Terms = null;
 
-        public Search_Terms_Properties Search_Terms
-        {
-            get => search_Terms; set => OnPropertyChangedWhenNotBusy(nameof(Search_Terms), nameof(search_Terms), value, typeof(LoadFilesInfo), true);
+        //public Search_Terms_Properties Search_Terms
+        //{
 
-        }
+        //    get => search_Terms;
 
-        private bool loadOnlyItemsWithSearchTermsForAllActions = false;
+        //    set => OnPropertyChangedWhenNotBusy(nameof(Search_Terms), nameof(search_Terms), value, typeof(LoadFilesInfo), true);
 
-        public bool LoadOnlyItemsWithSearchTermsForAllActions { get => loadOnlyItemsWithSearchTermsForAllActions; set => OnPropertyChanged(nameof(LoadOnlyItemsWithSearchTermsForAllActions), nameof(loadOnlyItemsWithSearchTermsForAllActions), value, typeof(LoadFilesInfo)); }
+        //}
+
+        //private bool loadOnlyItemsWithSearchTermsForAllActions = false;
+
+        //public bool LoadOnlyItemsWithSearchTermsForAllActions { get => loadOnlyItemsWithSearchTermsForAllActions; set => OnPropertyChanged(nameof(LoadOnlyItemsWithSearchTermsForAllActions), nameof(loadOnlyItemsWithSearchTermsForAllActions), value, typeof(LoadFilesInfo)); }
 
         // TODO : avec un setter ? gérer les exceptions pour différents répertoires racines
 
@@ -228,7 +224,7 @@ namespace WinCopies.IO.FileProcesses
 
         // public ObservableCollection<FileSystemInfo> _pathsLoaded = null;
 
-        public System.Collections.ObjectModel.ObservableCollection<FileSystemInfo> _pathsLoaded { get; private set; } = null;
+        private System.Collections.ObjectModel.ObservableCollection<FileSystemInfo> _pathsLoaded { get; /*private*/ set; } = null;
 
         public System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo> PathsLoaded { get; private set; } = null;
 
@@ -238,6 +234,7 @@ namespace WinCopies.IO.FileProcesses
 
         public Size TotalSize
         {
+
             get => _totalSize;
 
             private set => OnPropertyChanged(nameof(TotalSize), nameof(_totalSize), value, typeof(LoadFilesInfo));
@@ -254,7 +251,7 @@ namespace WinCopies.IO.FileProcesses
 
         private readonly bool _IsLoaded = false;
 
-        public bool IsLoaded { get => _IsLoaded; private    set => OnPropertyChanged(nameof(IsLoaded), nameof(_IsLoaded), value, typeof(LoadFilesInfo)); }
+        public bool IsLoaded { get => _IsLoaded; private set => OnPropertyChanged(nameof(IsLoaded), nameof(_IsLoaded), value, typeof(LoadFilesInfo)); }
 
         /// <summary>
         /// Occurs when a property value changes.
@@ -265,17 +262,17 @@ namespace WinCopies.IO.FileProcesses
 
         {
 
-            var (propertyChanged, oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
         }
 
-        protected void OnPropertyChangedWhenNotBusy(string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy)
+        protected void OnPropertyChangedWhenNotBusy(string propertyName, string fieldName, object newValue, Type declaringType)
 
         {
 
-            var (propertyChanged, oldValue) = Extensions.SetPropertyWhenNotBusy(this, propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = WinCopies.Util. Util.SetPropertyWhenNotBusy(this, propertyName, fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
@@ -326,13 +323,13 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-           _bgWorker. DoWork += LoadFilesInfo_DoWork;
+            _bgWorker.DoWork += LoadFilesInfo_DoWork;
 
             _bgWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => ProgressChanged?.Invoke(sender, e);
 
-           _bgWorker. RunWorkerCompleted += LoadFilesInfo_RunWorkerCompleted;
+            _bgWorker.RunWorkerCompleted += LoadFilesInfo_RunWorkerCompleted;
 
-            _bgWorker.Disposed += (object sender, EventArgs e) => Disposed?.Invoke(sender, e);    
+            _bgWorker.Disposed += (object sender, EventArgs e) => Disposed?.Invoke(sender, e);
 
             _pathsLoaded = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
 
@@ -348,7 +345,7 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-        public void LoadAsync() => _bgWorker. RunWorkerAsync();
+        public void LoadAsync() => _bgWorker.RunWorkerAsync();
 
 
 
@@ -370,7 +367,7 @@ namespace WinCopies.IO.FileProcesses
 
             RunWorkerCompleted?.Invoke(sender, e);
 
-        } 
+        }
 
 
 
@@ -439,19 +436,19 @@ namespace WinCopies.IO.FileProcesses
 
                         List<int> pathsIndexes = new List<int>();
 
-                        var t = path.FileSystemInfoProperties.GetType();
+                        Type t = path.FileSystemInfoProperties.GetType();
 
                         DirectoryInfo directoriesInfo = (DirectoryInfo)path.FileSystemInfoProperties;
 
 #if DEBUG 
 
-                        Debug.WriteLine("LoadFilesInfo log: " + (ActionType != ActionType.Deletion && SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)).ToString());
+                        Debug.WriteLine("LoadFilesInfo log: " + (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/).ToString());
 
                         // Console.WriteLine("LoadFilesInfo log: "+ActionType.ToString() + " " + path.FileSystemInfoProperties.FullName + " " + path.FileType.ToString() + " " + LoadOnlyItemsWithSearchTermsForAllActions.ToString() + " " + Search_Terms.ToString());
 
 #endif
 
-                        if (ActionType != ActionType.Deletion && SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+                        if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
                         {
 
                             _pathsLoaded.Add(path);
@@ -459,11 +456,11 @@ namespace WinCopies.IO.FileProcesses
                             ReportProgress(0);
 
                             // System.Windows.Forms.MessageBox.Show("a" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) + "a" + " " + "b" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName) + "b" + " " + (IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) != IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName)).ToString());
-                            if (path.FileSystemInfoProperties.FullName != ((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName)
+                            //if (path.FileSystemInfoProperties.FullName != ((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName)
 
-                                if (directoriesInfo.Attributes.HasFlag(FileAttributes.Hidden) && (directoriesInfo.GetDirectories().Length > 0 || directoriesInfo.GetFiles().Length > 0))
+                            //    if (directoriesInfo.Attributes.HasFlag(FileAttributes.Hidden) && (directoriesInfo.GetDirectories().Length > 0 || directoriesInfo.GetFiles().Length > 0))
 
-                                    Hidden_Folders_With_Subpaths.Add(path.FileSystemInfoProperties.FullName);
+                            //        Hidden_Folders_With_Subpaths.Add(path.FileSystemInfoProperties.FullName);
 
                             //else
                             //{
@@ -485,24 +482,25 @@ namespace WinCopies.IO.FileProcesses
 
                         //TODO : vraiment utile ?
 
-                        ReportProgress(0);
+                        // ReportProgress(0);
 
                         try
                         {
 
                             foreach (FileInfo file in directoriesInfo.GetFiles())
+
                             {
 
-                                if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
-                                {
+                                //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+                                //{
 
-                                    _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
+                                _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
 
-                                    ReportProgress(0);
+                                TotalSize += file.Length;
 
-                                    TotalSize += file.Length;
+                                ReportProgress(0);
 
-                                } // end if
+                                //} // end if
 
                             } // next file
 
@@ -546,14 +544,14 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-                                    if (directory.Attributes.HasFlag(FileAttributes.Hidden) && (directory.GetDirectories().Length > 0 || directory.GetFiles().Length > 0))
+                                    //if (directory.Attributes.HasFlag(FileAttributes.Hidden) && (directory.GetDirectories().Length > 0 || directory.GetFiles().Length > 0))
 
-                                        Hidden_Folders_With_Subpaths.Add(directory.FullName);
-
-
+                                    //    Hidden_Folders_With_Subpaths.Add(directory.FullName);
 
 
-                                    if (ActionType != ActionType.Deletion && SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+
+
+                                    if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
                                     {
 
                                         _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
@@ -565,21 +563,23 @@ namespace WinCopies.IO.FileProcesses
 
 
                                     foreach (FileInfo file in directory.GetFiles())
+
                                     {
-                                        if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
-                                        {
 
-                                            _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
+                                        //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+                                        //{
 
-                                            ReportProgress(0);
+                                        _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
 
-                                            TotalSize += file.Length;
+                                        TotalSize += file.Length;
 
-                                        } // end if
+                                        ReportProgress(0);
+
+                                        //} // end if
 
                                     } // next file
 
-                                    if (ActionType == ActionType.Deletion && SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+                                    if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
                                     {
 
                                         _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
@@ -596,14 +596,14 @@ namespace WinCopies.IO.FileProcesses
 
                                     pathsIndexes.Add(0);
 
-                                    findIndex += 1;
+                                    findIndex++;
 
                                 } // end while
 
                             } // end try
 
                             catch (Exception)
-                            { findIndex += 1; }
+                            { findIndex++; }
 
                             do
                             {
@@ -612,7 +612,7 @@ namespace WinCopies.IO.FileProcesses
 
                                 directoriesInfo = directoriesInfo.Parent;
 
-                                findIndex -= 1;
+                                findIndex--;
 
                                 pathsIndexes[findIndex] += 1;
 
@@ -624,11 +624,11 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-                            } while (directoriesInfo.GetDirectories().Length == pathsIndexes[findIndex] && pathsIndexes[0] != pathSubdirectoriesCount); 
+                            } while (directoriesInfo.GetDirectories().Length == pathsIndexes[findIndex] && pathsIndexes[0] != pathSubdirectoriesCount);
 
                         } // end while
 
-                        if (ActionType == ActionType.Deletion && SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+                        if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
                         {
 
                             _pathsLoaded.Add(path);
@@ -648,8 +648,8 @@ namespace WinCopies.IO.FileProcesses
                             Debug.WriteLine("LoadFilesInfo log: " + path.FileSystemInfoProperties.FullName + " (1)");
 #endif 
 
-                            if (SearchMethods.AddFile(path.FileSystemInfoProperties, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
-                            {
+                            //if (SearchMethods.AddFile(path.FileSystemInfoProperties, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+                            //{
 
 #if DEBUG 
                                 Debug.WriteLine("LoadFilesInfo log: " + path.FileSystemInfoProperties.FullName + " (2)");
@@ -657,11 +657,11 @@ namespace WinCopies.IO.FileProcesses
 
                                 _pathsLoaded.Add(path);
 
-                                ReportProgress(0);
-
                                 TotalSize += ((FileInfo)path.FileSystemInfoProperties).Length;
 
-                            } // end if
+                                ReportProgress(0);
+
+                            //} // end if
 
                         } // end try
 
