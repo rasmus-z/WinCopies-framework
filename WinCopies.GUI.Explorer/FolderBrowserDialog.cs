@@ -9,14 +9,14 @@ using static WinCopies.Util.Util;
 namespace WinCopies.GUI.Windows.Dialogs
 {
 
-    public enum FoldersBrowserDialogMode
+    public enum FolderBrowserDialogMode
     {
 
         OpenFiles, OpenFolder, Save
 
     }
 
-    public struct FoldersBrowserDialogFilter
+    public struct FolderBrowserDialogFilter
     {
 
         public string FilterName { get; set; }
@@ -25,24 +25,24 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         public override string ToString() => string.Format("{0} ({1})", FilterName, Filter);
 
-        public override bool Equals(object obj) => obj is FoldersBrowserDialogFilter _obj ? _obj.Filter == Filter : false;
+        public override bool Equals(object obj) => obj is FolderBrowserDialogFilter _obj ? _obj.Filter == Filter : false;
 
     }
 
-    public class FoldersBrowserDialog : Window, ICommandSource
+    public class FolderBrowserDialog : Window, ICommandSource
     {
 
         /// <summary>
         /// Identifies the <see cref="ExplorerControl"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ExplorerControlProperty = DependencyProperty.Register(nameof(ExplorerControl), typeof(ExplorerControl), typeof(FoldersBrowserDialog), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        public static readonly DependencyProperty ExplorerControlProperty = DependencyProperty.Register(nameof(ExplorerControl), typeof(ExplorerControl), typeof(FolderBrowserDialog), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {
 
             ExplorerControl explorerControl = (ExplorerControl)e.NewValue;
 
             explorerControl.Command = Commands.SelectFile;
 
-            explorerControl.CommandBindings.Add(new CommandBinding(Commands.SelectFile, ((FoldersBrowserDialog)d).SelectFileCommand_Executed, ((FoldersBrowserDialog)d).SelectFileCommand_CanExecute));
+            explorerControl.CommandBindings.Add(new CommandBinding(Commands.SelectFile, ((FolderBrowserDialog)d).SelectFileCommand_Executed, ((FolderBrowserDialog)d).SelectFileCommand_CanExecute));
 
         }));
 
@@ -51,28 +51,28 @@ namespace WinCopies.GUI.Windows.Dialogs
         /// <summary>
         /// Identifies the <see cref="Text"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(FoldersBrowserDialog));
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(FolderBrowserDialog));
 
         public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="BottomContent"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty BottomContentProperty = DependencyProperty.Register(nameof(BottomContent), typeof(object), typeof(FoldersBrowserDialog));
+        public static readonly DependencyProperty BottomContentProperty = DependencyProperty.Register(nameof(BottomContent), typeof(object), typeof(FolderBrowserDialog));
 
         public object BottomContent { get => GetValue(BottomContentProperty); set => SetValue(BottomContentProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="Mode"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(nameof(Mode), typeof(FoldersBrowserDialogMode), typeof(FoldersBrowserDialog));
+        public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(nameof(Mode), typeof(FolderBrowserDialogMode), typeof(FolderBrowserDialog));
 
-        public FoldersBrowserDialogMode Mode { get => (FoldersBrowserDialogMode)GetValue(ModeProperty); set => SetValue(ModeProperty, value); }
+        public FolderBrowserDialogMode Mode { get => (FolderBrowserDialogMode)GetValue(ModeProperty); set => SetValue(ModeProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="Command"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(FoldersBrowserDialog), new PropertyMetadata(null));
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(FolderBrowserDialog), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets the command that will be executed when the command source is invoked.
@@ -82,7 +82,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         /// <summary>
         /// Identifies the <see cref="CommandParameter"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(FoldersBrowserDialog), new PropertyMetadata(null));
+        public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(FolderBrowserDialog), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets a value that represents a user defined data value that can be passed to the command when it is executed.
@@ -92,7 +92,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         /// <summary>
         /// Identifies the <see cref="CommandTarget"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty CommandTargetProperty = DependencyProperty.Register(nameof(CommandTarget), typeof(IInputElement), typeof(FoldersBrowserDialog), new PropertyMetadata(null));
+        public static readonly DependencyProperty CommandTargetProperty = DependencyProperty.Register(nameof(CommandTarget), typeof(IInputElement), typeof(FolderBrowserDialog), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets a value that represents the object that the command is being executed on.
@@ -101,19 +101,19 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 
 
-        static FoldersBrowserDialog() => DefaultStyleKeyProperty.OverrideMetadata(typeof(FoldersBrowserDialog), new FrameworkPropertyMetadata(typeof(FoldersBrowserDialog)));
+        static FolderBrowserDialog() => DefaultStyleKeyProperty.OverrideMetadata(typeof(FolderBrowserDialog), new FrameworkPropertyMetadata(typeof(FolderBrowserDialog)));
 
 
 
-        public FoldersBrowserDialog() => Init(FoldersBrowserDialogMode.OpenFiles, SelectionMode.Single, System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
+        public FolderBrowserDialog() => Init(FolderBrowserDialogMode.OpenFiles, SelectionMode.Single, System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
 
-        public FoldersBrowserDialog(FoldersBrowserDialogMode mode, SelectionMode selectionMode) => Init(mode, selectionMode, mode == FoldersBrowserDialogMode.OpenFiles ? selectionMode != SelectionMode.Single ? Explorer.Themes.Generic.OpenFiles : Explorer.Themes.Generic.OpenFile : mode == FoldersBrowserDialogMode.OpenFolder ? Explorer.Themes.Generic.OpenFolder : mode == FoldersBrowserDialogMode.Save ? Explorer.Themes.Generic.Save : System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
+        public FolderBrowserDialog(FolderBrowserDialogMode mode, SelectionMode selectionMode) => Init(mode, selectionMode, mode == FolderBrowserDialogMode.OpenFiles ? selectionMode != SelectionMode.Single ? Explorer.Themes.Generic.OpenFiles : Explorer.Themes.Generic.OpenFile : mode == FolderBrowserDialogMode.OpenFolder ? Explorer.Themes.Generic.OpenFolder : mode == FolderBrowserDialogMode.Save ? Explorer.Themes.Generic.Save : System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
 
-        public FoldersBrowserDialog(string title) => Init(FoldersBrowserDialogMode.OpenFiles, SelectionMode.Single, title);
+        public FolderBrowserDialog(string title) => Init(FolderBrowserDialogMode.OpenFiles, SelectionMode.Single, title);
 
-        public FoldersBrowserDialog(FoldersBrowserDialogMode mode, SelectionMode selectionMode, string title) => Init(mode, selectionMode, title);
+        public FolderBrowserDialog(FolderBrowserDialogMode mode, SelectionMode selectionMode, string title) => Init(mode, selectionMode, title);
 
-        private void Init(FoldersBrowserDialogMode mode, SelectionMode selectionMode, string title)
+        private void Init(FolderBrowserDialogMode mode, SelectionMode selectionMode, string title)
 
         {
 
@@ -179,7 +179,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         {
 
-            if ((If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, Mode, FoldersBrowserDialogMode.OpenFiles, FoldersBrowserDialogMode.Save) && If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, ExplorerControl.Path.SelectedItem.FileType, FileType.Folder, FileType.SpecialFolder, FileType.Link)) || Mode == FoldersBrowserDialogMode.OpenFolder)
+            if ((If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, Mode, FolderBrowserDialogMode.OpenFiles, FolderBrowserDialogMode.Save) && If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, ExplorerControl.Path.SelectedItem.FileType, FileType.Folder, FileType.SpecialFolder, FileType.Link)) || Mode == FolderBrowserDialogMode.OpenFolder)
 
                 ExplorerControl.Open();
 

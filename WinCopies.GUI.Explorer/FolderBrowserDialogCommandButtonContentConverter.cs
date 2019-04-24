@@ -6,12 +6,14 @@ using ShellObjectInfo = WinCopies.GUI.Explorer.ShellObjectInfo;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
-    public class FoldersBrowserDialogCommandButtonContentConverter : Util.DataConverters.MultiConverterBase
+    public class FolderBrowserDialogCommandButtonContentConverter : Util.DataConverters.MultiConverterBase
     {
         public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
 
             if (values[0] == System.Windows.DependencyProperty.UnsetValue) return null;
+
+
 
             IBrowsableObjectInfo selectedItem = (IBrowsableObjectInfo)values[0];
 
@@ -23,18 +25,18 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 
 
-            switch ((FoldersBrowserDialogMode)values[1])
+            switch ((FolderBrowserDialogMode)values[1])
             {
 
-                case FoldersBrowserDialogMode.OpenFiles:
+                case FolderBrowserDialogMode.OpenFiles:
 
                     return Explorer.Themes.Generic.Open;
 
-                case FoldersBrowserDialogMode.OpenFolder:
+                case FolderBrowserDialogMode.OpenFolder:
 
                     return ResourcesHelper.Cancel;
 
-                case FoldersBrowserDialogMode.Save:
+                case FolderBrowserDialogMode.Save:
 
                     return Explorer.Themes.Generic.Save;
 

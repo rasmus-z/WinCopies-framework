@@ -153,7 +153,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         }
 
-        protected virtual void OnCommandCanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = e.Parameter is DialogWindowCommandParameters parameter ? If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals,  parameter ,DialogWindowCommandParameters.Cancel , DialogWindowCommandParameters.No) || (parameter == DialogWindowCommandParameters.OK && DialogButton == DialogButton.OK ) ||     Command == null ? true : Command.CanExecute(CommandParameter) : true;
+        protected virtual void OnCommandCanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = e.Parameter is DialogWindowCommandParameters parameter ? If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, parameter, DialogWindowCommandParameters.Cancel, DialogWindowCommandParameters.No) || (parameter == DialogWindowCommandParameters.OK && DialogButton == DialogButton.OK) || Command == null ? true : Command.CanExecute(CommandParameter) : true;
 
         protected virtual void OnCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
@@ -204,9 +204,9 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             MessageBoxResult = messageBoxResult;
 
-            if ( DialogButton != DialogButton.OK &&     dialogResult && Command != null)    
+            if (DialogButton != DialogButton.OK && dialogResult && Command != null)
 
-               Command.Execute(CommandParameter, CommandTarget);
+                Command.Execute(CommandParameter, CommandTarget);
 
             Close();
 

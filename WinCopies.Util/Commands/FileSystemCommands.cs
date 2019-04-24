@@ -23,7 +23,7 @@ namespace WinCopies.Util.Commands
         /// <summary>
         /// Gets a value that represents the show file properties command.
         /// </summary>
-        public static RoutedUICommand ShowFileProperties { get; } = new RoutedUICommand(Generic.ShowFileProperties, nameof(ShowFileProperties), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.Enter, ModifierKeys.Alt) });
+        public static RoutedUICommand FileProperties { get; } = new RoutedUICommand(Generic.ShowFileProperties, nameof(FileProperties), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.Enter, ModifierKeys.Alt) });
 
         public static RoutedUICommand Rename { get; } = new RoutedUICommand(Generic.Rename, nameof(Rename), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.R, ModifierKeys.Control) });    
 

@@ -27,6 +27,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
@@ -107,9 +108,9 @@ namespace TsudaKageyu
             return splitIcons.ToArray();
         }
 
-        public static Icon TryGetIcon(this Icon icon, Size size, bool tryResize) => icon.Split().TryGetIcon(size, tryResize);
+        public static Icon TryGetIcon(this Icon icon, Size size, int bits, bool tryResize, bool tryRedefineBitsCount) => icon.Split().TryGetIcon(size, bits, tryResize, tryRedefineBitsCount);
 
-        public static Icon TryGetIcon(this Icon[] icons, Size size, bool tryResize)
+        public static Icon TryGetIcon(this Icon[] icons, Size size, int bits, bool tryResize, bool tryRedefineBitsCount)
 
         {
 
@@ -117,11 +118,12 @@ namespace TsudaKageyu
 
             foreach (Icon i in icons)
 
-                if (i.Size == size)
+                if (i.Size == size && i.GetBitCount() == bits)
+                {
+                    Debug.WriteLine("bits: " + bits.ToString());
+                    return i; }
 
-                    return i;
-
-            if (tryResize)
+            if (tryResize || tryRedefineBitsCount)
 
             {
 
@@ -129,9 +131,27 @@ namespace TsudaKageyu
 
                 foreach (Icon i in icons)
 
-                    if (i.Size.Height > size.Height && (icon == null || i.Size.Height > icon.Size.Height))
+                {
+
+                    bool result = (i.Size == size || tryResize) && ((i.Size.Height > size.Height && (icon == null || i.Size.Height > icon.Size.Height)) || (i.Size.Height < size.Height && (icon == null || i.Size.Height > icon.Size.Height)));
+
+                    if (!result)
+
+                    {
+
+                        int i_bits = i.GetBitCount();
+
+                        int icon_bits = icon.GetBitCount();
+
+                        result = (i_bits == bits || tryRedefineBitsCount) && ((i_bits > bits && (icon == null || i_bits > icon_bits)) || (i_bits < bits && (icon == null || i_bits > icon_bits)));
+
+                    }
+
+                    if (result)
 
                         icon = i;
+
+                }
 
                 return icon;
 
@@ -172,7 +192,7 @@ namespace TsudaKageyu
         /// If the icon has multiple variations, this method returns the bit 
         /// depth of the first variation.
         /// </remarks>
-        public static int GetBitCount(Icon icon)
+        public static int GetBitCount(this Icon icon)
         {
             if (icon == null)
                 throw new ArgumentNullException(nameof(icon));

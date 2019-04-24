@@ -51,10 +51,10 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
 
-        /// <summary>
-        /// Gets the selected index.
-        /// </summary>
-        public int SelectedIndex => ItemsSource == null ? Items.IndexOf(SelectedItem) : ItemsSource.ToList().IndexOf(SelectedItem);
+        ///// <summary>
+        ///// Gets the selected index.
+        ///// </summary>
+        //public int SelectedIndex => ItemsSource == null ? Items.IndexOf(SelectedItem) : ItemsSource.ToList().IndexOf(SelectedItem);
 
         internal static readonly DependencyPropertyKey PreviouslySelectedItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(PreviouslySelectedItem), typeof(TreeViewItem), typeof(TreeView), new PropertyMetadata());
 

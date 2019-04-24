@@ -38,8 +38,8 @@ namespace WinCopies.IO
         public override string Name => System.IO.Path.GetFileName(Path);
 
         private Icon TryGetIcon(System.Drawing.Size size) => System.IO.Path.HasExtension(Path)
-                ? Registry.GetIconVariationsFromFileType(Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path)))?.TryGetIcon(size, true)
-                : new IconExtractor(WinCopies.IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, true);
+                ? Registry.GetIconVariationsFromFileType(Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path)))?.TryGetIcon(size, 32, true, true)
+                : new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, 32, true, true);
 
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
@@ -65,7 +65,7 @@ namespace WinCopies.IO
             get
             {
 
-                using (Icon icon = TryGetIcon(new System.Drawing.Size(64, 64)))
+                using (Icon icon = TryGetIcon(new System.Drawing.Size(48, 48)))
 
                     return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 

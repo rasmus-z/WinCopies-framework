@@ -154,13 +154,13 @@ namespace WinCopies.GUI.Windows.Dialogs
             DataContext = shellObject;
 
             CommandBindings.Add(new CommandBinding(DefineOpenWithSoftware, (object sender, ExecutedRoutedEventArgs e) =>
-           {
+            {
 
-               FoldersBrowserDialog foldersBrowserDialog = new FoldersBrowserDialog();
+                FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
 
-               foldersBrowserDialog.ShowDialog();
+                folderBrowserDialog.ShowDialog();
 
-           }));
+            }));
 
             // Content = new Control { Template = (ControlTemplate)ResourcesHelper.Instance.ResourceDictionary["FilePropertiesDialogTemplate"] };
 
@@ -184,7 +184,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                     // MessageBox.Show(openWithSoftware);
 
-                    SetValue(OpenWithSoftwarePropertyKey, ShellObject.FromParsingName(Registry.GetOpenWithSoftwarePathFromCommand(Registry.GetCommandByExtension("open", ext))));
+                    string openWithCommand = Registry.GetCommandByExtension("open", ext);
+
+                    if (openWithCommand != null)
+
+                        SetValue(OpenWithSoftwarePropertyKey, ShellObject.FromParsingName(Registry.GetOpenWithSoftwarePathFromCommand(openWithCommand)));
 
                     WinShellAppInfoInterop winShellAppInfoInterop = new WinShellAppInfoInterop(ext);
 
@@ -198,7 +202,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                 string[] kinds = null;
 
-                foreach (IShellProperty prop in new ShellPropertyCollection(new_Value.ShellObject))    
+                foreach (IShellProperty prop in new ShellPropertyCollection(new_Value.ShellObject))
 
                 {
 
@@ -248,99 +252,137 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 #endif
 
-                PropertyInfo[] properties = typeof(ShellProperties.PropertySystem).GetProperties();
-
-                void addProperties(string propertyKind, Type propertyType, PropertyStoreItems propertyStoreItems)
+                if (kinds != null)
 
                 {
 
-                    foreach (PropertyInfo _property in propertyType.GetProperties())    
+                    PropertyInfo[] properties = typeof(ShellProperties.PropertySystem).GetProperties();
 
-                        specificValues.Add(new Util.NamedObject<ShellPropertyContainer>(propertyKind, new ShellPropertyContainer((IShellProperty)_property.GetValue(propertyStoreItems))));
-
-                    #region Comments
-
-                    // if (shellProperty.Description.DisplayName == "Mode flash")
-
-                    // {
-
-                    // MessageBox.Show(shellProperty.ValueType.ToString());
-
-                    //foreach (ShellPropertyEnumType propertyEnumType in shellProperty.Description.PropertyEnumTypes)
-
-                    //    MessageBox.Show(propertyEnumType.DisplayText + " " + propertyEnumType.EnumType.ToString() + " " + propertyEnumType.ToString());
-
-                    // MessageBox.Show(shellProperty.Description.PropertyEnumTypes[0].DisplayText + " " + shellProperty.Description.PropertyEnumTypes[0].EnumType.ToString() + " " + shellProperty.Description.PropertyEnumTypes[0].ToString());
-
-                    // MessageBox.Show(shellProperty.Description.GroupingRange.ToString());
-
-                    // }
-
-                    #endregion
-
-                }
-
-                foreach (PropertyInfo property in properties)
-
-                {
-
-                    // todo: to add the other properties
-
-                    object propvalue = property.GetValue(new_Value.ShellObject.Properties.System);
-
-                    if (property.PropertyType == typeof(ShellProperties.PropertySystemAudio) && (kinds.Contains(Movie) || kinds.Contains(Music) || kinds.Contains(RecordedTV) || kinds.Contains(Video)))
-
-                        addProperties(Audio, typeof(ShellProperties.PropertySystemAudio), new_Value.ShellObject.Properties.System.Audio);
-
-                    else if (property.PropertyType == typeof(ShellProperties.PropertySystemCalendar) && kinds.Contains(Calendar))
-
-                        addProperties(CalendarPropertyCategory, typeof(ShellProperties.PropertySystemCalendar), new_Value.ShellObject.Properties.System.Calendar);
-
-                    else if (property.PropertyType == typeof(ShellProperties.PropertySystemDocument) && kinds.Contains(Document))
-
-                        // MessageBox.Show((property.PropertyType == typeof(ShellProperties.PropertySystemDocument)).ToString() + (kinds.Contains("document")).ToString());
-
-                        addProperties(DocumentPropertyCategory, typeof(ShellProperties.PropertySystemDocument), new_Value.ShellObject.Properties.System.Document);
-
-                    else if (property.PropertyType == typeof(ShellProperties.PropertySystemImage) && kinds.Contains(Picture))
-
-                        addProperties(ImagePropertyCategory, typeof(ShellProperties.PropertySystemImage), new_Value.ShellObject.Properties.System.Image);
-
-                    else if (property.PropertyType == typeof(ShellProperties.PropertySystemMedia) && (kinds.Contains(Movie) || kinds.Contains(Music) || kinds.Contains(RecordedTV) || kinds.Contains(Video)))
-
-                        addProperties(Media, typeof(ShellProperties.PropertySystemMedia), new_Value.ShellObject.Properties.System.Media);
-
-                    else if (property.PropertyType == typeof(ShellProperties.PropertySystemMusic) && kinds.Contains(Music))
-
-                        // {
-
-                        // MessageBox.Show("music");
-
-                        addProperties(MusicPropertyCategory, typeof(Microsoft.WindowsAPICodePack.Shell.PropertySystem.ShellProperties.PropertySystemMusic), new_Value.ShellObject.Properties.System.Music);
-
-                    // }
-
-                    else if (property.PropertyType == typeof(ShellProperties.PropertySystemPhoto) && kinds.Contains(Picture))
-
-                        // {
-
-                        // MessageBox.Show("photo");
-
-                        addProperties(Photo, typeof(Microsoft.WindowsAPICodePack.Shell.PropertySystem.ShellProperties.PropertySystemPhoto), new_Value.ShellObject.Properties.System.Photo);
-
-                    // }
-
-                    else if (property.GetValue(new_Value.ShellObject.Properties.System) is IShellProperty)
+                    void addProperties(string propertyKind, Type propertyType, PropertyStoreItems propertyStoreItems)
 
                     {
 
-                        // if (property.GetValue(new_Value.ShellObject.Properties.System) is ShellProperties.PropertySystemDocument) MessageBox.Show(property.PropertyType.ToString());
+                        foreach (PropertyInfo _property in propertyType.GetProperties())
 
-                        IShellProperty value = (IShellProperty)property.GetValue(new_Value.ShellObject.Properties.System);
+                            specificValues.Add(new Util.NamedObject<ShellPropertyContainer>(propertyKind, new ShellPropertyContainer((IShellProperty)_property.GetValue(propertyStoreItems))));
 
-                        commonValues.Add(new Util.NamedObject<ShellPropertyContainer>("Common", new ShellPropertyContainer(value)));
+                        #region Comments
+
+                        // if (shellProperty.Description.DisplayName == "Mode flash")
+
+                        // {
+
+                        // MessageBox.Show(shellProperty.ValueType.ToString());
+
+                        //foreach (ShellPropertyEnumType propertyEnumType in shellProperty.Description.PropertyEnumTypes)
+
+                        //    MessageBox.Show(propertyEnumType.DisplayText + " " + propertyEnumType.EnumType.ToString() + " " + propertyEnumType.ToString());
+
+                        // MessageBox.Show(shellProperty.Description.PropertyEnumTypes[0].DisplayText + " " + shellProperty.Description.PropertyEnumTypes[0].EnumType.ToString() + " " + shellProperty.Description.PropertyEnumTypes[0].ToString());
+
+                        // MessageBox.Show(shellProperty.Description.GroupingRange.ToString());
+
+                        // }
+
+                        #endregion
 
                     }
+
+                    foreach (PropertyInfo property in properties)
+
+                    {
+
+                        // todo: to add the other properties
+
+                        object propvalue = property.GetValue(new_Value.ShellObject.Properties.System);
+
+                        if (property.PropertyType == typeof(ShellProperties.PropertySystemAudio) && (kinds.Contains(Movie) || kinds.Contains(Music) || kinds.Contains(RecordedTV) || kinds.Contains(Video)))
+
+                            addProperties(Audio, typeof(ShellProperties.PropertySystemAudio), new_Value.ShellObject.Properties.System.Audio);
+
+                        else if (property.PropertyType == typeof(ShellProperties.PropertySystemCalendar) && kinds.Contains(Calendar))
+
+                            addProperties(CalendarPropertyCategory, typeof(ShellProperties.PropertySystemCalendar), new_Value.ShellObject.Properties.System.Calendar);
+
+                        else if (property.PropertyType == typeof(ShellProperties.PropertySystemDocument) && kinds.Contains(Document))
+
+                            // MessageBox.Show((property.PropertyType == typeof(ShellProperties.PropertySystemDocument)).ToString() + (kinds.Contains("document")).ToString());
+
+                            addProperties(DocumentPropertyCategory, typeof(ShellProperties.PropertySystemDocument), new_Value.ShellObject.Properties.System.Document);
+
+                        else if (property.PropertyType == typeof(ShellProperties.PropertySystemImage) && kinds.Contains(Picture))
+
+                            addProperties(ImagePropertyCategory, typeof(ShellProperties.PropertySystemImage), new_Value.ShellObject.Properties.System.Image);
+
+                        else if (property.PropertyType == typeof(ShellProperties.PropertySystemMedia) && (kinds.Contains(Movie) || kinds.Contains(Music) || kinds.Contains(RecordedTV) || kinds.Contains(Video)))
+
+                            addProperties(Media, typeof(ShellProperties.PropertySystemMedia), new_Value.ShellObject.Properties.System.Media);
+
+                        else if (property.PropertyType == typeof(ShellProperties.PropertySystemMusic) && kinds.Contains(Music))
+
+                            // {
+
+                            // MessageBox.Show("music");
+
+                            addProperties(MusicPropertyCategory, typeof(Microsoft.WindowsAPICodePack.Shell.PropertySystem.ShellProperties.PropertySystemMusic), new_Value.ShellObject.Properties.System.Music);
+
+                        // }
+
+                        else if (property.PropertyType == typeof(ShellProperties.PropertySystemPhoto) && kinds.Contains(Picture))
+
+                            // {
+
+                            // MessageBox.Show("photo");
+
+                            addProperties(Photo, typeof(Microsoft.WindowsAPICodePack.Shell.PropertySystem.ShellProperties.PropertySystemPhoto), new_Value.ShellObject.Properties.System.Photo);
+
+                        // }
+
+                        else if (property.GetValue(new_Value.ShellObject.Properties.System) is IShellProperty)
+
+                        {
+
+                            // if (property.GetValue(new_Value.ShellObject.Properties.System) is ShellProperties.PropertySystemDocument) MessageBox.Show(property.PropertyType.ToString());
+
+                            IShellProperty value = (IShellProperty)property.GetValue(new_Value.ShellObject.Properties.System);
+
+                            commonValues.Add(new Util.NamedObject<ShellPropertyContainer>("Common", new ShellPropertyContainer(value)));
+
+                        }
+
+                    }
+
+                }
+
+                else
+
+                {
+
+                    //foreach (PropertyInfo property in properties)
+
+                    //{
+
+                    //    if (property.GetValue(new_Value.ShellObject.Properties.System) is IShellProperty)
+
+                    //{
+
+                    //    // if (property.GetValue(new_Value.ShellObject.Properties.System) is ShellProperties.PropertySystemDocument) MessageBox.Show(property.PropertyType.ToString());
+
+                    //    IShellProperty value = (IShellProperty)property.GetValue(new_Value.ShellObject.Properties.System);
+
+                    //    commonValues.Add(new Util.NamedObject<ShellPropertyContainer>("Common", new ShellPropertyContainer(value)));
+
+                    //    }
+
+                    //}
+
+                    // ObservableCollection<ShellPropertyContainer> properties = new ObservableCollection<ShellPropertyContainer>();
+
+                    if (new_Value.ShellObject.Properties.DefaultPropertyCollection != null)
+
+                        foreach (IShellProperty property in new_Value.ShellObject.Properties.DefaultPropertyCollection)
+
+                            commonValues.Add(new Util.NamedObject<ShellPropertyContainer>("Common", new ShellPropertyContainer(property)));
 
                 }
 

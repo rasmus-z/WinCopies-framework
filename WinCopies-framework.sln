@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttachedCommandBehavior", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PushBinding", "Third parties\PushBinding\PushBinding.csproj", "{E47AEB50-7203-4133-B815-F028554DB500}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IconExtractor", "Third parties\IconExtractor-1.0\IconExtractor\IconExtractor.csproj", "{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -138,6 +140,14 @@ Global
 		{E47AEB50-7203-4133-B815-F028554DB500}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E47AEB50-7203-4133-B815-F028554DB500}.Release|x64.ActiveCfg = Release|Any CPU
 		{E47AEB50-7203-4133-B815-F028554DB500}.Release|x64.Build.0 = Release|Any CPU
+		{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}.Debug|x64.Build.0 = Debug|Any CPU
+		{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}.Release|x64.ActiveCfg = Release|Any CPU
+		{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -145,6 +155,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{BA852758-6682-4878-906A-917A1E75DE16} = {BD05D88B-B026-4233-A221-90F6732313BC}
 		{E47AEB50-7203-4133-B815-F028554DB500} = {BD05D88B-B026-4233-A221-90F6732313BC}
+		{FDFD4EEB-C202-4D93-A6E9-D8984A12D014} = {BD05D88B-B026-4233-A221-90F6732313BC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75922CA2-98D5-4443-BE25-39062994E598}

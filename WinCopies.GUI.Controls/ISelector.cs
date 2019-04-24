@@ -20,6 +20,11 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         object SelectedItem { get; }
 
+    }
+
+    public interface ISingleSelector : ISelector
+    {
+
         /// <summary>
         /// Gets the selected index.
         /// </summary>
@@ -30,20 +35,27 @@ namespace WinCopies.GUI.Controls
     /// <summary>
     /// Provides properties that apply to the UI controls that can select one or more children by the item itself or by the parent selector.
     /// </summary>
-    public interface ISettableSelector : ISelector
+    public interface ISettableSelector
     {
 
         /// <summary>
         /// Sets the selected item.
         /// </summary>
-        new object SelectedItem { set; }
+        object SelectedItem { get; set; }
+
+    }
+
+    public interface ISingleSettableSelector : ISettableSelector
+    {
 
         /// <summary>
         /// Sets the selected index.
         /// </summary>
-        new int SelectedIndex { set; }
+        int SelectedIndex { get; set; }
 
     }
+
+    // todo: to implement this interface in the other selectable controls 'listbox, listview, ...)
 
     /// <summary>
     /// Provides properties that apply to the UI controls that can be selected.
@@ -51,6 +63,8 @@ namespace WinCopies.GUI.Controls
     public interface ISelectable
 
     {
+
+        bool IsSelected { get; set; }
 
         /// <summary>
         /// Gets a value that indicates whether this item is selected by focus.

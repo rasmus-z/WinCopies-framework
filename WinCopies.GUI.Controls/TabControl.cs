@@ -9,7 +9,7 @@ namespace WinCopies.GUI.Controls
     /// <summary>
     /// Represents a control that contains multiple items that share the same space on the screen.
     /// </summary>
-    public class TabControl : System.Windows.Controls.TabControl, ISettableSelector
+    public class TabControl : System.Windows.Controls.TabControl, ISingleSettableSelector
     {
 
         private static readonly DependencyPropertyKey CanScrollToLeftPropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanScrollToLeft), typeof(bool), typeof(TabControl), new PropertyMetadata(false));

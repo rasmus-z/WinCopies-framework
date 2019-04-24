@@ -5,7 +5,7 @@ using WinCopies.Util;
 
 namespace WinCopies.GUI.Controls
 {
-    public class ListView : System.Windows.Controls.ListView, IScrollable, ISettableSelector, ICommandSource
+    public class ListView : System.Windows.Controls.ListView, IScrollable, ISingleSettableSelector, ICommandSource
     {
         public ScrollViewer ScrollHost { get; private set; } = null;
 

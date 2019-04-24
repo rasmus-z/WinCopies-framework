@@ -32,7 +32,8 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        private void FilePropertyGrid_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        protected virtual void OnDataContextChanged(DependencyPropertyChangedEventArgs e)
+
         {
 
             if (e.NewValue is IO.ShellObjectInfo selectedItem)
@@ -43,13 +44,9 @@ namespace WinCopies.GUI.Explorer
 
                 if (selectedItem.ShellObject.Properties.DefaultPropertyCollection != null)
 
-                {
-
                     foreach (IShellProperty property in selectedItem.ShellObject.Properties.DefaultPropertyCollection)
 
                         properties.Add(new ShellPropertyContainer(property));
-
-                }
 
                 FileProperties = new ReadOnlyObservableCollection<ShellPropertyContainer>(properties);
 
@@ -64,7 +61,14 @@ namespace WinCopies.GUI.Explorer
 #endif 
 
             }
+
+            else
+
+                FileProperties = null;
+
         }
+
+        private void FilePropertyGrid_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) => OnDataContextChanged(e);
 
         private void EditProperty_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = true;
 

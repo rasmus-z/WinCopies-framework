@@ -25,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\bin\x64\Debug\WinCopies.GUI.Explorer.xml</DocumentationFile>
     <LangVersion>7.2</LangVersion>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -125,14 +126,15 @@
     <Compile Include="Data\FileSystemInfoConverter.cs" />
     <Compile Include="Data\FileTypeConverter.cs" />
     <Compile Include="Data\HistorySelectedItemConverter.cs" />
+    <Compile Include="Data\ShowInFilePropertiesGridConverter.cs" />
     <Compile Include="Data\ShowItemsCheckBoxConverter.cs" />
     <Compile Include="Data\StringArrayToFoldersDialogFilterConverter.cs" />
     <Compile Include="ExplorerControl.cs" />
     <Compile Include="FilePropertiesDialog.cs" />
     <Compile Include="FilePropertyEditorDialog.cs" />
     <Compile Include="FilePropertyGrid.cs" />
-    <Compile Include="FoldersBrowserDialog.cs" />
-    <Compile Include="FoldersBrowserDialogCommandButtonContentConverter.cs" />
+    <Compile Include="FolderBrowserDialog.cs" />
+    <Compile Include="FolderBrowserDialogCommandButtonContentConverter.cs" />
     <Compile Include="HistoryItemData.cs" />
     <Compile Include="IBrowsableObjectInfo.cs" />
     <Compile Include="Data\PathToItemsConverter.cs" />
