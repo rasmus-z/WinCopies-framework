@@ -69,7 +69,7 @@ namespace WinCopies.IO.FileProcesses
 
             get => _overwrite;
 
-            set => OnPropertyChangedWhenNotBusy(nameof(Overwrite), nameof(_overwrite), value, typeof(CopyProcessInfo), true);
+            set => OnPropertyChangedWhenNotBusy(nameof(Overwrite), nameof(_overwrite), value, typeof(CopyProcessInfo));
 
         }
 
@@ -90,7 +90,7 @@ namespace WinCopies.IO.FileProcesses
 
             get => _how_To_Retry_When_Exception_Occured;
 
-            set => OnPropertyChangedWhenNotBusy(nameof(HowToRetryWhenExceptionOccured), nameof(_how_To_Retry_When_Exception_Occured), value, typeof(CopyProcessInfo), true);
+            set => OnPropertyChangedWhenNotBusy(nameof(HowToRetryWhenExceptionOccured), nameof(_how_To_Retry_When_Exception_Occured), value, typeof(CopyProcessInfo));
 
         }
 
@@ -115,7 +115,7 @@ namespace WinCopies.IO.FileProcesses
 
             {
 
-                OnPropertyChangedWhenNotBusy(nameof(IsAFileMoving), nameof(_isAFileMoving), value, typeof(CopyProcessInfo), true);
+                OnPropertyChangedWhenNotBusy(nameof(IsAFileMoving), nameof(_isAFileMoving), value, typeof(CopyProcessInfo));
 
                 OnPropertyChanged(nameof(ActionType), nameof(_actionType), value ? FileProcesses.ActionType.Move : FileProcesses.ActionType.Copy, typeof(CopyProcessInfo));
 
@@ -250,7 +250,7 @@ namespace WinCopies.IO.FileProcesses
 
         }
 
-        //private void loadFilesInfo_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) =>
+        //private void FilesInfoLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) =>
 
         //    // todo : si le disque du répertoire de destination a un espace de stockage insuffisant, mettre une exception.
 

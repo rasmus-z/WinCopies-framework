@@ -20,7 +20,7 @@ namespace WinCopies.IO.FileProcesses
     /// <summary>
     /// Provides instance methods and properties for a file search process. This class inherits from <see cref="WinCopies.Util.BackgroundWorker"/>.
     /// </summary>
-    public class LoadFilesInfo : IBackgroundWorker, INotifyPropertyChanged
+    public class FilesInfoLoader : IBackgroundWorker, INotifyPropertyChanged
     {
 
         #region BackgroundWorker implementation
@@ -181,14 +181,14 @@ namespace WinCopies.IO.FileProcesses
         private readonly ActionType actionType = ActionType.Unknown;
 
         /// <summary>
-        /// Gets or sets the <see cref="FileProcesses. ActionType"/> of this <see cref="LoadFilesInfo"/>.
+        /// Gets or sets the <see cref="FileProcesses. ActionType"/> of this <see cref="FilesInfoLoader"/>.
         /// </summary>
         public ActionType ActionType
         {
 
             get => actionType;
 
-            set => OnPropertyChangedWhenNotBusy(nameof(ActionType), nameof(actionType), value, typeof(LoadFilesInfo));
+            set => OnPropertyChangedWhenNotBusy(nameof(ActionType), nameof(actionType), value, typeof(FilesInfoLoader));
 
         }
 
@@ -199,13 +199,13 @@ namespace WinCopies.IO.FileProcesses
 
         //    get => search_Terms;
 
-        //    set => OnPropertyChangedWhenNotBusy(nameof(Search_Terms), nameof(search_Terms), value, typeof(LoadFilesInfo), true);
+        //    set => OnPropertyChangedWhenNotBusy(nameof(Search_Terms), nameof(search_Terms), value, typeof(FilesInfoLoader), true);
 
         //}
 
         //private bool loadOnlyItemsWithSearchTermsForAllActions = false;
 
-        //public bool LoadOnlyItemsWithSearchTermsForAllActions { get => loadOnlyItemsWithSearchTermsForAllActions; set => OnPropertyChanged(nameof(LoadOnlyItemsWithSearchTermsForAllActions), nameof(loadOnlyItemsWithSearchTermsForAllActions), value, typeof(LoadFilesInfo)); }
+        //public bool LoadOnlyItemsWithSearchTermsForAllActions { get => loadOnlyItemsWithSearchTermsForAllActions; set => OnPropertyChanged(nameof(LoadOnlyItemsWithSearchTermsForAllActions), nameof(loadOnlyItemsWithSearchTermsForAllActions), value, typeof(FilesInfoLoader)); }
 
         // TODO : avec un setter ? gérer les exceptions pour différents répertoires racines
 
@@ -237,7 +237,7 @@ namespace WinCopies.IO.FileProcesses
 
             get => _totalSize;
 
-            private set => OnPropertyChanged(nameof(TotalSize), nameof(_totalSize), value, typeof(LoadFilesInfo));
+            private set => OnPropertyChanged(nameof(TotalSize), nameof(_totalSize), value, typeof(FilesInfoLoader));
 
         }
 
@@ -247,11 +247,11 @@ namespace WinCopies.IO.FileProcesses
 
         // private long _totalFolders = 0;
 
-        // public long TotalFolders { get=>_totalFolders; private set=>OnPropertyChanged(nameof(TotalFolders), nameof(_totalFolders), value, typeof(LoadFilesInfo)); } 
+        // public long TotalFolders { get=>_totalFolders; private set=>OnPropertyChanged(nameof(TotalFolders), nameof(_totalFolders), value, typeof(FilesInfoLoader)); } 
 
         private readonly bool _IsLoaded = false;
 
-        public bool IsLoaded { get => _IsLoaded; private set => OnPropertyChanged(nameof(IsLoaded), nameof(_IsLoaded), value, typeof(LoadFilesInfo)); }
+        public bool IsLoaded { get => _IsLoaded; private set => OnPropertyChanged(nameof(IsLoaded), nameof(_IsLoaded), value, typeof(FilesInfoLoader)); }
 
         /// <summary>
         /// Occurs when a property value changes.
@@ -286,16 +286,16 @@ namespace WinCopies.IO.FileProcesses
         // public event EventHandler<FileInfoLoadedEventArgs> FileInfoLoaded;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LoadFilesInfo"/> class.
+        /// Initializes a new instance of the <see cref="FilesInfoLoader"/> class.
         /// </summary>
-        public LoadFilesInfo() => SetProperties();
+        public FilesInfoLoader() => SetProperties();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LoadFilesInfo"/> class using custom parameters.
+        /// Initializes a new instance of the <see cref="FilesInfoLoader"/> class using custom parameters.
         /// </summary>
         /// <param name="paths">The paths to browse.</param>
-        /// <param name="actionType">The <see cref="WinCopies.IO.FileProcesses. ActionType"/> to set this <see cref="LoadFilesInfo"/> for.</param>
-        public LoadFilesInfo(IList<FileSystemInfo> paths, ActionType actionType)
+        /// <param name="actionType">The <see cref="WinCopies.IO.FileProcesses. ActionType"/> to set this <see cref="FilesInfoLoader"/> for.</param>
+        public FilesInfoLoader(IList<FileSystemInfo> paths, ActionType actionType)
         {
 
             SetProperties();
@@ -304,7 +304,7 @@ namespace WinCopies.IO.FileProcesses
 
             ActionType = actionType;
 
-        } // end LoadFilesInfo
+        } // end FilesInfoLoader
 
         private void SetProperties()
         {
@@ -323,11 +323,11 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-            _bgWorker.DoWork += LoadFilesInfo_DoWork;
+            _bgWorker.DoWork += FilesInfoLoader_DoWork;
 
             _bgWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => ProgressChanged?.Invoke(sender, e);
 
-            _bgWorker.RunWorkerCompleted += LoadFilesInfo_RunWorkerCompleted;
+            _bgWorker.RunWorkerCompleted += FilesInfoLoader_RunWorkerCompleted;
 
             _bgWorker.Disposed += (object sender, EventArgs e) => Disposed?.Invoke(sender, e);
 
@@ -349,7 +349,7 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-        private void LoadFilesInfo_DoWork(object sender, DoWorkEventArgs e)
+        private void FilesInfoLoader_DoWork(object sender, DoWorkEventArgs e)
 
         {
 
@@ -359,7 +359,7 @@ namespace WinCopies.IO.FileProcesses
 
         }
 
-        private void LoadFilesInfo_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void FilesInfoLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 
         {
 
@@ -414,7 +414,7 @@ namespace WinCopies.IO.FileProcesses
 
 #if DEBUG 
 
-                Debug.WriteLine("LoadFilesInfo log: " + path.FileSystemInfoProperties.FullName);
+                Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName);
 
 #endif
 
@@ -442,9 +442,9 @@ namespace WinCopies.IO.FileProcesses
 
 #if DEBUG 
 
-                        Debug.WriteLine("LoadFilesInfo log: " + (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/).ToString());
+                        Debug.WriteLine("FilesInfoLoader log: " + (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/).ToString());
 
-                        // Console.WriteLine("LoadFilesInfo log: "+ActionType.ToString() + " " + path.FileSystemInfoProperties.FullName + " " + path.FileType.ToString() + " " + LoadOnlyItemsWithSearchTermsForAllActions.ToString() + " " + Search_Terms.ToString());
+                        // Console.WriteLine("FilesInfoLoader log: "+ActionType.ToString() + " " + path.FileSystemInfoProperties.FullName + " " + path.FileType.ToString() + " " + LoadOnlyItemsWithSearchTermsForAllActions.ToString() + " " + Search_Terms.ToString());
 
 #endif
 
@@ -645,14 +645,14 @@ namespace WinCopies.IO.FileProcesses
                         {
 
 #if DEBUG 
-                            Debug.WriteLine("LoadFilesInfo log: " + path.FileSystemInfoProperties.FullName + " (1)");
+                            Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName + " (1)");
 #endif 
 
                             //if (SearchMethods.AddFile(path.FileSystemInfoProperties, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
                             //{
 
 #if DEBUG 
-                                Debug.WriteLine("LoadFilesInfo log: " + path.FileSystemInfoProperties.FullName + " (2)");
+                                Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName + " (2)");
 #endif 
 
                                 _pathsLoaded.Add(path);

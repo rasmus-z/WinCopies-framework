@@ -155,9 +155,9 @@ namespace WinCopies.IO
 
 #endif
 
-            //List<LoadFolder.IPathInfo> directories = new List<LoadFolder.IPathInfo>();
+            //List<FolderLoader.IPathInfo> directories = new List<FolderLoader.IPathInfo>();
 
-            //List<LoadFolder.IPathInfo> files = new List<LoadFolder.IPathInfo>();
+            //List<FolderLoader.IPathInfo> files = new List<FolderLoader.IPathInfo>();
 
             List<IFileSystemObject> paths = new List<IFileSystemObject>();
 
@@ -365,7 +365,7 @@ namespace WinCopies.IO
 
             // string CurrentFile_Normalized = "";
 
-            // CurrentFile_Normalized = LoadFolder.PathInfo.NormalizePath(file.Path);
+            // CurrentFile_Normalized = FolderLoader.PathInfo.NormalizePath(file.Path);
 
             // file.Normalized_Path = CurrentFile_Normalized;
 
@@ -409,7 +409,7 @@ namespace WinCopies.IO
 
                 reportProgressAndAddNewPathToObservableCollection(path_);
 
-            //foreach (LoadFolder.PathInfo path_ in files)
+            //foreach (FolderLoader.PathInfo path_ in files)
 
             //    reportProgressAndAddNewPathToObservableCollection(path_);
 

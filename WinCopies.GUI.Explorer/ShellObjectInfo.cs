@@ -99,10 +99,10 @@ namespace WinCopies.GUI.Explorer
 
     }
 
-    //public class LoadFolder : WinCopies.IO.LoadFolder
+    //public class FolderLoader : WinCopies.IO.FolderLoader
     //{
 
-    //    public LoadFolder() : base(true, true)
+    //    public FolderLoader() : base(true, true)
     //    {
 
     //        #region Comments
@@ -134,7 +134,7 @@ namespace WinCopies.GUI.Explorer
 
     //        //                List<IPathContainer> files = new List<IPathContainer>();
 
-    //        //                var comp = LoadFolder.comp.GetInstance();
+    //        //                var comp = FolderLoader.comp.GetInstance();
 
     //        //                void AddDirectory(ref PathInfo pathInfo, bool isSpecialFolder = false)
 
@@ -197,7 +197,7 @@ namespace WinCopies.GUI.Explorer
     //        //                        Console.WriteLine("b");
     //        //#endif
 
-    //        //                        files.Add(new LoadFolder.PathInfo() { Path = ((Microsoft.WindowsAPICodePack.Shell.ShellFile)so).Path, Normalized_Path = null, Shell_Object = so, FileType = FileTypes.File });
+    //        //                        files.Add(new FolderLoader.PathInfo() { Path = ((Microsoft.WindowsAPICodePack.Shell.ShellFile)so).Path, Normalized_Path = null, Shell_Object = so, FileType = FileTypes.File });
 
     //        //                    }
 
@@ -333,7 +333,7 @@ namespace WinCopies.GUI.Explorer
 
     //        //                {
 
-    //        //                    LoadFolder.PathInfo directory = (LoadFolder.PathInfo)directories[i];
+    //        //                    FolderLoader.PathInfo directory = (FolderLoader.PathInfo)directories[i];
 
     //        //                    Boolean showFolder = false;
 
@@ -368,7 +368,7 @@ namespace WinCopies.GUI.Explorer
 
     //        //                        CurrentFile_Normalized = currentFile_Normalized_.Normalize(System.Text.NormalizationForm.FormC);
 
-    //        //                        // directories.Add(new LoadFolder.PathInfo { Path = directory, Normalized_Path = CurrentFile_Normalized });
+    //        //                        // directories.Add(new FolderLoader.PathInfo { Path = directory, Normalized_Path = CurrentFile_Normalized });
 
     //        //                        directory.Normalized_Path = CurrentFile_Normalized;
 
@@ -388,7 +388,7 @@ namespace WinCopies.GUI.Explorer
 
     //        //                {
 
-    //        //                    LoadFolder.PathInfo file = (LoadFolder.PathInfo)files[i];
+    //        //                    FolderLoader.PathInfo file = (FolderLoader.PathInfo)files[i];
 
     //        //                    Boolean showFile = false;
 
@@ -418,7 +418,7 @@ namespace WinCopies.GUI.Explorer
 
     //        //                        CurrentFile_Normalized = currentFile_Normalized_.Normalize(System.Text.NormalizationForm.FormC);
 
-    //        //                        // pathInfosFiles.Add(new LoadFolder.PathInfo { Path = file, Normalized_Path = CurrentFile_Normalized });
+    //        //                        // pathInfosFiles.Add(new FolderLoader.PathInfo { Path = file, Normalized_Path = CurrentFile_Normalized });
 
     //        //                        file.Normalized_Path = CurrentFile_Normalized;
 
@@ -436,7 +436,7 @@ namespace WinCopies.GUI.Explorer
 
 
 
-    //        //                void reportProgressAndAddNewPathToObservableCollection(LoadFolder.PathInfo path_)
+    //        //                void reportProgressAndAddNewPathToObservableCollection(FolderLoader.PathInfo path_)
 
     //        //                {
     //        //#if DEBUG
@@ -461,7 +461,7 @@ namespace WinCopies.GUI.Explorer
 
 
 
-    //        //                foreach (LoadFolder.PathInfo path_ in directories)
+    //        //                foreach (FolderLoader.PathInfo path_ in directories)
 
     //        //                {
 
@@ -469,7 +469,7 @@ namespace WinCopies.GUI.Explorer
 
     //        //                }
 
-    //        //                foreach (LoadFolder.PathInfo path_ in files)
+    //        //                foreach (FolderLoader.PathInfo path_ in files)
 
     //        //                {
 

@@ -49,7 +49,7 @@ namespace WinCopies.IO
 
             bool ok;
 
-            ArchiveLoader loadArchive = null;
+            ArchiveLoader ArchiveLoader = null;
 
             // int archiveSubpathsCount = 0;
 
@@ -67,11 +67,11 @@ namespace WinCopies.IO
 
                     if (browsableObjectInfo.FileType == FileType.Archive)
 
-                        loadArchive = new ArchiveLoader(true, false, FileTypesFlags.All);
+                        ArchiveLoader = new ArchiveLoader(true, false, FileTypesFlags.All);
 
-                    loadArchive.Path = browsableObjectInfo;
+                    ArchiveLoader.Path = browsableObjectInfo;
 
-                    loadArchive.OnDoWork();
+                    ArchiveLoader.OnDoWork();
 
                     string s = paths[i].ToLower();
 
@@ -93,7 +93,7 @@ namespace WinCopies.IO
 
                     {
 
-                        if (browsableObjectInfo.FileType == FileType.Archive && loadArchive != null)
+                        if (browsableObjectInfo.FileType == FileType.Archive && ArchiveLoader != null)
 
                             throw new IOException("The 'Open archive in archive' feature is currently not supported by the WinCopies framework.");
 

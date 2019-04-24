@@ -143,7 +143,7 @@ namespace WinCopies.IO
 
         //    get => ItemsLoader;
 
-        //    set => ItemsLoader = (LoadFolder)value;
+        //    set => ItemsLoader = (FolderLoader)value;
 
         //}
 

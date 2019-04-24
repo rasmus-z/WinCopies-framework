@@ -81,7 +81,7 @@ namespace WinCopies.IO
         ///// The <see cref="FileStream"/> for this <see cref="ShellObjectInfo"/> when it represents an archive file system item. See the remarks section.
         ///// </summary>
         ///// <remarks>
-        ///// This field is only used by the <see cref="ShellObjectInfo"/>, <see cref="LoadFolder"/> and the <see cref="LoadArchive"/> classes in order to lock the file that the <see cref="ShellObjectInfo"/> represents when the items of the archive are loaded.
+        ///// This field is only used by the <see cref="ShellObjectInfo"/>, <see cref="FolderLoader"/> and the <see cref="ArchiveLoader"/> classes in order to lock the file that the <see cref="ShellObjectInfo"/> represents when the items of the archive are loaded.
         ///// </remarks>
         //public FileStream ArchiveFileStream { get => _archiveFileStream; internal set => OnPropertyChanged(nameof(ArchiveFileStream), nameof(_archiveFileStream), value, typeof(ShellObjectInfo)); }
 

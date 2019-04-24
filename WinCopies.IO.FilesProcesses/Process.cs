@@ -23,17 +23,17 @@ namespace WinCopies.IO.FileProcesses
 
         {
 
-            var (propertyChanged, oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
         }
 
-        protected void OnPropertyChangedWhenNotBusy(string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy)
+        protected void OnPropertyChangedWhenNotBusy(string propertyName, string fieldName, object newValue, Type declaringType)
 
         {
 
-            var (propertyChanged, oldValue) = Extensions.SetPropertyWhenNotBusy(this, propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = WinCopies.Util.Util.SetPropertyWhenNotBusy(this, propertyName, fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
@@ -280,25 +280,25 @@ namespace WinCopies.IO.FileProcesses
 
         public int StartItemIndex { get => _startItemIndex; set => OnPropertyChanged(nameof(StartItemIndex), nameof(_startItemIndex), value, typeof(Process)); }
 
-        // private LoadFilesInfo _filesInfoLoader = null;
+        // private FilesInfoLoader _filesInfoLoader = null;
 
         // TODO : utile en tant que champ/propriété ? meilleur nom ? 
 
-        private LoadFilesInfo _loadFilesInfo = null;
+        private FilesInfoLoader _FilesInfoLoader = null;
 
         /// <summary>
         /// Gets the loader of the files and folders for this process.
         /// </summary>
-        public LoadFilesInfo FilesInfoLoader
+        public FilesInfoLoader FilesInfoLoader
         {
-            get => _loadFilesInfo; set
+            get => _FilesInfoLoader; set
             {
 
-                // FilesInfoLoader.RunWorkerCompleted += loadFilesInfo_RunWorkerCompleted;
+                // FilesInfoLoader.RunWorkerCompleted += FilesInfoLoader_RunWorkerCompleted;
 
                 // FilesInfoLoader.PathsInfo = pathsInfo;
 
-                OnPropertyChanged(nameof(FilesInfoLoader), nameof(_loadFilesInfo), value, typeof(Process));
+                OnPropertyChanged(nameof(FilesInfoLoader), nameof(_FilesInfoLoader), value, typeof(Process));
 
                 value.ActionType = ActionType.Copy;
             }
@@ -348,7 +348,7 @@ namespace WinCopies.IO.FileProcesses
 
         //public event EventHandler<CopyProgressChangedEventArgs> ProgressChanged;
 
-        //  public Process() => SetProperties(new LoadFilesInfo()); // { PathsInfo = null; }
+        //  public Process() => SetProperties(new FilesInfoLoader()); // { PathsInfo = null; }
 
         // public Process() => SetProperties();
         // {
@@ -435,7 +435,7 @@ namespace WinCopies.IO.FileProcesses
         //    ProgressChanged?.Invoke(this, eventArgs);
         //}
 
-        // public void LoadFilesInfo() => _filesInfoLoader.LoadAsync();
+        // public void FilesInfoLoader() => _filesInfoLoader.LoadAsync();
     }
 
 }

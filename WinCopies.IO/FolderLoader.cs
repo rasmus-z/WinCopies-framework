@@ -75,7 +75,7 @@ namespace WinCopies.IO
                     try
                     {
 
-                        FileSystemWatcher = GetLoadFolderFileSystemWatcher();
+                        FileSystemWatcher = GetFolderLoaderFileSystemWatcher();
 
                         if ((((ShellObjectInfo)Path).FileType == FileType.Drive && new DriveInfo(((ShellObjectInfo)Path).Path).IsReady) || (((ShellObjectInfo)Path).FileType != FileType.Drive && ((ShellObjectInfo)Path).ShellObject.IsFileSystemObject))
 
@@ -108,7 +108,7 @@ namespace WinCopies.IO
         /// <para>When substituted in a derived class, provides a custom <see cref="FolderLoaderFileSystemWatcher"/>.</para>
         /// </summary>
         /// <returns>An instance of the <see cref="FolderLoaderFileSystemWatcher"/> class.</returns>
-        protected virtual FolderLoaderFileSystemWatcher GetLoadFolderFileSystemWatcher() => new FolderLoaderFileSystemWatcher();
+        protected virtual FolderLoaderFileSystemWatcher GetFolderLoaderFileSystemWatcher() => new FolderLoaderFileSystemWatcher();
 
         /// <summary>
         /// Frees all resources used by this <see cref="FolderLoader"/>.

@@ -535,7 +535,7 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        protected internal virtual void OnItemsControlContextMenuOpening(FrameworkElement sender, ISelector source, ContextMenuEventArgs e)
+        protected internal virtual void OnItemsControlContextMenuOpening(FrameworkElement sender, ISingleSettableSelector source, ContextMenuEventArgs e)
 
         {
 
@@ -1161,14 +1161,14 @@ namespace WinCopies.GUI.Explorer
 
             // if (path is ShellObjectInfo && (((ShellObjectInfo)path).FileType == FileTypes.Folder || ((ShellObjectInfo)path).FileType == FileTypes.Drive))
 
-            // if (BrowsableObjectInfoItemsLoader == null || BrowsableObjectInfoItemsLoader.GetType() != typeof(LoadFolder))
+            // if (BrowsableObjectInfoItemsLoader == null || BrowsableObjectInfoItemsLoader.GetType() != typeof(FolderLoader))
 
-            // BrowsableObjectInfoItemsLoader = new LoadFolder((ShellObjectInfo)path);
+            // BrowsableObjectInfoItemsLoader = new FolderLoader((ShellObjectInfo)path);
 
             SetValue(HeaderPropertyKey, path.LocalizedName);
 
 
-            // loadFolder.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) =>
+            // FolderLoader.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) =>
 
             SetValue(PathPropertyKey, path);
 

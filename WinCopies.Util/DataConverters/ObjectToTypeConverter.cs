@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace WinCopiesProcessesManager
+namespace WinCopies.Util.DataConverters
 {
     public class ObjectToTypeConverter : WinCopies.Util.DataConverters.ConverterBase
     {
