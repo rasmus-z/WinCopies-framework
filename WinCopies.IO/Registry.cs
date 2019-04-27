@@ -10,6 +10,7 @@ using static WinCopies.Util.Generic;
 using System.Drawing;
 using TsudaKageyu;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace WinCopies.IO
 {
@@ -472,7 +473,9 @@ namespace WinCopies.IO
 
             string defaultIconPath;
 
-            int iconIndex;
+            string iconName;
+
+            int? iconIndex;
 
             if ((_registryKey = registryKey.OpenSubKey("DefaultIcon")) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null)
 
@@ -482,7 +485,9 @@ namespace WinCopies.IO
                     ? "%SystemRoot%\\System32\\SHELL32.dll"
                     : GetOpenWithSoftwarePathFromCommand(defaultIconPath);
 
-                iconIndex = 0;
+                iconName = null;
+
+                iconIndex = null;
 
             }
 
@@ -498,59 +503,127 @@ namespace WinCopies.IO
 
                     subPaths = defaultIconPath.Split(',');
 
-                    if (int.TryParse(subPaths[subPaths.Length - 1], out iconIndex))
+                    string iconId = subPaths[subPaths.Length - 1];
+
+                    if (iconId.StartsWith("-"))
 
                     {
 
-                        bool ok = false;
+                        iconName = iconId.Substring(1);
 
-                        for (int i = 0; i < subPaths.Length - 1; i++)
-
-                            if (subPaths[i] != "")
-
-                            {
-
-                                ok = true;
-
-                                break;
-
-                            }
-
-                        if (ok)
-
-                        {
-
-                            StringBuilder stringBuilder = new StringBuilder();
-
-                            for (int i = 0; i < subPaths.Length - 1; i++)
-
-                                stringBuilder.Append(subPaths[i]);
-
-                            defaultIconPath = stringBuilder.ToString();
-
-                        }
-
-                        else
-
-                            throw new RegistryException("Invalid DefaultIcon registry value.", null, registryKey.Name);
+                        iconIndex = null;
 
                     }
 
                     else
 
-                        iconIndex = 0;
+                    {
+
+                        int _iconIndex;
+
+                        if (int.TryParse(iconId, out _iconIndex))
+
+                        {
+
+                            iconIndex = _iconIndex;
+
+                            iconName = null;
+
+                        }
+
+                        else
+
+                        {
+
+                            iconName = iconId;
+
+                            iconIndex = null;
+
+                        }
+
+                    }
+
+                        StringBuilder stringBuilder = new StringBuilder();
+
+                        for (int i = 0; i < subPaths.Length - 1; i++)
+
+                            stringBuilder.Append(subPaths[i]);
+
+                        defaultIconPath = stringBuilder.ToString();
+
+                        if (defaultIconPath == "")
+
+                            throw new RegistryException("Invalid DefaultIcon registry value.", null, registryKey.Name);
 
                 }
 
                 else
 
-                    iconIndex = 0;
+                {
+
+                    iconName = null;
+
+                    iconIndex = null;
+
+                }
 
             }
 
-            return new IconExtractor(Path.GetRealPathFromEnvironmentVariables(defaultIconPath)).GetIcon(iconIndex).Split();
+            defaultIconPath = Path.GetRealPathFromEnvironmentVariables(defaultIconPath);
 
+            //try
+            //{
+
+            //    var obj = WinCopies.Win32Interop.Icon.ExtractIconFromExe(defaultIconPath, iconIndex.Value, true)?.Split();
+
+            //    Debug.WriteLine("obj.Length: " + obj.Length);
+
+            //}
+            //catch (Exception) { }
+
+            System.Drawing.IconLib.MultiIcon m = new System.Drawing.IconLib.MultiIcon();
+
+            m.SelectedIndex = -1;
+
+            m.Load(defaultIconPath);
+
+            System.Drawing.IconLib.SingleIcon obj = null;
+
+            if (!iconIndex.HasValue && iconName == null)
+
+                iconIndex = 0;
+
+            if (iconIndex.HasValue)
+
+                obj = m.ToList()[iconIndex.Value];
+
+            else /*if (iconName != null)*/
+
+            {
+
+                foreach (System.Drawing.IconLib.SingleIcon _obj in m)
+
+                    if (_obj.Name == iconName)
+
+                    {
+
+                        obj = _obj;
+
+                        break;
+
+                    }
+
+                if (obj == null)
+
+                    obj = m.ToList()[0];
+
+            }
+
+            return obj.Icon.Split(); //return defaultIconPath.EndsWith(".ico")
+            //    ? new Icon(defaultIconPath).Split() : !iconIndex.HasValue ? Icon.ExtractAssociatedIcon(defaultIconPath).Split()
+            //    : WinCopies.Win32Interop.Icon.ExtractIconFromExe(defaultIconPath, iconIndex.Value, true)?.Split();
         }
 
     }
+
 }

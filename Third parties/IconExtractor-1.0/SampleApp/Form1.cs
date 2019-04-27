@@ -34,6 +34,7 @@ namespace SampleApp
 
         private void btnPickFile_Click(object sender, EventArgs e)
         {
+            MessageBox.Show((unchecked((uint)-69)).ToString());
             var result = iconPickerDialog.ShowDialog(this);
             if (result == DialogResult.OK)
             {

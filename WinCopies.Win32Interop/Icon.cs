@@ -1,4 +1,70 @@
-﻿//using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+
+using static WinCopies.Win32NativeInterop.NativeMethods;
+
+namespace WinCopies.Win32Interop
+{
+
+
+    /*
+     * Example using ExtractIconEx
+     * Created by Martin Hyldahl (alanadin@post8.tele.dk)
+     * http://www.hyldahlnet.dk
+     */
+
+    public static class Icon
+    {
+
+        public static System.Drawing.Icon ExtractIconFromExe(string file, int index, bool large)
+        {
+            int readIconCount = 0;
+            IntPtr[] hDummy = new IntPtr[1] { IntPtr.Zero };
+            IntPtr[] hIconEx = new IntPtr[1] { IntPtr.Zero };
+
+            try
+            {
+                if (large)
+                    readIconCount = ExtractIconEx(file, index, hIconEx, hDummy, 1);
+                else
+                    readIconCount = ExtractIconEx(file, index, hDummy, hIconEx, 1);
+
+                if (readIconCount > 0 && hIconEx[0] != IntPtr.Zero)
+                {
+                    // GET FIRST EXTRACTED ICON
+                   System.Drawing. Icon extractedIcon = (System.Drawing.Icon)System.Drawing.Icon.FromHandle(hIconEx[0]).Clone();
+
+                    return extractedIcon;
+                }
+                else // NO ICONS READ
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                /* EXTRACT ICON ERROR */
+
+                // BUBBLE UP
+                throw new ApplicationException("Could not extract icon", ex);
+            }
+            finally
+            {
+                // RELEASE RESOURCES
+                foreach (IntPtr ptr in hIconEx)
+                    if (ptr != IntPtr.Zero)
+                        DestroyIcon(ptr);
+
+                foreach (IntPtr ptr in hDummy)
+                    if (ptr != IntPtr.Zero)
+                        DestroyIcon(ptr);
+            }
+        }
+    }
+}
+//using System;
 //using System.Collections.Generic;
 //using System.ComponentModel;
 //using System.Linq;

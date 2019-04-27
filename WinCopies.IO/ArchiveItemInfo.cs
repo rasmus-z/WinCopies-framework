@@ -37,9 +37,14 @@ namespace WinCopies.IO
 
         public override string Name => System.IO.Path.GetFileName(Path);
 
-        private Icon TryGetIcon(System.Drawing.Size size) => System.IO.Path.HasExtension(Path)
-                ? Registry.GetIconVariationsFromFileType(Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path)))?.TryGetIcon(size, 32, true, true)
-                : new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, 32, true, true);
+        private Icon TryGetIcon(System.Drawing.Size size)
+        {
+            Debug.WriteLine(Path);
+            string fileType = System.IO.Path.HasExtension(Path) ? Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path)) : null;
+            return fileType != null
+? Registry.GetIconVariationsFromFileType(fileType)?.TryGetIcon(size, 32, true, true)
+: new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, 32, true, true);
+        }
 
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.

@@ -42,10 +42,10 @@
         // /// Le processus est une recherche de fichiers et dossiers dont certaines caractéristiques correspondent à celles passées au processus de recherche et définient généralement par l'utilisateur.
         // /// </summary>
 
-        /// <summary>
-        /// The process is a file search.
-        /// </summary>
-        Search = 5
+        // /// <summary>
+        // /// The process is a file search.
+        // /// </summary>
+        // Search = 5
 
     }
 

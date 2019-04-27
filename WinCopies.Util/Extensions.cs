@@ -176,7 +176,7 @@ namespace WinCopies.Util
 
         }
 
-        public static bool CheckPropertySetIntegrity(Type propertyObjectType, string propertyName, out string methodName, int skipFramesForStackFrame, BindingFlags bindingFlags = Util. DefaultBindingFlagsForPropertySet)
+        public static bool CheckPropertySetIntegrity(Type propertyObjectType, string propertyName, out string methodName, int skipFramesForStackFrame, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
 
@@ -220,7 +220,7 @@ namespace WinCopies.Util
 
         }
 
-        public static (bool propertyChanged, object oldValue) SetProperty(this INotifyPropertyChanged obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util. DefaultBindingFlagsForPropertySet)
+        public static (bool propertyChanged, object oldValue) SetProperty(this INotifyPropertyChanged obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
 
@@ -313,7 +313,7 @@ namespace WinCopies.Util
 
         {
 
-            IList<T> sorted = oc.OrderBy(x => x).ToList();
+            IList<T> sorted = oc.OrderBy(x => x).ToList<T>();
 
             for (int i = 0; i < sorted.Count; i++)
 
@@ -331,7 +331,7 @@ namespace WinCopies.Util
 
         {
 
-            IList<T> sorted = oc.OrderBy(x => x, comparer).ToList();
+            IList<T> sorted = oc.OrderBy(x => x, comparer).ToList<T>();
 
             for (int i = 0; i < sorted.Count; i++)
 
@@ -514,19 +514,19 @@ namespace WinCopies.Util
 
         }
 
-        public static List<T> ToList<T>(this IEnumerable<T> array)
+        //public static List<T> ToList<T>(this IEnumerable<T> array)
 
-        {
+        //{
 
-            List<T> arrayList = new List<T>();
+        //    List<T> arrayList = new List<T>();
 
-            foreach (T value in array)
+        //    foreach (T value in array)
 
-                arrayList.Add(value);
+        //        arrayList.Add(value);
 
-            return arrayList;
+        //    return arrayList;
 
-        }
+        //}
 
         public static void AddRange(this IList collection, IEnumerable array)
 
@@ -564,7 +564,7 @@ namespace WinCopies.Util
 
         {
 
-            List<T> arrayList = array.ToList();
+            List<T> arrayList = array.ToList<T>();
 
             for (int i = start; i < length; i++)
 
@@ -712,7 +712,7 @@ namespace WinCopies.Util
 
             while (source != null && source is FrameworkElement && (typeEquality ? source.GetType() != type : !type.IsAssignableFrom(source.GetType())));
 
-            return (T) source;
+            return (T)source;
 
         }
 

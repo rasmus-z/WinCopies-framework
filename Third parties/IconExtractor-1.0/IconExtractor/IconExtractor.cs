@@ -45,8 +45,8 @@ namespace TsudaKageyu
 
         // Resource types for EnumResourceNames().
 
-        private readonly static IntPtr RT_ICON = (IntPtr)3;
-        private readonly static IntPtr RT_GROUP_ICON = (IntPtr)14;
+        private static readonly IntPtr RT_ICON = (IntPtr)3;
+        private static readonly IntPtr RT_GROUP_ICON = (IntPtr)14;
 
         private const int MAX_PATH = 260;
 
@@ -113,7 +113,7 @@ namespace TsudaKageyu
         private void Initialize(string fileName)
         {
             if (fileName == null)
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
 
             IntPtr hModule = IntPtr.Zero;
             try
@@ -126,16 +126,16 @@ namespace TsudaKageyu
 
                 // Enumerate the icon resource and build .ico files in memory.
 
-                var tmpData = new List<byte[]>();
+                List<byte[]> tmpData = new List<byte[]>();
 
-                ENUMRESNAMEPROC callback = (h, t, name, l) =>
+                bool callback(IntPtr h, IntPtr t, IntPtr name, IntPtr l)
                 {
                     // Refer the following URL for the data structures used here:
                     // http://msdn.microsoft.com/en-us/library/ms997538.aspx
 
                     // RT_GROUP_ICON resource consists of a GRPICONDIR and GRPICONDIRENTRY's.
 
-                    var dir = GetDataFromResource(hModule, RT_GROUP_ICON, name);
+                    byte[] dir = GetDataFromResource(hModule, RT_GROUP_ICON, name);
 
                     // Calculate the size of an entire .icon file.
 
@@ -144,7 +144,7 @@ namespace TsudaKageyu
                     for (int i = 0; i < count; ++i)
                         len += BitConverter.ToInt32(dir, 6 + 14 * i + 8);   // GRPICONDIRENTRY.dwBytesInRes
 
-                    using (var dst = new BinaryWriter(new MemoryStream(len)))
+                    using (BinaryWriter dst = new BinaryWriter(new MemoryStream(len)))
                     {
                         // Copy GRPICONDIR to ICONDIR.
 
@@ -157,7 +157,7 @@ namespace TsudaKageyu
                             // Load the picture.
 
                             ushort id = BitConverter.ToUInt16(dir, 6 + 14 * i + 12);    // GRPICONDIRENTRY.nID
-                            var pic = GetDataFromResource(hModule, RT_ICON, (IntPtr)id);
+                            byte[] pic = GetDataFromResource(hModule, RT_ICON, (IntPtr)id);
 
                             // Copy GRPICONDIRENTRY to ICONDIRENTRY.
 
@@ -179,7 +179,7 @@ namespace TsudaKageyu
                     }
 
                     return true;
-                };
+                }
                 NativeMethods.EnumResourceNames(hModule, RT_GROUP_ICON, callback, IntPtr.Zero);
 
                 iconData = tmpData.ToArray();

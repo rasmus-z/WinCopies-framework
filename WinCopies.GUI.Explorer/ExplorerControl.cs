@@ -499,17 +499,17 @@ namespace WinCopies.GUI.Explorer
 
                     oldValue.Dispose();
 
-                oldValue.Items.CollectionChanging -= Items_CollectionChanging;
+                // oldValue.Items.CollectionChanging -= Items_CollectionChanging;
 
                 listViewItems.Clear();
 
-                SetValue(VisibleItemsCountPropertyKey, 0);
+                // SetValue(VisibleItemsCountPropertyKey, 0);
 
             }
 
             // ((INotifyCollectionChanging)newValue.Items).CollectionChanging += Path_CollectionChanging;
 
-            newValue.Items.CollectionChanging += Items_CollectionChanging;
+            // newValue.Items.CollectionChanging += Items_CollectionChanging;
 
         }
 
@@ -728,7 +728,9 @@ namespace WinCopies.GUI.Explorer
 
                 };
 
-                ListView.ItemContainerGenerator.StatusChanged += ItemContainerGenerator_StatusChanged;
+                // ListView.ItemContainerGenerator.StatusChanged += ItemContainerGenerator_StatusChanged;
+
+                ListView.ItemContainerGenerator.ItemsChanged += ItemContainerGenerator_ItemsChanged;
 
             }
 
@@ -736,44 +738,63 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        protected virtual void OnItemsCollectionChanging(Util.NotifyCollectionChangedEventArgs e)
+        private void ItemContainerGenerator_ItemsChanged(object sender, System.Windows.Controls.Primitives.ItemsChangedEventArgs e)
+
         {
+            Debug.WriteLine("ici: " + e.Action.ToString() + " " + e.ItemCount);
+            if (e.Action == NotifyCollectionChangedAction.Add)
 
-            if (ListView != null && ListView.ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
+                SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount + e.ItemCount);
 
-            {
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
 
-                ListViewItem item;
+                SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - e.ItemCount);
 
-                if (e.OldItems != null)
+            else if (e.Action == NotifyCollectionChangedAction.Reset)
 
-                    for (int i = 0; i < e.OldItems.Count; i++)
-
-                    {
-
-                        item = (ListViewItem)ListView.ItemContainerGenerator.ContainerFromIndex(e.OldStartingIndex + i);
-
-                        if (listViewItems.Contains(item))
-
-                        {
-
-                            listViewItems.Remove(item);
-
-                            SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - 1);
-
-                        }
-
-                    }
-
-                if (e.NewItems != null)
-
-                    UpdateVisibleItemsCount();
-
-            }
+                SetValue(VisibleItemsCountPropertyKey, ListView.ItemContainerGenerator.Items.Count);
 
         }
 
-        private void Items_CollectionChanging(object sender, Util.NotifyCollectionChangedEventArgs e) => OnItemsCollectionChanging(e);
+        //protected virtual void OnItemsCollectionChanging(Util.NotifyCollectionChangedEventArgs e)
+        //{
+        //    Debug.WriteLine("OnItemsCollectionChanging: 1");
+        //    Debug.WriteLine("OnItemsCollectionChanging: " + e.Action.ToString());
+        //    if (ListView != null && ListView.ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
+
+        //    {
+        //        Debug.WriteLine("OnItemsCollectionChanging: 2");
+        //        ListViewItem item;
+
+        //        if (e.OldItems != null)
+
+        //            for (int i = 0; i < e.OldItems.Count; i++)
+
+        //            {
+        //                Debug.WriteLine("OnItemsCollectionChanging: 3");
+        //                item = (ListViewItem)ListView.ItemContainerGenerator.ContainerFromIndex(e.OldStartingIndex + i);
+
+        //                if (listViewItems.Contains(item))
+
+        //                {
+
+        //                    listViewItems.Remove(item);
+
+        //                    SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - 1);
+
+        //                }
+
+        //            }
+
+        //        if (e.NewItems != null)
+
+        //            UpdateVisibleItemsCount();
+
+        //    }
+
+        //}
+
+        //private void Items_CollectionChanging(object sender, Util.NotifyCollectionChangedEventArgs e) => OnItemsCollectionChanging(e);
 
         private readonly List<ListViewItem> listViewItems = new List<ListViewItem>();
 
@@ -815,7 +836,7 @@ namespace WinCopies.GUI.Explorer
 
                         listViewItems.RemoveAt(i);
 
-                        SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - 1);
+                       // SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - 1);
 
                     }
 

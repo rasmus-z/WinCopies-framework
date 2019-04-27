@@ -46,7 +46,7 @@ namespace WinCopies.IO
 
             dic.Add(InArchiveFormat.Arj, new string[] { ".arj" });
 
-            dic.Add(InArchiveFormat.BZip2, new string[] { ".bz2" });
+            dic.Add(InArchiveFormat.BZip2, new string[] { ".bz2", ".tar", ".xz" });
 
             dic.Add(InArchiveFormat.Cab, new string[] { ".cab" });
 
