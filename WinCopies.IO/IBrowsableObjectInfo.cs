@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Windows.Media.Imaging;
 
 namespace WinCopies.IO
 {
@@ -9,6 +10,26 @@ namespace WinCopies.IO
     /// </summary>
     public interface IBrowsableObjectInfo : IFileSystemObject, INotifyPropertyChanged, IDisposable
     {
+
+        /// <summary>
+        /// Gets the small <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        BitmapSource SmallBitmapSource { get; }
+
+        /// <summary>
+        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        BitmapSource MediumBitmapSource { get; }
+
+        /// <summary>
+        /// Gets the large <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        BitmapSource LargeBitmapSource { get; }
+
+        /// <summary>
+        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        BitmapSource ExtraLargeBitmapSource { get; }
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is browsable.
