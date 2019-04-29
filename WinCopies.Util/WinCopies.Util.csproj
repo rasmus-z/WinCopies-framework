@@ -110,6 +110,7 @@
     <Compile Include="Commands\FileSystemCommands.cs" />
     <Compile Include="Commands\NavigationAndWindowCommands.cs" />
     <Compile Include="DataConverters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="DataConverters\CoalesceConverter.cs" />
     <Compile Include="DataConverters\ConverterBase.cs" />
     <Compile Include="DataConverters\EnumToBooleanConverter.cs" />
     <Compile Include="DataConverters\EnumToReversedBooleanConverter.cs" />

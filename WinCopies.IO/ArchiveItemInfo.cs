@@ -39,11 +39,33 @@ namespace WinCopies.IO
 
         private Icon TryGetIcon(System.Drawing.Size size)
         {
-            Debug.WriteLine(Path);
-            string fileType = System.IO.Path.HasExtension(Path) ? Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path)) : null;
-            return fileType != null
-? Registry.GetIconVariationsFromFileType(fileType)?.TryGetIcon(size, 32, true, true)
-: new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, 32, true, true);
+
+            if (System.IO.Path.HasExtension(Path))
+
+                if (Path.EndsWith(".exe"))
+
+                    return new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\imageres.dll")).GetIcon(11).Split()?.TryGetIcon(size, 32, true, true);
+
+                else
+
+                {
+
+                    string fileType = Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path));
+
+                    Icon icon = null;
+
+                    if (fileType != null)
+
+                        icon = Registry.GetIconVariationsFromFileType(fileType)?.TryGetIcon(size, 32, true, true);
+
+                    return icon ?? new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, 32, true, true);
+
+                }
+
+            else
+
+                return new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, 32, true, true);
+
         }
 
         /// <summary>

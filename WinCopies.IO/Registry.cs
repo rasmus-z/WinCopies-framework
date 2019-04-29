@@ -543,17 +543,17 @@ namespace WinCopies.IO
 
                     }
 
-                        StringBuilder stringBuilder = new StringBuilder();
+                    StringBuilder stringBuilder = new StringBuilder();
 
-                        for (int i = 0; i < subPaths.Length - 1; i++)
+                    for (int i = 0; i < subPaths.Length - 1; i++)
 
-                            stringBuilder.Append(subPaths[i]);
+                        stringBuilder.Append(subPaths[i]);
 
-                        defaultIconPath = stringBuilder.ToString();
+                    defaultIconPath = stringBuilder.ToString();
 
-                        if (defaultIconPath == "")
+                    if (defaultIconPath == "")
 
-                            throw new RegistryException("Invalid DefaultIcon registry value.", null, registryKey.Name);
+                        throw new RegistryException("Invalid DefaultIcon registry value.", null, registryKey.Name);
 
                 }
 
@@ -569,7 +569,21 @@ namespace WinCopies.IO
 
             }
 
-            defaultIconPath = Path.GetRealPathFromEnvironmentVariables(defaultIconPath);
+            try
+
+            {
+
+                defaultIconPath = Path.GetRealPathFromEnvironmentVariables(defaultIconPath);
+
+            }
+
+            catch (Exception)
+
+            {
+
+                return null;
+
+            }
 
             //try
             //{
