@@ -58,6 +58,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="IconExtractor, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Third parties\IconExtractor-1.0\IconExtractor\bin\x64\Debug\IconExtractor.dll</HintPath>
+    </Reference>
     <Reference Include="IconLib">
       <HintPath>..\Third parties\IconLib\IconLib_src\IconLib\bin\x64\Debug\IconLib.dll</HintPath>
     </Reference>
@@ -175,12 +179,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Third parties\IconExtractor-1.0\IconExtractor\IconExtractor.csproj">
-      <Project>{FDFD4EEB-C202-4D93-A6E9-D8984A12D014}</Project>
-      <Name>IconExtractor</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

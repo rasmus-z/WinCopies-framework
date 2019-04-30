@@ -22,6 +22,8 @@ namespace WinCopies.Util
     public static class Extensions
     {
 
+        #region Enumerable extension methods
+
         public static bool AddIfNotContains<T>(this IList<T> collection, T value)
 
         {
@@ -107,6 +109,361 @@ namespace WinCopies.Util
             return false;
 
         }
+
+        #region AddRange methods
+
+        public static void AddRange(this IList collection, IEnumerable array)
+
+        {
+
+            foreach (object item in array)
+
+                collection.Add(item);
+
+        }
+
+        public static void AddRange(this IList collection, IEnumerable array, int start, int length)
+
+        {
+
+            ArrayList arrayList = array.ToList();
+
+            for (int i = start; i < length; i++)
+
+                collection.Add(arrayList[i]);
+
+        }
+
+        public static void AddRange<T>(this IList<T> collection, IEnumerable<T> array)
+
+        {
+
+            foreach (T item in array)
+
+                collection.Add(item);
+
+        }
+
+        public static void AddRange<T>(this IList<T> collection, IEnumerable<T> array, int start, int length)
+
+        {
+
+            List<T> arrayList = array.ToList<T>();
+
+            for (int i = start; i < length; i++)
+
+                collection.Add(arrayList[i]);
+
+        }
+
+        #endregion
+
+        public static ArrayList ToList(this IEnumerable array) => array.ToList(0, null);
+
+        /// <summary>
+        /// Converts an <see cref="IEnumerable"/> to an <see cref="ArrayList"/> from a given index for a given length.
+        /// </summary>
+        /// <param name="array">The <see cref="IEnumerable"/> to convert</param>
+        /// <param name="startIndex">The index from which start the conversion.</param>
+        /// <param name="length">The length of items to copy in the out <see cref="ArrayList"/>. Left this parameter to null if you want to copy all the source <see cref="IEnumerable"/>.</param>
+        /// <returns>The result <see cref="ArrayList"/>.</returns>
+        public static ArrayList ToList(this IEnumerable array, int startIndex, int? length)
+
+        {
+
+            ArrayList arrayList = new ArrayList();
+
+            int i = 0;
+
+            int count = 0;
+
+            foreach (object value in array)
+
+            {
+
+                if (i < startIndex)
+
+                    i++;
+
+                else
+
+                {
+
+                    arrayList.Add(value);
+
+                    count++;
+
+                }
+
+                if (count == length)
+
+                    break;
+
+            }
+
+            return arrayList;
+
+        }
+
+        //public static List<T> ToList<T>(this IEnumerable<T> array)
+
+        //{
+
+        //    List<T> arrayList = new List<T>();
+
+        //    foreach (T value in array)
+
+        //        arrayList.Add(value);
+
+        //    return arrayList;
+
+        //}
+
+        /// <summary>
+        /// Converts an <see cref="IEnumerable"/> to a <see cref="List{T}"/> from a given index for a given length.
+        /// </summary>
+        /// <param name="array">The <see cref="IEnumerable"/> to convert</param>
+        /// <param name="startIndex">The index from which start the conversion.</param>
+        /// <param name="length">The length of items to copy in the out <see cref="List{T}"/>. Left this parameter to null if you want to copy all the source <see cref="IEnumerable"/>.</param>
+        /// <returns>The result <see cref="List{T}"/>.</returns>
+        public static List<T> ToList<T>(this IEnumerable<T> array, int startIndex, int? length)
+
+        {
+
+            List<T> arrayList = new List<T>();
+
+            int i = 0;
+
+            int count = 0;
+
+            foreach (T value in array)
+
+            {
+
+                if (i < startIndex)
+
+                    i++;
+
+                else
+
+                {
+
+                    arrayList.Add(value);
+
+                    count++;
+
+                }
+
+                if (count == length)
+
+                    break;
+
+            }
+
+            return arrayList;
+
+        }
+
+        public static Array ToArray(this IEnumerable array, int startIndex, int length)
+
+        {
+
+            object[] _array = new object[length];
+
+            int i = 0;
+
+            int count = 0;
+
+            foreach (object value in array)
+
+            {
+
+                if (i < startIndex)
+
+                    i++;
+
+                else
+
+                    _array[count++] = value;
+
+                if (count == length)
+
+                    break;
+
+            }
+
+            return _array;
+
+        }
+
+        public static T[] ToArray<T>(this IEnumerable<T> array, int startIndex, int length)
+
+        {
+
+            T[] _array = new T[length];
+
+            int i = 0;
+
+            int count = 0;
+
+            foreach (T value in array)
+
+            {
+
+                if (i < startIndex)
+
+                    i++;
+
+                else
+
+                    _array[count++] = value;
+
+                if (count == length)
+
+                    break;
+
+            }
+
+            return _array;
+
+        }
+
+        public static ArrayList ToList(this object[] array, int startIndex, int length)
+
+        {
+
+            ArrayList arrayList = new ArrayList();
+
+            int count = startIndex + length;
+
+            int i;
+
+            for (i = startIndex; i < count; i++)
+
+                arrayList.Add(array[i]);
+
+            return arrayList;
+
+        }
+
+        public static List<T> ToList<T>(this T[] array, int startIndex, int length)
+
+        {
+
+            List<T> arrayList = new List<T>();
+
+            int count = startIndex + length;
+
+            int i;
+
+            for (i = startIndex; i < count; i++)
+
+                arrayList.Add(array[i]);
+
+            return arrayList;
+
+        }
+
+        public static Array ToArray(this IList arrayList, int startIndex, int length)
+
+        {
+
+            object[] array = new object[length];
+
+            int i;
+
+            for (i = 0; i < length; i++)
+
+                array[i] = arrayList[i + startIndex];
+
+            return array;
+
+        }
+
+        public static T[] ToArray<T>(this IList<T> arrayList, int startIndex, int length)
+
+        {
+
+            T[] array = new T[length];
+
+            int i;
+
+            for (i = 0; i < length; i++)
+
+                array[i] = arrayList[i + startIndex];
+
+            return array;
+
+        }
+
+        /// <summary>
+        /// Removes multiple items in an <see cref="IList"/> collection, from a start index to a given length.
+        /// </summary>
+        /// <param name="collection">The collection from which remove the items.</param>
+        /// <param name="start">The start index in the collection from which delete the items.</param>
+        /// <param name="length">The length to remove.</param>
+        public static void RemoveRange(this IList collection, int start, int length)
+
+        {
+
+            for (int i = 0; i < length; i++)
+
+                collection.RemoveAt(start + i);
+
+        }
+
+        /// <summary>
+        /// Appends data to the table. The item type is not checked. Arrays must have only a dimension.
+        /// </summary>
+        /// <param name="array">The source table.</param>
+        /// <param name="arrays">The tables to concatenate.</param>
+        /// <returns></returns>
+        public static Array Append(this Array array, params Array[] arrays) => Util.Concatenate((object[])array, arrays);
+
+        /// <summary>
+        /// Appends data to the table using the <see cref="Array.LongLength"/> length property. The item type is not checked. Arrays must have only a dimension.
+        /// </summary>
+        /// <param name="array">The source table.</param>
+        /// <param name="arrays">The tables to concatenate.</param>
+        /// <returns></returns>
+        public static Array AppendLong(this Array array, params Array[] arrays) => Util.ConcatenateLong((object[])array, arrays);
+
+        /// <summary>
+        /// Sort an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
+        /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
+        public static void Sort<T>(this System.Collections.ObjectModel.ObservableCollection<T> oc)
+
+        {
+
+            IList<T> sorted = oc.OrderBy(x => x).ToList<T>();
+
+            for (int i = 0; i < sorted.Count; i++)
+
+                oc.Move(oc.IndexOf(sorted[i]), i);
+
+        }
+
+        /// <summary>
+        /// Sort an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> with a user-defined comparer.
+        /// </summary>
+        /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
+        /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
+        /// <param name="comparer">An <see cref="IComparer{T}"/> providing comparison for sorting the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</param>
+        public static void Sort<T>(this System.Collections.ObjectModel.ObservableCollection<T> oc, IComparer<T> comparer)
+
+        {
+
+            IList<T> sorted = oc.OrderBy(x => x, comparer).ToList<T>();
+
+            for (int i = 0; i < sorted.Count; i++)
+
+                oc.Move(oc.IndexOf(sorted[i]), i);
+
+        }
+
+        #endregion
 
         public static IEnumerable<TKey> GetKeys<TKey, TValue>(this KeyValuePair<TKey, TValue>[] array)
 
@@ -288,57 +645,6 @@ namespace WinCopies.Util
 
         }
 
-        /// <summary>
-        /// Appends data to the table. The item type is not checked. Arrays must have only a dimension.
-        /// </summary>
-        /// <param name="array">The source table.</param>
-        /// <param name="arrays">The tables to concatenate.</param>
-        /// <returns></returns>
-        public static Array Append(this Array array, params Array[] arrays) => Util.Concatenate((object[])array, arrays);
-
-        /// <summary>
-        /// Appends data to the table using the <see cref="Array.LongLength"/> length property. The item type is not checked. Arrays must have only a dimension.
-        /// </summary>
-        /// <param name="array">The source table.</param>
-        /// <param name="arrays">The tables to concatenate.</param>
-        /// <returns></returns>
-        public static Array AppendLong(this Array array, params Array[] arrays) => Util.ConcatenateLong((object[])array, arrays);
-
-        /// <summary>
-        /// Sort an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
-        /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
-        public static void Sort<T>(this System.Collections.ObjectModel.ObservableCollection<T> oc)
-
-        {
-
-            IList<T> sorted = oc.OrderBy(x => x).ToList<T>();
-
-            for (int i = 0; i < sorted.Count; i++)
-
-                oc.Move(oc.IndexOf(sorted[i]), i);
-
-        }
-
-        /// <summary>
-        /// Sort an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> with a user-defined comparer.
-        /// </summary>
-        /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
-        /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
-        /// <param name="comparer">An <see cref="IComparer{T}"/> providing comparison for sorting the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</param>
-        public static void Sort<T>(this System.Collections.ObjectModel.ObservableCollection<T> oc, IComparer<T> comparer)
-
-        {
-
-            IList<T> sorted = oc.OrderBy(x => x, comparer).ToList<T>();
-
-            for (int i = 0; i < sorted.Count; i++)
-
-                oc.Move(oc.IndexOf(sorted[i]), i);
-
-        }
-
         public static object GetNumValue(this Enum @enum, string enumName) => Convert.ChangeType(@enum.GetType().GetField(enumName).GetValue(@enum), Enum.GetUnderlyingType(@enum.GetType()));
 
         // public static object GetNumValue(this Enum @enum) => GetNumValue(@enum, @enum.ToString());
@@ -500,93 +806,7 @@ namespace WinCopies.Util
 
         }
 
-        public static ArrayList ToList(this IEnumerable array)
-
-        {
-
-            ArrayList arrayList = new ArrayList();
-
-            foreach (object value in array)
-
-                arrayList.Add(value);
-
-            return arrayList;
-
-        }
-
-        //public static List<T> ToList<T>(this IEnumerable<T> array)
-
-        //{
-
-        //    List<T> arrayList = new List<T>();
-
-        //    foreach (T value in array)
-
-        //        arrayList.Add(value);
-
-        //    return arrayList;
-
-        //}
-
-        public static void AddRange(this IList collection, IEnumerable array)
-
-        {
-
-            foreach (object item in array)
-
-                collection.Add(item);
-
-        }
-
-        public static void AddRange(this IList collection, IEnumerable array, int start, int length)
-
-        {
-
-            ArrayList arrayList = array.ToList();
-
-            for (int i = start; i < length; i++)
-
-                collection.Add(arrayList[i]);
-
-        }
-
-        public static void AddRange<T>(this IList<T> collection, IEnumerable<T> array)
-
-        {
-
-            foreach (T item in array)
-
-                collection.Add(item);
-
-        }
-
-        public static void AddRange<T>(this IList<T> collection, IEnumerable<T> array, int start, int length)
-
-        {
-
-            List<T> arrayList = array.ToList<T>();
-
-            for (int i = start; i < length; i++)
-
-                collection.Add(arrayList[i]);
-
-        }
-
-        /// <summary>
-        /// Removes multiple items in an <see cref="IList"/> collection, from a start index to a given length.
-        /// </summary>
-        /// <param name="collection">The collection from which remove the items.</param>
-        /// <param name="start">The start index in the collection from which delete the items.</param>
-        /// <param name="length">The length to remove.</param>
-        public static void RemoveRange(this IList collection, int start, int length)
-
-        {
-
-            for (int i = 0; i < length; i++)
-
-                collection.RemoveAt(start + i);
-
-        }
+        public static bool Between(this int i, int start, int length) => i >= start && i <= length;
 
         public static void Execute(this ICommand command, object commandParameter, IInputElement commandTarget)
 
@@ -692,8 +912,8 @@ namespace WinCopies.Util
         /// <summary>
         /// Searches for the first parent of an object which is assignable from a given type.
         /// </summary>
+        /// <typeparam name="T">The type to search</typeparam>
         /// <param name="source">The source object</param>
-        /// <param name="type">The type to search</param>
         /// <param name="typeEquality">Indicates whether to check for the exact type equality. <see langword="true"/> to only search for objects with same type than the given type, <see langword="false"/> to search for all objects of type for which the given type is assignable from.</param>
         /// <returns>The first object that was found, if any, otherwise null.</returns>
         public static T GetParent<T>(this DependencyObject source, bool typeEquality) where T : DependencyObject
