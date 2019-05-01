@@ -24,6 +24,13 @@ namespace WinCopies.Util
 
         #region Enumerable extension methods
 
+        /// <summary>
+        /// Tries to add a value to an <see cref="IList{T}"/> if it does not contain the value already.
+        /// </summary>
+        /// <typeparam name="T">The value type</typeparam>
+        /// <param name="collection">The collection to which try to add the value</param>
+        /// <param name="value">The value to try to add to the collection</param>
+        /// <returns><see langword="true"/> if the value has been added to the collection, otherwise <see langword="false"/>.</returns>
         public static bool AddIfNotContains<T>(this IList<T> collection, T value)
 
         {
