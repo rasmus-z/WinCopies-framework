@@ -174,15 +174,26 @@ namespace WinCopies.IO
 
         //}
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class.
+        /// </summary>
+        /// <param name="archiveShellObject">The <see cref="ShellObjectInfo"/> that correspond to the root path of the archive</param>
+        /// <param name="archiveFileInfo">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represent a folder that exists implicitly in the archive.</param>
+        /// <param name="path">The full path to this archive item</param>
+        /// <param name="fileType">The file type of this archive item</param>
         public ArchiveItemInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) : base(path, fileType)
 
         {
 
             if (fileType == FileType.SpecialFolder)
 
+                // todo:
+
                 throw new ArgumentException("'fileType' can't be a SpecialFolder.");
 
             if (archiveFileInfo.HasValue && !path.EndsWith(archiveFileInfo.Value.FileName))
+
+                // todo:
 
                 throw new ArgumentException($"'{nameof(path)}' must end with '{nameof(archiveFileInfo.Value.FileName)}'");
 
@@ -240,7 +251,7 @@ namespace WinCopies.IO
 
         }
 
-        public override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length && Path.Contains("\\") ? GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
+        public override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 

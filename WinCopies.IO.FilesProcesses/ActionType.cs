@@ -25,7 +25,7 @@
         /// <summary>
         /// The process is a file move to the Windows Recycle bin.
         /// </summary>
-        MoveToRecycleBin = 3,
+        Recycling = 3,
 
         // /// <summary>
         // /// Le processus de fichiers est une suppression. Si le processus marqué comme Deletion plutôt que comme Moving_To_Recycle_Bin ( valeur 2 ), cela signifie que les éléments marqués à supprimer sont effacés définitivement du système.

@@ -172,7 +172,7 @@ namespace WinCopies.Util
         /// </summary>
         /// <param name="array">The <see cref="IEnumerable"/> to convert</param>
         /// <param name="startIndex">The index from which start the conversion.</param>
-        /// <param name="length">The length of items to copy in the out <see cref="ArrayList"/>. Left this parameter to null if you want to copy all the source <see cref="IEnumerable"/>.</param>
+        /// <param name="length">The length of items to copy in the out <see cref="ArrayList"/>. Leave this parameter to null if you want to copy all the source <see cref="IEnumerable"/>.</param>
         /// <returns>The result <see cref="ArrayList"/>.</returns>
         public static ArrayList ToList(this IEnumerable array, int startIndex, int? length)
 
@@ -231,7 +231,7 @@ namespace WinCopies.Util
         /// </summary>
         /// <param name="array">The <see cref="IEnumerable"/> to convert</param>
         /// <param name="startIndex">The index from which start the conversion.</param>
-        /// <param name="length">The length of items to copy in the out <see cref="List{T}"/>. Left this parameter to null if you want to copy all the source <see cref="IEnumerable"/>.</param>
+        /// <param name="length">The length of items to copy in the out <see cref="List{T}"/>. Leave this parameter to null if you want to copy all the source <see cref="IEnumerable"/>.</param>
         /// <returns>The result <see cref="List{T}"/>.</returns>
         public static List<T> ToList<T>(this IEnumerable<T> array, int startIndex, int? length)
 

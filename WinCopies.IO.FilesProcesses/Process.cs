@@ -215,7 +215,7 @@ namespace WinCopies.IO.FileProcesses
         #endregion    
 
         /// <summary>
-        /// Determines the type of this process.
+        /// Gets the type of this process.
         /// </summary>
         public abstract ActionType ActionType { get; }    // { get => _actionType; private    set => OnPropertyChanged(nameof(ActionType), nameof(_actionType), value);    } 
 
@@ -308,9 +308,24 @@ namespace WinCopies.IO.FileProcesses
 
         public bool ExceptionsOccurred { get => _exceptionsOccurred; protected set => OnPropertyChanged(nameof(ExceptionsOccurred), nameof(_exceptionsOccurred), value, typeof(Process)); }
 
-        private Exceptions _exceptionsToRetry = Exceptions.None;
+        private readonly Exceptions _exceptionsToRetry = FileProcesses.Exceptions.None;
 
         public Exceptions ExceptionsToRetry { get => _exceptionsToRetry; set { OnPropertyChanged(nameof(ExceptionsToRetry), nameof(_exceptionsToRetry), value, typeof(Process)); } }
+
+        private readonly HowToRetry _howToRetryWhenExceptionOccured = HowToRetry.None;
+
+        /// <summary>
+        /// Gets or sets a value that indicates how to retry to copy the file system objects.
+        /// </summary>
+        /// <remarks>If this property is set, this property have to be set to null individually for all the path items.</remarks>
+        public HowToRetry HowToRetryWhenExceptionOccured
+        {
+
+            get => _howToRetryWhenExceptionOccured;
+
+            set => OnPropertyChangedWhenNotBusy(nameof(HowToRetryWhenExceptionOccured), nameof(_howToRetryWhenExceptionOccured), value, typeof(CopyProcessInfo));
+
+        }
 
         private bool _isPaused = false;
 
@@ -320,13 +335,24 @@ namespace WinCopies.IO.FileProcesses
 
         public bool PausePending { get => _pausePending; private set => OnPropertyChanged(nameof(PausePending), nameof(_pausePending), value, typeof(Process)); }
 
+        private FileSystemInfo _pausedFile = null;
+
+        /// <summary>
+        /// If a copy is paused during copying, this property gets the file paused, otherwise it returns null.
+        /// </summary>
+        public FileSystemInfo PausedFile { get => _pausedFile; protected set => OnPropertyChanged(nameof(PausedFile), nameof(_pausedFile), value, typeof(Process)); }
+
+        private int _pausedIndex = -1;
+
+        public int PausedIndex { get => _pausedIndex; protected set => OnPropertyChanged(nameof(PausedIndex), nameof(_pausedIndex), value, typeof(CopyProcessInfo)); }
+
         private System.Collections.ObjectModel.ObservableCollection<FileSystemInfo> _pausedFiles = null;
 
         protected System.Collections.ObjectModel.ObservableCollection<FileSystemInfo> _PausedFiles
 
         {
 
-            get => _pausedFiles;    
+            get => _pausedFiles;
 
             set
 
@@ -343,6 +369,13 @@ namespace WinCopies.IO.FileProcesses
         }
 
         public System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo> PausedFiles { get; private set; } = null;
+
+        protected System.Collections.ObjectModel.ObservableCollection<FileSystemInfo> ExceptionsProtected { get; } = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
+
+        /// <summary>
+        /// Gets a <see cref="System.Collections.ObjectModel.ReadOnlyObservableCollection{FileSystemInfo}"/> which represents the files for which a <see cref="WinCopies.IO.FileProcesses.Exceptions"/> exception has occurred.
+        /// </summary>
+        public System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo> Exceptions { get; private set; } = null;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -383,11 +416,13 @@ namespace WinCopies.IO.FileProcesses
 
             // FilesInfoLoader = filesInfoLoader;
 
+            Exceptions = new System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo>(ExceptionsProtected);
+
             WorkerReportsProgress = true;
 
             WorkerSupportsCancellation = true;
 
-            _PausedFiles = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();    
+            _PausedFiles = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
 
             _bgWorker.DoWork += (object sender, DoWorkEventArgs e) => DoWork?.Invoke(this, e);
 

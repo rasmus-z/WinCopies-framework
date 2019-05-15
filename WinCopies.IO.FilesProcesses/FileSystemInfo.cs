@@ -20,7 +20,7 @@ namespace WinCopies.IO.FileProcesses
         /// </summary>
         public FileType FileType { get; set; } = FileType.None;
 
-        public Exceptions _exception = Exceptions.None;
+        internal Exceptions _exception = Exceptions.None;
 
         /// <summary>
         /// Gets, if any, the exceptions occured with this <see cref="FileSystemInfo"/> when processing.

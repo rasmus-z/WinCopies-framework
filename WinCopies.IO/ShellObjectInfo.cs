@@ -306,7 +306,7 @@ namespace WinCopies.IO
         public override IBrowsableObjectInfo GetParent()
         {
 
-            IBrowsableObjectInfo parent = null;
+            IBrowsableObjectInfo parent;
 
             if (FileType == FileType.Folder || FileType == FileType.Archive || (FileType == FileType.SpecialFolder && ShellObject.IsFileSystemObject))
 
@@ -324,15 +324,15 @@ namespace WinCopies.IO
 
                 }
 
+                else parent = null;
+
             }
 
-            else if (FileType == FileType.Drive)
-
-                parent = GetBrowsableObjectInfo(ShellObject.Parent, KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolders.Computer);
-
-            else if (FileType == FileType.SpecialFolder && SpecialFolder != SpecialFolders.Computer)
-
-                parent = GetBrowsableObjectInfo(ShellObject.Parent, KnownFolderHelper.FromParsingName(ShellObject.Parent.ParsingName).Path);
+            else parent = FileType == FileType.Drive
+                ? GetBrowsableObjectInfo(ShellObject.Parent, KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolders.Computer)
+                : FileType == FileType.SpecialFolder && SpecialFolder != SpecialFolders.Computer
+                ? GetBrowsableObjectInfo(ShellObject.Parent, KnownFolderHelper.FromParsingName(ShellObject.Parent.ParsingName).Path)
+                : null;
 
             return parent;
 

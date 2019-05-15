@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WinCopies.Win32NativeInterop</RootNamespace>
     <AssemblyName>WinCopies.Win32NativeInterop</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,7 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CopyFileFlags.cs" />
+    <Compile Include="CopyProgressCallbackReason.cs" />
+    <Compile Include="CopyProgressResult.cs" />
     <Compile Include="ErrorCodes.cs" />
+    <Compile Include="FileOperations.cs" />
     <Compile Include="HResult.cs" />
     <Compile Include="IImageList.cs" />
     <Compile Include="ILD_FLAGS.cs" />
@@ -54,6 +59,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rect.cs" />
     <Compile Include="SHFILEINFO.cs" />
+    <Compile Include="SHFILEOPSTRUCT.cs" />
     <Compile Include="SHGFI.cs" />
     <Compile Include="SHIL.cs" />
     <Compile Include="SystemMetric.cs" />

@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using WinCopies.Util;
+using WinCopies.Win32NativeInterop;
 using static WinCopies.IO.FileProcesses.Copy;
 
 namespace WinCopies.IO.FileProcesses
@@ -31,22 +32,12 @@ namespace WinCopies.IO.FileProcesses
 
         private readonly ActionType _actionType = ActionType.Unknown;
 
+        /// <summary>
+        /// Gets the type of this process.
+        /// </summary>
         public override ActionType ActionType => _actionType;
 
-        private FileSystemInfo _pausedFile = null;
-
-        /// <summary>
-        /// If a copy is paused during copying, this property gets the file paused, otherwise it returns null.
-        /// </summary>
-        public FileSystemInfo PausedFile { get => _pausedFile; private set => OnPropertyChanged(nameof(PausedFile), nameof(_pausedFile), value, typeof(CopyProcessInfo)); }
-
-        private string _destPausedFilePath = null;
-
-        public string DestPausedFilePath { get => _destPausedFilePath; set => OnPropertyChanged(nameof(DestPausedFilePath), nameof(_destPausedFilePath), value, typeof(CopyProcessInfo)); }
-
-        private int _pausedIndex = -1;
-
-        public int PausedIndex { get => _pausedIndex; set => OnPropertyChanged(nameof(PausedIndex), nameof(_pausedIndex), value, typeof(CopyProcessInfo)); }
+        private void SetActionType(ActionType value) => OnPropertyChanged(nameof(ActionType), nameof(_actionType), value, typeof(CopyProcessInfo));
 
         private readonly long _copiedFiles = 0;
 
@@ -79,21 +70,6 @@ namespace WinCopies.IO.FileProcesses
 
         // todo : exception : 'exceptions' ? - nullable
 
-        private readonly HowToRetry _how_To_Retry_When_Exception_Occured = HowToRetry.None;
-
-        /// <summary>
-        /// Gets or sets a value that indicates how to retry to copy the file system objects.
-        /// </summary>
-        /// <remarks>If this property is set, this property have to be set to null individually for all the path items.</remarks>
-        public HowToRetry HowToRetryWhenExceptionOccured
-        {
-
-            get => _how_To_Retry_When_Exception_Occured;
-
-            set => OnPropertyChangedWhenNotBusy(nameof(HowToRetryWhenExceptionOccured), nameof(_how_To_Retry_When_Exception_Occured), value, typeof(CopyProcessInfo));
-
-        }
-
         private readonly bool _isAFileMoving = false;
 
         //TODO : 'OK' : - simplifier l'utilisation ? - nom / nomenclature du nom ? - voir également commenatire CopyFiles.cs
@@ -111,13 +87,11 @@ namespace WinCopies.IO.FileProcesses
         /// </summary>
         public bool IsAFileMoving
         {
+
             get => _isAFileMoving; set
 
             {
-
-                OnPropertyChangedWhenNotBusy(nameof(IsAFileMoving), nameof(_isAFileMoving), value, typeof(CopyProcessInfo));
-
-                OnPropertyChanged(nameof(ActionType), nameof(_actionType), value ? FileProcesses.ActionType.Move : FileProcesses.ActionType.Copy, typeof(CopyProcessInfo));
+                OnPropertyChangedWhenNotBusy(nameof(IsAFileMoving), nameof(_isAFileMoving), value, typeof(CopyProcessInfo)); SetActionType(value ? ActionType.Move : ActionType.Copy);
 
             }
 
@@ -138,7 +112,7 @@ namespace WinCopies.IO.FileProcesses
         // /// </summary>
 
         /// <summary>
-        /// Gets the file which is copying or moving.
+        /// Gets the file which is being copied or moved.
         /// </summary>
         public FileSystemInfo CurrentCopiedFile
         {
@@ -158,7 +132,7 @@ namespace WinCopies.IO.FileProcesses
         // /// </summary>
 
         /// <summary>
-        /// Gets the destination path to copy or moving the files.
+        /// Gets the destination path to copy or move the files.
         /// </summary>
         public string DestPath { get; } = null;
 
@@ -167,7 +141,7 @@ namespace WinCopies.IO.FileProcesses
         private readonly Size _current_File_Copied_Size = new Size(0, SizeUnit.Byte);
 
         /// <summary>
-        /// Gets the total current copied size.
+        /// Gets the total copied size.
         /// </summary>
         public Size CurrentCopiedSize { get => _current_Copied_Size; set => OnPropertyChanged(nameof(CurrentCopiedSize), nameof(_current_Copied_Size), value, typeof(CopyProcessInfo)); }
 
@@ -180,12 +154,9 @@ namespace WinCopies.IO.FileProcesses
 
         // #region Exceptions collections
 
-        private readonly System.Collections.ObjectModel.ObservableCollection<FileSystemInfo> _exceptions = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
+        private string _destPausedFilePath = null;
 
-        /// <summary>
-        /// Gets a <see cref="System.Collections.ObjectModel.ReadOnlyObservableCollection{FileSystemInfo}"/> which represents the files for which a <see cref="WinCopies.IO.FileProcesses.Exceptions"/> exception has occurred.
-        /// </summary>
-        public System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo> Exceptions { get; } = null;
+        public string DestPausedFilePath { get => _destPausedFilePath; protected set => OnPropertyChanged(nameof(DestPausedFilePath), nameof(_destPausedFilePath), value, typeof(CopyProcessInfo)); }
 
         /// <summary>
         /// Initializes a new instance of <see cref="CopyProcessInfo"/> which will keep in memory the source files and folders.
@@ -193,14 +164,12 @@ namespace WinCopies.IO.FileProcesses
         /// <param name="destPath">Destination folder path for copying the source files and folders</param>
         /// <param name="isAFileMoving">True if the process is a file moving</param>
         // /// <param name="filesInfoLoader">Files info loader for this <see cref="CopyProcessInfo"/>.</param>
-        public CopyProcessInfo(string destPath, bool isAFileMoving)
+        public CopyProcessInfo(string destPath, bool isAFileMoving) : base()
         {
 
             DestPath = destPath;
 
             IsAFileMoving = isAFileMoving;
-
-            Exceptions = new System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo>(_exceptions);
 
         }
 
@@ -208,9 +177,9 @@ namespace WinCopies.IO.FileProcesses
 
         //{
 
-        //    _exceptions.RemoveAt(index);
+        //    ExceptionsProtected.RemoveAt(index);
 
-        //    _exceptions.Sort(new FileSystemInfoComparer());
+        //    ExceptionsProtected.Sort(new FileSystemInfoComparer());
 
         //}
 
@@ -220,7 +189,7 @@ namespace WinCopies.IO.FileProcesses
 
         //TODO: problème de back-slash - private ? vraiment utile en tant que méthode à part ? déplacer la conditionnelle pour ne pas la ré-itérer à chaque fois ?
 
-        public string GetCopyPath(string oldFile, bool rename_Path)
+        public string GetCopyPath(string oldFile, bool renamePath)
         {
 
             string path = DestPath + oldFile.Substring(System.IO.Path.GetDirectoryName(FilesInfoLoader.Paths[0].FileSystemInfoProperties.FullName).Length);
@@ -234,19 +203,7 @@ namespace WinCopies.IO.FileProcesses
 
 #endif
 
-            string dest_Path = "";
-
-            if (rename_Path)
-
-                //inutile : le test pour passer le fichier est effectué dans la méthode principale if (oldFile.HowToRetryToProcess == HowToRetryToProcess.Rename)
-
-                dest_Path = Path.RenamePathWithAutomaticNumber(oldFile, System.IO.Path.GetDirectoryName(path));
-
-            else
-
-                dest_Path = path;
-
-            return dest_Path;
+            return renamePath ? Path.RenamePathWithAutomaticNumber(oldFile, System.IO.Path.GetDirectoryName(path)) : path;
 
         }
 
@@ -278,13 +235,9 @@ namespace WinCopies.IO.FileProcesses
 
             if (FilesInfoLoader.IsBusy)
 
-                //TODO:
-
                 throw new Exception(Generic.LoadingFilesInfoModuleIsRunning);
 
             if (!FilesInfoLoader.IsLoaded)
-
-                //TODO:
 
                 throw new Exception(Generic.LoadingFilesInfoModuleHasNotRanYet);
 
@@ -330,17 +283,21 @@ namespace WinCopies.IO.FileProcesses
 
 
 
+            bool onlyFirstFile = (bool)e.Argument;
+
+
+
             if (PausedFiles.Count == 0 && HowToRetryWhenExceptionOccured == HowToRetry.Cancel)
 
             {
 
                 FileSystemInfo item = null;
 
-                while (_exceptions.Count > 0)
+                void copy()
 
                 {
 
-                    item = _exceptions[0];
+                    item = ExceptionsProtected[0];
 
                     item._exception = FileProcesses.Exceptions.None;
 
@@ -350,11 +307,21 @@ namespace WinCopies.IO.FileProcesses
 
                         CurrentCopiedSize += ((FileInfo)item.FileSystemInfoProperties).Length;
 
-                    _exceptions.RemoveAt(0);
+                    ExceptionsProtected.RemoveAt(0);
 
                 }
 
-                ExceptionsOccurred = false;
+                if (onlyFirstFile)
+
+                    copy();
+
+                else
+
+                    while (ExceptionsProtected.Count > 0)
+
+                        copy();
+
+                ExceptionsOccurred = ExceptionsProtected.Count == 0;
 
                 return;
 
@@ -363,8 +330,6 @@ namespace WinCopies.IO.FileProcesses
 
 
             // List<string> folder_Path = new List<string>(); // Liste des répertoires à supprimer lors du déplacement une fois celui-ci effectué (déplacements uniquement).
-
-            bool onlyFirstFile = (bool)e.Argument;
 
             void getStartAndLength(Exceptions flag, out int _start, out int _length)
 
@@ -384,21 +349,21 @@ namespace WinCopies.IO.FileProcesses
 
                 {
 
-                    _start = _exceptions.IndexOf(_exceptions.First((FileSystemInfo f) => f.Exception == flag));
+                    _start = ExceptionsProtected.IndexOf(ExceptionsProtected.First((FileSystemInfo f) => f.Exception == flag));
 
-                    _length = onlyFirstFile ? 1 : _exceptions.IndexOf(_exceptions.Last((FileSystemInfo f) => f.Exception == flag)) + 1;
+                    _length = onlyFirstFile ? 1 : ExceptionsProtected.IndexOf(ExceptionsProtected.Last((FileSystemInfo f) => f.Exception == flag)) + 1;
 
                 }
 
             }
 
-            int start = 0;
+            int start;
 
-            int length = 0;
+            int length;
 
             if (PausedFiles.Count > 0)
 
-                this_all_Files_DoWork(PausedIndex, PausedFiles.Count, _PausedFiles, _PausedFiles == _exceptions, true);
+                this_all_Files_DoWork(PausedIndex, PausedFiles.Count, _PausedFiles, _PausedFiles == ExceptionsProtected, true);
 
             else if (ExceptionsToRetry == FileProcesses.Exceptions.None)
             {
@@ -439,7 +404,7 @@ namespace WinCopies.IO.FileProcesses
 
                         this_all_Files_DoWork(start, length, Exceptions, true);
 
-                        ExceptionsOccurred = _exceptions.Count > 0; // If we are in a re-try process, we check if there are still paths in the exceptions list.
+                        ExceptionsOccurred = ExceptionsProtected.Count > 0; // If we are in a re-try process, we check if there are still paths in the exceptions list.
 
                     }
 
@@ -471,11 +436,11 @@ namespace WinCopies.IO.FileProcesses
         private void this_all_Files_DoWork(int start, int length, IList<FileSystemInfo> items, bool isARetry = false, bool isResuming = false)
         {
 
-            void copyFile(ref Exceptions ex, FileSystemInfo _path, string destFilePath, int currentIndex, bool overwrite)
+            Exceptions copyFile(FileSystemInfo _path, string destFilePath, int currentIndex, bool overwrite)
 
             {
 
-                ex = Copy_Files(_path.FileSystemInfoProperties.FullName, destFilePath, IsAFileMoving, overwrite,
+                Exceptions ex = Copy_Files(_path.FileSystemInfoProperties.FullName, destFilePath, IsAFileMoving, overwrite,
                              (
             long totalFileSize,
             long totalBytesTransferred,
@@ -486,7 +451,7 @@ namespace WinCopies.IO.FileProcesses
             IntPtr hSourceFile,
             IntPtr hDestinationFile,
             IntPtr lpData) =>
-                             copyProgressCallback(this, _path, ref destFilePath, items, ref currentIndex, ref totalFileSize, ref totalBytesTransferred, ref streamSize, ref streamBytesTransferred, ref dwStreamNumber, dwCallbackReason, ref hSourceFile, ref hDestinationFile, ref lpData)).ex;
+                             copyProgressCallback(_path, ref destFilePath, items, ref currentIndex, ref totalFileSize, ref totalBytesTransferred, ref streamSize, ref streamBytesTransferred, ref dwStreamNumber, dwCallbackReason, ref hSourceFile, ref hDestinationFile, ref lpData)).ex;
 
                 if (ex == FileProcesses.Exceptions.None)
 
@@ -507,12 +472,13 @@ namespace WinCopies.IO.FileProcesses
 
                 }
 
+                return ex;
+
             }
 
 
 
-            CopyProgressResult copyProgressCallback(CopyProcessInfo cpi,
-                        FileSystemInfo currentPath,
+            CopyProgressResult copyProgressCallback(FileSystemInfo currentPath,
                        ref string destFilePath,
                         IList<FileSystemInfo> currentFiles,
                         ref int currentIndex,
@@ -533,14 +499,14 @@ namespace WinCopies.IO.FileProcesses
 
                 //TODO: 'TotalFileSize' : utiliser plutôt path.Length ? renommer Path.Length en Path.Size ?
 
-                Size oldCurrent_File_Copied_Size = cpi._current_File_Copied_Size;
+                Size oldCurrent_File_Copied_Size = _current_File_Copied_Size;
 
-                cpi.CurrentFileCopiedSize = (Size)StreamBytesTransferred;
+                CurrentFileCopiedSize = (Size)StreamBytesTransferred;
 
-                cpi.CurrentCopiedSize += StreamBytesTransferred - oldCurrent_File_Copied_Size;
+                CurrentCopiedSize += StreamBytesTransferred - oldCurrent_File_Copied_Size;
 
 #if DEBUG
-                if (cpi.CurrentCopiedSize >= cpi.FilesInfoLoader.TotalSize) Debug.WriteLine(cpi._copiedFiles.ToString() + " " + cpi.CurrentCopiedSize.ToString() + " " + cpi.FilesInfoLoader.TotalSize.ToString());
+                if (CurrentCopiedSize >= FilesInfoLoader.TotalSize) Debug.WriteLine(_copiedFiles.ToString() + " " + CurrentCopiedSize.ToString() + " " + FilesInfoLoader.TotalSize.ToString());
 #endif
 
                 // var fi = new FileInfo(currentPath.FileSystemInfoProperties.FullName);
@@ -549,27 +515,27 @@ namespace WinCopies.IO.FileProcesses
 
                 //TODO:
 
-                cpi.ReportProgress(0);
+                ReportProgress(0);
 
-                if (cpi.PausePending)
+                if (PausePending)
 
                 {
 
-                    cpi.PausedFile = currentPath;
+                    PausedFile = currentPath;
 
-                    cpi.DestPausedFilePath = destFilePath;
+                    DestPausedFilePath = destFilePath;
 
-                    cpi._PausedFiles = isARetry ? (System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>)currentFiles : new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>(currentFiles);
+                    _PausedFiles = isARetry ? (System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>)currentFiles : new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>(currentFiles);
 
-                    cpi.PausedIndex = currentIndex;
+                    PausedIndex = currentIndex;
 
 
 
-                    cpi.Pause();
+                    Pause();
 
                 }
 
-                return cpi.CancellationPending ? CopyProgressResult.PROGRESS_CANCEL : CopyProgressResult.PROGRESS_CONTINUE;
+                return CancellationPending ? CopyProgressResult.PROGRESS_CANCEL : CopyProgressResult.PROGRESS_CONTINUE;
 
             }
 
@@ -583,13 +549,11 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-            if (isResuming && _pausedFile != null)
+            if (isResuming && PausedFile != null)
 
             {
 
-                Exceptions ex = FileProcesses.Exceptions.None;
-
-                copyFile(ref ex, _pausedFile, _destPausedFilePath, start, _overwrite || (isARetry && (_pausedFile.HowToRetryToProcess == HowToRetry.Replace || _how_To_Retry_When_Exception_Occured == HowToRetry.Replace)));
+                Exceptions ex = copyFile(PausedFile, DestPausedFilePath, start, _overwrite || (isARetry && (PausedFile.HowToRetryToProcess == HowToRetry.Replace || HowToRetryWhenExceptionOccured == HowToRetry.Replace)));
 
                 PausedFile = null;
 
@@ -605,7 +569,7 @@ namespace WinCopies.IO.FileProcesses
 
             {
 
-                if (length == 1 && _how_To_Retry_When_Exception_Occured == HowToRetry.None && items[start].HowToRetryToProcess == HowToRetry.None)
+                if (length == 1 && HowToRetryWhenExceptionOccured == HowToRetry.None && items[start].HowToRetryToProcess == HowToRetry.None)
 
                     return;
 
@@ -637,11 +601,11 @@ namespace WinCopies.IO.FileProcesses
 
                         _path._exception = FileProcesses.Exceptions.NotEnoughSpaceOnDisk;
 
-                        _exceptions.Add(_path);
+                        ExceptionsProtected.Add(_path);
 
                     }
 
-                    _exceptions.Sort(new FileSystemInfoComparer());
+                    ExceptionsProtected.Sort(new FileSystemInfoComparer());
 
                     return;
 
@@ -649,21 +613,17 @@ namespace WinCopies.IO.FileProcesses
 
                 else driveInfo = null;
 
-                #endregion
-
 
 
             }
 
+            #endregion
 
 
-            #region Variables initialization
 
             FileSystemInfo path = null;
 
             int i = start;
-
-            #endregion
 
             // _length = onlyFirstFile ? 1 : items.Count;
 
@@ -683,7 +643,7 @@ namespace WinCopies.IO.FileProcesses
 
                     if (!isARetry)
 
-                        _exceptions.Add(path);
+                        ExceptionsProtected.Add(path);
 
                 }
 
@@ -698,7 +658,7 @@ namespace WinCopies.IO.FileProcesses
 
                 {
 
-                    #region pre-processing item actions
+                    #region item pre-processing actions
 
                     path = items[i];
 
@@ -712,7 +672,7 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-                    bool rename = path.Exception == FileProcesses.Exceptions.FileAlreadyExists && (path.HowToRetryToProcess == HowToRetry.Rename || _how_To_Retry_When_Exception_Occured == HowToRetry.Rename);
+                    bool rename = path.Exception == FileProcesses.Exceptions.FileAlreadyExists && (path.HowToRetryToProcess == HowToRetry.Rename || HowToRetryWhenExceptionOccured == HowToRetry.Rename);
 
                     destFilePath = GetCopyPath(path.FileSystemInfoProperties.FullName, rename);
 
@@ -744,15 +704,15 @@ namespace WinCopies.IO.FileProcesses
 
                     }
 
-                    if (isARetry && path.HowToRetryToProcess != HowToRetry.Retry && _how_To_Retry_When_Exception_Occured != HowToRetry.Retry && path.HowToRetryToProcess != HowToRetry.Rename && _how_To_Retry_When_Exception_Occured != HowToRetry.Rename && path.HowToRetryToProcess != HowToRetry.Replace && _how_To_Retry_When_Exception_Occured != HowToRetry.Replace)
+                    if (isARetry && path.HowToRetryToProcess != HowToRetry.Retry && HowToRetryWhenExceptionOccured != HowToRetry.Retry && path.HowToRetryToProcess != HowToRetry.Rename && HowToRetryWhenExceptionOccured != HowToRetry.Rename && path.HowToRetryToProcess != HowToRetry.Replace && HowToRetryWhenExceptionOccured != HowToRetry.Replace)
 
                     {
 
-                        if (path.HowToRetryToProcess != HowToRetry.None || _how_To_Retry_When_Exception_Occured != HowToRetry.None)
+                        if (path.HowToRetryToProcess != HowToRetry.None || HowToRetryWhenExceptionOccured != HowToRetry.None)
 
                         {
 
-                            _exceptions.RemoveAt(i);
+                            ExceptionsProtected.RemoveAt(i);
 
                             // items.RemoveAt(i);    
 
@@ -790,7 +750,7 @@ namespace WinCopies.IO.FileProcesses
 
                         ReportProgress(0);
 
-                        ExceptionsOccurred = i == length && _exceptions.Count > 0;
+                        ExceptionsOccurred = i == length && ExceptionsProtected.Count > 0;
 
                         continue;
 
@@ -809,8 +769,6 @@ namespace WinCopies.IO.FileProcesses
 #endif
 
                     #endregion
-
-                    FileProcesses.Exceptions ex = FileProcesses.Exceptions.None;
 
                     if (path.FileType == FileType.Drive || path.FileType == FileType.Folder)
 #if DEBUG
@@ -832,19 +790,17 @@ namespace WinCopies.IO.FileProcesses
                         Debug.WriteLine($"Copie du fichier : de {path.FileSystemInfoProperties.FullName} vers {destFilePath}");
 #endif
 
+                        Exceptions ex = FileProcesses.Exceptions.None;
 
+                        if ((ex = copyFile(path, destFilePath, i, _overwrite || (isARetry && (path.HowToRetryToProcess == HowToRetry.Replace || HowToRetryWhenExceptionOccured == HowToRetry.Replace)))) == FileProcesses.Exceptions.None)
 
-                        copyFile(ref ex, path, destFilePath, i, _overwrite || (isARetry && (path.HowToRetryToProcess == HowToRetry.Replace || _how_To_Retry_When_Exception_Occured == HowToRetry.Replace)));
+                            CopiedFiles += 1;
+
+                        else
+
+                            onException(ex);
 
                     }
-
-                    if (ex == FileProcesses.Exceptions.None)
-
-                        CopiedFiles += 1;
-
-                    else
-
-                        onException(ex);
 
                     //else if (ex == Exceptions.FileAlreadyExists)
 
@@ -898,35 +854,13 @@ namespace WinCopies.IO.FileProcesses
 
                 {
 
-                    bool driveNotReady = false;
-
-                    driveInfo = new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath));
-
-                    if (!driveInfo.IsReady)
-
-                        driveNotReady = true;
-
-                    else
-
-                    {
-
-                        driveInfo = new DriveInfo(System.IO.Path.GetPathRoot(DestPath));
-
-                        if (!driveInfo.IsReady)
-
-                            driveNotReady = true;
-
-                    }
-
-                    driveInfo = null;
-
-                    if (driveNotReady)
+                    if (new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).IsReady || new DriveInfo(System.IO.Path.GetPathRoot(DestPath)).IsReady)
 
                     {
 
                         ExceptionsOccurred = true;
 
-                        _exceptions.Clear();
+                        ExceptionsProtected.Clear();
 
                         foreach (FileSystemInfo _path in items)
 
@@ -934,7 +868,7 @@ namespace WinCopies.IO.FileProcesses
 
                             _path._exception = FileProcesses.Exceptions.DiskNotReady;
 
-                            _exceptions.Add(_path);
+                            ExceptionsProtected.Add(_path);
 
                         }
 
@@ -942,13 +876,17 @@ namespace WinCopies.IO.FileProcesses
 
                     }
 
+                    else
+
+                        onException(FileProcesses.Exceptions.Unknown);
+
                 }
 
                 if (isARetry)
 
                 {
 
-                    _exceptions.RemoveAt(0);
+                    ExceptionsProtected.RemoveAt(0);
 
                     length--;
 
@@ -962,7 +900,7 @@ namespace WinCopies.IO.FileProcesses
 
             // todo : maybe more functional with a dictionary which would create a collection corresponding to an exception when it'd be needed (this case would mean no sorting needed)
 
-            _exceptions.Sort(new FileSystemInfoComparer());
+            ExceptionsProtected.Sort(new FileSystemInfoComparer());
 
 
 
@@ -986,22 +924,22 @@ namespace WinCopies.IO.FileProcesses
 
         // }
 
-        public class FileSystemInfoComparer : IComparer<FileSystemInfo>
+    }
 
+    public class FileSystemInfoComparer : IComparer<FileSystemInfo>
+
+    {
+
+        StringComparer sc = StringComparer.Create(CultureInfo.CurrentCulture, true);
+
+        public int Compare(FileSystemInfo x, FileSystemInfo y)
         {
 
-            StringComparer sc = StringComparer.Create(CultureInfo.CurrentCulture, true);
+            if (x.Exception < y.Exception) return -1;
 
-            public int Compare(FileSystemInfo x, FileSystemInfo y)
-            {
+            else if (x.Exception == y.Exception) return 0;
 
-                if (x.Exception < y.Exception) return -1;
-
-                else if (x.Exception == y.Exception) return 0;
-
-                else return 1;
-
-            }
+            else return 1;
 
         }
 

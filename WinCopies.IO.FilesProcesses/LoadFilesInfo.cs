@@ -272,7 +272,7 @@ namespace WinCopies.IO.FileProcesses
 
         {
 
-            (bool propertyChanged, object oldValue) = WinCopies.Util. Util.SetPropertyWhenNotBusy(this, propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = WinCopies.Util.Util.SetPropertyWhenNotBusy(this, propertyName, fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
@@ -409,249 +409,257 @@ namespace WinCopies.IO.FileProcesses
 
             //    } // end if
 
-            foreach (FileSystemInfo path in Paths)
-            {
-
-#if DEBUG 
-
-                Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName);
-
-#endif
-
-                // parent_Path = "";
 
 
+            if (actionType == ActionType.Recycling)
 
-                switch (path.FileType)
+                _pathsLoaded = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>(Paths);
+
+            else
+
+                foreach (FileSystemInfo path in Paths)
                 {
 
-                    case FileType.Folder:
-                    case FileType.Drive:
+#if DEBUG
 
-                        // TODO : vraiment utile ?
-
-                        // ReportProgress(0);
-
-                        // TotalFolders += 1;
-
-                        List<int> pathsIndexes = new List<int>();
-
-                        Type t = path.FileSystemInfoProperties.GetType();
-
-                        DirectoryInfo directoriesInfo = (DirectoryInfo)path.FileSystemInfoProperties;
-
-#if DEBUG 
-
-                        Debug.WriteLine("FilesInfoLoader log: " + (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/).ToString());
-
-                        // Console.WriteLine("FilesInfoLoader log: "+ActionType.ToString() + " " + path.FileSystemInfoProperties.FullName + " " + path.FileType.ToString() + " " + LoadOnlyItemsWithSearchTermsForAllActions.ToString() + " " + Search_Terms.ToString());
+                    Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName);
 
 #endif
 
-                        if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
-                        {
-
-                            _pathsLoaded.Add(path);
-
-                            ReportProgress(0);
-
-                            // System.Windows.Forms.MessageBox.Show("a" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) + "a" + " " + "b" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName) + "b" + " " + (IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) != IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName)).ToString());
-                            //if (path.FileSystemInfoProperties.FullName != ((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName)
-
-                            //    if (directoriesInfo.Attributes.HasFlag(FileAttributes.Hidden) && (directoriesInfo.GetDirectories().Length > 0 || directoriesInfo.GetFiles().Length > 0))
-
-                            //        Hidden_Folders_With_Subpaths.Add(path.FileSystemInfoProperties.FullName);
-
-                            //else
-                            //{
-
-                            //    _pathsLoaded.Add(new FileSystemInfo(path.FileSystemInfoProperties, FileTypes.Drive));
-
-                            //    ReportProgress(0);
-
-                            //}
+                    // parent_Path = "";
 
 
-                            //FileSystemInfoLoaded = pathsLoaded[pathsLoaded.Count - 1];
 
-                            // PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileSystemInfoThatIsLoading)));
+                    switch (path.FileType)
+                    {
 
-                            //ReportProgress(0);
+                        case FileType.Folder:
+                        case FileType.Drive:
 
-                        } // end if
+                            // TODO : vraiment utile ?
 
-                        //TODO : vraiment utile ?
+                            // ReportProgress(0);
 
-                        // ReportProgress(0);
+                            // TotalFolders += 1;
 
-                        try
-                        {
+                            List<int> pathsIndexes = new List<int>();
 
-                            foreach (FileInfo file in directoriesInfo.GetFiles())
+                            Type t = path.FileSystemInfoProperties.GetType();
 
+                            DirectoryInfo directoriesInfo = (DirectoryInfo)path.FileSystemInfoProperties;
+
+#if DEBUG
+
+                            Debug.WriteLine("FilesInfoLoader log: " + (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/).ToString());
+
+                            // Console.WriteLine("FilesInfoLoader log: "+ActionType.ToString() + " " + path.FileSystemInfoProperties.FullName + " " + path.FileType.ToString() + " " + LoadOnlyItemsWithSearchTermsForAllActions.ToString() + " " + Search_Terms.ToString());
+
+#endif
+
+                            if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
                             {
 
-                                //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
-                                //{
-
-                                _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
-
-                                TotalSize += file.Length;
+                                _pathsLoaded.Add(path);
 
                                 ReportProgress(0);
 
-                                //} // end if
+                                // System.Windows.Forms.MessageBox.Show("a" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) + "a" + " " + "b" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName) + "b" + " " + (IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) != IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName)).ToString());
+                                //if (path.FileSystemInfoProperties.FullName != ((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName)
 
-                            } // next file
+                                //    if (directoriesInfo.Attributes.HasFlag(FileAttributes.Hidden) && (directoriesInfo.GetDirectories().Length > 0 || directoriesInfo.GetFiles().Length > 0))
 
-                        } // end try
+                                //        Hidden_Folders_With_Subpaths.Add(path.FileSystemInfoProperties.FullName);
 
-                        catch (Exception)
-                        { }
+                                //else
+                                //{
 
-                        int pathSubdirectoriesCount = 0;
+                                //    _pathsLoaded.Add(new FileSystemInfo(path.FileSystemInfoProperties, FileTypes.Drive));
 
-                        try
-                        {
+                                //    ReportProgress(0);
 
-                            pathSubdirectoriesCount = ((DirectoryInfo)path.FileSystemInfoProperties).GetDirectories().Length;
+                                //}
 
-                        } // end try
 
-                        catch (Exception)
-                        { }
+                                //FileSystemInfoLoaded = pathsLoaded[pathsLoaded.Count - 1];
 
-                        pathsIndexes.Add(0);
+                                // PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileSystemInfoThatIsLoading)));
 
-                        int findIndex = 0;
+                                //ReportProgress(0);
 
-                        while (pathsIndexes[0] < pathSubdirectoriesCount)
-                        {
+                            } // end if
+
+                            //TODO : vraiment utile ?
+
+                            // ReportProgress(0);
 
                             try
                             {
 
-                                DirectoryInfo[] directories = directoriesInfo.GetDirectories();
+                                foreach (FileInfo file in directoriesInfo.GetFiles())
 
-                                while (directories.Length > 0)
                                 {
 
+                                    //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+                                    //{
 
+                                    _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
 
-                                    DirectoryInfo directory = directories[pathsIndexes[findIndex]];
+                                    TotalSize += file.Length;
 
-                                    directories = directory.GetDirectories();
+                                    ReportProgress(0);
 
+                                    //} // end if
 
-
-                                    //if (directory.Attributes.HasFlag(FileAttributes.Hidden) && (directory.GetDirectories().Length > 0 || directory.GetFiles().Length > 0))
-
-                                    //    Hidden_Folders_With_Subpaths.Add(directory.FullName);
-
-
-
-
-                                    if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
-                                    {
-
-                                        _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
-
-                                        ReportProgress(0);
-
-                                    } // end if
-
-
-
-                                    foreach (FileInfo file in directory.GetFiles())
-
-                                    {
-
-                                        //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
-                                        //{
-
-                                        _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
-
-                                        TotalSize += file.Length;
-
-                                        ReportProgress(0);
-
-                                        //} // end if
-
-                                    } // next file
-
-                                    if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
-                                    {
-
-                                        _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
-
-                                        ReportProgress(0);
-
-                                        //FileSystemInfoLoaded = pathsLoaded[pathsLoaded.Count - 1];
-
-                                        // PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileSystemInfoThatIsLoading)));
-
-                                        //ReportProgress(0);
-
-                                    } // end if
-
-                                    pathsIndexes.Add(0);
-
-                                    findIndex++;
-
-                                } // end while
+                                } // next file
 
                             } // end try
 
                             catch (Exception)
-                            { findIndex++; }
+                            { }
 
-                            do
+                            int pathSubdirectoriesCount = 0;
+
+                            try
                             {
 
+                                pathSubdirectoriesCount = ((DirectoryInfo)path.FileSystemInfoProperties).GetDirectories().Length;
+
+                            } // end try
+
+                            catch (Exception)
+                            { }
+
+                            pathsIndexes.Add(0);
+
+                            int findIndex = 0;
+
+                            while (pathsIndexes[0] < pathSubdirectoriesCount)
+                            {
+
+                                try
+                                {
+
+                                    DirectoryInfo[] directories = directoriesInfo.GetDirectories();
+
+                                    while (directories.Length > 0)
+                                    {
 
 
-                                directoriesInfo = directoriesInfo.Parent;
 
-                                findIndex--;
+                                        DirectoryInfo directory = directories[pathsIndexes[findIndex]];
 
-                                pathsIndexes[findIndex] += 1;
-
-
-
-                                for (int i = findIndex + 1; i < pathsIndexes.Count; i++)
-
-                                    pathsIndexes.RemoveAt(findIndex + 1);
+                                        directories = directory.GetDirectories();
 
 
 
-                            } while (directoriesInfo.GetDirectories().Length == pathsIndexes[findIndex] && pathsIndexes[0] != pathSubdirectoriesCount);
+                                        //if (directory.Attributes.HasFlag(FileAttributes.Hidden) && (directory.GetDirectories().Length > 0 || directory.GetFiles().Length > 0))
 
-                        } // end while
+                                        //    Hidden_Folders_With_Subpaths.Add(directory.FullName);
 
-                        if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
-                        {
 
-                            _pathsLoaded.Add(path);
 
-                            ReportProgress(0);
 
-                        } // end if
+                                        if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
+                                        {
 
-                        break;
+                                            _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
 
-                    case FileType.File:
+                                            ReportProgress(0);
 
-                        try
-                        {
+                                        } // end if
 
-#if DEBUG 
-                            Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName + " (1)");
-#endif 
 
-                            //if (SearchMethods.AddFile(path.FileSystemInfoProperties, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
-                            //{
 
-#if DEBUG 
+                                        foreach (FileInfo file in directory.GetFiles())
+
+                                        {
+
+                                            //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+                                            //{
+
+                                            _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
+
+                                            TotalSize += file.Length;
+
+                                            ReportProgress(0);
+
+                                            //} // end if
+
+                                        } // next file
+
+                                        if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
+                                        {
+
+                                            _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
+
+                                            ReportProgress(0);
+
+                                            //FileSystemInfoLoaded = pathsLoaded[pathsLoaded.Count - 1];
+
+                                            // PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileSystemInfoThatIsLoading)));
+
+                                            //ReportProgress(0);
+
+                                        } // end if
+
+                                        pathsIndexes.Add(0);
+
+                                        findIndex++;
+
+                                    } // end while
+
+                                } // end try
+
+                                catch (Exception)
+                                { findIndex++; }
+
+                                do
+                                {
+
+
+
+                                    directoriesInfo = directoriesInfo.Parent;
+
+                                    findIndex--;
+
+                                    pathsIndexes[findIndex] += 1;
+
+
+
+                                    for (int i = findIndex + 1; i < pathsIndexes.Count; i++)
+
+                                        pathsIndexes.RemoveAt(findIndex + 1);
+
+
+
+                                } while (directoriesInfo.GetDirectories().Length == pathsIndexes[findIndex] && pathsIndexes[0] != pathSubdirectoriesCount);
+
+                            } // end while
+
+                            if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
+                            {
+
+                                _pathsLoaded.Add(path);
+
+                                ReportProgress(0);
+
+                            } // end if
+
+                            break;
+
+                        case FileType.File:
+
+                            try
+                            {
+
+#if DEBUG
+                                Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName + " (1)");
+#endif
+
+                                //if (SearchMethods.AddFile(path.FileSystemInfoProperties, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+                                //{
+
+#if DEBUG
                                 Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName + " (2)");
 #endif 
 
@@ -661,19 +669,19 @@ namespace WinCopies.IO.FileProcesses
 
                                 ReportProgress(0);
 
-                            //} // end if
+                                //} // end if
 
-                        } // end try
+                            } // end try
 
-                        catch (Exception) { }
+                            catch (Exception) { }
 
 
 
-                        break;
+                            break;
 
-                } // end switch
-                //System.Windows.Forms.MessageBox.Show(path.FileSystemInfoProperties.FullName);
-            } // next
+                    } // end switch
+                      //System.Windows.Forms.MessageBox.Show(path.FileSystemInfoProperties.FullName);
+                } // next
 
         } // end void
 
