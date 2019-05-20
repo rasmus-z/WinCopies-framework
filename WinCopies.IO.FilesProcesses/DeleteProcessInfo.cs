@@ -201,7 +201,7 @@ namespace WinCopies.IO.FileProcesses
 
                 fileOperation.Advise(new FileOperationProgressSink());
 
-                ShellOperationFlags shellOperationFlags = ShellOperationFlags.FOF_SILENT | ShellOperationFlags.FOF_NOERRORUI;
+                ShellOperationFlags shellOperationFlags = ShellOperationFlags.FOF_NOERRORUI | ShellOperationFlags.FOFX_EARLYFAILURE | ShellOperationFlags.FOF_SILENT;
 
                 if (ActionType == ActionType.Recycling)
 
