@@ -866,15 +866,18 @@ namespace WinCopies.Util
             if (command.CanExecute(commandParameter, commandTarget))
 
             {
-                try
-                {
-                    command.Execute(commandParameter, commandTarget);
-                }
-                catch (InvalidOperationException ex)
-                {
+                // try
+                // {
 
-                    Debug.WriteLine(ex.Message);
-                }
+                command.Execute(commandParameter, commandTarget);
+
+                // }
+                // catch (InvalidOperationException ex)
+                // {
+
+                // Debug.WriteLine(ex.Message);
+
+                // }
 
                 return true;
 
@@ -929,9 +932,9 @@ namespace WinCopies.Util
 
             Type type = typeof(T);
 
-            if (!typeof(DependencyObject).IsAssignableFrom(type))
+            //if (!typeof(DependencyObject).IsAssignableFrom(type))
 
-                throw new InvalidOperationException($"The DependencyObject type must be assignable from the type parameter.");
+            //    throw new InvalidOperationException($"The DependencyObject type must be assignable from the type parameter.");
 
             do
 

@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.Util;
+using WinCopies.Util.Commands;
 
 namespace WinCopies.GUI.Controls
 {
@@ -57,7 +58,7 @@ namespace WinCopies.GUI.Controls
 
             if (Command == null) return;
 
-            if ( KeyDownCommandHelper.CanRaiseCommand(this, e))
+            if ( KeyCommandHelper.CanRaiseCommand(this, e))
 
                 Command.Execute(CommandParameter, CommandTarget);
 

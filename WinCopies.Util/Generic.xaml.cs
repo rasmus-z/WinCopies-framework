@@ -68,6 +68,11 @@ namespace WinCopies.Util
         public static string Rename => GetResource<string>(nameof(Rename));
 
         /// <summary>
+        /// Gets the DeletePermanently resource.
+        /// </summary>
+        public static string DeletePermanently => GetResource<string>(nameof(DeletePermanently));
+
+        /// <summary>
         /// Gets the DeclaringTypesNotCorrespond resource.
         /// </summary>
         public static string DeclaringTypesNotCorrespond => GetResource<string>(nameof(DeclaringTypesNotCorrespond));

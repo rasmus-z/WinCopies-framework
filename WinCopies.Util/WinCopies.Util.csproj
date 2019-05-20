@@ -108,6 +108,7 @@
     <Compile Include="CheckableObject.cs" />
     <Compile Include="Commands\CommandAction.cs" />
     <Compile Include="Commands\FileSystemCommands.cs" />
+    <Compile Include="Commands\KeyCommandHelper.cs" />
     <Compile Include="Commands\NavigationAndWindowCommands.cs" />
     <Compile Include="DataConverters\BooleanToVisibilityConverter.cs" />
     <Compile Include="DataConverters\CoalesceConverter.cs" />

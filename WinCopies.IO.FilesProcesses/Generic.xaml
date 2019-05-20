@@ -4,6 +4,6 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
              x:Class="WinCopies.IO.FileProcesses.Generic">
     <sys:String x:Key="IncompatibleValues" >{0} cannot be set to true when {1} has the None value.</sys:String>
-    <sys:String x:Key="LoadingFilesInfoModuleHasNotRanYet" >The Loading files info module has not loaded. You must load it first.</sys:String>
-    <sys:String x:Key="LoadingFilesInfoModuleIsRunning" >The LoadingFilesInfo module is running.</sys:String>
+    <sys:String x:Key="LoadFilesInfoModuleHasNotRanYet" >The Loading files info module has not loaded. You must load it first.</sys:String>
+    <sys:String x:Key="LoadFilesInfoModuleIsRunning" >The LoadingFilesInfo module is running.</sys:String>
 </ResourceDictionary>

@@ -14,7 +14,7 @@ namespace WinCopies.IO.FileProcesses
         /// <summary>
         /// Gets the type of this process.
         /// </summary>
-        public override ActionType ActionType => ActionType.Deletion;
+        public override ActionType ActionType { get; }
 
         private long _deletedFiles = 0;
 
@@ -56,39 +56,7 @@ namespace WinCopies.IO.FileProcesses
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteProcessInfo"/> class.
         /// </summary>
-        public DeleteProcessInfo()
-
-        {
-
-
-
-        }
-
-        public void StartDeletion() => StartDeletion(false);
-
-        public void StartDeletion(bool onlyFirstFile)
-
-        {
-
-            if (FilesInfoLoader == null)
-
-                throw new ArgumentNullException(nameof(FilesInfoLoader));
-
-            if (FilesInfoLoader.IsBusy)
-
-                throw new Exception(Generic.LoadingFilesInfoModuleIsRunning);
-
-            if (!FilesInfoLoader.IsLoaded)
-
-                throw new Exception(Generic.LoadingFilesInfoModuleHasNotRanYet);
-
-            if (onlyFirstFile && (ExceptionsToRetry == FileProcesses.Exceptions.None || HowToRetryWhenExceptionOccured == HowToRetry.Cancel))
-
-                throw new ArgumentException(string.Format(Generic.IncompatibleValues, nameof(onlyFirstFile), nameof(ExceptionsToRetry)));
-
-            _bgWorker.RunWorkerAsync(onlyFirstFile);
-
-        }
+        public DeleteProcessInfo(bool tryRecycle) => ActionType = tryRecycle ? ActionType.Recycling : ActionType.Deletion;
 
         protected override void OnDoWork(DoWorkEventArgs e)
         {
@@ -233,13 +201,13 @@ namespace WinCopies.IO.FileProcesses
 
                 fileOperation.Advise(new FileOperationProgressSink());
 
+                ShellOperationFlags shellOperationFlags = ShellOperationFlags.FOF_SILENT | ShellOperationFlags.FOF_NOERRORUI;
+
                 if (ActionType == ActionType.Recycling)
 
-                    fileOperation.SetOperationFlags(ShellOperationFlags.FOF_ALLOWUNDO);
+                    shellOperationFlags |= ShellOperationFlags.FOF_ALLOWUNDO;
 
-                fileOperation.SetOperationFlags(ShellOperationFlags.FOF_SILENT);
-
-                fileOperation.SetOperationFlags(ShellOperationFlags.FOF_NOERRORUI);
+                fileOperation.SetOperationFlags(shellOperationFlags);
 
                 Exceptions deleteFile(FileSystemInfo _path)
 
@@ -483,7 +451,7 @@ namespace WinCopies.IO.FileProcesses
 
                             else
 
-                            onException(FileProcesses.Exceptions.Unknown);
+                                onException(FileProcesses.Exceptions.Unknown);
 
                         }
 

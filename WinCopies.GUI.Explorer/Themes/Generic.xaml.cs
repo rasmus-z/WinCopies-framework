@@ -7,6 +7,8 @@ using BooleanToVisibilityConverter = WinCopies.Util.DataConverters.BooleanToVisi
 using WinCopies.Util;
 using System;
 using System.IO;
+using Microsoft.WindowsAPICodePack.Shell;
+using System.Collections;
 
 namespace WinCopies.GUI.Explorer.Themes
 {
@@ -177,11 +179,6 @@ namespace WinCopies.GUI.Explorer.Themes
         /// </summary>
         public static string Save => GetResource<string>(nameof(Save));
 
-        /// <summary>
-        /// Gets a resource that represents the path to the WinCopies Processes manager application.
-        /// </summary>
-        public static string WinCopiesProcessesManagerPath => GetResource<string>(nameof(WinCopiesProcessesManagerPath));
-
         public static BooleanToVisibilityConverter BooleanToVisibilityConverter => GetResource<BooleanToVisibilityConverter>(nameof(BooleanToVisibilityConverter));
 
         public static FileSystemInfoAttributesToVisibilityConverter FileSystemInfoAttributesToVisibilityConverter => GetResource<FileSystemInfoAttributesToVisibilityConverter>(nameof(FileSystemInfoAttributesToVisibilityConverter));
@@ -198,7 +195,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
         {
 
-            var historyItem = ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).History[((ExplorerControl)((FrameworkElement)sender).TemplatedParent).HistorySelectedIndex + 1];
+            IHistoryItemData historyItem = ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).History[((ExplorerControl)((FrameworkElement)sender).TemplatedParent).HistorySelectedIndex + 1];
 
             if (historyItem is HistoryItemData)
 
@@ -210,7 +207,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
         {
 
-            var historyitem = ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).History[((ExplorerControl)((FrameworkElement)sender).TemplatedParent).HistorySelectedIndex - 1];
+            IHistoryItemData historyitem = ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).History[((ExplorerControl)((FrameworkElement)sender).TemplatedParent).HistorySelectedIndex - 1];
 
             if (historyitem is IHistoryItemData)
 
@@ -322,6 +319,10 @@ namespace WinCopies.GUI.Explorer.Themes
             listView.GetParent<ExplorerControl>(false).OnItemsControlContextMenuOpening((FrameworkElement)sender, listView, e);
 
         }
+
+        private void PART_TreeView_KeyDown(object sender, KeyEventArgs e) => ((TreeView)sender).TryRaiseCommandsByKeyDown(e);
+
+        private void PART_ListView_KeyDown(object sender, KeyEventArgs e) => ((ListView)sender).TryRaiseCommandsByKeyDown(e);
 
         // private void Button_Click_1(object sender, RoutedEventArgs e) => ((DependencyObject)sender).GetParent<TreeViewItem>(false).IsSelected = true;
 

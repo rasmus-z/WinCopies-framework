@@ -70,7 +70,7 @@ namespace WinCopies.IO.FileProcesses
 
         // todo : exception : 'exceptions' ? - nullable
 
-        private readonly bool _isAFileMoving = false;
+        private readonly bool _isAFileMove = false;
 
         //TODO : 'OK' : - simplifier l'utilisation ? - nom / nomenclature du nom ? - voir également commenatire CopyFiles.cs
 
@@ -85,13 +85,13 @@ namespace WinCopies.IO.FileProcesses
         /// <summary>
         /// Gets or sets a value that indicates if this module represents a file moving. True for moving directly the selected file system objects if the moving is running on the same drive for both the source and destination paths or deleting the original file system objects if the moving is running on multiple drives. False for copying all the file system objects each time and keep the original file system objects.
         /// </summary>
-        public bool IsAFileMoving
+        public bool IsAFileMove
         {
 
-            get => _isAFileMoving; set
+            get => _isAFileMove; set
 
             {
-                OnPropertyChangedWhenNotBusy(nameof(IsAFileMoving), nameof(_isAFileMoving), value, typeof(CopyProcessInfo)); SetActionType(value ? ActionType.Move : ActionType.Copy);
+                OnPropertyChangedWhenNotBusy(nameof(IsAFileMove), nameof(_isAFileMove), value, typeof(CopyProcessInfo)); SetActionType(value ? ActionType.Move : ActionType.Copy);
 
             }
 
@@ -162,14 +162,14 @@ namespace WinCopies.IO.FileProcesses
         /// Initializes a new instance of <see cref="CopyProcessInfo"/> which will keep in memory the source files and folders.
         /// </summary>
         /// <param name="destPath">Destination folder path for copying the source files and folders</param>
-        /// <param name="isAFileMoving">True if the process is a file moving</param>
+        /// <param name="isAFileMove">True if the process is a file moving</param>
         // /// <param name="filesInfoLoader">Files info loader for this <see cref="CopyProcessInfo"/>.</param>
-        public CopyProcessInfo(string destPath, bool isAFileMoving) : base()
+        public CopyProcessInfo(string destPath, bool isAFileMove) : base()
         {
 
             DestPath = destPath;
 
-            IsAFileMoving = isAFileMoving;
+            IsAFileMove = isAFileMove;
 
         }
 
@@ -212,46 +212,6 @@ namespace WinCopies.IO.FileProcesses
         //    // todo : si le disque du répertoire de destination a un espace de stockage insuffisant, mettre une exception.
 
         //    FilesInfoLoaded(this, new EventArgs());
-
-        // todo : copy tout-court pour le nom ?
-
-        /// <summary>
-        /// Starts the copy.
-        /// </summary>
-        public void StartCopy() => StartCopy(false);
-
-        /// <summary>
-        /// Starts the copy with the possibility to copy only the first item.
-        /// </summary>
-        /// <param name="onlyFirstFile">Define if the process must be copy or move only the first item</param>
-        public void StartCopy(bool onlyFirstFile)
-        {
-
-            //            CancellationPending = false;
-
-            if (FilesInfoLoader == null)
-
-                throw new ArgumentNullException(nameof(FilesInfoLoader));
-
-            if (FilesInfoLoader.IsBusy)
-
-                throw new Exception(Generic.LoadingFilesInfoModuleIsRunning);
-
-            if (!FilesInfoLoader.IsLoaded)
-
-                throw new Exception(Generic.LoadingFilesInfoModuleHasNotRanYet);
-
-            if (onlyFirstFile && (ExceptionsToRetry == FileProcesses.Exceptions.None || HowToRetryWhenExceptionOccured == HowToRetry.Cancel))
-
-                throw new ArgumentException(string.Format(Generic.IncompatibleValues, nameof(onlyFirstFile), nameof(ExceptionsToRetry)));
-
-            /*if (CopyFiles == null)*/ //CopyFiles = new CopyFiles(FilesInfoLoader.pathsLoaded, DestPath);
-
-            //TODO:
-
-            _bgWorker.RunWorkerAsync(onlyFirstFile);
-
-        }
 
         //private void CopyFiles_ProgressChanged(object sender, ProgressChangedEventArgs e)
         //{
@@ -440,7 +400,7 @@ namespace WinCopies.IO.FileProcesses
 
             {
 
-                Exceptions ex = Copy_Files(_path.FileSystemInfoProperties.FullName, destFilePath, IsAFileMoving, overwrite,
+                Exceptions ex = Copy_Files(_path.FileSystemInfoProperties.FullName, destFilePath, IsAFileMove, overwrite,
                              (
             long totalFileSize,
             long totalBytesTransferred,
@@ -459,7 +419,7 @@ namespace WinCopies.IO.FileProcesses
 
                     //TODO: ? - Si c'est un déplacement sur le même lecteur, plutôt procéder par nbre de fichiers déplacés / s.
 
-                    if (IsAFileMoving && System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath) == System.IO.Path.GetPathRoot(DestPath))
+                    if (IsAFileMove && System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath) == System.IO.Path.GetPathRoot(DestPath))
                     {
 
                         long fileLength = ((FileInfo)_path.FileSystemInfoProperties).Length;
@@ -587,7 +547,7 @@ namespace WinCopies.IO.FileProcesses
 
                 driveInfo = new DriveInfo(System.IO.Path.GetPathRoot(DestPath));
 
-                if ((new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).RootDirectory != driveInfo.RootDirectory || !_isAFileMoving) && driveInfo.AvailableFreeSpace <= FilesInfoLoader.TotalSize)
+                if ((new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).RootDirectory != driveInfo.RootDirectory || !_isAFileMove) && driveInfo.AvailableFreeSpace <= FilesInfoLoader.TotalSize)
 
                 {
 

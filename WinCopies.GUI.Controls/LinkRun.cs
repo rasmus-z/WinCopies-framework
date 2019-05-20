@@ -84,11 +84,11 @@ namespace WinCopies.GUI.Controls
         public bool Seen { get => (bool)GetValue(SeenProperty); set => SetValue(SeenProperty, value); }
 
         /// <summary>
-        /// Identifies the <see cref="Url"/> dependency property.
+        /// Identifies the <see cref="Uri"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty UrlProperty = DependencyProperty.Register(nameof(Url), typeof(string), typeof(Link), new PropertyMetadata(null));
+        public static readonly DependencyProperty UriProperty = DependencyProperty.Register(nameof(Uri), typeof(string), typeof(Link), new PropertyMetadata(null));
 
-        public string Url { get => (string)GetValue(UrlProperty); set => SetValue(UrlProperty, value); }
+        public string Uri { get => (string)GetValue(UriProperty); set => SetValue(UriProperty, value); }
 
         public static readonly RoutedEvent ClickEvent = EventManager.RegisterRoutedEvent(nameof(Click), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(LinkRun));
 
@@ -379,11 +379,11 @@ namespace WinCopies.GUI.Controls
         protected void OnClick()
         {
 
-            if (WinCopies.Util.Util.IsNullEmptyOrWhiteSpace(Url))
+            if (WinCopies.Util.Util.IsNullEmptyOrWhiteSpace(Uri))
 
                 return;
 
-            Process.Start(Url);
+            Process.Start(Uri);
 
             Seen = true;
 

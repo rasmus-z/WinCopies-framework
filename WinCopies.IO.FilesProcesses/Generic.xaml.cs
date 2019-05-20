@@ -16,9 +16,9 @@ namespace WinCopies.IO.FileProcesses
 
         public static string IncompatibleValues => GetStringResource(nameof(IncompatibleValues));
 
-        public static string LoadingFilesInfoModuleHasNotRanYet => GetStringResource(nameof(LoadingFilesInfoModuleHasNotRanYet));
+        public static string LoadFilesInfoModuleHasNotRanYet => GetStringResource(nameof(LoadFilesInfoModuleHasNotRanYet));
 
-        public static string LoadingFilesInfoModuleIsRunning => GetStringResource(nameof(LoadingFilesInfoModuleIsRunning));
+        public static string LoadFilesInfoModuleIsRunning => GetStringResource(nameof(LoadFilesInfoModuleIsRunning));
 
     }
 }

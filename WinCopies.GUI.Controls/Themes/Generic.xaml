@@ -405,7 +405,7 @@
         <Setter Property="Template" >
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:Link}">
-                    <local:LinkRun x:Name="LinkRun" Url="{Binding Url, RelativeSource={RelativeSource Mode=TemplatedParent}}" UnderliningMode="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" NormalForeground="{Binding NormalForeground, RelativeSource={RelativeSource Mode=TemplatedParent}}" HighlightedForeground="{Binding HighlightedForeground, RelativeSource={RelativeSource Mode=TemplatedParent}}" ActiveForeground="{Binding ActiveForeground, RelativeSource={RelativeSource Mode=TemplatedParent}}" SeenForeground="{Binding SeenForeground, RelativeSource={RelativeSource Mode=TemplatedParent}}" Seen="{Binding Seen, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                    <local:LinkRun x:Name="LinkRun" Uri="{Binding Url, RelativeSource={RelativeSource Mode=TemplatedParent}}" UnderliningMode="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" NormalForeground="{Binding NormalForeground, RelativeSource={RelativeSource Mode=TemplatedParent}}" HighlightedForeground="{Binding HighlightedForeground, RelativeSource={RelativeSource Mode=TemplatedParent}}" ActiveForeground="{Binding ActiveForeground, RelativeSource={RelativeSource Mode=TemplatedParent}}" SeenForeground="{Binding SeenForeground, RelativeSource={RelativeSource Mode=TemplatedParent}}" Seen="{Binding Seen, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

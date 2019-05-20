@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.Util;
+using WinCopies.Util.Commands;
 
 // todo: to add command input gesture for mouse actions
 
@@ -143,7 +144,7 @@ namespace WinCopies.GUI.Controls
 
             if (e.Key == Key.Enter) OnClick(e);
 
-            else if (Command != null && KeyDownCommandHelper.CanRaiseCommand(this, e))
+            else if (Command != null && KeyCommandHelper.CanRaiseCommand(this, e))
 
             {
 

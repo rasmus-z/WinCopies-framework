@@ -86,7 +86,6 @@
     <Compile Include="GridView.cs" />
     <Compile Include="IScrollable.cs" />
     <Compile Include="ISelector.cs" />
-    <Compile Include="KeyDownCommandHelper.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Link.cs" />
     <Compile Include="LinkRun.cs" />

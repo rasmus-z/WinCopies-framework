@@ -14,6 +14,7 @@
     <sys:String x:Key="NewArchive" >Nouveau _dossier compressé...</sys:String>
     <sys:String x:Key="ShowFileProperties" >_Propriétés du fichier...</sys:String>
     <sys:String x:Key="Rename" >_Renommer</sys:String>
+    <sys:String x:Key="DeletePermanently" >Supprimer de façon définitive</sys:String>
     <!--Exception messages-->
     <sys:String x:Key="DeclaringTypesNotCorrespond" >The declaring types of '{0}' and '{1}' are not corresponding. The declaring types of '{0}' and '{1}' must correspond for read-only properties when an integrity check is performed.</sys:String>
     <!--<sys:String x:Key="DeclaringTypeIsNotInObjectInheritanceHierarchyException" >'{0}' is not in the inheritance hierarchy of '{1}'.</sys:String>-->

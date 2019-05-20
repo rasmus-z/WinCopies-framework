@@ -68,8 +68,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Resources\git\aybe\Windows-API-Code-Pack-1.1-master\source\WindowsAPICodePack\Core\bin\x64\Debug\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
-    <Reference Include="SevenZipSharp, Version=1.1.136.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb, processorArchitecture=MSIL">
-      <HintPath>..\packages\Squid-Box.SevenZipSharp.1.1.136\lib\net45\SevenZipSharp.dll</HintPath>
+    <Reference Include="SevenZipSharp, Version=1.1.144.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb, processorArchitecture=MSIL">
+      <HintPath>..\packages\Squid-Box.SevenZipSharp.1.1.144\lib\net45\SevenZipSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

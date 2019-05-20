@@ -365,6 +365,12 @@ namespace WinCopies.GUI.Explorer
 
         public IEnumerable<string> Filter { get => (IEnumerable<string>)GetValue(FilterProperty); set => SetValue(FilterProperty, value); }
 
+        // todo: to add a default implementation:
+
+        public static readonly DependencyProperty PasteActionProperty = DependencyProperty.Register(nameof(PasteAction), typeof(Action<bool, StringCollection, string>), typeof(ExplorerControl));
+
+        public Action<bool, StringCollection, string> PasteAction { get => (Action<bool, StringCollection, string>)GetValue(PasteActionProperty); set => SetValue(PasteActionProperty, value); }
+
         // public static readonly DependencyProperty BrowsableObjectInfoItemsLoaderProperty = DependencyProperty.Register("BrowsableObjectInfoItemsLoader", typeof(BrowsableObjectInfoItemsLoader), typeof(ExplorerControl), new PropertyMetadata()));
 
         // private WinCopies.IO.BrowsableObjectInfoItemsLoader BrowsableObjectInfoItemsLoader = null;
@@ -439,6 +445,8 @@ namespace WinCopies.GUI.Explorer
 
             CommandBindings.Add(new CommandBinding(Commands.Open, Open_Executed, Open_CanExecute));
 
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, Copy_Executed, FileSystemOperation_CanExecute));
+
             // CommandBindings.Add(new CommandBinding(Util.Util.CommonCommand, Open_Execute, Open_CanExecute));
 
             #region Comments
@@ -458,6 +466,61 @@ namespace WinCopies.GUI.Explorer
             //CommandBindings.Add(new CommandBinding(Commands.Properties, Properties_Executed, Command_CanExecute));
 
             #endregion
+
+        }
+
+        private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnOpenCanExecute(e);
+
+        private void FileSystemOperation_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // var explorerControl = SelectedItem.PART_ExplorerControl;
+
+            if (ListView.SelectedItem is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject is ShellFolder || TreeView.SelectedItem is ShellObjectInfo _shellObjectInfo && _shellObjectInfo.ShellObject is ShellFolder) e.CanExecute = true;
+
+        }
+
+        private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
+
+        {
+
+            if (e.Parameter is null)
+
+                OnOpening(null);
+
+            else if (e.Parameter is IEnumerable paths)
+
+            {
+
+                IBrowsableObjectInfo[] _paths = new IBrowsableObjectInfo[paths.ToList().Count];
+
+                int i = -1;
+
+                foreach (object path in paths)
+
+                {
+
+                    i++;
+
+                    _paths[i] = (IBrowsableObjectInfo)path;
+
+                }
+
+                OnOpening(_paths);
+
+            }
+
+            else if (e.Parameter is IBrowsableObjectInfo path)
+
+                OnOpening(path);
+
+        }
+
+        private void Copy_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+            if (sender is ExplorerControl && e.Parameter is ActionsFromObjects)
+
+                Copy((ActionsFromObjects)e.Parameter);
 
         }
 
@@ -692,6 +755,10 @@ namespace WinCopies.GUI.Explorer
 
             TreeView = (TreeView)Template.FindName("PART_TreeView", this);
 
+            if (TreeView != null)
+
+                TreeView.ParentExplorerControl = this;
+
             ListView = (ListView)Template.FindName("PART_ListView", this);
 
             if (ListView != null)
@@ -836,7 +903,7 @@ namespace WinCopies.GUI.Explorer
 
                         listViewItems.RemoveAt(i);
 
-                       // SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - 1);
+                        // SetValue(VisibleItemsCountPropertyKey, VisibleItemsCount - 1);
 
                     }
 
@@ -1303,7 +1370,7 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        protected virtual void OnOpening(params IBrowsableObjectInfo[] paths)
+        protected internal virtual void OnOpening(params IBrowsableObjectInfo[] paths)
         {
 
             if (paths == null) return;
@@ -1311,58 +1378,16 @@ namespace WinCopies.GUI.Explorer
             IBrowsableObjectInfo path;
 
             for (int i = 0; i < paths.Length; i++)
-            {
-                path = paths[i];
-                var bidule = (IBrowsableObjectInfo)(path is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(ShellObject.FromParsingName(shellObjectInfo.ShellObject.ParsingName), shellObjectInfo.Path, shellObjectInfo.FileType, shellObjectInfo.SpecialFolder) : path is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
 
-                var chose = bidule == paths[i];
-                paths[i] = bidule;
-            }
+                paths[i] = (IBrowsableObjectInfo)(paths[i] is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(ShellObject.FromParsingName(shellObjectInfo.ShellObject.ParsingName), shellObjectInfo.Path, shellObjectInfo.FileType, shellObjectInfo.SpecialFolder) : paths[i] is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
 
             Open(paths);
+
         }
+
+        protected internal virtual void OnOpenCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = TreeView?.SelectedItem != null || ListView?.SelectedItem != null;
 
         internal void OnOpeningInternal(params IBrowsableObjectInfo[] paths) => OnOpening(paths);
-
-        private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
-
-        private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
-
-        {
-
-            if (e.Parameter is null)
-
-                OnOpening(null);
-
-            else if (e.Parameter is IEnumerable paths)
-
-            {
-
-                IBrowsableObjectInfo[] _paths = new IBrowsableObjectInfo[paths.ToList().Count];
-
-                int i = -1;
-
-                foreach (object path in paths)
-
-                {
-
-                    i++;
-
-                    Debug.WriteLine(path.GetType().ToString());
-
-                    _paths[i] = (IBrowsableObjectInfo)path;
-
-                }
-
-                OnOpening(_paths);
-
-            }
-
-            else if (e.Parameter is IBrowsableObjectInfo path)
-
-                OnOpening(path);
-
-        }
 
         public StringCollection GetFileDropList(ActionsFromObjects copyFrom)
 
@@ -1404,7 +1429,9 @@ namespace WinCopies.GUI.Explorer
 
             if (sc != null)
 
-                // Clipboard.EmptyClipboard();
+            {
+
+                Clipboard.EmptyClipboard();
 
                 //while (true)
 
@@ -1413,17 +1440,19 @@ namespace WinCopies.GUI.Explorer
 
                 Clipboard.SetFileDropList(new WindowInteropHelper(Window.GetWindow(this)), sc, false);
 
-            //    break;
+                //    break;
 
-            //}
+                //}
 
-            //catch (Win32Exception ex)
+                //catch (Win32Exception ex)
 
-            //{
+                //{
 
 
 
-            //}
+                //}
+
+            }
 
         }
 
@@ -1445,10 +1474,8 @@ namespace WinCopies.GUI.Explorer
 
             StringCollection sc = GetFileDropList(cutFrom);
 
-            byte moveEffect = (byte)DragDropEffects.Move; // new byte[] { 2, 0, 0, 0 };
-
             MemoryStream dropEffect = new MemoryStream();
-            dropEffect.WriteByte(moveEffect);
+            dropEffect.WriteByte((byte)DragDropEffects.Move /* new byte[] { 2, 0, 0, 0 }; */);
 
             DataObject data = new DataObject();
             data.SetFileDropList(sc);
@@ -1477,25 +1504,7 @@ namespace WinCopies.GUI.Explorer
 
         {
 
-#if DEBUG
-            Debug.WriteLine("Is a file moving: " + isAFileMoving.ToString());
-#endif
 
-            string args = null;
-
-            args += isAFileMoving ? "\"FileMoving\" " : "\"Copy\" ";
-
-            foreach (string s in sc)
-
-                args += "\"" + s + "\" ";
-
-            args += "\"" + destPath + "\"";
-
-#if DEBUG
-            Debug.WriteLine(args);
-#endif
-
-            Process.Start(new ProcessStartInfo(Generic.WinCopiesProcessesManagerPath, args));
 
         }
 

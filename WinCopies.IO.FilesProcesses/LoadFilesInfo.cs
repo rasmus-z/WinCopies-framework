@@ -418,9 +418,9 @@ namespace WinCopies.IO.FileProcesses
             else
 
                 foreach (FileSystemInfo path in Paths)
-                {
 
 #if DEBUG
+                {
 
                     Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName);
 
@@ -681,7 +681,9 @@ namespace WinCopies.IO.FileProcesses
 
                     } // end switch
                       //System.Windows.Forms.MessageBox.Show(path.FileSystemInfoProperties.FullName);
+#if DEBUG
                 } // next
+#endif
 
         } // end void
 

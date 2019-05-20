@@ -49,7 +49,7 @@ namespace WinCopies.IO.FileProcesses
 
         #region BackgroundWorker implementation
 
-        protected readonly BackgroundWorker _bgWorker = new BackgroundWorker();
+        private readonly BackgroundWorker _bgWorker = new BackgroundWorker();
 
 
 
@@ -437,6 +437,49 @@ namespace WinCopies.IO.FileProcesses
             _bgWorker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => OnRunWorkerCompleted(e);
 
             _bgWorker.Disposed += (object sender, EventArgs e) => Disposed?.Invoke(sender, e);
+
+        }
+
+        // todo : copy tout-court pour le nom ?
+
+        /// <summary>
+        /// Starts the process.
+        /// </summary>
+        public void StartProcess() => StartProcess(false);
+
+        /// <summary>
+        /// Starts the process with the possibility to copy only the first item.
+        /// </summary>
+        /// <param name="onlyFirstFile">Defines whether to only process the first item</param>
+        /// <exception cref="NullReferenceException">Exception thrown when the <see cref="FilesInfoLoader"/> property is null.</exception>
+        /// <exception cref="Exception">Exception thrown when the load files info module is running or has not ran yet.</exception>
+        /// <exception cref="ArgumentException">Exception thrown when onlyFirstFile is set to <see langword="true"/> and <see cref="ExceptionsToRetry"/> is set to <see cref="FileProcesses.Exceptions.None"/> or <see cref="HowToRetryWhenExceptionOccured"/> is set to <see cref="HowToRetry.Cancel"/>.</exception>
+        public void StartProcess(bool onlyFirstFile)
+        {
+
+            //            CancellationPending = false;
+
+            if (FilesInfoLoader == null)
+
+                throw new NullReferenceException(nameof(FilesInfoLoader));
+
+            if (FilesInfoLoader.IsBusy)
+
+                throw new Exception(Generic.LoadFilesInfoModuleIsRunning);
+
+            if (!FilesInfoLoader.IsLoaded)
+
+                throw new Exception(Generic.LoadFilesInfoModuleHasNotRanYet);
+
+            if (onlyFirstFile && (ExceptionsToRetry == FileProcesses.Exceptions.None || HowToRetryWhenExceptionOccured == HowToRetry.Cancel))
+
+                throw new ArgumentException(string.Format(Generic.IncompatibleValues, nameof(onlyFirstFile), nameof(ExceptionsToRetry)));
+
+            /*if (CopyFiles == null)*/ //CopyFiles = new CopyFiles(FilesInfoLoader.pathsLoaded, DestPath);
+
+            //TODO:
+
+            _bgWorker.RunWorkerAsync(onlyFirstFile);
 
         }
 
