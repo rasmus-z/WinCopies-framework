@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using WinCopies.Util;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.FileProcesses
 {
@@ -195,263 +196,49 @@ namespace WinCopies.IO.FileProcesses
         private void this_all_Files_DoWork(int start, int length, IList<FileSystemInfo> items, bool isARetry = false, bool isResuming = false)
         {
 
-            using (FileOperation fileOperation = new FileOperation())
+            Exceptions deleteFile(FileSystemInfo _path, FileOperation _fileOperation)
 
             {
 
-                fileOperation.Advise(new FileOperationProgressSink());
+                if (!_path.FileSystemInfoProperties.Exists)
 
-                ShellOperationFlags shellOperationFlags = ShellOperationFlags.FOF_NOERRORUI | ShellOperationFlags.FOFX_EARLYFAILURE | ShellOperationFlags.FOF_SILENT;
+                    return FileProcesses.Exceptions.PathNotFound;
 
-                if (ActionType == ActionType.Recycling)
+                if (_path.FileType == FileType.Drive)
 
-                    shellOperationFlags |= ShellOperationFlags.FOF_ALLOWUNDO;
+                    return FileProcesses.Exceptions.NotAllowedOnDrives;
 
-                fileOperation.SetOperationFlags(shellOperationFlags);
-
-                Exceptions deleteFile(FileSystemInfo _path)
+                if (_fileOperation != null)
 
                 {
 
-                    if (!_path.FileSystemInfoProperties.Exists)
+                    ShellObject shellObject = ShellObject.FromParsingName(_path.FileSystemInfoProperties.FullName);
 
-                        return FileProcesses.Exceptions.PathNotFound;
+                    Guid guid = KnownFolders.RecycleBin.FolderId;
 
-                    fileOperation.DeleteItem(ShellObject.FromParsingName(_path.FileSystemInfoProperties.FullName), null);
+                    // todo: to optimize
 
-                    fileOperation.PerformOperations();
-
-                    return fileOperation.GetAnyOperationsAborted() ? FileProcesses.Exceptions.Unknown : FileProcesses.Exceptions.None;
-
-                }
-
-
-
-                if (isResuming && PausedFile != null)
-
-                {
-
-                    Exceptions ex = deleteFile(PausedFile);
-
-                    PausedFile = null;
-
-                    _PausedFiles = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
-
-                    PausedIndex = -1;
-
-                }
-
-                else if (!isResuming)
-
-                {
-
-                    if (length == 1 && HowToRetryWhenExceptionOccured == HowToRetry.None && items[start].HowToRetryToProcess == HowToRetry.None)
-
-                        return;
-
-
-
-                    ExceptionsOccurred = false;
-
-                    FileSystemInfo path = null;
-
-                    int i = start;
-
-                    void onException(Exceptions exception)
+                    while ((shellObject = shellObject.Parent) != null)
 
                     {
 
-                        ExceptionsOccurred = true;
+                        if ((shellObject is FileSystemKnownFolder knownFolder && knownFolder.FolderId == guid) || (shellObject is NonFileSystemKnownFolder folder && folder.FolderId == guid))
 
-                        if (path._exception != exception)
-
-                        {
-
-                            path._exception = exception;
-
-                            if (!isARetry)
-
-                                ExceptionsProtected.Add(path);
-
-                        }
-
-                        ReportProgress(i / length * 100);
+                            return FileProcesses.Exceptions.FileIsAlreadyInRecycleBin;
 
                     }
 
-                    while (i < length && !CancellationPending)
+                    if (FileOperation.QueryRecycleBinInfo(System.IO.Path.GetPathRoot(_path.FileSystemInfoProperties.FullName), out RecycleBinInfo recycleBinInfo))
 
                     {
+
+                        _fileOperation.DeleteItem(ShellObject.FromParsingName(_path.FileSystemInfoProperties.FullName), null);
 
                         try
 
                         {
 
-                            #region item pre-processing actions
-
-                            path = items[i];
-
-                            if (PausePending)
-
-                            {
-
-                                PausedFile = path;
-
-                                _PausedFiles = isARetry ? (System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>)items : new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>(items);
-
-                                PausedIndex = i;
-
-
-
-                                break;
-
-                            }
-
-                            if (isARetry && path.HowToRetryToProcess != HowToRetry.Retry && HowToRetryWhenExceptionOccured != HowToRetry.Retry && path.HowToRetryToProcess != HowToRetry.Rename && HowToRetryWhenExceptionOccured != HowToRetry.Rename && path.HowToRetryToProcess != HowToRetry.Replace && HowToRetryWhenExceptionOccured != HowToRetry.Replace)
-
-                            {
-
-                                if (path.HowToRetryToProcess != HowToRetry.None || HowToRetryWhenExceptionOccured != HowToRetry.None)
-
-                                {
-
-                                    ExceptionsProtected.RemoveAt(i);
-
-                                    // items.RemoveAt(i);    
-
-                                    // todo : HowToRetry ...
-
-                                    //if (path.HowToRetryToProcess == HowToRetry.None)
-
-                                    //{
-
-                                    //    onException(path.Exception);
-
-                                    //    continue;
-
-                                    //}
-
-                                    if (path.HowToRetryToProcess == HowToRetry.Ignore || HowToRetryWhenExceptionOccured == HowToRetry.Ignore)
-
-                                    {
-
-                                        path._exception = FileProcesses.Exceptions.None;
-
-                                        DeletedFiles += 1;
-
-                                        if (path.FileSystemInfoProperties.GetType() == typeof(FileInfo))
-
-                                            CurrentDeletedSize += ((FileInfo)path.FileSystemInfoProperties).Length;
-
-                                    }
-
-                                }
-
-                                // i++;
-
-                                length--;
-
-                                ReportProgress(0);
-
-                                ExceptionsOccurred = i == length && ExceptionsProtected.Count > 0;
-
-                                continue;
-
-                            }
-
-
-
-                            CurrentDeletedFile = path;
-
-                            #endregion
-
-                            Exceptions ex = FileProcesses.Exceptions.None;
-
-                            if ((ex = deleteFile(path)) == FileProcesses.Exceptions.None)
-
-                                DeletedFiles += 1;
-
-                            else
-
-                                onException(ex);
-
-                            //else if (ex == Exceptions.FileAlreadyExists)
-
-                            //{
-
-                            //    _file_Already_Exists.Add(path);
-
-                            //}
-
-                            //else if (ex == Exceptions.DirectoryNotFound)
-
-                            //{
-
-                            //    _directory_Not_Found.Add(path);
-
-                            //}
-
-
-
-                            //TODO:
-
-                            // if (start_Item_Index + 1 == pathsToCopy.Count) start_Item_Index = 0; else start_Item_Index += 1;
-
-                            //TODO:
-
-                            ReportProgress(i / length * 100);
-
-                        }
-
-                        catch (DirectoryNotFoundException)
-                        {
-
-                            onException(FileProcesses.Exceptions.PathNotFound);
-
-                        }
-                        catch (PathTooLongException)
-                        {
-
-                            onException(FileProcesses.Exceptions.FileNameTooLong);
-
-                        }
-                        // catch (IOException) { ex = FileProcesses.Exceptions.FileAlreadyExists; } 
-                        catch (UnauthorizedAccessException)
-                        {
-
-                            onException(FileProcesses.Exceptions.AccessDenied);
-
-                        }
-
-                        catch (IOException)
-
-                        {
-
-                            if (new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).IsReady)
-
-                            {
-
-                                ExceptionsOccurred = true;
-
-                                ExceptionsProtected.Clear();
-
-                                foreach (FileSystemInfo _path in items)
-
-                                {
-
-                                    _path._exception = FileProcesses.Exceptions.DiskNotReady;
-
-                                    ExceptionsProtected.Add(_path);
-
-                                }
-
-                                break;
-
-                            }
-
-                            else
-
-                                onException(FileProcesses.Exceptions.Unknown);
+                            _fileOperation.PerformOperations();
 
                         }
 
@@ -459,31 +246,333 @@ namespace WinCopies.IO.FileProcesses
 
                         {
 
-                            onException(FileProcesses.Exceptions.Unknown);
+                            return FileProcesses.Exceptions.Unknown;
 
                         }
 
-                        if (isARetry)
+                        return FileProcesses.Exceptions.None;
+
+                    }
+
+                    else return FileProcesses.Exceptions.NotAllowedOnCurrentFileSystem;
+
+                }
+
+                else
+
+                {
+
+                    if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, _path.FileType, FileType.Folder, FileType.SpecialFolder))
+
+                        System.IO.Directory.Delete(_path.FileSystemInfoProperties.FullName);
+
+                    else if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, _path.FileType, FileType.File, FileType.Link, FileType.Archive))
+
+                        System.IO.File.Delete(_path.FileSystemInfoProperties.FullName);
+
+                    return FileProcesses.Exceptions.None;
+
+                }
+
+            }
+
+
+
+            FileOperation getFileOperation()
+
+            {
+
+                FileOperation fileOperation = new FileOperation();
+
+                fileOperation.Advise(new FileOperationProgressSink());
+
+                fileOperation.SetOperationFlags(ShellOperationFlags.FOF_ALLOWUNDO | ShellOperationFlags.FOF_NOERRORUI | ShellOperationFlags.FOFX_EARLYFAILURE | ShellOperationFlags.FOF_SILENT);
+
+                return fileOperation;
+
+            }
+
+
+
+            void onException(FileSystemInfo path, int progress, Exceptions exception)
+
+            {
+
+                ExceptionsOccurred = true;
+
+                if (path._exception != exception)
+
+                {
+
+                    path._exception = exception;
+
+                    if (!isARetry)
+
+                        ExceptionsProtected.Add(path);
+
+                }
+
+                ReportProgress(progress);
+
+            }
+
+
+
+            if (isResuming && PausedFile != null)
+
+            {
+
+                Exceptions e = FileProcesses.Exceptions.None;
+
+                FileSystemInfo path = null;
+
+                int index = -1;
+
+                if (ActionType == ActionType.Recycling)
+
+                    using (FileOperation fileOperation = getFileOperation())
+
+                        e = deleteFile(PausedFile, fileOperation);
+
+                path = PausedFile;
+
+                PausedFile = null;
+
+                _PausedFiles = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
+
+                index = PausedIndex;
+
+                PausedIndex = -1;
+
+                if (e != FileProcesses.Exceptions.None)
+
+                    onException(path, index / length * 100, e);
+
+            }
+
+            else if (!isResuming)
+
+            {
+
+                if (length == 1 && HowToRetryWhenExceptionOccured == HowToRetry.None && items[start].HowToRetryToProcess == HowToRetry.None)
+
+                    return;
+
+
+
+                ExceptionsOccurred = false;
+
+                FileSystemInfo path = null;
+
+                int i = start;
+
+                while (i < length && !CancellationPending)
+
+                {
+
+                    try
+
+                    {
+
+                        #region item pre-processing actions
+
+                        path = items[i];
+
+                        if (PausePending)
 
                         {
 
-                            ExceptionsProtected.RemoveAt(0);
+                            PausedFile = path;
+
+                            _PausedFiles = isARetry ? (System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>)items : new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>(items);
+
+                            PausedIndex = i;
+
+
+
+                            if (StopProcessOnPause) return;
+
+                            Pause();
+
+                        }
+
+                        if (isARetry && path.HowToRetryToProcess != HowToRetry.Retry && HowToRetryWhenExceptionOccured != HowToRetry.Retry && path.HowToRetryToProcess != HowToRetry.Rename && HowToRetryWhenExceptionOccured != HowToRetry.Rename && path.HowToRetryToProcess != HowToRetry.Replace && HowToRetryWhenExceptionOccured != HowToRetry.Replace)
+
+                        {
+
+                            if (path.HowToRetryToProcess != HowToRetry.None || HowToRetryWhenExceptionOccured != HowToRetry.None)
+
+                            {
+
+                                ExceptionsProtected.RemoveAt(i);
+
+                                // items.RemoveAt(i);    
+
+                                // todo : HowToRetry ...
+
+                                //if (path.HowToRetryToProcess == HowToRetry.None)
+
+                                //{
+
+                                //    onException(path.Exception);
+
+                                //    continue;
+
+                                //}
+
+                                if (path.HowToRetryToProcess == HowToRetry.Ignore || HowToRetryWhenExceptionOccured == HowToRetry.Ignore)
+
+                                {
+
+                                    path._exception = FileProcesses.Exceptions.None;
+
+                                    DeletedFiles += 1;
+
+                                    if (path.FileSystemInfoProperties.GetType() == typeof(FileInfo))
+
+                                        CurrentDeletedSize += ((FileInfo)path.FileSystemInfoProperties).Length;
+
+                                }
+
+                            }
+
+                            // i++;
 
                             length--;
+
+                            ReportProgress(0);
+
+                            ExceptionsOccurred = i == length && ExceptionsProtected.Count > 0;
+
+                            continue;
+
+                        }
+
+
+
+                        CurrentDeletedFile = path;
+
+                        #endregion
+
+                        Exceptions e = FileProcesses.Exceptions.None;
+
+                        using (FileOperation fileOperation = getFileOperation())
+
+                            if ((e = deleteFile(path, fileOperation)) == FileProcesses.Exceptions.None)
+
+                                DeletedFiles += 1;
+
+                            else
+
+                                onException(path, i / length * 100, e);
+
+                        //else if (ex == Exceptions.FileAlreadyExists)
+
+                        //{
+
+                        //    _file_Already_Exists.Add(path);
+
+                        //}
+
+                        //else if (ex == Exceptions.DirectoryNotFound)
+
+                        //{
+
+                        //    _directory_Not_Found.Add(path);
+
+                        //}
+
+
+
+                        //TODO:
+
+                        // if (start_Item_Index + 1 == pathsToCopy.Count) start_Item_Index = 0; else start_Item_Index += 1;
+
+                        //TODO:
+
+                        ReportProgress(i / length * 100);
+
+                    }
+
+                    catch (DirectoryNotFoundException)
+                    {
+
+                        onException(path, i / length * 100, FileProcesses.Exceptions.PathNotFound);
+
+                    }
+                    catch (PathTooLongException)
+                    {
+
+                        onException(path, i / length * 100, FileProcesses.Exceptions.FileNameTooLong);
+
+                    }
+                    // catch (IOException) { ex = FileProcesses.Exceptions.FileAlreadyExists; } 
+                    catch (UnauthorizedAccessException)
+                    {
+
+                        onException(path, i / length * 100, FileProcesses.Exceptions.AccessDenied);
+
+                    }
+
+                    catch (IOException)
+
+                    {
+
+                        if (new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).IsReady)
+
+                        {
+
+                            ExceptionsOccurred = true;
+
+                            ExceptionsProtected.Clear();
+
+                            foreach (FileSystemInfo _path in items)
+
+                            {
+
+                                _path._exception = FileProcesses.Exceptions.DiskNotReady;
+
+                                ExceptionsProtected.Add(_path);
+
+                            }
+
+                            break;
 
                         }
 
                         else
 
-                            i++;
+                            onException(path, i / length * 100, FileProcesses.Exceptions.Unknown);
 
                     }
 
-                    // todo : maybe more functional with a dictionary which would create a collection corresponding to an exception when it'd be needed (this case would mean no sorting needed)
+                    catch (Win32Exception)
 
-                    ExceptionsProtected.Sort(new FileSystemInfoComparer());
+                    {
+
+                        onException(path, i / length * 100, FileProcesses.Exceptions.Unknown);
+
+                    }
+
+                    if (isARetry)
+
+                    {
+
+                        ExceptionsProtected.RemoveAt(0);
+
+                        length--;
+
+                    }
+
+                    else
+
+                        i++;
 
                 }
+
+                // todo : maybe more functional with a dictionary which would create a collection corresponding to an exception when it'd be needed (this case would mean no sorting needed)
+
+                ExceptionsProtected.Sort(new FileSystemInfoComparer());
 
             }
 

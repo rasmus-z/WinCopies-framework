@@ -36,7 +36,7 @@ namespace WinCopies.IO.FileProcesses
 
         DirectoryCannotBeRemoved = 16,
 
-        WriteProtect = 32,
+        WriteProtected = 32,
 
         ExceptionOnDeviceUnit = 64,
 
@@ -76,9 +76,15 @@ namespace WinCopies.IO.FileProcesses
 
         DestPathIsASubdirectory = 131072,
 
-        NotEnoughSpaceOnDisk = 262144, 
+        NotEnoughSpaceOnDisk = 262144,
 
-        RequestCancelled = 524288
+        RequestCancelled = 524288,
+
+        NotAllowedOnCurrentFileSystem = 1048576,
+
+        FileIsAlreadyInRecycleBin = 2097152,
+
+        NotAllowedOnDrives = 4194304
 
 
 

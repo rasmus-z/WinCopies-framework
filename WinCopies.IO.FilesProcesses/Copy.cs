@@ -114,9 +114,11 @@ namespace WinCopies.IO.FileProcesses
 
             CopyFileFlags copyFileFlag = CopyFileFlags.COPY_FILE_NO_BUFFERING | CopyFileFlags.COPY_FILE_RESTARTABLE;
 
-                    if (overwrite) copyFileFlag |= CopyFileFlags.COPY_FILE_OPEN_SOURCE_FOR_WRITE;
+            // if (overwrite) copyFileFlag |= CopyFileFlags.COPY_FILE_OPEN_SOURCE_FOR_WRITE;
 
-                    else copyFileFlag |= CopyFileFlags.COPY_FILE_FAIL_IF_EXISTS;
+            /*else*/
+
+            if (overwrite) copyFileFlag |= CopyFileFlags.COPY_FILE_FAIL_IF_EXISTS;
 
 #if DEBUG
 
@@ -381,7 +383,7 @@ namespace WinCopies.IO.FileProcesses
 
                         case ErrorCodes.ERROR_WRITE_PROTECT:
 
-                            ex = Exceptions.WriteProtect;
+                            ex = Exceptions.WriteProtected;
 
                             break;
 

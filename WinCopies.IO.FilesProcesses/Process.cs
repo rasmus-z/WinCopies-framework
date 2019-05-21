@@ -377,6 +377,13 @@ namespace WinCopies.IO.FileProcesses
         /// </summary>
         public System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo> Exceptions { get; private set; } = null;
 
+        private bool _stopProcessOnPause = true;
+
+        /// <summary>
+        /// Gets or sets a value that indicates if the process will stop on pause request.
+        /// </summary>
+        public bool StopProcessOnPause { get => _stopProcessOnPause; set => OnPropertyChanged(nameof(StopProcessOnPause), nameof(_stopProcessOnPause), value, typeof(CopyProcessInfo)); }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         //public event EventHandler<CopyProgressChangedEventArgs> ProgressChanged;

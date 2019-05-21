@@ -143,12 +143,12 @@ namespace WinCopies.IO.FileProcesses
         /// <summary>
         /// Gets the total copied size.
         /// </summary>
-        public Size CurrentCopiedSize { get => _current_Copied_Size; set => OnPropertyChanged(nameof(CurrentCopiedSize), nameof(_current_Copied_Size), value, typeof(CopyProcessInfo)); }
+        public Size CurrentCopiedSize { get => _current_Copied_Size; private set => OnPropertyChanged(nameof(CurrentCopiedSize), nameof(_current_Copied_Size), value, typeof(CopyProcessInfo)); }
 
         /// <summary>
         /// Gets the current file copied size.
         /// </summary>
-        public Size CurrentFileCopiedSize { get => _current_File_Copied_Size; set => OnPropertyChanged(nameof(CurrentFileCopiedSize), nameof(_current_File_Copied_Size), value, typeof(CopyProcessInfo)); }
+        public Size CurrentFileCopiedSize { get => _current_File_Copied_Size; private set => OnPropertyChanged(nameof(CurrentFileCopiedSize), nameof(_current_File_Copied_Size), value, typeof(CopyProcessInfo)); }
 
         // todo : utiliser des observable collections "traditionnelles" ou bien des read-only wrapper, afin de respecter la logique
 
@@ -156,7 +156,7 @@ namespace WinCopies.IO.FileProcesses
 
         private string _destPausedFilePath = null;
 
-        public string DestPausedFilePath { get => _destPausedFilePath; protected set => OnPropertyChanged(nameof(DestPausedFilePath), nameof(_destPausedFilePath), value, typeof(CopyProcessInfo)); }
+        public string DestPausedFilePath { get => _destPausedFilePath; private set => OnPropertyChanged(nameof(DestPausedFilePath), nameof(_destPausedFilePath), value, typeof(CopyProcessInfo)); }
 
         /// <summary>
         /// Initializes a new instance of <see cref="CopyProcessInfo"/> which will keep in memory the source files and folders.
@@ -413,6 +413,10 @@ namespace WinCopies.IO.FileProcesses
             IntPtr lpData) =>
                              copyProgressCallback(_path, ref destFilePath, items, ref currentIndex, ref totalFileSize, ref totalBytesTransferred, ref streamSize, ref streamBytesTransferred, ref dwStreamNumber, dwCallbackReason, ref hSourceFile, ref hDestinationFile, ref lpData)).ex;
 
+                if (PausePending)
+
+                    return FileProcesses.Exceptions.None;
+
                 if (ex == FileProcesses.Exceptions.None)
 
                 {
@@ -491,6 +495,10 @@ namespace WinCopies.IO.FileProcesses
 
 
 
+                    if (StopProcessOnPause) return CopyProgressResult.PROGRESS_STOP;
+
+
+
                     Pause();
 
                 }
@@ -514,6 +522,8 @@ namespace WinCopies.IO.FileProcesses
             {
 
                 Exceptions ex = copyFile(PausedFile, DestPausedFilePath, start, _overwrite || (isARetry && (PausedFile.HowToRetryToProcess == HowToRetry.Replace || HowToRetryWhenExceptionOccured == HowToRetry.Replace)));
+
+                if (PausePending) return;
 
                 PausedFile = null;
 
@@ -660,7 +670,9 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-                        break;
+                        if (StopProcessOnPause) return;
+
+                        Pause();
 
                     }
 
@@ -750,9 +762,11 @@ namespace WinCopies.IO.FileProcesses
                         Debug.WriteLine($"Copie du fichier : de {path.FileSystemInfoProperties.FullName} vers {destFilePath}");
 #endif
 
-                        Exceptions ex = FileProcesses.Exceptions.None;
+                        Exceptions ex = copyFile(path, destFilePath, i, _overwrite || (isARetry && (path.HowToRetryToProcess == HowToRetry.Replace || HowToRetryWhenExceptionOccured == HowToRetry.Replace)));
 
-                        if ((ex = copyFile(path, destFilePath, i, _overwrite || (isARetry && (path.HowToRetryToProcess == HowToRetry.Replace || HowToRetryWhenExceptionOccured == HowToRetry.Replace)))) == FileProcesses.Exceptions.None)
+                        if (PausePending) return;
+
+                        if (ex == FileProcesses.Exceptions.None)
 
                             CopiedFiles += 1;
 
