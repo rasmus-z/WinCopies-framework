@@ -887,8 +887,8 @@ namespace WinCopies.Util
 
         }
 
-        public static bool CanExecute(this ICommand command, object commandParameter, IInputElement commandTarget) => command is RoutedCommand
-                ? ((RoutedCommand)command).CanExecute(commandParameter, commandTarget)
+        public static bool CanExecute(this ICommand command, object commandParameter, IInputElement commandTarget) => command is RoutedCommand routedCommand
+                ? routedCommand.CanExecute(commandParameter, commandTarget)
                 : command.CanExecute(commandParameter);
 
         ///// <summary>

@@ -22,9 +22,17 @@ using Clipboard = WinCopies.IO.Clipboard;
 using System.Windows.Interop;
 using System.ComponentModel;
 using System.Collections;
+using WinCopies.Util.Commands;
 
 namespace WinCopies.GUI.Explorer
 {
+
+    public delegate void PasteHandler(bool isAFileMoving, StringCollection sc, string destPath);
+
+    public delegate void RenameHandler(IBrowsableObjectInfo path, string newName);
+
+    public delegate void DeleteHandler(IBrowsableObjectInfo[] paths);
+
     public class ExplorerControl : Control, ICommandSource
     {
 
@@ -365,11 +373,53 @@ namespace WinCopies.GUI.Explorer
 
         public IEnumerable<string> Filter { get => (IEnumerable<string>)GetValue(FilterProperty); set => SetValue(FilterProperty, value); }
 
+        private static readonly DependencyPropertyKey CanCopyPropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanCopy), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
+
+        public static readonly DependencyProperty CanCopyProperty = CanCopyPropertyKey.DependencyProperty;
+
+        public bool CanCopy => (bool)GetValue(CanCopyProperty);
+
+        private static readonly DependencyPropertyKey CanCutPropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanCut), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
+
+        public static readonly DependencyProperty CanCutProperty = CanCutPropertyKey.DependencyProperty;
+
+        public bool CanCut => (bool)GetValue(CanCutProperty);
+
+        private static readonly DependencyPropertyKey CanPastePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanPaste), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
+
+        public static readonly DependencyProperty CanPasteProperty = CanPastePropertyKey.DependencyProperty;
+
+        public bool CanPaste => (bool)GetValue(CanPasteProperty);
+
+        private static readonly DependencyPropertyKey CanRenamePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanRename), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
+
+        public static readonly DependencyProperty CanRenameProperty = CanRenamePropertyKey.DependencyProperty;
+
+        public bool CanRename => (bool)GetValue(CanRenameProperty);
+
+        private static readonly DependencyPropertyKey CanDeletePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanDelete), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
+
+        public static readonly DependencyProperty CanDeleteProperty = CanDeletePropertyKey.DependencyProperty;
+
+        public bool CanDelete => (bool)GetValue(CanDeleteProperty);
+
         // todo: to add a default implementation:
 
-        public static readonly DependencyProperty PasteActionProperty = DependencyProperty.Register(nameof(PasteAction), typeof(Action<bool, StringCollection, string>), typeof(ExplorerControl));
+        public static readonly DependencyProperty PasteActionProperty = DependencyProperty.Register(nameof(PasteAction), typeof(PasteHandler), typeof(ExplorerControl));
 
-        public Action<bool, StringCollection, string> PasteAction { get => (Action<bool, StringCollection, string>)GetValue(PasteActionProperty); set => SetValue(PasteActionProperty, value); }
+        public PasteHandler PasteAction { get => (PasteHandler)GetValue(PasteActionProperty); set => SetValue(PasteActionProperty, value); }
+
+        // todo: to add a default implementation:
+
+        public static readonly DependencyProperty RenameActionProperty = DependencyProperty.Register(nameof(RenameAction), typeof(RenameHandler), typeof(ExplorerControl));
+
+        public RenameHandler RenameAction { get => (RenameHandler)GetValue(RenameActionProperty); set => SetValue(RenameActionProperty, value); }
+
+        // todo: to add a default implementation:
+
+        public static readonly DependencyProperty DeleteActionProperty = DependencyProperty.Register(nameof(DeleteAction), typeof(DeleteHandler), typeof(ExplorerControl));
+
+        public DeleteHandler DeleteAction { get => (DeleteHandler)GetValue(DeleteActionProperty); set => SetValue(DeleteActionProperty, value); }
 
         // public static readonly DependencyProperty BrowsableObjectInfoItemsLoaderProperty = DependencyProperty.Register("BrowsableObjectInfoItemsLoader", typeof(BrowsableObjectInfoItemsLoader), typeof(ExplorerControl), new PropertyMetadata()));
 
@@ -445,23 +495,23 @@ namespace WinCopies.GUI.Explorer
 
             CommandBindings.Add(new CommandBinding(Commands.Open, Open_Executed, Open_CanExecute));
 
-            CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, Copy_Executed, FileSystemOperation_CanExecute));
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, Copy_Executed, Copy_CanExecute));
+
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, Cut_Executed, Cut_CanExecute));
+
+            CommandBindings.Add(new CommandBinding(FileSystemCommands.Rename, Rename_Executed, Rename_CanExecute));
+
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Delete, Delete_Executed, Delete_CanExecute));
 
             // CommandBindings.Add(new CommandBinding(Util.Util.CommonCommand, Open_Execute, Open_CanExecute));
 
+            SelectionChanged += ExplorerControl_SelectionChanged;
+
             #region Comments
-
-            //CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, Copy_Executed, Command_CanExecute));
-
-            //CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, Cut_Executed, Command_CanExecute));
 
             //CommandBindings.Add(new CommandBinding(ApplicationCommands.Paste, Paste_Executed, Command_CanExecute));
 
             //CommandBindings.Add(new CommandBinding(Commands.CreateShortcut, CreateShortcut_Executed, CanWrite_CanExecute));
-
-            //CommandBindings.Add(new CommandBinding(Commands.Rename, Rename_Executed, CanWrite_CanExecute));
-
-            //CommandBindings.Add(new CommandBinding(Commands.Delete, Delete_Executed, CanWrite_CanExecute));
 
             //CommandBindings.Add(new CommandBinding(Commands.Properties, Properties_Executed, Command_CanExecute));
 
@@ -469,15 +519,32 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnOpenCanExecute(e);
-
-        private void FileSystemOperation_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void ExplorerControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // var explorerControl = SelectedItem.PART_ExplorerControl;
 
-            if (ListView.SelectedItem is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject is ShellFolder || TreeView.SelectedItem is ShellObjectInfo _shellObjectInfo && _shellObjectInfo.ShellObject is ShellFolder) e.CanExecute = true;
+            if (ListView.SelectedItem is IBrowsableObjectInfo browsableObjectInfo)
+
+            {
+
+                SetValue(CanRenamePropertyKey, true);
+
+                SetValue(CanDeletePropertyKey, true);
+
+                if (browsableObjectInfo is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject)
+
+                {
+
+                    SetValue(CanCopyPropertyKey, true);
+
+                    SetValue(CanCutPropertyKey, true);
+
+                }
+
+            }
 
         }
+
+        private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnOpenCanExecute(e);
 
         private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
 
@@ -515,12 +582,55 @@ namespace WinCopies.GUI.Explorer
 
         }
 
+        protected virtual void OnCopyCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanCopy;//e.ContinueRouting = false;//e.Handled = true;//raise
+
+        private void Copy_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnCopyCanExecute(e);
+
         private void Copy_Executed(object sender, ExecutedRoutedEventArgs e)
         {
 
-            if (sender is ExplorerControl && e.Parameter is ActionsFromObjects)
+            // if (sender == this)
 
-                Copy((ActionsFromObjects)e.Parameter);
+            Copy(ActionsFromObjects.ListView);
+
+        }
+
+        protected virtual void OnCutCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanCut;
+
+        private void Cut_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnCutCanExecute(e);
+
+        private void Cut_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+            // if (sender == this)
+
+            Cut(ActionsFromObjects.ListView);
+
+        }
+
+        protected virtual void OnRenameCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanRename;
+
+        private void Rename_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnRenameCanExecute(e);
+
+        private void Rename_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+            // if (sender == this)
+
+            RenameAction?.Invoke(ListView.SelectedItem as IBrowsableObjectInfo, e.Parameter as string);
+
+        }
+
+        protected virtual void OnDeleteCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanDelete;
+
+        private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnDeleteCanExecute(e);
+
+        private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+            // if (sender == this)
+
+            DeleteAction?.Invoke(ListView.SelectedItems.OfType<IBrowsableObjectInfo>().ToArray());
 
         }
 
@@ -598,7 +708,7 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        protected internal virtual void OnItemsControlContextMenuOpening(FrameworkElement sender, ISingleSettableSelector source, ContextMenuEventArgs e)
+        protected internal virtual void OnItemsControlContextMenuOpening(FrameworkElement sender, ISelectionIndexableSettableSelector source, ContextMenuEventArgs e)
 
         {
 
@@ -755,9 +865,9 @@ namespace WinCopies.GUI.Explorer
 
             TreeView = (TreeView)Template.FindName("PART_TreeView", this);
 
-            if (TreeView != null)
+            //if (TreeView != null)
 
-                TreeView.ParentExplorerControl = this;
+            //    TreeView.ParentExplorerControl = this;
 
             ListView = (ListView)Template.FindName("PART_ListView", this);
 
@@ -1253,14 +1363,18 @@ namespace WinCopies.GUI.Explorer
 
             // BrowsableObjectInfoItemsLoader = new FolderLoader((ShellObjectInfo)path);
 
-            SetValue(HeaderPropertyKey, path.LocalizedName);
-
 
             // FolderLoader.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) =>
 
             SetValue(PathPropertyKey, path);
 
+            SetValue(HeaderPropertyKey, path.LocalizedName);
+
             SetValue(CanMoveToParentPathPropertyKey, path.Parent != null);
+
+            if (path is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject)
+
+                SetValue(CanPastePropertyKey, true);
 
 
 
@@ -1500,13 +1614,7 @@ namespace WinCopies.GUI.Explorer
 
         //} 
 
-        protected virtual void OnPaste(bool isAFileMoving, StringCollection sc, string destPath)
-
-        {
-
-
-
-        }
+        protected virtual void OnPaste(bool isAFileMoving, StringCollection sc, string destPath) => PasteAction?.Invoke(isAFileMoving, sc, destPath);
 
         public void Paste(ActionsFromObjects pasteTo)
 
@@ -1554,31 +1662,7 @@ namespace WinCopies.GUI.Explorer
 
         //}
 
-        private void CanWrite_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-
-        {
-
-            // todo
-
-        }
-
         private void CreateShortcut_Executed(object sender, ExecutedRoutedEventArgs e)
-
-        {
-
-            // todo
-
-        }
-
-        private void Rename_Executed(object sender, ExecutedRoutedEventArgs e)
-
-        {
-
-            // todo
-
-        }
-
-        private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
 
         {
 

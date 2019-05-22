@@ -10,7 +10,7 @@ namespace WinCopies.GUI.Controls
     // todo: to add this interface to the other FrameworkElements to which they applies.
 
     /// <summary>
-    /// Provides properties that apply to the UI controls that can select one or more children.
+    /// Provides properties that apply to the UI controls that can select at least one child.
     /// </summary>
     public interface ISelector
     {
@@ -22,7 +22,7 @@ namespace WinCopies.GUI.Controls
 
     }
 
-    public interface ISingleSelector : ISelector
+    public interface ISelectionIndexableSelector : ISelector
     {
 
         /// <summary>
@@ -33,19 +33,19 @@ namespace WinCopies.GUI.Controls
     }
 
     /// <summary>
-    /// Provides properties that apply to the UI controls that can select one or more children by the item itself or by the parent selector.
+    /// Provides properties that apply to the UI controls that can select at least one child by the item itself or by the parent selector.
     /// </summary>
-    public interface ISettableSelector
+    public interface ISettableSelector : ISelector
     {
 
         /// <summary>
         /// Sets the selected item.
         /// </summary>
-        object SelectedItem { get; set; }
+        new object SelectedItem { get; set; }
 
     }
 
-    public interface ISingleSettableSelector : ISettableSelector
+    public interface ISelectionIndexableSettableSelector : ISettableSelector
     {
 
         /// <summary>

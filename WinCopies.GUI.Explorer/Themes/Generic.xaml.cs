@@ -320,9 +320,9 @@ namespace WinCopies.GUI.Explorer.Themes
 
         }
 
-        private void PART_TreeView_KeyDown(object sender, KeyEventArgs e) => ((TreeView)sender).TryRaiseCommandsByKeyDown(e);
+        // private void PART_TreeView_KeyDown(object sender, KeyEventArgs e) => ((TreeView)sender).TryRaiseCommandsByKeyDown(e);
 
-        private void PART_ListView_KeyDown(object sender, KeyEventArgs e) => ((ListView)sender).TryRaiseCommandsByKeyDown(e);
+        // private void PART_ListView_KeyDown(object sender, KeyEventArgs e) => ((ListView)sender).TryRaiseCommandsByKeyDown(e);
 
         // private void Button_Click_1(object sender, RoutedEventArgs e) => ((DependencyObject)sender).GetParent<TreeViewItem>(false).IsSelected = true;
 

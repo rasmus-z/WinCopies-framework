@@ -442,10 +442,7 @@
                             </Button>
                         </Grid>
 
-                        <local:TreeView x:Name="PART_TreeView" Grid.Row="1" ItemsSource="{Binding TreeViewItems, RelativeSource={RelativeSource Mode=TemplatedParent}}" Command="{Binding Command, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}"        CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource Mode=Self}}" KeyDown="PART_TreeView_KeyDown" >
-                            <!--<local:TreeView.CommandBindings>
-                                <CommandBinding Command="Copy" CanExecute="FileSystemOperation_CanExecute" Executed="Copy_Executed" />
-                            </local:TreeView.CommandBindings>-->
+                        <local:TreeView x:Name="PART_TreeView" Grid.Row="1" ItemsSource="{Binding TreeViewItems, RelativeSource={RelativeSource Mode=TemplatedParent}}" Command="{Binding Command, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}"        CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource Mode=Self}}" >
                             <local:TreeView.ItemTemplate>
                                 <HierarchicalDataTemplate ItemsSource="{Binding Items}" >
                                     <!--<Button Click="Button_Click_1">
@@ -509,7 +506,7 @@
 
                         <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="5" />
 
-                        <local:ListView x:Name="PART_ListView" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding Path.SelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding SelectionMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" Focusable="True" CommandParameter="{Binding SelectedItems, RelativeSource={RelativeSource Self}}" Command="{Binding Command, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}"        KeyDown="PART_ListView_KeyDown" >
+                        <local:ListView x:Name="PART_ListView" Grid.Column="1" Grid.Row="1" Margin="5,0,5,0" ItemsSource="{Binding Path.Items, RelativeSource={RelativeSource Mode=TemplatedParent}}" SelectedItem="{Binding Path.SelectedItem, RelativeSource={RelativeSource Mode=TemplatedParent}}" MouseDoubleClick="ListView_MouseDoubleClick" SelectionChanged="ListView_SelectionChanged" SelectionMode="{Binding SelectionMode, RelativeSource={RelativeSource Mode=TemplatedParent}}" Focusable="True" CommandParameter="{Binding SelectedItems, RelativeSource={RelativeSource Self}}" Command="{Binding Command, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" >
                             <!--<local:ListView.Resources>
                                 <FrameworkElement x:Key="FrameworkElement" DataContext="{Binding}" />
                             </local:ListView.Resources>-->

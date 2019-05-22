@@ -21,18 +21,18 @@ namespace WinCopies.GUI.Explorer
 
         protected override DependencyObject GetContainerForItemOverride() => new ListViewItem(ParentExplorerControl);
 
-        internal void TryRaiseCommandsByKeyDown(KeyEventArgs e)
-        {
+        //internal void TryRaiseCommandsByKeyDown(KeyEventArgs e)
+        //{
 
-            ICommand[] commands = new ICommand[] { ApplicationCommands.Copy, ApplicationCommands.Cut, ApplicationCommands.Paste, ApplicationCommands.Delete };
+        //    ICommand[] commands = new ICommand[] { ApplicationCommands.Copy, ApplicationCommands.Cut, ApplicationCommands.Paste, FileSystemCommands.Rename, ApplicationCommands.Delete, FileSystemCommands.PermanentlyDelete };
 
-            foreach (ICommand command in commands)
+        //    foreach (ICommand command in commands)
 
-                if (KeyCommandHelper.CanRaiseCommand(command, ActionsFromObjects.ListView, ParentExplorerControl, e))
+        //        if (KeyCommandHelper.CanRaiseCommand(command, ActionsFromObjects.ListView, ParentExplorerControl, e))
 
-                    command.Execute(ActionsFromObjects.ListView);
+        //            command.Execute(ActionsFromObjects.ListView);
 
-        }
+        //}
 
     }
 }
