@@ -27,7 +27,7 @@ namespace WinCopies.Util.Commands
 
         public static RoutedUICommand Rename { get; } = new RoutedUICommand(Generic.Rename, nameof(Rename), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.R, ModifierKeys.Control) });
 
-        public static RoutedUICommand PermanentlyDelete { get; } = new RoutedUICommand(Generic.PermanentlyDelete, nameof(PermanentlyDelete), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.R, ModifierKeys.Alt) });
+        public static RoutedUICommand DeletePermanently { get; } = new RoutedUICommand(Generic.DeletePermanently, nameof(DeletePermanently), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.R, ModifierKeys.Alt) });
 
     }
 }

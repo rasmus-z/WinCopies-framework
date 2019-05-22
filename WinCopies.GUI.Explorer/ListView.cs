@@ -24,7 +24,7 @@ namespace WinCopies.GUI.Explorer
         //internal void TryRaiseCommandsByKeyDown(KeyEventArgs e)
         //{
 
-        //    ICommand[] commands = new ICommand[] { ApplicationCommands.Copy, ApplicationCommands.Cut, ApplicationCommands.Paste, FileSystemCommands.Rename, ApplicationCommands.Delete, FileSystemCommands.PermanentlyDelete };
+        //    ICommand[] commands = new ICommand[] { ApplicationCommands.Copy, ApplicationCommands.Cut, ApplicationCommands.Paste, FileSystemCommands.Rename, ApplicationCommands.Delete, FileSystemCommands.DeletePermanently };
 
         //    foreach (ICommand command in commands)
 

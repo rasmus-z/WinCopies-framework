@@ -522,25 +522,31 @@ namespace WinCopies.GUI.Explorer
         private void ExplorerControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
+            bool selectedItemIsBrowsableObjectInfo;
+
+            bool selectedItemIsShellObjectInfo;
+
             if (ListView.SelectedItem is IBrowsableObjectInfo browsableObjectInfo)
 
             {
 
-                SetValue(CanRenamePropertyKey, true);
+                selectedItemIsBrowsableObjectInfo = true;
 
-                SetValue(CanDeletePropertyKey, true);
-
-                if (browsableObjectInfo is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject)
-
-                {
-
-                    SetValue(CanCopyPropertyKey, true);
-
-                    SetValue(CanCutPropertyKey, true);
-
-                }
+                selectedItemIsShellObjectInfo = browsableObjectInfo is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject;
 
             }
+
+            else
+
+                selectedItemIsBrowsableObjectInfo = selectedItemIsShellObjectInfo = false;
+
+            SetValue(CanRenamePropertyKey, selectedItemIsBrowsableObjectInfo);
+
+            SetValue(CanDeletePropertyKey, selectedItemIsBrowsableObjectInfo);
+
+            SetValue(CanCopyPropertyKey, selectedItemIsShellObjectInfo);
+
+            SetValue(CanCutPropertyKey, selectedItemIsShellObjectInfo);
 
         }
 
@@ -1698,8 +1704,8 @@ namespace WinCopies.GUI.Explorer
 
                   _obj.LoadItems(true, false, FileTypesFlags.Folder | FileTypesFlags.Drive | FileTypesFlags.Archive);
 
-              // MessageBox.Show(obj.ToString());
-          });
+          // MessageBox.Show(obj.ToString());
+      });
 
         // todo:
 
