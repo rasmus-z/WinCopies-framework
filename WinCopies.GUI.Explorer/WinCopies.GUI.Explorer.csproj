@@ -145,6 +145,7 @@
     <Compile Include="IBrowsableObjectInfo.cs" />
     <Compile Include="Data\PathToItemsConverter.cs" />
     <Compile Include="IBrowsableObjectInfoHelper.cs" />
+    <Compile Include="InArchiveFormats.cs" />
     <Compile Include="ListView.cs" />
     <Compile Include="ListViewItem.cs" />
     <Compile Include="MultiplePathsOpenRequestedEventArgs.cs" />

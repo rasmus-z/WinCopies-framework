@@ -28,7 +28,7 @@ namespace WinCopies.Util
 
                 else
 
-                    return (false, Extensions. GetField(fieldName, declaringType, bindingFlags).GetValue(bgWorker));
+                    return (false, Extensions.GetField(fieldName, declaringType, bindingFlags).GetValue(bgWorker));
 
             else
 
@@ -3184,6 +3184,28 @@ namespace WinCopies.Util
         /// <param name="d">The <see cref="decimal"/> in which one set the <see cref="decimal"/> value</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the <see cref="string"/> given is a <see cref="decimal"/>.</returns>
         public static bool IsNumeric(string s, out decimal d) => decimal.TryParse(s, out d);
+
+        public static T GetEnumAllFlags<T>() where T : Enum
+
+        {
+
+            Type enumType = typeof(T);
+
+            if (enumType.GetCustomAttributes<FlagsAttribute>().ToList().Count == 0)
+
+                throw new ArgumentException("Enum is not a 'flags' enum.");
+
+            Array array = Enum.GetValues(enumType);
+
+            long values = 0;
+
+            foreach (object value in array)
+
+                values |= (long) Convert.ChangeType( value, TypeCode.Int64);
+
+            return (T)Enum.ToObject(enumType, values);
+
+        }
 
     }
 }

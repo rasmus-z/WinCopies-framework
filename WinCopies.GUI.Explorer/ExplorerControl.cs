@@ -421,6 +421,10 @@ namespace WinCopies.GUI.Explorer
 
         public DeleteHandler DeleteAction { get => (DeleteHandler)GetValue(DeleteActionProperty); set => SetValue(DeleteActionProperty, value); }
 
+        public static readonly DependencyProperty ArchiveFormatsToOpenProperty = DependencyProperty.Register(nameof(ArchiveFormatsToOpen), typeof(InArchiveFormats), typeof(ExplorerControl), new PropertyMetadata(WinCopies.Util.Util.GetEnumAllFlags<InArchiveFormats>()));
+
+        public InArchiveFormats ArchiveFormatsToOpen { get => (InArchiveFormats)GetValue(ArchiveFormatsToOpenProperty); set => SetValue(ArchiveFormatsToOpenProperty, value); }
+
         // public static readonly DependencyProperty BrowsableObjectInfoItemsLoaderProperty = DependencyProperty.Register("BrowsableObjectInfoItemsLoader", typeof(BrowsableObjectInfoItemsLoader), typeof(ExplorerControl), new PropertyMetadata()));
 
         // private WinCopies.IO.BrowsableObjectInfoItemsLoader BrowsableObjectInfoItemsLoader = null;
@@ -592,53 +596,41 @@ namespace WinCopies.GUI.Explorer
 
         private void Copy_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnCopyCanExecute(e);
 
-        private void Copy_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
+        private void Copy_Executed(object sender, ExecutedRoutedEventArgs e) =>
 
             // if (sender == this)
 
             Copy(ActionsFromObjects.ListView);
 
-        }
-
         protected virtual void OnCutCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanCut;
 
         private void Cut_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnCutCanExecute(e);
 
-        private void Cut_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
+        private void Cut_Executed(object sender, ExecutedRoutedEventArgs e) =>
 
             // if (sender == this)
 
             Cut(ActionsFromObjects.ListView);
 
-        }
-
         protected virtual void OnRenameCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanRename;
 
         private void Rename_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnRenameCanExecute(e);
 
-        private void Rename_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
+        private void Rename_Executed(object sender, ExecutedRoutedEventArgs e) =>
 
             // if (sender == this)
 
             RenameAction?.Invoke(ListView.SelectedItem as IBrowsableObjectInfo, e.Parameter as string);
 
-        }
-
         protected virtual void OnDeleteCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanDelete;
 
         private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnDeleteCanExecute(e);
 
-        private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
+        private void Delete_Executed(object sender, ExecutedRoutedEventArgs e) =>
 
             // if (sender == this)
 
             DeleteAction?.Invoke(ListView.SelectedItems.OfType<IBrowsableObjectInfo>().ToArray());
-
-        }
 
         private bool IsAutomaticItemContainerGeneratorStatusChange = false;
 
@@ -1009,11 +1001,7 @@ namespace WinCopies.GUI.Explorer
 
                 for (int i = 0; i < listViewItems.Count; i++)
 
-                {
-
-                    item = ListView.ItemContainerGenerator.ItemFromContainer(listViewItems[i]);
-
-                    if (item == null || !ListView.ItemContainerGenerator.Items.Contains(item))
+                    if ((item = ListView.ItemContainerGenerator.ItemFromContainer(listViewItems[i])) == null || !ListView.ItemContainerGenerator.Items.Contains(item))
 
                     {
 
@@ -1023,15 +1011,11 @@ namespace WinCopies.GUI.Explorer
 
                     }
 
-                }
-
                 foreach (object _item in ListView.ItemContainerGenerator.Items)
 
                 {
 
-                    value = (ListViewItem)ListView.ItemContainerGenerator.ContainerFromItem(_item);
-
-                    if (value == null)
+                    if ((value = (ListViewItem)ListView.ItemContainerGenerator.ContainerFromItem(_item)) == null)
 
                         return;
 
@@ -1091,7 +1075,7 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        private void FileOpeningBgWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        private void FileOpeningBgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 
         {
 
@@ -1103,7 +1087,7 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        private void FileOpeningBgWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private void FileOpeningBgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
 
             foreach (ShellFile item in pathsToOpen)
@@ -1130,9 +1114,7 @@ namespace WinCopies.GUI.Explorer
 
             {
 
-                if (path.FileType == FileType.Folder || path.FileType == FileType.Drive || path.FileType == FileType.SpecialFolder || path.FileType == FileType.Archive)
-
-                {
+                if (path.FileType == FileType.Folder || path.FileType == FileType.Drive || path.FileType == FileType.SpecialFolder)
 
                     if (firstItem)
 
@@ -1145,6 +1127,60 @@ namespace WinCopies.GUI.Explorer
                     }
 
                     else return null;
+
+                else if (path.FileType == FileType.Archive)
+
+                {
+
+                    foreach (KeyValuePair<SevenZip.InArchiveFormat, string[]> items in ArchiveLoader.InArchiveFormats)
+
+                        if (items.Value.Contains(System.IO.Path.GetExtension(path.Path)))
+
+                            if (ArchiveFormatsToOpen.HasFlag((Enum)Enum.Parse(typeof(InArchiveFormats), items.Key.ToString())))
+
+                                if (firstItem)
+
+                                {
+
+                                    Navigate(path, true);
+
+                                    return true;
+
+                                }
+
+                                else return null;
+
+                            else if (!(path is IO.ShellObjectInfo) || !(((IO.ShellObjectInfo)path).ShellObject is ShellFile))
+
+                                // todo:
+
+                                throw new ArgumentException("path isn't a ShellObjectInfo or its ShellObject property value isn't a ShellFile.");
+
+                            else
+
+                            {
+
+                                OpenFile((ShellFile)((IO.ShellObjectInfo)path).ShellObject);
+
+                                return true;
+
+                            }
+
+                    if (!(path is IO.ShellObjectInfo) || !(((IO.ShellObjectInfo)path).ShellObject is ShellFile))
+
+                        // todo:
+
+                        throw new ArgumentException("path isn't a ShellObjectInfo or its ShellObject property value isn't a ShellFile.");
+
+                    else
+
+                    {
+
+                        OpenFile((ShellFile)((IO.ShellObjectInfo)path).ShellObject);
+
+                        return true;
+
+                    }
 
                 }
 
@@ -1704,8 +1740,8 @@ namespace WinCopies.GUI.Explorer
 
                   _obj.LoadItems(true, false, FileTypesFlags.Folder | FileTypesFlags.Drive | FileTypesFlags.Archive);
 
-          // MessageBox.Show(obj.ToString());
-      });
+              // MessageBox.Show(obj.ToString());
+          });
 
         // todo:
 
