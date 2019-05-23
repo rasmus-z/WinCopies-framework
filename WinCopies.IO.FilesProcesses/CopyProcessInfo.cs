@@ -8,6 +8,7 @@ using System.Linq;
 using WinCopies.Util;
 using WinCopies.Win32NativeInterop;
 using static WinCopies.IO.FileProcesses.Copy;
+using Microsoft.WindowsAPICodePack.Shell;
 
 namespace WinCopies.IO.FileProcesses
 {
@@ -401,42 +402,46 @@ namespace WinCopies.IO.FileProcesses
             {
 
                 Exceptions ex = Copy_Files(_path.FileSystemInfoProperties.FullName, destFilePath, IsAFileMove, overwrite,
-                             (
-            long totalFileSize,
-            long totalBytesTransferred,
-            long streamSize,
-            long streamBytesTransferred,
-            uint dwStreamNumber,
-            CopyProgressCallbackReason dwCallbackReason,
-            IntPtr hSourceFile,
-            IntPtr hDestinationFile,
-            IntPtr lpData) =>
-                             copyProgressCallback(_path, ref destFilePath, items, ref currentIndex, ref totalFileSize, ref totalBytesTransferred, ref streamSize, ref streamBytesTransferred, ref dwStreamNumber, dwCallbackReason, ref hSourceFile, ref hDestinationFile, ref lpData)).ex;
+                            (
+           long totalFileSize,
+           long totalBytesTransferred,
+           long streamSize,
+           long streamBytesTransferred,
+           uint dwStreamNumber,
+           CopyProgressCallbackReason dwCallbackReason,
+           IntPtr hSourceFile,
+           IntPtr hDestinationFile,
+           IntPtr lpData) =>
+                            copyProgressCallback(_path, ref destFilePath, items, ref currentIndex, ref totalFileSize, ref totalBytesTransferred, ref streamSize, ref streamBytesTransferred, ref dwStreamNumber, dwCallbackReason, ref hSourceFile, ref hDestinationFile, ref lpData)).ex;
+
+                if (ex != FileProcesses.Exceptions.None)
+
+                    onException(_path, ex, 0);
 
                 if (PausePending)
 
-                    return FileProcesses.Exceptions.None;
+                    return ex;
 
-                if (ex == FileProcesses.Exceptions.None)
+                //if (ex == FileProcesses.Exceptions.None)
 
+                //{
+
+                //TODO: ? - Si c'est un déplacement sur le même lecteur, plutôt procéder par nbre de fichiers déplacés / s.
+
+                if (IsAFileMove && System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath) == System.IO.Path.GetPathRoot(DestPath))
                 {
 
-                    //TODO: ? - Si c'est un déplacement sur le même lecteur, plutôt procéder par nbre de fichiers déplacés / s.
+                    long fileLength = ((FileInfo)_path.FileSystemInfoProperties).Length;
 
-                    if (IsAFileMove && System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath) == System.IO.Path.GetPathRoot(DestPath))
-                    {
+                    CurrentFileCopiedSize = (Size)fileLength;
 
-                        long fileLength = ((FileInfo)_path.FileSystemInfoProperties).Length;
-
-                        CurrentFileCopiedSize = (Size)fileLength;
-
-                        CurrentCopiedSize += fileLength;
-
-                    }
+                    CurrentCopiedSize += fileLength;
 
                 }
 
-                return ex;
+                //}
+
+                return ex ;
 
             }
 
@@ -459,7 +464,7 @@ namespace WinCopies.IO.FileProcesses
 
                 // TODO : meilleure gestion ?
 
-                if (dwStreamNumber > 1) return CopyProgressResult.PROGRESS_QUIET;
+                if (dwStreamNumber > 1) return CopyProgressResult.Quiet;
 
                 //TODO: 'TotalFileSize' : utiliser plutôt path.Length ? renommer Path.Length en Path.Size ?
 
@@ -495,7 +500,7 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-                    if (StopProcessOnPause) return CopyProgressResult.PROGRESS_STOP;
+                    if (StopProcessOnPause) return CopyProgressResult.Stop;
 
 
 
@@ -503,7 +508,7 @@ namespace WinCopies.IO.FileProcesses
 
                 }
 
-                return CancellationPending ? CopyProgressResult.PROGRESS_CANCEL : CopyProgressResult.PROGRESS_CONTINUE;
+                return CancellationPending ? CopyProgressResult.Cancel : CopyProgressResult.Continue;
 
             }
 
@@ -517,77 +522,27 @@ namespace WinCopies.IO.FileProcesses
 
 
 
-            if (isResuming && PausedFile != null)
+            void onException(FileSystemInfo _path, Exceptions exception, int progress)
 
             {
 
-                Exceptions ex = copyFile(PausedFile, DestPausedFilePath, start, _overwrite || (isARetry && (PausedFile.HowToRetryToProcess == HowToRetry.Replace || HowToRetryWhenExceptionOccured == HowToRetry.Replace)));
+                ExceptionsOccurred = true;
 
-                if (PausePending) return;
-
-                PausedFile = null;
-
-                DestPausedFilePath = null;
-
-                _PausedFiles = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
-
-                PausedIndex = -1;
-
-            }
-
-            else if (!isResuming)
-
-            {
-
-                if (length == 1 && HowToRetryWhenExceptionOccured == HowToRetry.None && items[start].HowToRetryToProcess == HowToRetry.None)
-
-                    return;
-
-
-
-                ExceptionsOccurred = false;
-
-
-
-                // if (isARetry && HowToRetryWhenExceptionOccured == HowToRetry.None) return;
-
-
-
-                // We check if the destination drive has enough space on disk if the destination drives are different or if the current process is a copy. 
-
-                driveInfo = new DriveInfo(System.IO.Path.GetPathRoot(DestPath));
-
-                if ((new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).RootDirectory != driveInfo.RootDirectory || !_isAFileMove) && driveInfo.AvailableFreeSpace <= FilesInfoLoader.TotalSize)
+                if (_path._exception != exception)
 
                 {
 
-                    driveInfo = null;
+                    _path._exception = exception;
 
-                    ExceptionsOccurred = true;
-
-                    foreach (FileSystemInfo _path in items)
-
-                    {
-
-                        _path._exception = FileProcesses.Exceptions.NotEnoughSpaceOnDisk;
+                    if (!isARetry)
 
                         ExceptionsProtected.Add(_path);
 
-                    }
-
-                    ExceptionsProtected.Sort(new FileSystemInfoComparer());
-
-                    return;
-
                 }
 
-                else driveInfo = null;
-
-
+                ReportProgress(progress);
 
             }
-
-            #endregion
 
 
 
@@ -595,37 +550,91 @@ namespace WinCopies.IO.FileProcesses
 
             int i = start;
 
-            // _length = onlyFirstFile ? 1 : items.Count;
-
-            // TODO : for ? -- attention alors aux incrémentations manuelles / autre système ? 
-
-            void onException(Exceptions exception)
+            try
 
             {
 
-                ExceptionsOccurred = true;
-
-                if (path._exception != exception)
+                if (isResuming && PausedFile != null)
 
                 {
 
-                    path._exception = exception;
+                    Exceptions ex = copyFile(PausedFile, DestPausedFilePath, start, _overwrite || (isARetry && (PausedFile.HowToRetryToProcess == HowToRetry.Replace || HowToRetryWhenExceptionOccured == HowToRetry.Replace)));
 
-                    if (!isARetry)
+                    if (PausePending)
 
-                        ExceptionsProtected.Add(path);
+                        return;
+
+                    PausedFile = null;
+
+                    DestPausedFilePath = null;
+
+                    _PausedFiles = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
+
+                    PausedIndex = -1;
 
                 }
 
-                ReportProgress(i / length * 100);
+                else if (!isResuming)
 
-            }
+                {
 
-            while (i < length && !CancellationPending)
-            {
+                    if (length == 1 && HowToRetryWhenExceptionOccured == HowToRetry.None && items[start].HowToRetryToProcess == HowToRetry.None)
 
-                try
+                        return;
 
+
+
+                    ExceptionsOccurred = false;
+
+
+
+                    // if (isARetry && HowToRetryWhenExceptionOccured == HowToRetry.None) return;
+
+
+
+                    // We check if the destination drive has enough space on disk if the destination drives are different or if the current process is a copy. 
+
+                    driveInfo = new DriveInfo(System.IO.Path.GetPathRoot(DestPath));
+
+                    if ((new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).RootDirectory != driveInfo.RootDirectory || !_isAFileMove) && driveInfo.AvailableFreeSpace <= FilesInfoLoader.TotalSize)
+
+                    {
+
+                        driveInfo = null;
+
+                        ExceptionsOccurred = true;
+
+                        foreach (FileSystemInfo _path in items)
+
+                        {
+
+                            _path._exception = FileProcesses.Exceptions.NotEnoughSpaceOnDisk;
+
+                            ExceptionsProtected.Add(_path);
+
+                        }
+
+                        ExceptionsProtected.Sort(new FileSystemInfoComparer());
+
+                        return;
+
+                    }
+
+                    else driveInfo = null;
+
+
+
+                }
+
+                #endregion
+
+
+
+                // _length = onlyFirstFile ? 1 : items.Count;
+
+                // TODO : for ? -- attention alors aux incrémentations manuelles / autre système ? 
+
+                while (i < length && !CancellationPending)
                 {
 
                     #region item pre-processing actions
@@ -650,7 +659,7 @@ namespace WinCopies.IO.FileProcesses
 
                     {
 
-                        onException(FileProcesses.Exceptions.DestPathIsASubdirectory);
+                        onException(path, FileProcesses.Exceptions.DestPathIsASubdirectory, i / length * 100);
 
                         return;
 
@@ -772,7 +781,7 @@ namespace WinCopies.IO.FileProcesses
 
                         else
 
-                            onException(ex);
+                            return;
 
                     }
 
@@ -802,73 +811,73 @@ namespace WinCopies.IO.FileProcesses
 
                     ReportProgress(i / length * 100);
 
-                }
-
-                catch (DirectoryNotFoundException)
-                {
-
-                    onException(FileProcesses.Exceptions.PathNotFound);
-
-                }
-                catch (PathTooLongException)
-                {
-
-                    onException(FileProcesses.Exceptions.FileNameTooLong);
-
-                }
-                // catch (IOException) { ex = FileProcesses.Exceptions.FileAlreadyExists; } 
-                catch (UnauthorizedAccessException)
-                {
-
-                    onException(FileProcesses.Exceptions.AccessDenied);
-
-                }
-
-                catch (IOException)
-
-                {
-
-                    if (new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).IsReady || new DriveInfo(System.IO.Path.GetPathRoot(DestPath)).IsReady)
+                    if (isARetry)
 
                     {
 
-                        ExceptionsOccurred = true;
+                        ExceptionsProtected.RemoveAt(0);
 
-                        ExceptionsProtected.Clear();
-
-                        foreach (FileSystemInfo _path in items)
-
-                        {
-
-                            _path._exception = FileProcesses.Exceptions.DiskNotReady;
-
-                            ExceptionsProtected.Add(_path);
-
-                        }
-
-                        break;
+                        length--;
 
                     }
 
                     else
 
-                        onException(FileProcesses.Exceptions.Unknown);
+                        i++;
 
                 }
 
-                if (isARetry)
+            }
+
+            catch (DirectoryNotFoundException)
+            {
+
+                onException(path, FileProcesses.Exceptions.PathNotFound, i / length * 100);
+
+            }
+            catch (PathTooLongException)
+            {
+
+                onException(path, FileProcesses.Exceptions.FileNameTooLong, i / length * 100);
+
+            }
+            // catch (IOException) { ex = FileProcesses.Exceptions.FileAlreadyExists; } 
+            catch (UnauthorizedAccessException)
+            {
+
+                onException(path, FileProcesses.Exceptions.AccessDenied, i / length * 100);
+
+            }
+
+            catch (IOException)
+
+            {
+
+                if (new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).IsReady || new DriveInfo(System.IO.Path.GetPathRoot(DestPath)).IsReady)
 
                 {
 
-                    ExceptionsProtected.RemoveAt(0);
+                    ExceptionsOccurred = true;
 
-                    length--;
+                    ExceptionsProtected.Clear();
+
+                    foreach (FileSystemInfo _path in items)
+
+                    {
+
+                        _path._exception = FileProcesses.Exceptions.DiskNotReady;
+
+                        ExceptionsProtected.Add(_path);
+
+                    }
+
+                    // break;
 
                 }
 
                 else
 
-                    i++;
+                    onException(path, FileProcesses.Exceptions.Unknown, i / length * 100);
 
             }
 

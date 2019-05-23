@@ -264,11 +264,11 @@ namespace WinCopies.IO.FileProcesses
 
                     if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, _path.FileType, FileType.Folder, FileType.SpecialFolder))
 
-                        System.IO.Directory.Delete(_path.FileSystemInfoProperties.FullName);
+                        Directory.Delete(_path.FileSystemInfoProperties.FullName);
 
                     else if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, _path.FileType, FileType.File, FileType.Link, FileType.Archive))
 
-                        System.IO.File.Delete(_path.FileSystemInfoProperties.FullName);
+                        File.Delete(_path.FileSystemInfoProperties.FullName);
 
                     return FileProcesses.Exceptions.None;
 
@@ -366,13 +366,13 @@ namespace WinCopies.IO.FileProcesses
 
                 int i = start;
 
-                while (i < length && !CancellationPending)
-
-                {
-
                     try
 
                     {
+
+                while (i < length && !CancellationPending)
+
+                {
 
                         #region item pre-processing actions
 
@@ -492,68 +492,6 @@ namespace WinCopies.IO.FileProcesses
 
                         ReportProgress(i / length * 100);
 
-                    }
-
-                    catch (DirectoryNotFoundException)
-                    {
-
-                        onException(path, i / length * 100, FileProcesses.Exceptions.PathNotFound);
-
-                    }
-                    catch (PathTooLongException)
-                    {
-
-                        onException(path, i / length * 100, FileProcesses.Exceptions.FileNameTooLong);
-
-                    }
-                    // catch (IOException) { ex = FileProcesses.Exceptions.FileAlreadyExists; } 
-                    catch (UnauthorizedAccessException)
-                    {
-
-                        onException(path, i / length * 100, FileProcesses.Exceptions.AccessDenied);
-
-                    }
-
-                    catch (IOException)
-
-                    {
-
-                        if (new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).IsReady)
-
-                        {
-
-                            ExceptionsOccurred = true;
-
-                            ExceptionsProtected.Clear();
-
-                            foreach (FileSystemInfo _path in items)
-
-                            {
-
-                                _path._exception = FileProcesses.Exceptions.DiskNotReady;
-
-                                ExceptionsProtected.Add(_path);
-
-                            }
-
-                            break;
-
-                        }
-
-                        else
-
-                            onException(path, i / length * 100, FileProcesses.Exceptions.Unknown);
-
-                    }
-
-                    catch (Win32Exception)
-
-                    {
-
-                        onException(path, i / length * 100, FileProcesses.Exceptions.Unknown);
-
-                    }
-
                     if (isARetry)
 
                     {
@@ -567,6 +505,66 @@ namespace WinCopies.IO.FileProcesses
                     else
 
                         i++;
+
+                    }
+
+                }
+
+                catch (DirectoryNotFoundException)
+                {
+
+                    onException(path, i / length * 100, FileProcesses.Exceptions.PathNotFound);
+
+                }
+                catch (PathTooLongException)
+                {
+
+                    onException(path, i / length * 100, FileProcesses.Exceptions.FileNameTooLong);
+
+                }
+                // catch (IOException) { ex = FileProcesses.Exceptions.FileAlreadyExists; } 
+                catch (UnauthorizedAccessException)
+                {
+
+                    onException(path, i / length * 100, FileProcesses.Exceptions.AccessDenied);
+
+                }
+
+                catch (IOException)
+
+                {
+
+                    if (new DriveInfo(System.IO.Path.GetPathRoot(FilesInfoLoader.SourcePath)).IsReady)
+
+                    {
+
+                        ExceptionsOccurred = true;
+
+                        ExceptionsProtected.Clear();
+
+                        foreach (FileSystemInfo _path in items)
+
+                        {
+
+                            _path._exception = FileProcesses.Exceptions.DiskNotReady;
+
+                            ExceptionsProtected.Add(_path);
+
+                        }
+
+                    }
+
+                    else
+
+                        onException(path, i / length * 100, FileProcesses.Exceptions.Unknown);
+
+                }
+
+                catch (Win32Exception)
+
+                {
+
+                    onException(path, i / length * 100, FileProcesses.Exceptions.Unknown);
 
                 }
 

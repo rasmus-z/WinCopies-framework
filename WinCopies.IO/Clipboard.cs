@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Win32Native.Core;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -15,6 +16,8 @@ using System.Windows.Media.Imaging;
 using WinCopies.Util;
 using WinCopies.Win32NativeInterop;
 using IDataObject = System.Runtime.InteropServices.ComTypes.IDataObject;
+
+// todo
 
 namespace WinCopies.IO
 {

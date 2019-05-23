@@ -18,6 +18,7 @@ namespace WinCopies.IO
     public static class Path
 
     {
+        public static readonly string[] EnvironmentPathVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
 
         public static BrowsableObjectInfo GetBrowsableObjectInfoFromPath(string path)
 
@@ -656,6 +657,46 @@ namespace WinCopies.IO
             }
 
             return stringBuilder.ToString();
+
+        }
+
+        public static string GetShortcutPath(string path)
+
+        {
+
+            List<KeyValuePair<string, string>> paths = new List<KeyValuePair<string, string>>();
+
+            foreach (string environmentPathVariable in EnvironmentPathVariables)
+
+            {
+
+                string _path = Environment.GetEnvironmentVariable(environmentPathVariable);
+
+                if (_path != null)
+
+                    paths.Add(new KeyValuePair<string, string>(environmentPathVariable, _path));
+
+            }
+
+
+
+            paths.Sort((KeyValuePair<string, string> x, KeyValuePair<string, string> y) => x.Value.Length < y.Value.Length ? 1 : x.Value.Length == y.Value.Length ? 0 : -1);
+
+
+
+            foreach (KeyValuePair<string, string> _path in paths)
+
+                if (path.StartsWith(_path.Value))
+
+                {
+
+                    path = "%" + _path.Key + "%" + path.Substring(_path.Value.Length);
+
+                    break;
+
+                }
+
+            return path;
 
         }
 

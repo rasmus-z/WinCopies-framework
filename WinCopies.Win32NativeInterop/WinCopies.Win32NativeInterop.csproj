@@ -44,10 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CopyFileFlags.cs" />
-    <Compile Include="CopyProgressCallbackReason.cs" />
-    <Compile Include="CopyProgressResult.cs" />
-    <Compile Include="ErrorCodes.cs" />
     <Compile Include="FileOperations.cs" />
     <Compile Include="HResult.cs" />
     <Compile Include="IImageList.cs" />

@@ -72,11 +72,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Win32Native">
+      <HintPath>..\..\Windows-API-Code-Pack\source\WindowsAPICodePack\Win32Native\bin\Debug\Microsoft.WindowsAPICodePack.Win32Native.dll</HintPath>
+    </Reference>
     <Reference Include="PushBinding, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\PushBinding.dll</HintPath>
     </Reference>
-    <Reference Include="SevenZipSharp, Version=1.1.136.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb" />
+    <Reference Include="SevenZipSharp, Version=1.1.144.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb, processorArchitecture=MSIL">
+      <HintPath>..\packages\Squid-Box.SevenZipSharp.1.1.144\lib\net45\SevenZipSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -93,10 +98,6 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="Win32Native, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Windows-API-Code-Pack\source\WindowsAPICodePack\Win32Native\bin\Debug\Win32Native.dll</HintPath>
-    </Reference>
     <Reference Include="WinCopies.GUI, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\WinCopies.GUI.dll</HintPath>
@@ -105,7 +106,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\WinCopies.GUI.Controls.dll</HintPath>
     </Reference>
-    <Reference Include="WinCopies.IO">
+    <Reference Include="WinCopies.IO, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\WinCopies.IO.dll</HintPath>
     </Reference>
     <Reference Include="WinCopies.Util">
@@ -173,6 +175,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
