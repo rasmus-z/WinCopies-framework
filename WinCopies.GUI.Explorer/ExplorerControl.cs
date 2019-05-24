@@ -85,7 +85,7 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
 
-        private static readonly DependencyPropertyKey PathPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Path), typeof(IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ExplorerControl)d).PathChanged?.Invoke(d, new ValueChangedEventArgs(e.OldValue, e.NewValue))));
+        private static readonly DependencyPropertyKey PathPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Path), typeof(IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ExplorerControl)d).PathChanged?.Invoke(d, new ValueChangedEventArgs<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.OldValue, (IBrowsableObjectInfo)e.NewValue))));
 
         /// <summary>
         /// Identifies the <see cref="Path"/> dependency property.
@@ -375,55 +375,89 @@ namespace WinCopies.GUI.Explorer
 
         private static readonly DependencyPropertyKey CanCopyPropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanCopy), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
 
+        /// <summary>
+        /// Identifies the <see cref="CanCopy"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CanCopyProperty = CanCopyPropertyKey.DependencyProperty;
 
         public bool CanCopy => (bool)GetValue(CanCopyProperty);
 
         private static readonly DependencyPropertyKey CanCutPropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanCut), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
 
+        /// <summary>
+        /// Identifies the <see cref="CanCut"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CanCutProperty = CanCutPropertyKey.DependencyProperty;
 
         public bool CanCut => (bool)GetValue(CanCutProperty);
 
         private static readonly DependencyPropertyKey CanPastePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanPaste), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
 
+        /// <summary>
+        /// Identifies the <see cref="CanPaste"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CanPasteProperty = CanPastePropertyKey.DependencyProperty;
 
         public bool CanPaste => (bool)GetValue(CanPasteProperty);
 
         private static readonly DependencyPropertyKey CanRenamePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanRename), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
 
+        /// <summary>
+        /// Identifies the <see cref="CanRename"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CanRenameProperty = CanRenamePropertyKey.DependencyProperty;
 
         public bool CanRename => (bool)GetValue(CanRenameProperty);
 
         private static readonly DependencyPropertyKey CanDeletePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanDelete), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
 
+        /// <summary>
+        /// Identifies the <see cref="CanDelete"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CanDeleteProperty = CanDeletePropertyKey.DependencyProperty;
 
         public bool CanDelete => (bool)GetValue(CanDeleteProperty);
 
         // todo: to add a default implementation:
 
+        /// <summary>
+        /// Identifies the <see cref="PasteAction"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty PasteActionProperty = DependencyProperty.Register(nameof(PasteAction), typeof(PasteHandler), typeof(ExplorerControl));
 
         public PasteHandler PasteAction { get => (PasteHandler)GetValue(PasteActionProperty); set => SetValue(PasteActionProperty, value); }
 
         // todo: to add a default implementation:
 
+        /// <summary>
+        /// Identifies the <see cref="RenameAction"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty RenameActionProperty = DependencyProperty.Register(nameof(RenameAction), typeof(RenameHandler), typeof(ExplorerControl));
 
         public RenameHandler RenameAction { get => (RenameHandler)GetValue(RenameActionProperty); set => SetValue(RenameActionProperty, value); }
 
         // todo: to add a default implementation:
+        /// <summary>
+        /// Identifies the <see cref="DeleteAction"/> dependency property.
+        /// </summary>
 
         public static readonly DependencyProperty DeleteActionProperty = DependencyProperty.Register(nameof(DeleteAction), typeof(DeleteHandler), typeof(ExplorerControl));
 
         public DeleteHandler DeleteAction { get => (DeleteHandler)GetValue(DeleteActionProperty); set => SetValue(DeleteActionProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="ArchiveFormatsToOpen"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty ArchiveFormatsToOpenProperty = DependencyProperty.Register(nameof(ArchiveFormatsToOpen), typeof(InArchiveFormats), typeof(ExplorerControl), new PropertyMetadata(WinCopies.Util.Util.GetEnumAllFlags<InArchiveFormats>()));
 
         public InArchiveFormats ArchiveFormatsToOpen { get => (InArchiveFormats)GetValue(ArchiveFormatsToOpenProperty); set => SetValue(ArchiveFormatsToOpenProperty, value); }
+
+        /// <summary>
+        /// Identifies the <see cref="OpenPathsDirectly"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty OpenPathsDirectlyProperty = DependencyProperty.Register(nameof(OpenPathsDirectly), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(true));
+
+        public bool OpenPathsDirectly { get => (bool)GetValue(OpenPathsDirectlyProperty); set => SetValue(OpenPathsDirectlyProperty, value); }
 
         // public static readonly DependencyProperty BrowsableObjectInfoItemsLoaderProperty = DependencyProperty.Register("BrowsableObjectInfoItemsLoader", typeof(BrowsableObjectInfoItemsLoader), typeof(ExplorerControl), new PropertyMetadata()));
 
@@ -432,7 +466,12 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Occurs when the <see cref="Path"/> property has changed.
         /// </summary>
-        public event ValueChangedEventHandler PathChanged;
+        public event ValueChangedEventHandler<IBrowsableObjectInfo> PathChanged;
+
+        /// <summary>
+        /// Occurs when a navigation is requested. This event occurs only if the <see cref="OpenPathsDirectly"/> is set to <see langword="false"/>.
+        /// </summary>
+        public event Util.EventHandler<IBrowsableObjectInfo> NavigationRequested;
 
         /// <summary>
         /// Occurs when the <see cref="Text"/> property has changed.
@@ -450,7 +489,7 @@ namespace WinCopies.GUI.Explorer
         public event ValueChangedEventHandler VisibleItemsCountChanged;
 
         /// <summary>
-        /// Occurs when an array of paths have been requested for opening. When the <see cref="ExplorerControl"/> raises this event, it has also tried to open the first path of the <see cref="MultiplePathsOpenRequestedEventArgs.Paths"/> array.
+        /// Occurs when an array of paths have been requested for opening. When the <see cref="ExplorerControl"/> raises this event, if the <see cref="OpenPathsDirectly"/> is set to <see langword="true"/>, it has also tried to open the first path of the <see cref="MultiplePathsOpenRequestedEventArgs.Paths"/> array. If this property is set to <see langword="false"/>, the <see cref="NavigationRequested"/> event is raised instead.
         /// </summary>
         public event MultiplePathsOpenRequestedEventHandler MultiplePathsOpenRequested;
 
@@ -847,7 +886,7 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        private void ExplorerControl_PathChanged(object sender, ValueChangedEventArgs e) => OnPathChanged((IBrowsableObjectInfo)e.OldValue, (IBrowsableObjectInfo)e.NewValue);
+        private void ExplorerControl_PathChanged(object sender, ValueChangedEventArgs<IBrowsableObjectInfo> e) => OnPathChanged(e.OldValue, e.NewValue);
 
         private void ExplorerControl_TextChanged(object sender, TextChangedEventArgs e) => OnTextChanged(e);
 
@@ -1384,6 +1423,16 @@ namespace WinCopies.GUI.Explorer
         public void Navigate(IBrowsableObjectInfo path, bool addPathToHistory, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 
         {
+
+            if (!OpenPathsDirectly)
+
+            {
+
+                NavigationRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo>(path));
+
+                return;
+
+            }
 
             // SetValue(PathPropertyKey, path);
 

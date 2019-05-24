@@ -21,7 +21,7 @@ namespace WinCopies.Util
     /// <summary>
     /// Provides an object that defines a value and notifies of the value change.
     /// </summary>
-    public class ValueObject : IValueObject 
+    public class ValueObject : IValueObject
     {
 
         // The IDE0044 warning is disabled for some fields in this class because they are set in the SetProperty extension method that is defined in the WinCopies.Util namespace (see the file 'Extensions.cs' for more details.
@@ -91,9 +91,9 @@ namespace WinCopies.Util
 
         {
 
-            var result = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
 
-            if (result.propertyChanged) OnPropertyChanged(propertyName, result.oldValue, newValue);
+            if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
         }
 

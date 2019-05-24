@@ -420,7 +420,7 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Appends data to the table. The item type is not checked. Arrays must have only a dimension.
+        /// Appends data to the table. Arrays must have only one dimension.
         /// </summary>
         /// <param name="array">The source table.</param>
         /// <param name="arrays">The tables to concatenate.</param>
@@ -428,7 +428,7 @@ namespace WinCopies.Util
         public static Array Append(this Array array, params Array[] arrays) => Util.Concatenate((object[])array, arrays);
 
         /// <summary>
-        /// Appends data to the table using the <see cref="Array.LongLength"/> length property. The item type is not checked. Arrays must have only a dimension.
+        /// Appends data to the table using the <see cref="Array.LongLength"/> length property. Arrays must have only one dimension.
         /// </summary>
         /// <param name="array">The source table.</param>
         /// <param name="arrays">The tables to concatenate.</param>
