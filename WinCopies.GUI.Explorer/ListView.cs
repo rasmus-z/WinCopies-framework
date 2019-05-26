@@ -4,8 +4,10 @@ using WinCopies.Util.Commands;
 
 namespace WinCopies.GUI.Explorer
 {
-    public class ListView : WinCopies.GUI.Controls.ListView
+    public class ListView : Controls.ListView
     {
+
+
 
         public ExplorerControl ParentExplorerControl { get; internal set; } = null;
 
@@ -19,7 +21,62 @@ namespace WinCopies.GUI.Explorer
 
         //}    
 
-        protected override DependencyObject GetContainerForItemOverride() => new ListViewItem(ParentExplorerControl);
+        public ListView()
+
+        {
+
+            // InputBindings.Add(new InputBinding(Commands.OpenOnLeftClick, new MouseGesture(MouseAction.LeftClick)));
+
+        }
+
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+
+            ListViewItem listViewItem = new ListViewItem(ParentExplorerControl);
+
+            bool alreadyFoundCommandBinding = false;
+
+            //foreach (object commandBinding in listViewItem.CommandBindings)
+
+            //    if (((CommandBinding)commandBinding).Command == Commands.Open)
+
+            //    {
+
+            //        alreadyFoundCommandBinding = true;
+
+            //        break;
+
+            //    }
+
+            //if (!alreadyFoundCommandBinding)
+
+            foreach (object inputBinding in listViewItem.InputBindings)
+
+                if (((InputBinding)inputBinding).Command == Commands.Open)
+
+                {
+
+                    alreadyFoundCommandBinding = true;
+
+                    break;
+
+                }
+
+            // listViewItem.CommandBindings.Add(new CommandBinding(Commands.Open, ParentExplorerControl.Open_Executed, ParentExplorerControl.Open_CanExecute));
+
+            if (!alreadyFoundCommandBinding)
+
+                if (ParentExplorerControl.OpenMode == OpenMode.OnFirstClick)
+
+                    listViewItem.InputBindings.Add(new InputBinding(Commands.Open, new MouseGesture(    MouseAction.LeftClick    )))    ;    
+
+                else if (ParentExplorerControl.OpenMode == OpenMode.OnDoubleClick)
+
+                listViewItem.InputBindings.Add(new InputBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
+
+            return listViewItem;
+
+        }
 
         //internal void TryRaiseCommandsByKeyDown(KeyEventArgs e)
         //{

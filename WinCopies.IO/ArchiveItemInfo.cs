@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using WinCopies.Util;
 
 using TsudaKageyu;
+using Microsoft.WindowsAPICodePack.Shell;
 
 namespace WinCopies.IO
 {
@@ -33,9 +34,9 @@ namespace WinCopies.IO
 
         public ShellObjectInfo ArchiveShellObject { get; } = null;
 
-        public override string LocalizedName => ArchiveShellObject.LocalizedName;
+        public sealed override string LocalizedName => ArchiveShellObject.LocalizedName;
 
-        public override string Name => System.IO.Path.GetFileName(Path);
+        public sealed override string Name => System.IO.Path.GetFileName(Path);
 
         private Icon TryGetIcon(System.Drawing.Size size)
         {
@@ -71,7 +72,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource SmallBitmapSource
+        public sealed override BitmapSource SmallBitmapSource
         {
             get
             {
@@ -87,7 +88,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource MediumBitmapSource
+        public sealed override BitmapSource MediumBitmapSource
         {
             get
             {
@@ -103,7 +104,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource LargeBitmapSource
+        public sealed override BitmapSource LargeBitmapSource
         {
             get
             {
@@ -119,7 +120,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource ExtraLargeBitmapSource
+        public sealed override BitmapSource ExtraLargeBitmapSource
         {
             get
             {
@@ -132,7 +133,7 @@ namespace WinCopies.IO
 
         }
 
-        public override bool IsBrowsable => FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.Archive;
+        public sealed override bool IsBrowsable => FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.Archive;
 
         // public ArchiveFileInfo ArchiveFileInfo { get; } = null;
 
@@ -251,11 +252,11 @@ namespace WinCopies.IO
 
         }
 
-        public override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
+        public sealed override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 
-        public override void LoadItems()
+        public sealed override void LoadItems()
 
         {
 
@@ -269,9 +270,9 @@ namespace WinCopies.IO
 
         }
 
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) => LoadItems(new ArchiveLoader(true, true, fileTypes));
+        public sealed override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) => LoadItems(new ArchiveLoader(true, true, fileTypes));
 
-        public override void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
+        public sealed override void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 
         {
 
@@ -296,9 +297,7 @@ namespace WinCopies.IO
 
             new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
 
-        public override void Rename(string newValue)
-
-        {
+        public sealed override void Rename(string newValue) =>
 
             // string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
 
@@ -314,7 +313,7 @@ namespace WinCopies.IO
 
             throw new NotSupportedException("This feature is currently not supported for the content archive items.");
 
-        }
+        public sealed override IBrowsableObjectInfo Clone() => GetBrowsableObjectInfo(new ShellObjectInfo(ArchiveShellObject.ShellObject, ArchiveShellObject.Path, ArchiveShellObject.FileType, ArchiveShellObject.SpecialFolder), ArchiveFileInfo, Path, FileType);
     }
 
 }

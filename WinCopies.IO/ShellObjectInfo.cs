@@ -28,37 +28,37 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the localized name of this <see cref="ShellObjectInfo"/> depending the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details..
         /// </summary>
-        public override string LocalizedName => ShellObject.GetDisplayName(DisplayNameType.Default);
+        public sealed override string LocalizedName => ShellObject.GetDisplayName(DisplayNameType.Default);
 
         /// <summary>
         /// Gets the name of this <see cref="ShellObjectInfo"/> depending of the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
         /// </summary>
-        public override string Name => ShellObject.Name;
+        public sealed override string Name => ShellObject.Name;
 
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo"/>.
         /// </summary>
-        public override BitmapSource SmallBitmapSource => ShellObject.Thumbnail.SmallBitmapSource;
+        public sealed override BitmapSource SmallBitmapSource => ShellObject.Thumbnail.SmallBitmapSource;
 
         /// <summary>
         /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo"/>.
         /// </summary>
-        public override BitmapSource MediumBitmapSource => ShellObject.Thumbnail.MediumBitmapSource;
+        public sealed override BitmapSource MediumBitmapSource => ShellObject.Thumbnail.MediumBitmapSource;
 
         /// <summary>
         /// Gets the large <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo"/>.
         /// </summary>
-        public override BitmapSource LargeBitmapSource => ShellObject.Thumbnail.LargeBitmapSource;
+        public sealed override BitmapSource LargeBitmapSource => ShellObject.Thumbnail.LargeBitmapSource;
 
         /// <summary>
         /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo"/>.
         /// </summary>
-        public override BitmapSource ExtraLargeBitmapSource => ShellObject.Thumbnail.ExtraLargeBitmapSource;
+        public sealed override BitmapSource ExtraLargeBitmapSource => ShellObject.Thumbnail.ExtraLargeBitmapSource;
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="ShellObjectInfo"/> is browsable.
         /// </summary>
-        public override bool IsBrowsable => (ShellObject is IEnumerable<ShellObject> || FileType == FileType.Archive) && (FileType != FileType.File && FileType != FileType.Link); // FileType == FileTypes.Folder || FileType == FileTypes.Drive || (FileType == FileTypes.SpecialFolder && SpecialFolder != SpecialFolders.Computer) || FileType == FileTypes.Archive;
+        public sealed override bool IsBrowsable => (ShellObject is IEnumerable<ShellObject> || FileType == FileType.Archive) && (FileType != FileType.File && FileType != FileType.Link); // FileType == FileTypes.Folder || FileType == FileTypes.Drive || (FileType == FileTypes.SpecialFolder && SpecialFolder != SpecialFolders.Computer) || FileType == FileTypes.Archive;
 
         /// <summary>
         /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a folder, drive or file. See the <see cref="BrowsableObjectInfo.FileType"/> property for more details.
@@ -303,7 +303,7 @@ namespace WinCopies.IO
 
         }
 
-        public override IBrowsableObjectInfo GetParent()
+        public sealed override IBrowsableObjectInfo GetParent()
         {
 
             IBrowsableObjectInfo parent;
@@ -341,7 +341,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Loads the items of this <see cref="ShellObjectInfo"/> asynchronously.
         /// </summary>
-        public override void LoadItems()
+        public sealed override void LoadItems()
 
         {
 
@@ -361,7 +361,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">A value that indicates whether the <see cref="BrowsableObjectInfoItemsLoader"/> will report progress.</param>
         /// <param name="workerSupportsCancellation">A value that indicates whether the <see cref="BrowsableObjectInfoItemsLoader"/> will supports cancellation.</param>
         /// <param name="fileTypes">A value that indicates which have to be loaded.</param>
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes)
+        public sealed override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes)
         {
 
             if (!IsBrowsable)
@@ -408,7 +408,7 @@ namespace WinCopies.IO
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using a given <see cref="BrowsableObjectInfoItemsLoader"/>.
         /// </summary>
         /// <param name="browsableObjectInfoItemsLoader">A custom loader to use to load the items of this <see cref="ShellObjectInfo"/>.</param>
-        public override void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
+        public sealed override void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 
         {
 
@@ -458,7 +458,7 @@ namespace WinCopies.IO
         /// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.
         /// </summary>
         /// <param name="newValue">The new name or relative path for this <see cref="ShellObjectInfo"/>.</param>
-        public override void Rename(string newValue)
+        public sealed override void Rename(string newValue)
 
         {
 
@@ -492,6 +492,8 @@ namespace WinCopies.IO
             }
 
         }
+
+        public sealed override IBrowsableObjectInfo Clone() => GetBrowsableObjectInfo(ShellObject.FromParsingName(ShellObject.ParsingName), Path, FileType, SpecialFolder);
 
     }
 

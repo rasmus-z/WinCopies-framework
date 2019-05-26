@@ -83,6 +83,7 @@
       <HintPath>..\packages\Squid-Box.SevenZipSharp.1.1.144\lib\net45\SevenZipSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
@@ -149,6 +150,7 @@
     <Compile Include="ListView.cs" />
     <Compile Include="ListViewItem.cs" />
     <Compile Include="MultiplePathsOpenRequestedEventArgs.cs" />
+    <Compile Include="OpenMode.cs" />
     <Compile Include="ResourcesHelper.cs" />
     <Compile Include="SelectionChangedEventArgs.cs" />
     <Compile Include="ShellObjectInfo.cs" />
@@ -171,6 +173,7 @@
     </Compile>
     <Compile Include="Data\ViewStyleConverter.cs" />
     <Compile Include="TreeView.cs" />
+    <Compile Include="TreeViewItem.cs" />
     <Compile Include="ViewStyles.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

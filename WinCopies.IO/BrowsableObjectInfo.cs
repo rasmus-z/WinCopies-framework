@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WinCopies.Util;
 using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
@@ -142,9 +140,9 @@ namespace WinCopies.IO
 
         }
 
-        private bool _considerAsPathRoot = false;
+        // private bool _considerAsPathRoot = false;
 
-        public bool ConsiderAsPathRoot { get => _considerAsPathRoot; set => OnPropertyChanged(nameof(ConsiderAsPathRoot), nameof(_considerAsPathRoot), value, typeof(BrowsableObjectInfo)); }
+        // public bool ConsiderAsPathRoot { get => _considerAsPathRoot; set => OnPropertyChanged(nameof(ConsiderAsPathRoot), nameof(_considerAsPathRoot), value, typeof(BrowsableObjectInfo)); }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -229,5 +227,6 @@ namespace WinCopies.IO
 
         public override string ToString() => Name;
 
+        public abstract IBrowsableObjectInfo Clone();
     }
 }

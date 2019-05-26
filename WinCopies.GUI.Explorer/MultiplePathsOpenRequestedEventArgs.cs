@@ -15,9 +15,9 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// The paths for which an open has been requested.
         /// </summary>
-        public IEnumerable<IBrowsableObjectInfo> Paths { get; }
+        public IBrowsableObjectInfo[] Paths { get; }
 
-        public MultiplePathsOpenRequestedEventArgs(IEnumerable<IBrowsableObjectInfo> paths) => Paths = paths;
+        public MultiplePathsOpenRequestedEventArgs(IBrowsableObjectInfo[] paths) => Paths = paths;
 
     }
 }

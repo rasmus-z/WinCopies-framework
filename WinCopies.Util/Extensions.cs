@@ -940,7 +940,7 @@ namespace WinCopies.Util
 
                 source = (source is FrameworkElement frameworkElement ? frameworkElement.Parent ?? frameworkElement.TemplatedParent : null) ?? VisualTreeHelper.GetParent(source);
 
-            while (source != null && source is FrameworkElement && (typeEquality ? source.GetType() != type : !type.IsAssignableFrom(source.GetType())));
+            while (source != null && (typeEquality ? source.GetType() != type : !type.IsAssignableFrom(source.GetType())));
 
             return (T)source;
 

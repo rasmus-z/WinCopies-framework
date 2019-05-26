@@ -115,19 +115,20 @@ namespace WinCopies.GUI.Controls
         }
 
         public LinkRun()
-
         {
 
-            var binding = new Binding(nameof(NormalForeground))
+            BindingOperations.SetBinding(this, ForegroundProperty, new Binding(nameof(NormalForeground))
             {
                 Source = this,
 
                 Mode = BindingMode.TwoWay
-            };
+            });
 
-            BindingOperations.SetBinding(this, ForegroundProperty, binding);
+            Click += LinkRun_Click;
 
         }
+
+        private void LinkRun_Click(object sender, RoutedEventArgs e) => OnClick(e);
 
         protected virtual void OnUnderliningModeChanged(DependencyPropertyChangedEventArgs e)
 
@@ -177,7 +178,7 @@ namespace WinCopies.GUI.Controls
 
             {
 
-
+                // todo
 
             }
 
@@ -195,14 +196,12 @@ namespace WinCopies.GUI.Controls
 
         {
 
-            var binding = new Binding(nameof(HighlightedForeground))
+            BindingOperations.SetBinding(this, ForegroundProperty, new Binding(nameof(HighlightedForeground))
             {
                 Source = this,
 
                 Mode = BindingMode.TwoWay
-            };
-
-            BindingOperations.SetBinding(this, ForegroundProperty, binding);
+            });
 
 
 
@@ -212,43 +211,25 @@ namespace WinCopies.GUI.Controls
 
         }
 
-        protected virtual void Activate()
-
+        protected virtual void Activate() => BindingOperations.SetBinding(this, ForegroundProperty, new Binding(nameof(ActiveForeground))
         {
+            Source = this,
 
-            var binding = new Binding(nameof(ActiveForeground))
-            {
-                Source = this,
+            Mode = BindingMode.TwoWay
+        });
 
-                Mode = BindingMode.TwoWay
-            };
-
-            BindingOperations.SetBinding(this, ForegroundProperty, binding);
-
-        }
-
-        protected virtual void OnHasBeenSeen()
-
-        {
-
-            var binding = new Binding(nameof(SeenForeground)) { Source = this, Mode = BindingMode.TwoWay };
-
-            BindingOperations.SetBinding(this, ForegroundProperty, binding);
-
-        }
+        protected virtual void OnHasBeenSeen() => BindingOperations.SetBinding(this, ForegroundProperty, new Binding(nameof(SeenForeground)) { Source = this, Mode = BindingMode.TwoWay });
 
         protected virtual void Dehighlight()
 
         {
 
-            var binding = new Binding(nameof(NormalForeground))
+            BindingOperations.SetBinding(this, ForegroundProperty, new Binding(nameof(NormalForeground))
             {
                 Source = this,
 
                 Mode = BindingMode.TwoWay
-            };
-
-            BindingOperations.SetBinding(this, ForegroundProperty, binding);
+            });
 
 
 
@@ -261,47 +242,49 @@ namespace WinCopies.GUI.Controls
         protected override void OnMouseEnter(MouseEventArgs e)
         {
 
+            base.OnMouseEnter(e);
+
             if (Mouse.LeftButton == MouseButtonState.Released && !IsFocused)
 
                 Highlight();
-
-            base.OnMouseEnter(e);
 
         }
 
         protected override void OnGotFocus(RoutedEventArgs e)
         {
 
-            Highlight();
-
             base.OnGotFocus(e);
+
+            Highlight();
 
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
 
+            base.OnMouseDown(e);
+
             Activate();
 
             CaptureMouse();
-
-            base.OnMouseDown(e);
 
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
 
+            base.OnKeyDown(e);
+
             if (e.Key == Key.Enter)
 
                 Activate();
-
-            base.OnKeyDown(e);
 
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
+
+            base.OnMouseUp(e);
 
             if (IsMouseCaptured)
 
@@ -315,18 +298,18 @@ namespace WinCopies.GUI.Controls
 
                     Highlight();
 
-                    OnClick();
+                    RaiseEvent(new RoutedEventArgs(ClickEvent, this));
 
                 }
 
             }
 
-            base.OnMouseUp(e);
-
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
         {
+
+            base.OnKeyUp(e);
 
             if (e.Key == Key.Enter && !IsMouseCaptured)
 
@@ -334,16 +317,16 @@ namespace WinCopies.GUI.Controls
 
                 Highlight();
 
-                OnClick();
+                RaiseEvent(new RoutedEventArgs(ClickEvent, this));
 
             }
-
-            base.OnKeyUp(e);
 
         }
 
         protected override void OnMouseLeave(MouseEventArgs e)
         {
+
+            base.OnMouseLeave(e);
 
             if (!IsFocused)
 
@@ -355,12 +338,12 @@ namespace WinCopies.GUI.Controls
 
                     Dehighlight();
 
-            base.OnMouseLeave(e);
-
         }
 
         protected override void OnLostFocus(RoutedEventArgs e)
         {
+
+            base.OnLostFocus(e);
 
             if (!IsMouseOver)
 
@@ -372,11 +355,9 @@ namespace WinCopies.GUI.Controls
 
                     Dehighlight();
 
-            base.OnLostFocus(e);
-
         }
 
-        protected void OnClick()
+        protected void OnClick(RoutedEventArgs e)
         {
 
             if (WinCopies.Util.Util.IsNullEmptyOrWhiteSpace(Uri))
@@ -386,8 +367,6 @@ namespace WinCopies.GUI.Controls
             Process.Start(Uri);
 
             Seen = true;
-
-            RaiseEvent(new RoutedEventArgs(ClickEvent, this));
 
         }
     }

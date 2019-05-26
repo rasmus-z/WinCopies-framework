@@ -82,6 +82,8 @@ namespace WinCopies.IO
 
         // string ToString();
 
+        IBrowsableObjectInfo Clone();
+
     }
 
 }

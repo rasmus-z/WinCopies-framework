@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using Microsoft.WindowsAPICodePack.Shell;
 using System.Collections;
+using System.Windows.Media;
 
 namespace WinCopies.GUI.Explorer.Themes
 {
@@ -309,7 +310,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
         private void PART_TextBox_TextChanged(object sender, TextChangedEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).RaiseTextChangedEvent(e);
 
-        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).OnListViewMouseDoubleClickInternal(e);
+        // private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).OnListViewMouseDoubleClickInternal(e);
 
         private void ListViewItem_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
@@ -317,6 +318,17 @@ namespace WinCopies.GUI.Explorer.Themes
             ListView listView = ((FrameworkElement)sender).GetParent<ListView>(false);
 
             listView.GetParent<ExplorerControl>(false).OnItemsControlContextMenuOpening((FrameworkElement)sender, listView, e);
+
+        }
+
+        private void PART_ListView_MouseEnter(object sender, MouseEventArgs e)
+        {
+
+            ListView listView = (ListView)sender;
+
+            if (listView.GetParent<ExplorerControl>(false)?.OpenMode == OpenMode.OnFirstClick)
+
+                listView.Focus();
 
         }
 

@@ -19,38 +19,8 @@ namespace WinCopies.GUI.Controls
     /// has items that can expand and collapse.
     /// </summary>
     [StyleTypedProperty(Property = nameof(ItemContainerStyle), StyleTargetType = typeof(TreeViewItem))]
-    public class TreeView : System.Windows.Controls.TreeView, ISelector, ICommandSource
+    public class TreeView : System.Windows.Controls.TreeView, ISelector
     {
-
-        /// <summary>
-        /// Identifies the <see cref="Command"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(TreeView), new PropertyMetadata(null));
-
-        /// <summary>
-        /// Gets or sets the command of this <see cref="TreeView"/>. This is a dependency property.
-        /// </summary>
-        public ICommand Command { get => (ICommand)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
-
-        /// <summary>
-        /// Identifies the <see cref="CommandParameter"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(TreeView), new PropertyMetadata(null));
-
-        /// <summary>
-        /// Gets or sets the command parameter for the <see cref="Command"/> property. This is a dependency property.
-        /// </summary>
-        public object CommandParameter { get => GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
-
-        /// <summary>
-        /// Identifies the <see cref="CommandTarget"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CommandTargetProperty = DependencyProperty.Register(nameof(CommandTarget), typeof(IInputElement), typeof(TreeView), new PropertyMetadata(null));
-
-        /// <summary>
-        /// The object that the command is being executed on.
-        /// </summary>
-        public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
 
         ///// <summary>
         ///// Gets the selected index.
@@ -92,20 +62,6 @@ namespace WinCopies.GUI.Controls
         /// <param name="e">The event parameters.</param>
         protected virtual void OnClick(RoutedEventArgs e)
         {
-            if (Command != null && Command.CanExecute(CommandParameter, CommandTarget))
-
-            {
-
-                OnCommandExecute();
-
-                Command.Execute(CommandParameter, CommandTarget);
-
-            }
-        }
-
-        protected virtual void OnCommandExecute()
-
-        {
 
             if (PreviouslySelectedItem == null) return;
 
@@ -144,15 +100,11 @@ namespace WinCopies.GUI.Controls
 
             if (e.Key == Key.Enter) OnClick(e);
 
-            else if (Command != null && KeyCommandHelper.CanRaiseCommand(this, e))
+            if (PreviouslySelectedItem == null) return;
 
-            {
+            PreviouslySelectedItem.SetValue(TreeViewItem.IsPreviouslySelectedItemPropertyKey, false);
 
-                OnCommandExecute();
-
-                Command.Execute(CommandParameter, CommandTarget);
-
-            }
+            SetValue(PreviouslySelectedItemPropertyKey, null);
 
         }
 

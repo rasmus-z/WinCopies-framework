@@ -40,9 +40,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             ExplorerControl explorerControl = (ExplorerControl)e.NewValue;
 
-            explorerControl.Command = Commands.SelectFile;
-
-            explorerControl.CommandBindings.Add(new CommandBinding(Commands.SelectFile, ((FolderBrowserDialog)d).SelectFileCommand_Executed, ((FolderBrowserDialog)d).SelectFileCommand_CanExecute));
+            explorerControl.OpenFilesDirectly = false;
 
         }));
 
@@ -125,39 +123,39 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             Title = title;
 
-            CommandBindings.Add(new CommandBinding(CommonCommand, OnCommandExecuted, OnCommandCanExecute));
+            //CommandBindings.Add(new CommandBinding(CommonCommand, OnCommandExecuted, OnCommandCanExecute));
 
         }
 
 
 
-        protected void OnCommandCanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = e.CanExecute = e.Parameter is bool result ? !result || Command == null ? true : Command.CanExecute(CommandParameter) : true;
+        //protected void OnCommandCanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = e.CanExecute = e.Parameter is bool result ? !result || Command == null ? true : Command.CanExecute(CommandParameter) : true;
 
-        protected void OnCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        //protected void OnCommandExecuted(object sender, ExecutedRoutedEventArgs e)
 
-        {
+        //{
 
-            if (e.Parameter is bool result)
+        //    if (e.Parameter is bool result)
 
-            {
+        //    {
 
-                Explorer.IBrowsableObjectInfo selectedItem = ExplorerControl.Path.SelectedItem;
+        //        Explorer.IBrowsableObjectInfo selectedItem = ExplorerControl.Path.SelectedItem;
 
-                if (result && selectedItem != null && (selectedItem.FileType == FileType.Folder || (selectedItem.FileType == FileType.SpecialFolder && selectedItem is Explorer.ShellObjectInfo so && so.ShellObject.IsFileSystemObject) || selectedItem.FileType == FileType.Drive))
+        //        if (result && selectedItem != null && (selectedItem.FileType == FileType.Folder || (selectedItem.FileType == FileType.SpecialFolder && selectedItem is Explorer.ShellObjectInfo so && so.ShellObject.IsFileSystemObject) || selectedItem.FileType == FileType.Drive))
 
-                {
+        //        {
 
-                    ExplorerControl.Open( selectedItem);
+        //            ExplorerControl.Open(selectedItem);
 
-                    return;
+        //            return;
 
-                }
+        //        }
 
-                CloseWindowWithDialogResult(result);
+        //        CloseWindowWithDialogResult(result);
 
-            }
+        //    }
 
-        }
+        //}
 
         protected void CloseWindowWithDialogResult(bool dialogResult)
 
@@ -173,17 +171,17 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         }
 
-        private void SelectFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
+        //private void SelectFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
 
-        private void SelectFileCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        //private void SelectFileCommand_Executed(object sender, ExecutedRoutedEventArgs e)
 
-        {
+        //{
 
-            if ((If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, Mode, FolderBrowserDialogMode.OpenFiles, FolderBrowserDialogMode.Save) && If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, ExplorerControl.Path.SelectedItem.FileType, FileType.Folder, FileType.SpecialFolder, FileType.Link)) || Mode == FolderBrowserDialogMode.OpenFolder)
+        //    if ((If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, Mode, FolderBrowserDialogMode.OpenFiles, FolderBrowserDialogMode.Save) && If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, ExplorerControl.Path.SelectedItem.FileType, FileType.Folder, FileType.SpecialFolder, FileType.Link)) || Mode == FolderBrowserDialogMode.OpenFolder)
 
-                ExplorerControl.Open();
+        //        ExplorerControl.Open();
 
-        }
+        //}
 
     }
 }

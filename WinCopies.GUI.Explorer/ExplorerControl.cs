@@ -16,13 +16,15 @@ using BackgroundWorker = WinCopies.Util.BackgroundWorker;
 using NotifyCollectionChangedEventArgs = System.Collections.Specialized.NotifyCollectionChangedEventArgs;
 using Generic = WinCopies.GUI.Explorer.Themes.Generic;
 using WinCopies.GUI.Controls;
-using TreeView = WinCopies.GUI.Controls.TreeView;
 using TextBox = System.Windows.Controls.TextBox;
 using Clipboard = WinCopies.IO.Clipboard;
 using System.Windows.Interop;
 using System.ComponentModel;
 using System.Collections;
 using WinCopies.Util.Commands;
+using WinCopies.Util;
+using static WinCopies.Util.Util;
+using System.Activities.Statements;
 
 namespace WinCopies.GUI.Explorer
 {
@@ -33,7 +35,7 @@ namespace WinCopies.GUI.Explorer
 
     public delegate void DeleteHandler(IBrowsableObjectInfo[] paths);
 
-    public class ExplorerControl : Control, ICommandSource
+    public class ExplorerControl : Control
     {
 
         public TreeView TreeView { get; private set; } = null;
@@ -47,33 +49,6 @@ namespace WinCopies.GUI.Explorer
         private List<ShellFile> pathsToOpen = null;
 
         private readonly FileSystemWatcher fsw = new FileSystemWatcher();
-
-        /// <summary>
-        /// Identifies the <see cref="Command"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(ExplorerControl), new PropertyMetadata(Commands.Open));
-
-        /// <summary>
-        /// Gets or sets the command of this <see cref="ExplorerControl"/>. This command is used to open items in this <see cref="ExplorerControl"/>. This is a dependency property.
-        /// </summary>
-        public ICommand Command { get => (ICommand)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
-
-        /// <summary>
-        /// Identifies the <see cref="CommandParameter"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(ExplorerControl), new PropertyMetadata(null));
-
-        /// <summary>
-        /// Gets or sets the command parameter for the <see cref="Command"/> property. This is a dependency property.
-        /// </summary>
-        public object CommandParameter { get => GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
-
-        /// <summary>
-        /// Identifies the <see cref="CommandTarget"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CommandTargetProperty = DependencyProperty.Register(nameof(CommandTarget), typeof(IInputElement), typeof(ExplorerControl), new PropertyMetadata(null));
-
-        public IInputElement CommandTarget { get => (IInputElement)GetValue(CommandTargetProperty); set => SetValue(CommandTargetProperty, value); }
 
         /// <summary>
         /// Identifies the <see cref="Text"/> dependency property.
@@ -453,15 +428,77 @@ namespace WinCopies.GUI.Explorer
         public InArchiveFormats ArchiveFormatsToOpen { get => (InArchiveFormats)GetValue(ArchiveFormatsToOpenProperty); set => SetValue(ArchiveFormatsToOpenProperty, value); }
 
         /// <summary>
-        /// Identifies the <see cref="OpenPathsDirectly"/> dependency property.
+        /// Identifies the <see cref="OpenDirectoriesDirectly"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty OpenPathsDirectlyProperty = DependencyProperty.Register(nameof(OpenPathsDirectly), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(true));
+        public static readonly DependencyProperty OpenDirectoriesDirectlyProperty = DependencyProperty.Register(nameof(OpenDirectoriesDirectly), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(true));
 
-        public bool OpenPathsDirectly { get => (bool)GetValue(OpenPathsDirectlyProperty); set => SetValue(OpenPathsDirectlyProperty, value); }
+        public bool OpenDirectoriesDirectly { get => (bool)GetValue(OpenDirectoriesDirectlyProperty); set => SetValue(OpenDirectoriesDirectlyProperty, value); }
+
+        /// <summary>
+        /// Identifies the <see cref="OpenFilesDirectly"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty OpenFilesDirectlyProperty = DependencyProperty.Register(nameof(OpenFilesDirectly), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(true));
+
+        public bool OpenFilesDirectly { get => (bool)GetValue(OpenFilesDirectlyProperty); set => SetValue(OpenFilesDirectlyProperty, value); }
+
+        /// <summary>
+        /// Identifies the <see cref="OpenMode"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty OpenModeProperty = DependencyProperty.Register(nameof(OpenMode), typeof(OpenMode), typeof(ExplorerControl), new PropertyMetadata(OpenMode.OnDoubleClick, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+
+        {
+
+            OpenMode openMode = (OpenMode)e.NewValue;
+
+            openMode.ThrowIfNotValidEnumValue();
+
+            ExplorerControl explorerControl = (ExplorerControl)d;
+
+            ListViewItem listViewItem = null;
+
+            for (int i = 0; i < explorerControl.Path.Items.Count; i++)
+
+            {
+
+                listViewItem = explorerControl.ListView.ItemContainerGenerator.ContainerFromIndex(i) as ListViewItem;
+
+                void tryRemove()
+
+                {
+
+                    for (int _i = 0; _i < listViewItem.InputBindings.Count;)
+
+                        if (((InputBinding)listViewItem.InputBindings[_i]).Command == Commands.Open)
+
+                            listViewItem.InputBindings.RemoveAt(_i);
+
+                        else
+
+                            _i++;
+
+                }
+
+                tryRemove();
+
+                if (openMode == OpenMode.OnFirstClick)
+
+                    listViewItem.InputBindings.Add(new InputBinding(Commands.Open, new MouseGesture(MouseAction.LeftClick)));
+
+                else if (openMode == OpenMode.OnDoubleClick)
+
+                    listViewItem.InputBindings.Add(new InputBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
+
+            }
+
+        }));
+
+        public OpenMode OpenMode { get => (OpenMode)GetValue(OpenModeProperty); set => SetValue(OpenModeProperty, value); }
 
         // public static readonly DependencyProperty BrowsableObjectInfoItemsLoaderProperty = DependencyProperty.Register("BrowsableObjectInfoItemsLoader", typeof(BrowsableObjectInfoItemsLoader), typeof(ExplorerControl), new PropertyMetadata()));
 
         // private WinCopies.IO.BrowsableObjectInfoItemsLoader BrowsableObjectInfoItemsLoader = null;
+
+        // todo: to turn to routed events
 
         /// <summary>
         /// Occurs when the <see cref="Path"/> property has changed.
@@ -469,9 +506,16 @@ namespace WinCopies.GUI.Explorer
         public event ValueChangedEventHandler<IBrowsableObjectInfo> PathChanged;
 
         /// <summary>
-        /// Occurs when a navigation is requested. This event occurs only if the <see cref="OpenPathsDirectly"/> is set to <see langword="false"/>.
+        /// Occurs when a navigation is requested. This event occurs only if the <see cref="OpenDirectoriesDirectly"/> is set to <see langword="false"/>.
         /// </summary>
         public event Util.EventHandler<IBrowsableObjectInfo> NavigationRequested;
+
+        /// <summary>
+        /// Occurs when an array of paths have been requested for opening. When the <see cref="ExplorerControl"/> raises this event, if the <see cref="OpenDirectoriesDirectly"/> is set to <see langword="true"/>, it has also tried to open the first path of the <see cref="MultiplePathsOpenRequestedEventArgs.Paths"/> array. If this property is set to <see langword="false"/>, the <see cref="NavigationRequested"/> event is raised instead.
+        /// </summary>
+        public event MultiplePathsOpenRequestedEventHandler MultiplePathsOpeningRequested;
+
+        public event Util.EventHandler<IBrowsableObjectInfo[]> FilesOpeningRequested;
 
         /// <summary>
         /// Occurs when the <see cref="Text"/> property has changed.
@@ -487,11 +531,6 @@ namespace WinCopies.GUI.Explorer
         /// Occurs when the visible items count changed.
         /// </summary>
         public event ValueChangedEventHandler VisibleItemsCountChanged;
-
-        /// <summary>
-        /// Occurs when an array of paths have been requested for opening. When the <see cref="ExplorerControl"/> raises this event, if the <see cref="OpenPathsDirectly"/> is set to <see langword="true"/>, it has also tried to open the first path of the <see cref="MultiplePathsOpenRequestedEventArgs.Paths"/> array. If this property is set to <see langword="false"/>, the <see cref="NavigationRequested"/> event is raised instead.
-        /// </summary>
-        public event MultiplePathsOpenRequestedEventHandler MultiplePathsOpenRequested;
 
         static ExplorerControl() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ExplorerControl), new FrameworkPropertyMetadata(typeof(ExplorerControl)));
 
@@ -514,6 +553,8 @@ namespace WinCopies.GUI.Explorer
 
         {
 
+            CommandBindings.Add(new CommandBinding(Commands.Open, Open_Executed, Open_CanExecute));
+
             SetValue(HistoryPropertyKey, new System.Collections.ObjectModel.ReadOnlyObservableCollection<IHistoryItemData>(history));
 
             history.CollectionChanged += History_CollectionChanged;
@@ -535,8 +576,6 @@ namespace WinCopies.GUI.Explorer
             Open(path);
 
             // InputBindings.Add(new MouseBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
-
-            CommandBindings.Add(new CommandBinding(Commands.Open, Open_Executed, Open_CanExecute));
 
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, Copy_Executed, Copy_CanExecute));
 
@@ -593,43 +632,9 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnOpenCanExecute(e);
+        internal void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnOpenCanExecute(e);
 
-        private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
-
-        {
-
-            if (e.Parameter is null)
-
-                OnOpening(null);
-
-            else if (e.Parameter is IEnumerable paths)
-
-            {
-
-                IBrowsableObjectInfo[] _paths = new IBrowsableObjectInfo[paths.ToList().Count];
-
-                int i = -1;
-
-                foreach (object path in paths)
-
-                {
-
-                    i++;
-
-                    _paths[i] = (IBrowsableObjectInfo)path;
-
-                }
-
-                OnOpening(_paths);
-
-            }
-
-            else if (e.Parameter is IBrowsableObjectInfo path)
-
-                OnOpening(path);
-
-        }
+        internal void Open_Executed(object sender, ExecutedRoutedEventArgs e) => OnOpening(ListView.SelectedItems.OfType<IBrowsableObjectInfo>().ToArray());
 
         protected virtual void OnCopyCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanCopy;//e.ContinueRouting = false;//e.Handled = true;//raise
 
@@ -892,6 +897,12 @@ namespace WinCopies.GUI.Explorer
 
         private ObservableListBoxSelectedItems _observableListBoxSelectedItems = null;
 
+        //private void TryAddCommandBinding()
+
+        //{
+
+        //}
+
         /// <summary>
         /// Is invoked whenever application code or internal processes call <see cref="FrameworkElement.ApplyTemplate" />.
         /// </summary>
@@ -913,6 +924,8 @@ namespace WinCopies.GUI.Explorer
             {
 
                 ListView.ParentExplorerControl = this;
+
+                // TryAddCommandBinding();
 
                 // ListView.SelectionChanged += (object sender, System.Windows.Controls.SelectionChangedEventArgs e) => OnListViewSelectionChanged(e);
 
@@ -1102,18 +1115,6 @@ namespace WinCopies.GUI.Explorer
 
         private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e) => OnItemContainerGeneratorStatusChanged(e);
 
-        internal void OnListViewMouseDoubleClickInternal(MouseButtonEventArgs e) => OnListViewMouseDoubleClick(e);
-
-        protected virtual void OnListViewMouseDoubleClick(MouseButtonEventArgs e)
-
-        {
-
-            if (e.ChangedButton == MouseButton.Left)
-
-                Command.TryExecute(CommandParameter, CommandTarget);
-
-        }
-
         private void FileOpeningBgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 
         {
@@ -1157,13 +1158,25 @@ namespace WinCopies.GUI.Explorer
 
                     if (firstItem)
 
-                    {
+                        if (OpenDirectoriesDirectly)
 
-                        Navigate(path, true);
+                        {
 
-                        return true;
+                            Navigate(path, true);
 
-                    }
+                            return true;
+
+                        }
+
+                        else
+
+                        {
+
+                            NavigationRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo>(path));
+
+                            return null;
+
+                        }
 
                     else return null;
 
@@ -1179,13 +1192,25 @@ namespace WinCopies.GUI.Explorer
 
                                 if (firstItem)
 
-                                {
+                                    if (OpenDirectoriesDirectly)
 
-                                    Navigate(path, true);
+                                    {
 
-                                    return true;
+                                        Navigate(path, true);
 
-                                }
+                                        return true;
+
+                                    }
+
+                                    else
+
+                                    {
+
+                                        NavigationRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo>(path));
+
+                                        return null;
+
+                                    }
 
                                 else return null;
 
@@ -1247,7 +1272,7 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        internal bool OpenLinkInternal(ShellLink path, bool firstItem)
+        internal bool? OpenLinkInternal(ShellLink path, bool firstItem)
 
         {
 
@@ -1257,13 +1282,25 @@ namespace WinCopies.GUI.Explorer
 
                 if (firstItem)
 
-                {
+                    if (OpenDirectoriesDirectly)
 
-                    Navigate(_path, true);
+                    {
 
-                    return true;
+                        Navigate(_path, true);
 
-                }
+                        return true;
+
+                    }
+
+                    else
+
+                    {
+
+                        NavigationRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo>(_path));
+
+                        return null;
+
+                    }
 
                 else return false;
 
@@ -1287,81 +1324,7 @@ namespace WinCopies.GUI.Explorer
         /// Opens a path array.
         /// </summary>
         /// <param name="paths">The <see cref="IBrowsableObjectInfo"/> paths array to open.</param>
-        public void Open(IEnumerable<IBrowsableObjectInfo> paths)
-
-        {
-
-            List<IBrowsableObjectInfo> nonOpenedPaths = new List<IBrowsableObjectInfo>();
-
-            bool firstBrowsableItem = true;
-
-            foreach (IBrowsableObjectInfo path in paths)
-
-            {
-
-#if DEBUG
-
-                Debug.WriteLine("ExplorerControl Open");
-
-                if (path is IO.ShellObjectInfo)
-
-                    Debug.WriteLine((!(path is IO.ShellObjectInfo)).ToString() + " " + ((IO.ShellObjectInfo)path).ShellObject.GetType().ToString());
-
-#endif
-
-                bool? result = OpenInternal(path, firstBrowsableItem);
-
-                if (path.IsBrowsable)
-
-                    firstBrowsableItem = false;
-
-                if (result.HasValue)
-
-                {
-
-                    if (!result.Value)
-
-                        if (path.FileType == FileType.Link)
-
-                            if (!(path is IO.ShellObjectInfo) || !((IO.ShellObjectInfo)path).ShellObject.IsLink)
-
-                                // todo:
-
-                                throw new ArgumentException("path isn't a ShellObjectInfo or path isn't a link.");
-
-                            else
-
-                            {
-
-                                ShellLink shellLink = (ShellLink)ShellObject.FromParsingName(((IO.ShellObjectInfo)path).ShellObject.ParsingName);
-
-                                if (shellLink.TargetShellObject.IsLink)
-
-                                    // todo:
-
-                                    throw new InvalidOperationException("Shell link target shell object is also a link.");
-
-                                else
-
-                                    if (!OpenLinkInternal(shellLink, firstBrowsableItem))
-
-                                    nonOpenedPaths.Add(path);
-
-                            }
-
-                }
-
-                else
-
-                    nonOpenedPaths.Add(path);
-
-            }
-
-            MultiplePathsOpenRequested?.Invoke(this, new MultiplePathsOpenRequestedEventArgs(paths));
-
-        }
-
-        public void Open(params IBrowsableObjectInfo[] paths) => Open((IEnumerable<IBrowsableObjectInfo>)paths);
+        public void Open(params IBrowsableObjectInfo[] paths) => OnOpening(paths);
 
         public void Open()
 
@@ -1414,7 +1377,7 @@ namespace WinCopies.GUI.Explorer
 
                 paths.Add((IBrowsableObjectInfo)path);
 
-            Open(paths);
+            OnOpening(paths.ToArray());
 
         }
 
@@ -1423,16 +1386,6 @@ namespace WinCopies.GUI.Explorer
         public void Navigate(IBrowsableObjectInfo path, bool addPathToHistory, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 
         {
-
-            if (!OpenPathsDirectly)
-
-            {
-
-                NavigationRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo>(path));
-
-                return;
-
-            }
 
             // SetValue(PathPropertyKey, path);
 
@@ -1578,15 +1531,89 @@ namespace WinCopies.GUI.Explorer
         protected internal virtual void OnOpening(params IBrowsableObjectInfo[] paths)
         {
 
-            if (paths == null) return;
+            List<IBrowsableObjectInfo> directories = new List<IBrowsableObjectInfo>();
 
-            IBrowsableObjectInfo path;
+            List<IBrowsableObjectInfo> files = new List<IBrowsableObjectInfo>();
 
-            for (int i = 0; i < paths.Length; i++)
+            foreach (IBrowsableObjectInfo path in paths)
 
-                paths[i] = (IBrowsableObjectInfo)(paths[i] is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(ShellObject.FromParsingName(shellObjectInfo.ShellObject.ParsingName), shellObjectInfo.Path, shellObjectInfo.FileType, shellObjectInfo.SpecialFolder) : paths[i] is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
+            {
 
-            Open(paths);
+#if DEBUG
+
+                Debug.WriteLine("ExplorerControl Open");
+
+                if (path is IO.ShellObjectInfo)
+
+                    Debug.WriteLine((!(path is IO.ShellObjectInfo)).ToString() + " " + ((IO.ShellObjectInfo)path).ShellObject.GetType().ToString());
+
+#endif
+
+                if (!OpenFilesDirectly && If(ComparisonType.And, ComparisonMode.Logical, Comparison.Equals, path.FileType, FileType.File, FileType.Link, FileType.Archive))
+
+                {
+
+                    files.Add(path);
+
+                    continue;
+
+                }
+
+                bool? result = OpenInternal(path, directories.Count == 0);
+
+                if (result.HasValue)
+
+                {
+
+                    if (!result.Value)
+
+                        if (path.FileType == FileType.Link)
+
+                            if (!(path is IO.ShellObjectInfo) || !((IO.ShellObjectInfo)path).ShellObject.IsLink)
+
+                                // todo:
+
+                                throw new ArgumentException("path isn't a ShellObjectInfo or path isn't a link.");
+
+                            else
+
+                            {
+
+                                ShellLink shellLink = (ShellLink)ShellObject.FromParsingName(((IO.ShellObjectInfo)path).ShellObject.ParsingName);
+
+                                if (shellLink.TargetShellObject.IsLink)
+
+                                    // todo:
+
+                                    throw new InvalidOperationException("Shell link target shell object is also a link.");
+
+                                else
+
+                                {
+
+                                    OpenLinkInternal(shellLink, directories.Count == 0);
+
+                                    directories.Add(path);
+
+                                }
+
+                            }
+
+                }
+
+                else
+
+                    directories.Add(path);
+
+            }
+
+            if (directories.Count > 1)
+
+                MultiplePathsOpeningRequested?.Invoke(this, new MultiplePathsOpenRequestedEventArgs(directories.ToArray()));
+
+            if (files.Count > 0)
+
+                FilesOpeningRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo[]>(files.ToArray()));
 
         }
 
@@ -1792,9 +1819,9 @@ namespace WinCopies.GUI.Explorer
               // MessageBox.Show(obj.ToString());
           });
 
-        // todo:
+        public static DelegateCommand MachinChose { get; } = new DelegateCommand((object obj) =>
 
-        public static RoutedUICommand SelectFile { get; } = new RoutedUICommand(nameof(SelectFile), nameof(SelectFile), typeof(Commands));
+        ((IBrowsableObjectInfo)obj).IsSelected = true);
 
         //public static readonly RoutedUICommand OpenInNewTab = new RoutedUICommand((string)Application.Current.Resources["OpenInNewTab"], "OpenInNewTab", typeof(Commands));
 

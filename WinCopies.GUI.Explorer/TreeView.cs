@@ -68,6 +68,8 @@ namespace WinCopies.GUI.Explorer
 
         }
 
+        protected override DependencyObject GetContainerForItemOverride() => new TreeViewItem(ParentExplorerControl);
+
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
 
