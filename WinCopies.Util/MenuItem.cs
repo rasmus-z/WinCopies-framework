@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace WinCopies.Util
+namespace WinCopies.Util.Data
 {
     public class MenuItem : INotifyPropertyChanged
     {

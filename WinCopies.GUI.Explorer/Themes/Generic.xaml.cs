@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.GUI.Explorer.Data;
-using BooleanToVisibilityConverter = WinCopies.Util.DataConverters.BooleanToVisibilityConverter;
+using BooleanToVisibilityConverter = WinCopies.Util.Data.BooleanToVisibilityConverter;
 using WinCopies.Util;
 using System;
 using System.IO;
@@ -302,13 +302,22 @@ namespace WinCopies.GUI.Explorer.Themes
 
 #endif
 
-            ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).RaiseSelectionChangedEvent(new SelectionChangedEventArgs(e.RoutedEvent, e.AddedItems, e.RemovedItems, ActionsFromObjects.ListView));
+            ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).RaiseEvent(new SelectionChangedEventArgs(ExplorerControl.SelectionChangedEvent, ActionsFromObjects.ListView, e.AddedItems, e.RemovedItems));
 
         }
 
         private void TextBox_LostFocus(object sender, RoutedEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Text = ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Path.Path;
 
-        private void PART_TextBox_TextChanged(object sender, TextChangedEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).RaiseTextChangedEvent(e);
+        private void PART_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (e.Changes == null)
+
+                ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).RaiseEvent(new TextChangedEventArgs(ExplorerControl.TextChangedEvent, e.UndoAction));
+
+            else
+
+                ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).RaiseEvent(new TextChangedEventArgs(ExplorerControl.TextChangedEvent, e.UndoAction, e.Changes));
+        }
 
         // private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).OnListViewMouseDoubleClickInternal(e);
 

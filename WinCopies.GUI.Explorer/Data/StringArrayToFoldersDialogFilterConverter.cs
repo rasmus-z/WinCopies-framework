@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Globalization;
-using WinCopies.Util.DataConverters;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Windows.Dialogs.Data
 {

@@ -71,17 +71,17 @@ namespace WinCopies.Util
 
         {
 
-            Equals = 0,
+            Equal = 0,
 
-            DoesNotEqual = 1,
+            NotEqual = 1,
 
-            LesserThan = 2,
+            Lesser = 2,
 
-            LesserOrEquals = 3,
+            LesserOrEqual = 3,
 
-            GreaterThan = 4,
+            Greater = 4,
 
-            GreaterOrEquals = 5
+            GreaterOrEqual = 5
 
         }
 
@@ -97,11 +97,9 @@ namespace WinCopies.Util
 
         }
 
-        private static bool CheckIfComparison(Comparison comparison, bool predicateResult, int result) => predicateResult && ((result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||
-                        (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||
-                        (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals)));//: comparisonType == ComparisonType.Or ?//(result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||//    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||//    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))
+        private static bool CheckIfComparison(Comparison comparison, bool predicateResult, int result) => comparison == Comparison.Equal ? predicateResult && result == 0 : comparison == Comparison.LesserOrEqual ? result <= 0 : comparison == Comparison.GreaterOrEqual ? result >= 0 : comparison == Comparison.Lesser ? !predicateResult && result < 0 : comparison == Comparison.Greater ? !predicateResult && result > 0 : comparison == Comparison.NotEqual ? !predicateResult && result != 0 : false;//: comparisonType == ComparisonType.Or ?//(result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||//    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||//    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))
 
-        private static bool CheckIfEqualityComparison(Comparison comparison, bool predicateResult, bool result) => (result && comparison == Comparison.Equals) || (!result && comparison == Comparison.DoesNotEqual);
+        private static bool CheckEqualityComparison(Comparison comparison, bool predicateResult, bool result) => (predicateResult && result && comparison == Comparison.Equal) || (!(predicateResult || result) && comparison == Comparison.NotEqual);
 
         // todo: factoriser au maximum
 
@@ -155,7 +153,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -179,7 +177,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -220,7 +218,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -264,7 +262,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -288,7 +286,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -329,7 +327,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -357,11 +355,11 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
 
             bool result;
 
@@ -375,13 +373,13 @@ namespace WinCopies.Util
 
                 foreach (object _value in values)
 
-                    if (!CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (!CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -399,13 +397,13 @@ namespace WinCopies.Util
 
                 foreach (object _value in values)
 
-                    if (CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -430,7 +428,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
@@ -440,13 +438,13 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckIfEqualityComparison(comparison, predicate(__value), equalityComparer.Equals(_value, value)))
+                            if (CheckEqualityComparison(comparison, predicate(__value), equalityComparer.Equals(_value, value)))
 
                             {
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -490,7 +488,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -514,7 +512,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -555,7 +553,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -599,7 +597,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -623,7 +621,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -664,7 +662,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -692,11 +690,11 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
 
             bool result;
 
@@ -710,13 +708,13 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                    if (!CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -734,13 +732,13 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                    if (CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -765,7 +763,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
@@ -775,13 +773,13 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckIfEqualityComparison(comparison, __value.Value(), equalityComparer.Equals(__value.Key, value)))
+                            if (CheckEqualityComparison(comparison, __value.Value(), equalityComparer.Equals(__value.Key, value)))
 
                             {
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -853,7 +851,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -881,7 +879,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -924,7 +922,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -976,7 +974,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1004,7 +1002,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1047,7 +1045,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -1079,11 +1077,11 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
 
             object _key = null;
 
@@ -1099,7 +1097,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, object> _value in values)
 
-                    if (!CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (!CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
@@ -1107,7 +1105,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1127,7 +1125,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, object> _value in values)
 
-                    if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
@@ -1135,7 +1133,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1162,7 +1160,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
@@ -1172,13 +1170,13 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                            if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                             {
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -1230,7 +1228,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1258,7 +1256,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1301,7 +1299,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -1353,7 +1351,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1381,7 +1379,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1424,7 +1422,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -1456,11 +1454,11 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
 
             object _key = null;
 
@@ -1476,7 +1474,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
 
-                    if (!CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
 
                     {
 
@@ -1484,7 +1482,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1504,7 +1502,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
 
-                    if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
 
                     {
 
@@ -1512,7 +1510,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1539,7 +1537,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
 
                     {
 
@@ -1549,13 +1547,13 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                            if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
 
                             {
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -1631,7 +1629,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1655,7 +1653,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1696,7 +1694,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -1740,7 +1738,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1764,7 +1762,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1805,7 +1803,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -1833,11 +1831,11 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
 
             bool result;
 
@@ -1851,13 +1849,13 @@ namespace WinCopies.Util
 
                 foreach (T _value in values)
 
-                    if (!CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (!CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1875,13 +1873,13 @@ namespace WinCopies.Util
 
                 foreach (T _value in values)
 
-                    if (CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1906,7 +1904,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckIfEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
 
                     {
 
@@ -1916,13 +1914,13 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckIfEqualityComparison(comparison, predicate(__value), equalityComparer.Equals(_value, value)))
+                            if (CheckEqualityComparison(comparison, predicate(__value), equalityComparer.Equals(_value, value)))
 
                             {
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -1966,7 +1964,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -1990,7 +1988,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2031,7 +2029,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -2075,7 +2073,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2099,7 +2097,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2140,7 +2138,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -2168,11 +2166,11 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
 
             bool result;
 
@@ -2186,13 +2184,13 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                    if (!CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2210,13 +2208,13 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                    if (CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2241,7 +2239,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckIfEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
 
                     {
 
@@ -2251,13 +2249,13 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckIfEqualityComparison(comparison, __value.Value(), equalityComparer.Equals(__value.Key, value)))
+                            if (CheckEqualityComparison(comparison, __value.Value(), equalityComparer.Equals(__value.Key, value)))
 
                             {
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -2329,7 +2327,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2357,7 +2355,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2400,7 +2398,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -2452,7 +2450,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2480,7 +2478,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2523,7 +2521,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -2555,11 +2553,11 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
 
             TKey _key = default;
 
@@ -2575,7 +2573,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<TKey, TValue> _value in values)
 
-                    if (!CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (!CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
@@ -2583,7 +2581,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2603,7 +2601,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<TKey, TValue> _value in values)
 
-                    if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
@@ -2611,7 +2609,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2638,7 +2636,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                     {
 
@@ -2648,13 +2646,13 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckIfEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                            if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
 
                             {
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -2706,7 +2704,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2734,7 +2732,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2777,7 +2775,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -2829,7 +2827,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2857,7 +2855,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2900,7 +2898,7 @@ namespace WinCopies.Util
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -2932,11 +2930,11 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equals || comparison == Comparison.DoesNotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equals)} or {nameof(Comparison.DoesNotEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
 
             TKey _key = default;
 
@@ -2952,7 +2950,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
 
-                    if (!CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
 
                     {
 
@@ -2960,7 +2958,7 @@ namespace WinCopies.Util
 
                         result = false;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -2980,7 +2978,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
 
-                    if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
 
                     {
 
@@ -2988,7 +2986,7 @@ namespace WinCopies.Util
 
                         result = true;
 
-                        if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                     }
 
@@ -3015,7 +3013,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
 
                     {
 
@@ -3025,13 +3023,13 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckIfEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                            if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
 
                             {
 
                                 result = false;
 
-                                if (comparisonMode == ComparisonMode.Binary) continue; else if (comparisonMode == ComparisonMode.Logical) break;
+                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
 
                             }
 
@@ -3201,7 +3199,7 @@ namespace WinCopies.Util
 
             foreach (object value in array)
 
-                values |= (long) Convert.ChangeType( value, TypeCode.Int64);
+                values |= (long)Convert.ChangeType(value, TypeCode.Int64);
 
             return (T)Enum.ToObject(enumType, values);
 

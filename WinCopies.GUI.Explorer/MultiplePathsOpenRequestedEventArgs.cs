@@ -1,23 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
 
-namespace WinCopies.GUI.Explorer
-{
+//namespace WinCopies.GUI.Explorer
+//{
 
-    public delegate void MultiplePathsOpenRequestedEventHandler(object sender, MultiplePathsOpenRequestedEventArgs e);
+//    public delegate void MultiplePathsOpenRequestedEventHandler(object sender, MultiplePathsOpenRequestedEventArgs e);
 
-    public class MultiplePathsOpenRequestedEventArgs : EventArgs
-    {
+//    public class MultiplePathsOpenRequestedEventArgs : EventArgs
+//    {
 
-        /// <summary>
-        /// The paths for which an open has been requested.
-        /// </summary>
-        public IBrowsableObjectInfo[] Paths { get; }
+//        /// <summary>
+//        /// The paths for which an open has been requested.
+//        /// </summary>
+//        public IBrowsableObjectInfo[] Paths { get; }
 
-        public MultiplePathsOpenRequestedEventArgs(IBrowsableObjectInfo[] paths) => Paths = paths;
+//        public MultiplePathsOpenRequestedEventArgs(IBrowsableObjectInfo[] paths) => Paths = paths;
 
-    }
-}
+//    }
+//}

@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace WinCopies.GUI.Explorer.Data
 {
-    public class HistorySelectedItemConverter : Util.DataConverters.MultiConverterBase
+    public class HistorySelectedItemConverter : Util.Data.MultiConverterBase
     {
         public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) => ((ReadOnlyObservableCollection<IHistoryItemData>)values[1]).IndexOf((IHistoryItemData)values[0]) == (int)values[2];
 

@@ -25,6 +25,9 @@ using WinCopies.Util.Commands;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 using System.Activities.Statements;
+using WinCopies.Collections;
+using WinCopies.Util.Data;
+using MenuItem = WinCopies.Util.Data.MenuItem;
 
 namespace WinCopies.GUI.Explorer
 {
@@ -60,7 +63,7 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
 
-        private static readonly DependencyPropertyKey PathPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Path), typeof(IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ExplorerControl)d).PathChanged?.Invoke(d, new ValueChangedEventArgs<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.OldValue, (IBrowsableObjectInfo)e.NewValue))));
+        private static readonly DependencyPropertyKey PathPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Path), typeof(IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ExplorerControl)d).RaiseEvent(new RoutedEventArgs<ValueChangedEventArgs<IBrowsableObjectInfo>>(PathChangedEvent, d, new ValueChangedEventArgs<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.OldValue, (IBrowsableObjectInfo)e.NewValue)))));
 
         /// <summary>
         /// Identifies the <see cref="Path"/> dependency property.
@@ -322,7 +325,7 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public bool CanMoveToParentPath => (bool)GetValue(CanMoveToParentPathProperty);
 
-        private static readonly DependencyPropertyKey VisibleItemsCountPropertyKey = DependencyProperty.RegisterReadOnly(nameof(VisibleItemsCount), typeof(int), typeof(ExplorerControl), new PropertyMetadata(0, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ExplorerControl)d).VisibleItemsCountChanged?.Invoke(d, new ValueChangedEventArgs(e.OldValue, e.NewValue))));
+        private static readonly DependencyPropertyKey VisibleItemsCountPropertyKey = DependencyProperty.RegisterReadOnly(nameof(VisibleItemsCount), typeof(int), typeof(ExplorerControl), new PropertyMetadata(0, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ExplorerControl)d).RaiseEvent(new RoutedEventArgs<ValueChangedEventArgs<int>>(VisibleItemsCountChangedEvent, d, new ValueChangedEventArgs<int>((int)e.OldValue, (int)e.NewValue)))));
 
         /// <summary>
         /// Identifies the <see cref="VisibleItemsCount"/> dependency property.
@@ -468,7 +471,7 @@ namespace WinCopies.GUI.Explorer
 
                     for (int _i = 0; _i < listViewItem.InputBindings.Count;)
 
-                        if (((InputBinding)listViewItem.InputBindings[_i]).Command == Commands.Open)
+                        if (listViewItem.InputBindings[_i].Command == Commands.Open)
 
                             listViewItem.InputBindings.RemoveAt(_i);
 
@@ -498,39 +501,123 @@ namespace WinCopies.GUI.Explorer
 
         // private WinCopies.IO.BrowsableObjectInfoItemsLoader BrowsableObjectInfoItemsLoader = null;
 
-        // todo: to turn to routed events
+        // todo: to turn all events to routed events
+
+        /// <summary>
+        /// Identifies the <see cref="PathChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PathChangedEvent = EventManager.RegisterRoutedEvent(nameof(PathChanged), RoutingStrategy.Bubble, typeof(RoutedEventHandler<ValueChangedEventArgs<IBrowsableObjectInfo>>), typeof(ExplorerControl));
 
         /// <summary>
         /// Occurs when the <see cref="Path"/> property has changed.
         /// </summary>
-        public event ValueChangedEventHandler<IBrowsableObjectInfo> PathChanged;
+        public event RoutedEventHandler<ValueChangedEventArgs<IBrowsableObjectInfo>> PathChanged
+        {
+
+            add => AddHandler(PathChangedEvent, value);
+
+            remove => RemoveHandler(PathChangedEvent, value);
+
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="NavigationRequested"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent NavigationRequestedEvent = EventManager.RegisterRoutedEvent(nameof(NavigationRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler<EventArgs<IBrowsableObjectInfo>>), typeof(ExplorerControl));
 
         /// <summary>
         /// Occurs when a navigation is requested. This event occurs only if the <see cref="OpenDirectoriesDirectly"/> is set to <see langword="false"/>.
         /// </summary>
-        public event Util.EventHandler<IBrowsableObjectInfo> NavigationRequested;
+        public event RoutedEventHandler<EventArgs<IBrowsableObjectInfo>> NavigationRequested
+        {
+
+            add => AddHandler(NavigationRequestedEvent, value);
+
+            remove => RemoveHandler(NavigationRequestedEvent, value);
+
+        }
 
         /// <summary>
-        /// Occurs when an array of paths have been requested for opening. When the <see cref="ExplorerControl"/> raises this event, if the <see cref="OpenDirectoriesDirectly"/> is set to <see langword="true"/>, it has also tried to open the first path of the <see cref="MultiplePathsOpenRequestedEventArgs.Paths"/> array. If this property is set to <see langword="false"/>, the <see cref="NavigationRequested"/> event is raised instead.
+        /// Identifies the <see cref="MultiplePathsOpeningRequested"/> routed event.
         /// </summary>
-        public event MultiplePathsOpenRequestedEventHandler MultiplePathsOpeningRequested;
+        public static readonly RoutedEvent MultiplePathsOpeningRequestedEvent = EventManager.RegisterRoutedEvent(nameof(MultiplePathsOpeningRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler<EventArgs<IBrowsableObjectInfo[]>>), typeof(ExplorerControl));
 
-        public event Util.EventHandler<IBrowsableObjectInfo[]> FilesOpeningRequested;
+        /// <summary>
+        /// Occurs when an array of paths have been requested for opening. When the <see cref="ExplorerControl"/> raises this event, if the <see cref="OpenDirectoriesDirectly"/> is set to <see langword="true"/>, it has also tried to open the first path of the <see cref="EventArgs{T}.Value"/> array. If this property is set to <see langword="false"/>, the <see cref="NavigationRequested"/> event is raised instead.
+        /// </summary>
+        public event RoutedEventHandler<EventArgs<IBrowsableObjectInfo[]>> MultiplePathsOpeningRequested
+        {
+
+            add => AddHandler(MultiplePathsOpeningRequestedEvent, value);
+
+            remove => RemoveHandler(MultiplePathsOpeningRequestedEvent, value);
+
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="FilesOpeningRequested"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent FilesOpeningRequestedEvent = EventManager.RegisterRoutedEvent(nameof(FilesOpeningRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler<EventArgs<IBrowsableObjectInfo[]>>), typeof(ExplorerControl));
+
+        public event RoutedEventHandler<EventArgs<IBrowsableObjectInfo[]>> FilesOpeningRequested
+        {
+
+            add => AddHandler(FilesOpeningRequestedEvent, value);
+
+            remove => RemoveHandler(FilesOpeningRequestedEvent, value);
+
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="TextChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent TextChangedEvent = EventManager.RegisterRoutedEvent(nameof(TextChanged), RoutingStrategy.Bubble, typeof(TextChangedEventHandler), typeof(ExplorerControl));
 
         /// <summary>
         /// Occurs when the <see cref="Text"/> property has changed.
         /// </summary>
-        public event TextChangedEventHandler TextChanged;
+        public event TextChangedEventHandler TextChanged
+        {
+
+            add => AddHandler(TextChangedEvent, value);
+
+            remove => RemoveHandler(TextChangedEvent, value);
+
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="SelectionChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent SelectionChangedEvent = EventManager.RegisterRoutedEvent(nameof(SelectionChanged), RoutingStrategy.Bubble, typeof(SelectionChangedEventHandler), typeof(ExplorerControl));
 
         /// <summary>
         /// Occurs when the selection has changed.
         /// </summary>
-        public event SelectionChangedEventHandler SelectionChanged;
+        public event SelectionChangedEventHandler SelectionChanged
+        {
+
+            add => AddHandler(SelectionChangedEvent, value);
+
+            remove => RemoveHandler(SelectionChangedEvent, value);
+
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="VisibleItemsCountChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent VisibleItemsCountChangedEvent = EventManager.RegisterRoutedEvent(nameof(VisibleItemsCountChanged), RoutingStrategy.Bubble, typeof(RoutedEventHandler<ValueChangedEventArgs<int>>), typeof(ExplorerControl));
 
         /// <summary>
         /// Occurs when the visible items count changed.
         /// </summary>
-        public event ValueChangedEventHandler VisibleItemsCountChanged;
+        public event RoutedEventHandler<ValueChangedEventArgs<int>> VisibleItemsCountChanged
+        {
+
+            add => AddHandler(VisibleItemsCountChangedEvent, value);
+
+            remove => RemoveHandler(VisibleItemsCountChangedEvent, value);
+
+        }
 
         static ExplorerControl() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ExplorerControl), new FrameworkPropertyMetadata(typeof(ExplorerControl)));
 
@@ -678,9 +765,9 @@ namespace WinCopies.GUI.Explorer
 
         private bool IsAutomaticItemContainerGeneratorStatusChange = false;
 
-        internal void RaiseTextChangedEvent(TextChangedEventArgs e) => TextChanged?.Invoke(this, e);
+        // internal void RaiseTextChangedEvent(TextChangedEventArgs e) => RaiseEvent(e);
 
-        internal void RaiseSelectionChangedEvent(SelectionChangedEventArgs e) => SelectionChanged?.Invoke(this, e);
+        internal void RaiseSelectionChangedEvent(SelectionChangedEventArgs e) => RaiseEvent(e);
 
         protected virtual void OnPathChanged(IBrowsableObjectInfo oldValue, IBrowsableObjectInfo newValue)
 
@@ -784,13 +871,13 @@ namespace WinCopies.GUI.Explorer
 
         private void Open(object value) => Open();
 
-        public List<Util.MenuItem> GetDefaultListViewItemContextMenu()
+        public List<MenuItem> GetDefaultListViewItemContextMenu()
 
         {
 
-            List<Util.MenuItem> menuItems = new List<Util.MenuItem>();
+            List<MenuItem> menuItems = new List<MenuItem>();
 
-            Util.MenuItem menuItem = new Util.MenuItem(Generic.Open, null, new DelegateCommand(Open), Path.SelectedItem, null);
+            MenuItem menuItem = new MenuItem(Generic.Open, null, new DelegateCommand(Open), Path.SelectedItem, null);
 
             string extension = System.IO.Path.GetExtension(Path.SelectedItem.Path);
 
@@ -804,19 +891,19 @@ namespace WinCopies.GUI.Explorer
 
             }
 
-            menuItems.AddRange(new Util.MenuItem[] {menuItem,
-                new Util.MenuItem(Generic.Copy, Properties.Resources.page_copy.ToImageSource(), new DelegateCommand(o => Copy(ActionsFromObjects.ListView)), null, null),
-                new Util.MenuItem(Generic.Cut, Properties.Resources.cut.ToImageSource(), new DelegateCommand(o => Cut(ActionsFromObjects.ListView)), null, null),
-                new Util.MenuItem(Generic.CreateShortcut, null, new DelegateCommand<ShellObjectInfo>(o => new ShellLink(o.Path, System.IO.Path.GetDirectoryName(o.Path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(o.Path) + ".lnk")), Path.SelectedItem, null),
-                new Util.MenuItem(Generic.Rename),
-                new Util.MenuItem(Generic.Delete),
-                new Util.MenuItem(Generic.Properties) });
+            menuItems.AddRange(new MenuItem[] {menuItem,
+                new MenuItem(Generic.Copy, Properties.Resources.page_copy.ToImageSource(), new DelegateCommand(o => Copy(ActionsFromObjects.ListView)), null, null),
+                new MenuItem(Generic.Cut, Properties.Resources.cut.ToImageSource(), new DelegateCommand(o => Cut(ActionsFromObjects.ListView)), null, null),
+                new MenuItem(Generic.CreateShortcut, null, new DelegateCommand<ShellObjectInfo>(o => new ShellLink(o.Path, System.IO.Path.GetDirectoryName(o.Path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(o.Path) + ".lnk")), Path.SelectedItem, null),
+                new MenuItem(Generic.Rename),
+                new MenuItem(Generic.Delete),
+                new MenuItem(Generic.Properties) });
 
             if (System.IO.Path.HasExtension(Path.SelectedItem.Path))
 
             {
 
-                menuItem = new Util.MenuItem("Open with");
+                menuItem = new MenuItem("Open with");
 
                 menuItems.Insert(1, menuItem);
 
@@ -832,7 +919,7 @@ namespace WinCopies.GUI.Explorer
 
                         foreach (AppInfo value in winShellAppInfoInterop.OpenWithAppInfos)
 
-                            menuItem.Items.Add(new Util.MenuItem(value.DisplayName, null, null, null, null));
+                            menuItem.Items.Add(new MenuItem(value.DisplayName, null, null, null, null));
 
                     }
 
@@ -891,7 +978,7 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        private void ExplorerControl_PathChanged(object sender, ValueChangedEventArgs<IBrowsableObjectInfo> e) => OnPathChanged(e.OldValue, e.NewValue);
+        private void ExplorerControl_PathChanged(object sender, RoutedEventArgs<ValueChangedEventArgs<IBrowsableObjectInfo>> e) => OnPathChanged(e.OriginalEventArgs.OldValue, e.OriginalEventArgs.NewValue);
 
         private void ExplorerControl_TextChanged(object sender, TextChangedEventArgs e) => OnTextChanged(e);
 
@@ -1172,7 +1259,7 @@ namespace WinCopies.GUI.Explorer
 
                         {
 
-                            NavigationRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo>(path));
+                            RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo>>(NavigationRequestedEvent, this, new EventArgs<IBrowsableObjectInfo>(path)));
 
                             return null;
 
@@ -1206,7 +1293,7 @@ namespace WinCopies.GUI.Explorer
 
                                     {
 
-                                        NavigationRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo>(path));
+                                        RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo>>(NavigationRequestedEvent, this, new EventArgs<IBrowsableObjectInfo>(path)));
 
                                         return null;
 
@@ -1296,7 +1383,7 @@ namespace WinCopies.GUI.Explorer
 
                     {
 
-                        NavigationRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo>(_path));
+                        RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo>>(NavigationRequestedEvent, this, new EventArgs<IBrowsableObjectInfo>(_path)));
 
                         return null;
 
@@ -1549,7 +1636,7 @@ namespace WinCopies.GUI.Explorer
 
 #endif
 
-                if (!OpenFilesDirectly && If(ComparisonType.And, ComparisonMode.Logical, Comparison.Equals, path.FileType, FileType.File, FileType.Link, FileType.Archive))
+                if (!OpenFilesDirectly && If(ComparisonType.And, ComparisonMode.Logical, Comparison.Equal, path.FileType, FileType.File, FileType.Link, FileType.Archive))
 
                 {
 
@@ -1609,11 +1696,11 @@ namespace WinCopies.GUI.Explorer
 
             if (directories.Count > 1)
 
-                MultiplePathsOpeningRequested?.Invoke(this, new MultiplePathsOpenRequestedEventArgs(directories.ToArray()));
+                RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo[]>>(MultiplePathsOpeningRequestedEvent, this, new EventArgs<IBrowsableObjectInfo[]>(directories.ToArray())));
 
             if (files.Count > 0)
 
-                FilesOpeningRequested?.Invoke(this, new EventArgs<IBrowsableObjectInfo[]>(files.ToArray()));
+                RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo[]>>(FilesOpeningRequestedEvent, this, new EventArgs<IBrowsableObjectInfo[]>(files.ToArray())));
 
         }
 

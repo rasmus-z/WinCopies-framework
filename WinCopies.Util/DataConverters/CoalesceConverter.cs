@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinCopies.Util.DataConverters
+namespace WinCopies.Util.Data
 {
     public class CoalesceConverter : ConverterBase
     {

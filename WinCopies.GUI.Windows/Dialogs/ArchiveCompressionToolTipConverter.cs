@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
-    public class ArchiveCompressionToolTipConverter : Util.DataConverters.ConverterBase
+    public class ArchiveCompressionToolTipConverter : Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using WinCopies.Util.DataConverters;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Explorer.Data
 {

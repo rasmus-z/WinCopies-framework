@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Media.Imaging;
+using WinCopies.Collections;
 using WinCopies.Util;
 using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 
@@ -76,12 +77,12 @@ namespace WinCopies.IO
         /// </summary>
         public bool AreItemsLoaded { get => areItemsLoaded; internal set => OnPropertyChanged(nameof(AreItemsLoaded), nameof(areItemsLoaded), value, typeof(BrowsableObjectInfo)); }
 
-        internal readonly WinCopies.Util.ObservableCollection<IBrowsableObjectInfo> items = new WinCopies.Util.ObservableCollection<IBrowsableObjectInfo>();
+        internal readonly ObservableCollection<IBrowsableObjectInfo> items = new ObservableCollection<IBrowsableObjectInfo>();
 
         /// <summary>
         /// Gets the items of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        public WinCopies.Util.ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; } = null;
+        public ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; } = null;
 
         private IBrowsableObjectInfo _parent = null;
 
@@ -134,7 +135,7 @@ namespace WinCopies.IO
 
                     value.Path = this;
 
-                PropertyChanged?.Invoke(this, new WinCopies.Util.PropertyChangedEventArgs(nameof(ItemsLoader), previousValue, value));
+                PropertyChanged?.Invoke(this, new WinCopies.Util.Data. PropertyChangedEventArgs(nameof(ItemsLoader), previousValue, value));
 
             }
 
@@ -159,7 +160,7 @@ namespace WinCopies.IO
 
             FileType = fileType;
 
-            Items = new WinCopies.Util.ReadOnlyObservableCollection<IBrowsableObjectInfo>(items);
+            Items = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(items);
 
         }
 
@@ -228,5 +229,31 @@ namespace WinCopies.IO
         public override string ToString() => Name;
 
         public abstract IBrowsableObjectInfo Clone();
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether <b>obj</b> implements the <see cref="IBrowsableObjectInfo"/> interface and both objects references, and <see cref="FileType"/> and <see cref="Path"/> properties are equal.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj is IBrowsableObjectInfo _obj)
+
+            {
+
+                if (ReferenceEquals(this, obj)) return true;
+
+                return FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower();
+
+            }
+
+            else return false;
+        }
+
+        /// <summary>
+        /// Get an hash code for this <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        /// <returns>The hash codes of the <see cref="FileType"/> and the <see cref="Path"/> property.</returns>
+        public override int GetHashCode() => FileType.GetHashCode() ^ Path.ToLower().GetHashCode();
     }
 }

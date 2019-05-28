@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
-    public class CompressionMethodToVisibilityConverter : WinCopies.Util.DataConverters.MultiConverterBase
+    public class CompressionMethodToVisibilityConverter : WinCopies.Util.Data.MultiConverterBase
     {
         public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

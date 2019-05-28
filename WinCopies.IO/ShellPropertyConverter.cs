@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace WinCopies.IO
 {
-    public class ShellPropertyConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class ShellPropertyConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

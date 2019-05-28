@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace WinCopies.Util.DataConverters
+namespace WinCopies.Util.Data
 { 
 
     // todo: already exists in the System.Windows.Controls namespace with a bit of features less.

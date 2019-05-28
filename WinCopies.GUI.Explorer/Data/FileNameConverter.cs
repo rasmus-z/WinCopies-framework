@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WinCopies.Util.DataConverters;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Explorer.Data
 {

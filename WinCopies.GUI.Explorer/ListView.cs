@@ -68,11 +68,11 @@ namespace WinCopies.GUI.Explorer
 
                 if (ParentExplorerControl.OpenMode == OpenMode.OnFirstClick)
 
-                    listViewItem.InputBindings.Add(new InputBinding(Commands.Open, new MouseGesture(    MouseAction.LeftClick    )))    ;    
+                    listViewItem.InputBindings.Add(new InputBinding(Commands.Open, new MouseGesture(MouseAction.LeftClick)));
 
                 else if (ParentExplorerControl.OpenMode == OpenMode.OnDoubleClick)
 
-                listViewItem.InputBindings.Add(new InputBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
+                    listViewItem.InputBindings.Add(new InputBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
 
             return listViewItem;
 

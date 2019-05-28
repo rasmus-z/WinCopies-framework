@@ -6,7 +6,7 @@ using ShellObjectInfo = WinCopies.GUI.Explorer.ShellObjectInfo;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
-    public class FolderBrowserDialogCommandButtonContentConverter : Util.DataConverters.MultiConverterBase
+    public class FolderBrowserDialogCommandButtonContentConverter : Util.Data.MultiConverterBase
     {
         public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

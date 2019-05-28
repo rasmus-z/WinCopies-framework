@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace WinCopies.Util.DataConverters
+namespace WinCopies.Util.Data
 {
     public class EnumToReversedBooleanConverter : ConverterBase
     {

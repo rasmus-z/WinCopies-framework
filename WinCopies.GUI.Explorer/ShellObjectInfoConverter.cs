@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
-    public class ShellObjectInfoConverter : Util.DataConverters.ConverterBase
+    public class ShellObjectInfoConverter : Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows;
 using WinCopies.GUI.Explorer.Themes;
-using WinCopies.Util.DataConverters;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Explorer.Data
 {
@@ -22,7 +22,7 @@ namespace WinCopies.GUI.Explorer.Data
 
         }
 
-        public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) => Util.Util.If(Util.Util.ComparisonType.Or, Util.Util.ComparisonMode.Logical, Util.Util.Comparison.Equals, DependencyProperty.UnsetValue, values) ? null :
+        public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) => Util.Util.If(Util.Util.ComparisonType.Or, Util.Util.ComparisonMode.Logical, Util.Util.Comparison.Equal, DependencyProperty.UnsetValue, values) ? null :
 
             BooleanToVisibilityConverter.Convert(values[0] is IO.ShellObjectInfo && ((ShellObjectInfo)values[0]).ShellObject.IsFileSystemObject
                ? !((FileAttributes)values[1]).HasFlag(FileAttributes.Hidden) && !((FileAttributes)values[1]).HasFlag(FileAttributes.System)

@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
-    public class EnumToStringConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class EnumToStringConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value?.ToString();
 

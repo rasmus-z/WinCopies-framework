@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
-using WinCopies.Util.DataConverters;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.Explorer.Data
 {

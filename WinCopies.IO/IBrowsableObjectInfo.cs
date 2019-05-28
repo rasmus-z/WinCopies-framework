@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Media.Imaging;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
@@ -44,7 +45,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
-        WinCopies.Util.ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; }
+        ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; }
 
         // todo: really needed? :
 

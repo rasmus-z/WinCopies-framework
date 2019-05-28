@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinCopies.Util.DataConverters
+namespace WinCopies.Util.Data
 {
     public class PercentConverter : MultiConverterBase 
     {
@@ -16,9 +16,6 @@ namespace WinCopies.Util.DataConverters
             return (int)values[0] / (int)values[1] * (int) parameter; 
         }
 
-        public override object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public override object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

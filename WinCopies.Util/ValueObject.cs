@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace WinCopies.Util
+namespace WinCopies.Util.Data
 {
 
     /// <summary>

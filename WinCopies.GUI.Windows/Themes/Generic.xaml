@@ -8,7 +8,7 @@
                     xmlns:io="clr-namespace:WinCopies.IO;assembly=WinCopies.IO"
                     xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
                     xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util"
-                    xmlns:dataConverters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+                    xmlns:dataConverters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util"
                     xmlns:commandBehavior="clr-namespace:AttachedCommandBehavior;assembly=AttachedCommandBehavior"
                     xmlns:guiExplorerDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI.Explorer"
                     xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI"

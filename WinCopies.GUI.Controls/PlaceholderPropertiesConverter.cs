@@ -38,25 +38,13 @@ namespace WinCopies.GUI.Controls
 
     }
 
-    public class PlaceholderPropertiesConverter : WinCopies.Util.DataConverters.MultiConverterBase
+    public class PlaceholderPropertiesConverter : WinCopies.Util.Data.MultiConverterBase
     {
         public PlaceholderProperties PlaceholderProperties { get; } = null;
 
-        public PlaceholderPropertiesConverter()
+        public PlaceholderPropertiesConverter() => PlaceholderProperties = new PlaceholderProperties();
 
-        {
-
-            this.PlaceholderProperties = new PlaceholderProperties();
-
-        }
-
-        public PlaceholderPropertiesConverter(PlaceholderProperties placeholderProperties)
-
-        {
-
-            this.PlaceholderProperties = placeholderProperties;
-
-        }
+        public PlaceholderPropertiesConverter(PlaceholderProperties placeholderProperties) => PlaceholderProperties = placeholderProperties;
 
         public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
@@ -82,11 +70,11 @@ namespace WinCopies.GUI.Controls
 
             if (parameter == null || parameter.GetType() != typeof(PlaceholderPropertiesConverterEnum)) throw new ArgumentException(string.Format("parameter must be {0} and cannot be null.", nameof(PlaceholderPropertiesConverterEnum)));
 
-            var _parameter = (PlaceholderPropertiesConverterEnum)parameter;
+            PlaceholderPropertiesConverterEnum _parameter = (PlaceholderPropertiesConverterEnum)parameter;
 
             short i = -1;
 
-            var enumNames = typeof(PlaceholderPropertiesConverterEnum).GetEnumNames();
+            string[] enumNames = typeof(PlaceholderPropertiesConverterEnum).GetEnumNames();
 
             for (ushort _i = 1; _i <= enumNames.Length - 1; _i++)
 
@@ -117,15 +105,17 @@ namespace WinCopies.GUI.Controls
         {
             if (parameter == null || parameter.GetType() != typeof(PlaceholderPropertiesConverterEnum)) throw new ArgumentException(string.Format("parameter must be {0} and cannot be null.", nameof(PlaceholderPropertiesConverterEnum)));
 
-            var _parameter = (PlaceholderPropertiesConverterEnum)parameter;
+            PlaceholderPropertiesConverterEnum _parameter = (PlaceholderPropertiesConverterEnum)parameter;
 
-            var values = Enum.GetValues(typeof(PlaceholderPropertiesConverterEnum)).Cast<byte>();
+            System.Collections.Generic.IEnumerable<byte> values = Enum.GetValues(typeof(PlaceholderPropertiesConverterEnum)).Cast<byte>();
 
-            var length = values.Count(_value => ((byte)_parameter & _value) == _value);
+            int length = values.Count(_value => ((byte)_parameter & _value) == _value);
 
-            var objectsToReturn = new object[length];
+            object[] objectsToReturn = new object[length];
 
-            var i = (short)-1;
+            short i = -1;
+
+            string enumName = null;
 
             foreach (byte enumValue in values)
 
@@ -133,7 +123,7 @@ namespace WinCopies.GUI.Controls
 
                 i++;
 
-                string enumName = Enum.GetName(typeof(PlaceholderPropertiesConverterEnum), enumValue);
+                enumName = Enum.GetName(typeof(PlaceholderPropertiesConverterEnum), enumValue);
 
                 Debug.WriteLine(enumName);
 

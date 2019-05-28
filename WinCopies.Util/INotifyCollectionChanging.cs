@@ -1,4 +1,4 @@
-﻿namespace WinCopies.Util
+﻿namespace WinCopies.Collections
 {
     public interface INotifyCollectionChanging
     {

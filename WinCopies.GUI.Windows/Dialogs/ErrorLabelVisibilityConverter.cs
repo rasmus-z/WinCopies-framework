@@ -5,7 +5,7 @@ using System.Windows.Data;
 namespace WinCopies.GUI.Windows.Dialogs
 {
     [ValueConversion(typeof(string), typeof(System.Windows.Visibility))]
-    public class ErrorLabelVisibilityConverter : Util.DataConverters.ConverterBase
+    public class ErrorLabelVisibilityConverter : Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
             // string _value = (string)value;

@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
-    public class EnumToStringStaticResourceConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class EnumToStringStaticResourceConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

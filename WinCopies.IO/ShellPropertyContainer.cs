@@ -65,11 +65,11 @@ namespace WinCopies.IO
 
                     valueAsObject = value;
 
-                    PropertyChanged?.Invoke(this, new WinCopies.Util.PropertyChangedEventArgs(nameof(ValueAsObject), previous_Value, value));
+                    PropertyChanged?.Invoke(this, new WinCopies.Util.Data.PropertyChangedEventArgs(nameof(ValueAsObject), previous_Value, value));
 
                     HasChanged = !(value == initialValue);// = (Property.ValueAsObject == null && value != null) || (Property.ValueAsObject != null && value == null) || (Property.ValueAsObject != null && !Property.ValueAsObject.Equals(value));
 
-                    PropertyChanged?.Invoke(this, new WinCopies.Util.PropertyChangedEventArgs(nameof(HasChanged), !HasChanged, HasChanged));
+                    PropertyChanged?.Invoke(this, new WinCopies.Util.Data. PropertyChangedEventArgs(nameof(HasChanged), !HasChanged, HasChanged));
 
                 }
 

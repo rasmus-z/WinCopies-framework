@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace WinCopies.Util.DataConverters
+namespace WinCopies.Util.Data
 {
     [ValueConversion(typeof(bool), typeof(Visibility), ParameterType = typeof(Visibility))]
     public class ReversedBooleanToVisibilityConverter : ConverterBase

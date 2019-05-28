@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WinCopies.Util
+namespace WinCopies.Util.Data
 {
     public delegate void EventHandler<T>(object sender, EventArgs<T> e);
 

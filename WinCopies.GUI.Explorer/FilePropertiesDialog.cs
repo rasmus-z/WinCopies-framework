@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using WinCopies.IO;
+using WinCopies.Util.Data;
 using Registry = WinCopies.IO.Registry;
 
 namespace WinCopies.GUI.Windows.Dialogs
@@ -128,14 +129,14 @@ namespace WinCopies.GUI.Windows.Dialogs
         /// </summary>
         public ShellObject[] OpenWithSoftwares => (ShellObject[])GetValue(OpenWithSoftwaresProperty);
 
-        private static readonly DependencyPropertyKey PropertiesPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Properties), typeof(ReadOnlyObservableCollection<Util.NamedObject<ShellPropertyContainer>>), typeof(FilePropertiesDialog), new PropertyMetadata(null));
+        private static readonly DependencyPropertyKey PropertiesPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Properties), typeof(ReadOnlyObservableCollection<NamedObject<ShellPropertyContainer>>), typeof(FilePropertiesDialog), new PropertyMetadata(null));
 
         /// <summary>
         /// Identifies the <see cref="Properties"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PropertiesProperty = PropertiesPropertyKey.DependencyProperty;
 
-        public ReadOnlyObservableCollection<Util.NamedObject<ShellPropertyContainer>> Properties { get => (ReadOnlyObservableCollection<Util.NamedObject<ShellPropertyContainer>>)GetValue(PropertiesProperty); }
+        public ReadOnlyObservableCollection<NamedObject<ShellPropertyContainer>> Properties { get => (ReadOnlyObservableCollection<NamedObject<ShellPropertyContainer>>)GetValue(PropertiesProperty); }
 
         static FilePropertiesDialog() => DefaultStyleKeyProperty.OverrideMetadata(typeof(FilePropertiesDialog), new FrameworkPropertyMetadata(typeof(FilePropertiesDialog)));
 
@@ -238,9 +239,9 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                 }
 
-                List<Util.NamedObject<ShellPropertyContainer>> specificValues = new List<Util.NamedObject<ShellPropertyContainer>>();
+                List<NamedObject<ShellPropertyContainer>> specificValues = new List<NamedObject<ShellPropertyContainer>>();
 
-                List<Util.NamedObject<ShellPropertyContainer>> commonValues = new List<Util.NamedObject<ShellPropertyContainer>>();
+                List<NamedObject<ShellPropertyContainer>> commonValues = new List<NamedObject<ShellPropertyContainer>>();
 
 #if DEBUG
 
@@ -264,7 +265,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         foreach (PropertyInfo _property in propertyType.GetProperties())
 
-                            specificValues.Add(new Util.NamedObject<ShellPropertyContainer>(propertyKind, new ShellPropertyContainer((IShellProperty)_property.GetValue(propertyStoreItems))));
+                            specificValues.Add(new NamedObject<ShellPropertyContainer>(propertyKind, new ShellPropertyContainer((IShellProperty)_property.GetValue(propertyStoreItems))));
 
                         #region Comments
 
@@ -346,7 +347,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                             IShellProperty value = (IShellProperty)property.GetValue(new_Value.ShellObject.Properties.System);
 
-                            commonValues.Add(new Util.NamedObject<ShellPropertyContainer>("Common", new ShellPropertyContainer(value)));
+                            commonValues.Add(new NamedObject<ShellPropertyContainer>("Common", new ShellPropertyContainer(value)));
 
                         }
 
@@ -382,15 +383,15 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                         foreach (IShellProperty property in new_Value.ShellObject.Properties.DefaultPropertyCollection)
 
-                            commonValues.Add(new Util.NamedObject<ShellPropertyContainer>("Common", new ShellPropertyContainer(property)));
+                            commonValues.Add(new NamedObject<ShellPropertyContainer>("Common", new ShellPropertyContainer(property)));
 
                 }
 
-                List<Util.NamedObject<ShellPropertyContainer>> propertiesOC = new List<Util.NamedObject<ShellPropertyContainer>>(specificValues);
+                List<NamedObject<ShellPropertyContainer>> propertiesOC = new List<NamedObject<ShellPropertyContainer>>(specificValues);
 
-                IEnumerable<Util.NamedObject<ShellPropertyContainer>> _propertiesOC = propertiesOC.Concat(commonValues);
+                IEnumerable<NamedObject<ShellPropertyContainer>> _propertiesOC = propertiesOC.Concat(commonValues);
 
-                SetValue(PropertiesPropertyKey, new ReadOnlyObservableCollection<Util.NamedObject<ShellPropertyContainer>>(new ObservableCollection<Util.NamedObject<ShellPropertyContainer>>(_propertiesOC)));
+                SetValue(PropertiesPropertyKey, new ReadOnlyObservableCollection<NamedObject<ShellPropertyContainer>>(new ObservableCollection<NamedObject<ShellPropertyContainer>>(_propertiesOC)));
 
                 // Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System.
 

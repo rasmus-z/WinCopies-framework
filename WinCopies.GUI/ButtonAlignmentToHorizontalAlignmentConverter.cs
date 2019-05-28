@@ -5,7 +5,7 @@ using System.Windows.Data;
 namespace WinCopies.GUI.Windows.Dialogs
 {
     [ValueConversion(typeof(HorizontalAlignment), typeof(System.Windows.HorizontalAlignment))]
-    public class ButtonAlignmentToHorizontalAlignmentConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class ButtonAlignmentToHorizontalAlignmentConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

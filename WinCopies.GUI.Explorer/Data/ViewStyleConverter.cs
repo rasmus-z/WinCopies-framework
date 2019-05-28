@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Controls;
-using WinCopies.Util.DataConverters;
+using WinCopies.Util.Data;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.GUI.Explorer.Data
@@ -15,7 +15,7 @@ namespace WinCopies.GUI.Explorer.Data
             //            Console.WriteLine("ViewStyleConverter value: "+value);
             //#endif
 
-            string result = If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, (ViewStyles)value, ViewStyles.SizeOne,
+            string result = If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, (ViewStyles)value, ViewStyles.SizeOne,
                 ViewStyles.SizeTwo,
                 ViewStyles.SizeThree,
                 ViewStyles.SizeFour,

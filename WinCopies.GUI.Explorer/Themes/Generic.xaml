@@ -8,7 +8,7 @@
     xmlns:e="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
     xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util"
-                    xmlns:converters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+                    xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util"
                     xmlns:commandBehavior="clr-namespace:AttachedCommandBehavior;assembly=AttachedCommandBehavior"
                     xmlns:io="clr-namespace:WinCopies.IO;assembly=WinCopies.IO"
                     xmlns:guiWindows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
