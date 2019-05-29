@@ -28,6 +28,7 @@ using System.Activities.Statements;
 using WinCopies.Collections;
 using WinCopies.Util.Data;
 using MenuItem = WinCopies.Util.Data.MenuItem;
+using System.Runtime.InteropServices;
 
 namespace WinCopies.GUI.Explorer
 {
@@ -489,13 +490,39 @@ namespace WinCopies.GUI.Explorer
 
                 else if (openMode == OpenMode.OnDoubleClick)
 
+                {
+
+                    explorerControl.UnderliningMode = LinkUnderliningMode.None;
+
                     listViewItem.InputBindings.Add(new InputBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
+
+                }
 
             }
 
         }));
 
         public OpenMode OpenMode { get => (OpenMode)GetValue(OpenModeProperty); set => SetValue(OpenModeProperty, value); }
+
+        public static readonly DependencyProperty UnderliningModeProperty = DependencyProperty.Register(nameof(LinkUnderliningMode), typeof(LinkUnderliningMode), typeof(ExplorerControl), new PropertyMetadata(LinkUnderliningMode.None, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+
+        {
+
+            ExplorerControl explorerControl = d as ExplorerControl;
+
+            if (explorerControl != null)
+
+            {
+
+                if ((LinkUnderliningMode)e.NewValue != LinkUnderliningMode.None && explorerControl.OpenMode == OpenMode.OnDoubleClick)
+
+                    throw new ArgumentException("UnderliningMode must be LinkUnderliningMode.None when OpenMode is OnDoubleClick");
+
+            }
+
+        }));
+
+        public LinkUnderliningMode UnderliningMode { get => (LinkUnderliningMode)GetValue(UnderliningModeProperty); set => SetValue(UnderliningModeProperty, value); }
 
         // public static readonly DependencyProperty BrowsableObjectInfoItemsLoaderProperty = DependencyProperty.Register("BrowsableObjectInfoItemsLoader", typeof(BrowsableObjectInfoItemsLoader), typeof(ExplorerControl), new PropertyMetadata()));
 
@@ -642,6 +669,8 @@ namespace WinCopies.GUI.Explorer
 
             CommandBindings.Add(new CommandBinding(Commands.Open, Open_Executed, Open_CanExecute));
 
+            CommandBindings.Add(new CommandBinding(Commands.SingleClickSelection, SingleClickSelection_Executed, SingleClickSelection_CanExecute));
+
             SetValue(HistoryPropertyKey, new System.Collections.ObjectModel.ReadOnlyObservableCollection<IHistoryItemData>(history));
 
             history.CollectionChanged += History_CollectionChanged;
@@ -685,6 +714,48 @@ namespace WinCopies.GUI.Explorer
             //CommandBindings.Add(new CommandBinding(Commands.Properties, Properties_Executed, Command_CanExecute));
 
             #endregion
+
+        }
+
+        private void SingleClickSelection_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+
+        {
+
+            Window window = Window.GetWindow(this);
+
+            //       
+
+            //Window window = Window.GetWindow(this);
+
+            e.CanExecute = window == null ? false : Microsoft.WindowsAPICodePack.ShellExtensions.WindowUtilities.IsOnForeground(new WindowInteropHelper(window).Handle) /*window == null || window.IsFocused*/;
+
+        }
+
+        private void SingleClickSelection_Executed(object sender, ExecutedRoutedEventArgs e)
+
+        {
+
+            IBrowsableObjectInfo _obj = (IBrowsableObjectInfo)e.Parameter;
+
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+
+                _obj.IsSelected = !_obj.IsSelected;
+
+            else
+
+            {
+
+                IO.IBrowsableObjectInfo p = _obj.Parent;
+
+                foreach (IO.IBrowsableObjectInfo browsableObjectInfo in p.Items)
+
+                    if (browsableObjectInfo is IBrowsableObjectInfo _browsableObjectInfo)
+
+                        _browsableObjectInfo.IsSelected = false;
+
+                _obj.IsSelected = true;
+
+            }
 
         }
 
@@ -1906,9 +1977,7 @@ namespace WinCopies.GUI.Explorer
               // MessageBox.Show(obj.ToString());
           });
 
-        public static DelegateCommand MachinChose { get; } = new DelegateCommand((object obj) =>
-
-        ((IBrowsableObjectInfo)obj).IsSelected = true);
+        public static RoutedUICommand SingleClickSelection { get; } = new RoutedUICommand();
 
         //public static readonly RoutedUICommand OpenInNewTab = new RoutedUICommand((string)Application.Current.Resources["OpenInNewTab"], "OpenInNewTab", typeof(Commands));
 

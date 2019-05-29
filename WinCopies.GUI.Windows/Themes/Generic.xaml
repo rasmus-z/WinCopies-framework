@@ -12,7 +12,8 @@
                     xmlns:commandBehavior="clr-namespace:AttachedCommandBehavior;assembly=AttachedCommandBehavior"
                     xmlns:guiExplorerDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI.Explorer"
                     xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI"
-                    xmlns:guiWindows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI">
+                    xmlns:guiWindows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
+                    xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
@@ -29,14 +30,14 @@
             <sys:String x:Key="SelectPathDialogDescription" >Sélectionnez un répertoire à compresser :</sys:String>
             <sys:String x:Key="ArchiveFileProperties" >Propriétés du dossier compressé :</sys:String>
             <sys:String x:Key="ArchiveFormat" >Format d'archive :</sys:String>
-            <x:Array xmlns:s="clr-namespace:System;assembly=mscorlib" Type="{x:Type s:String}" x:Key="ArchiveFormats">
-                <sys:String>Zip</sys:String>
-                <sys:String>SevenZip</sys:String>
-                <sys:String>GZip</sys:String>
-                <sys:String>BZip2</sys:String>
-                <sys:String>Tar</sys:String>
-                <sys:String>XZ</sys:String>
-            </x:Array>
+            <ResourceDictionary x:Key="OutArchiveFormats">
+                <sys:String x:Key="Zip" >Zip</sys:String>
+                <sys:String x:Key="SevenZip" >7zip</sys:String>
+                <sys:String x:Key="GZip" >GZip</sys:String>
+                <sys:String x:Key="BZip2" >BZip2</sys:String>
+                <sys:String x:Key="Tar" >Tar</sys:String>
+                <sys:String x:Key="XZ" >XZ</sys:String>
+            </ResourceDictionary>
             <sys:String x:Key="CompressionLevel" >Niveau de compression :</sys:String>
             <ResourceDictionary x:Key="CompressionLevels">
                 <sys:String x:Key="None" >Pas de compression supplémentaire</sys:String>
@@ -69,7 +70,7 @@
 
             <!--Data converters-->
 
-            <dialogs:EnumToStringStaticResourceConverter x:Key="EnumToStringStaticResourceConverter" />
+            <dialogs:EnumToStringConverter x:Key="EnumToStringConverter" />
             <dialogs:ArchiveCompressionToolTipConverter x:Key="ArchiveCompressionToolTipsConverter" />
 
             <!--Controls-->
@@ -315,11 +316,11 @@
                             </Grid.RowDefinitions>
 
                             <Label Content="{StaticResource ArchiveFormat}" ></Label>
-                            <ComboBox Grid.Column="1" ItemsSource="{StaticResource ArchiveFormats}" SelectedItem="{Binding ArchiveFormat, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={ dialogs:EnumToStringConverter}}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveFormat}" />
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding Converter={StaticResource EnumToStringConverter}, ConverterParameter={x:Type sevenZip:OutArchiveFormat}}" SelectedItem="{Binding ArchiveFormat, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringConverter}, ConverterParameter=SelectedItem}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveFormat}" />
                             <Label Grid.Column="2" Content="{StaticResource CompressionLevel}" ></Label>
-                            <ComboBox Grid.Column="3" ItemsSource="{Binding Values, Source={StaticResource CompressionLevels}}" SelectedItem="{Binding CompressionLevel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringStaticResourceConverter}, ConverterParameter=CompressionLevel}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveCompressionLevel}" />
+                            <ComboBox Grid.Column="3" ItemsSource="{Binding Converter={StaticResource EnumToStringConverter}, ConverterParameter={x:Type sevenZip:CompressionLevel}}" SelectedItem="{Binding CompressionLevel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringConverter}, ConverterParameter=SelectedItem}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveCompressionLevel}" />
                             <Label Grid.Row="1" Content="{StaticResource CompressionMethod}" ></Label>
-                            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Values, Source={StaticResource CompressionMethods}}" SelectedItem="{Binding CompressionMethod, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringStaticResourceConverter}, ConverterParameter=CompressionMethod}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveCompressionMethod}" >
+                            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Converter={StaticResource EnumToStringConverter}, ConverterParameter={x:Type sevenZip:CompressionMethod}}" SelectedItem="{Binding CompressionMethod, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringConverter}, ConverterParameter=SelectedItem}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveCompressionMethod}" >
                                 <ComboBox.ItemContainerStyle>
                                     <Style BasedOn="{StaticResource {x:Type ComboBoxItem}}" TargetType="ComboBoxItem" >
                                         <Setter Property="Visibility" >
@@ -334,7 +335,7 @@
                                 </ComboBox.ItemContainerStyle>
                             </ComboBox>
                             <Label Grid.Row="1" Grid.Column="2" Content="{StaticResource CompressionMode}" ></Label>
-                            <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding Values, Source={StaticResource CompressionModes}}" SelectedItem="{Binding CompressionMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={ StaticResource EnumToStringStaticResourceConverter}, ConverterParameter=CompressionMode}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveCompressionMode}" />
+                            <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding Converter={StaticResource EnumToStringConverter}, ConverterParameter={x:Type sevenZip:CompressionMode}}" SelectedItem="{Binding CompressionMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringConverter}, ConverterParameter=SelectedItem}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveCompressionMode}" />
                             <CheckBox Grid.Row="2" Content="{StaticResource PreserveDirectoryStructure}" IsChecked="{Binding DirectoryStructure, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" ></CheckBox>
                             <CheckBox Grid.Row="3" Content="{StaticResource IncludeEmptyDirectories}" IsChecked="{Binding IncludeEmptyDirectories, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" ></CheckBox>
 

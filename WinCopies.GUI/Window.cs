@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.ShellExtensions;
+using Microsoft.WindowsAPICodePack.ShellExtensions.Interop;
+using Microsoft.WindowsAPICodePack.Win32Native.Core;
+using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -16,7 +20,7 @@ namespace WinCopies.GUI.Windows
 
         {
 
-                d.SetValue(IsInHelpModePropertyKey, (bool?)e.NewValue == true ? (bool?)    false :     null);
+            d.SetValue(IsInHelpModePropertyKey, (bool?)e.NewValue == true ? (bool?)false : null);
 
         }));
 
@@ -50,28 +54,8 @@ namespace WinCopies.GUI.Windows
 
         }
 
-        private const uint WS_EX_CONTEXTHELP = 0x00000400;
-        private const uint WS_MINIMIZEBOX = 0x00020000;
-        private const uint WS_MAXIMIZEBOX = 0x00010000;
-        private const int GWL_STYLE = -16;
-        private const int GWL_EXSTYLE = -20;
-        private const int SWP_NOSIZE = 0x0001;
-        private const int SWP_NOMOVE = 0x0002;
-        private const int SWP_NOZORDER = 0x0004;
-        private const int SWP_FRAMECHANGED = 0x0020;
-        private const int WM_SYSCOMMAND = 0x0112;
-        private const int SC_CONTEXTHELP = 0xF180;
-
-
-        [DllImport("user32.dll")]
-        private static extern uint GetWindowLong(IntPtr hwnd, int index);
-
-        [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hwnd, int index, uint newStyle);
-
         [DllImport("user32.dll")]
         private static extern bool SetWindowPos(IntPtr hwnd, IntPtr hwndInsertAfter, int x, int y, int width, int height, uint flags);
-
 
         protected override void OnSourceInitialized(EventArgs e)
         {
@@ -79,14 +63,20 @@ namespace WinCopies.GUI.Windows
             if (ShowHelpButton)
             {
                 IntPtr hwnd = new WindowInteropHelper(this).Handle;
-                uint styles = GetWindowLong(hwnd, GWL_STYLE);
-                styles &= 0xFFFFFFFF ^ (WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
-                SetWindowLong(hwnd, GWL_STYLE, styles);
-                styles = GetWindowLong(hwnd, GWL_EXSTYLE);
-                styles |= WS_EX_CONTEXTHELP;
-                SetWindowLong(hwnd, GWL_EXSTYLE, styles);
-                SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+                WindowUtilities.SetWindow(hwnd, IntPtr.Zero, 0, 0, 0, 0, (WindowStyles)((uint)WindowUtilities.GetWindowStyles(hwnd) & 0xFFFFFFFF ^ ((uint)WindowStyles.MinimizeBox | (uint)WindowStyles.MaximizeBox)), (WindowStylesEx)((uint)WindowUtilities.GetWindowStylesEx(hwnd) | (uint)WindowStylesEx.ContextHelp), SetWindowPositionOptions.NoMove | SetWindowPositionOptions.NoSize | SetWindowPositionOptions.NoZOrder | SetWindowPositionOptions.FrameChanged);
+
                 ((HwndSource)PresentationSource.FromVisual(this)).AddHook(OnHelpButtonClickHook);
+
+                //IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+                //uint styles = GetWindowLongPtr(hwnd, GWL_STYLE);
+                //styles &= 0xFFFFFFFF ^ (WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+                //SetWindowLongPtr(hwnd, GWL_STYLE, styles);
+                //styles = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+                //styles |= WS_EX_CONTEXTHELP;
+                //SetWindowLongPtr(hwnd, GWL_EXSTYLE, styles);
+                //SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+                //((HwndSource)PresentationSource.FromVisual(this)).AddHook(OnHelpButtonClickHook);
             }
         }
 
@@ -104,13 +94,7 @@ namespace WinCopies.GUI.Windows
 
                 SetValue(IsInHelpModePropertyKey, !(bool)IsInHelpMode);
 
-                if ((bool)IsInHelpMode)
-
-                    Cursor = Cursors.Help;
-
-                else
-
-                    Cursor = Cursors.Arrow;    
+                Cursor = (bool)IsInHelpMode ? Cursors.Help : Cursors.Arrow;
 
             }
 
@@ -124,8 +108,8 @@ namespace WinCopies.GUI.Windows
                 IntPtr lParam,
                 ref bool handled)
         {
-            if (msg == WM_SYSCOMMAND &&
-                    ((int)wParam & 0xFFF0) == SC_CONTEXTHELP)
+            if (msg == (int)WindowMessage.SystemCommand &&
+                    ((int)wParam & 0xFFF0) == (int)SystemCommand.ContextHelp)
             {
                 OnHelpButtonClick();
                 handled = true;

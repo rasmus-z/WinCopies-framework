@@ -9,7 +9,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         {
             SevenZip.CompressionMethod currentCompressionMethod = SevenZip.CompressionMethod.Default;
 
-            currentCompressionMethod = (SevenZip.CompressionMethod)EnumToStringStaticResourceConverter.ConvertBackStatic(values[1], "CompressionMethod");
+            currentCompressionMethod = (SevenZip.CompressionMethod)((KeyValuePair)values[1]).Key;
 
             switch ((SevenZip.OutArchiveFormat)values[0])
 

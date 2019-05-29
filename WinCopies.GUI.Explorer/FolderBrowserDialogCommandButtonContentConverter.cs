@@ -3,6 +3,7 @@ using System.Globalization;
 using WinCopies.IO;
 using IBrowsableObjectInfo = WinCopies.GUI.Explorer.IBrowsableObjectInfo;
 using ShellObjectInfo = WinCopies.GUI.Explorer.ShellObjectInfo;
+using Generic = WinCopies.GUI.Explorer.Themes.Generic;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
@@ -30,11 +31,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                 case FolderBrowserDialogMode.OpenFiles:
 
-                    return Explorer.Themes.Generic.Open;
+                    return Generic.Open;
 
                 case FolderBrowserDialogMode.OpenFolder:
 
-                    return ResourcesHelper.Cancel;
+                    return GUI.Themes.Generic.Cancel;
 
                 case FolderBrowserDialogMode.Save:
 

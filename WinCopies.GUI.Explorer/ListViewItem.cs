@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using WinCopies.GUI.Controls;
 using WinCopies.Util;
 
 namespace WinCopies.GUI.Explorer

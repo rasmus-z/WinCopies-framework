@@ -122,7 +122,6 @@
     <Compile Include="Dialogs\ArchiveCompressionToolTipConverter.cs" />
     <Compile Include="Dialogs\ComboInputBox.cs" />
     <Compile Include="Dialogs\CompressionMethodToVisibilityConverter.cs" />
-    <Compile Include="Dialogs\EnumToStringStaticResourceConverter.cs" />
     <Compile Include="Dialogs\EnumToStringConverter.cs" />
     <Compile Include="Dialogs\ErrorLabelVisibilityConverter.cs" />
     <Compile Include="Dialogs\IconToImageSourceConverter.cs" />

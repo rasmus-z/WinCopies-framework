@@ -111,6 +111,7 @@
     <Compile Include="DataConverters\ConverterBase.cs" />
     <Compile Include="DataConverters\EnumToBooleanConverter.cs" />
     <Compile Include="DataConverters\EnumToReversedBooleanConverter.cs" />
+    <Compile Include="DataConverters\EnumToStringArrayConverter.cs" />
     <Compile Include="DataConverters\IsNullConverter.cs" />
     <Compile Include="DataConverters\MultiConverterBase.cs" />
     <Compile Include="DataConverters\ObjectToTypeConverter.cs" />

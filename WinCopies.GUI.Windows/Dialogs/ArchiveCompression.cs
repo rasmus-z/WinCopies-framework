@@ -1,4 +1,5 @@
 ﻿using SevenZip;
+using System.Collections;
 using System.Windows;
 using System.Windows.Input;
 using static WinCopies.Util.Util;
@@ -263,9 +264,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         {
 
+            // todo:
+
             System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
 
-            folderBrowserDialog.Description = (string)ResourcesHelper.Instance.ResourceDictionary["SelectPathDialogDescription"];
+            folderBrowserDialog.Description = Themes.Generic.SelectPathDialogDescription;
 
             System.Windows.Forms.DialogResult dialogResult = folderBrowserDialog.ShowDialog();
 

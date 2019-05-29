@@ -74,6 +74,74 @@
 
     <!--ExplorerControl ListView item container styles-->
 
+    <Style x:Key="ExplorerControlListViewItemTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}" >
+        <Setter Property="Text" Value="{Binding Name}" />
+        <Setter Property="ToolTip" Value="{Binding Name}" />
+        <Setter Property="TextTrimming" Value="WordEllipsis" />
+
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" Value="{x:Static controls:LinkUnderliningMode.AlwaysUnderline}" >
+                <Setter Property="TextDecorations" >
+                    <Setter.Value>
+                        <TextDecorationCollection>
+                            <!--todo: to put in style resources-->
+                            <TextDecoration Location="Underline" />
+                        </TextDecorationCollection>
+                    </Setter.Value>
+                </Setter>
+            </DataTrigger>
+
+            <MultiDataTrigger >
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" Value="{x:Static controls:LinkUnderliningMode.UnderlineWhenMouseOverOrFocused}" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Mode=Self}}" Value="true" />
+                </MultiDataTrigger.Conditions>
+
+                <Setter Property="TextDecorations" >
+                    <Setter.Value>
+                        <TextDecorationCollection>
+                            <!--todo: to put in style resources-->
+                            <TextDecoration Location="Underline" />
+                        </TextDecorationCollection>
+                    </Setter.Value>
+                </Setter>
+            </MultiDataTrigger>
+
+            <MultiDataTrigger >
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" Value="{x:Static controls:LinkUnderliningMode.UnderlineWhenMouseOverOrFocused}" />
+                    <Condition Binding="{Binding IsFocused, RelativeSource={RelativeSource Mode=Self}}" Value="true" />
+                </MultiDataTrigger.Conditions>
+
+                <Setter Property="TextDecorations" >
+                    <Setter.Value>
+                        <TextDecorationCollection>
+                            <!--todo: to put in style resources-->
+                            <TextDecoration Location="Underline" />
+                        </TextDecorationCollection>
+                    </Setter.Value>
+                </Setter>
+            </MultiDataTrigger>
+
+            <MultiDataTrigger >
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" Value="{x:Static controls:LinkUnderliningMode.UnderlineWhenNotMouseOverNorFocused}" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Mode=Self}}" Value="false" />
+                    <Condition Binding="{Binding IsFocused, RelativeSource={RelativeSource Mode=Self}}" Value="false" />
+                </MultiDataTrigger.Conditions>
+
+                <Setter Property="TextDecorations" >
+                    <Setter.Value>
+                        <TextDecorationCollection>
+                            <!--todo: to put in style resources-->
+                            <TextDecoration Location="Underline" />
+                        </TextDecorationCollection>
+                    </Setter.Value>
+                </Setter>
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="ExplorerControlListViewItemStyle" TargetType="{x:Type local:ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}" >
         <Setter Property="IsSelected" Value="{Binding IsSelected}" />
 
@@ -116,7 +184,7 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding OpenMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" Value="{x:Static local:OpenMode.OnFirstClick}">
                 <Setter Property="commandBehavior:CommandBehavior.Event" Value="MouseEnter" />
-                <Setter Property="commandBehavior:CommandBehavior.Command" Value="{x:Static local:Commands.MachinChose}" />
+                <Setter Property="commandBehavior:CommandBehavior.Command" Value="{x:Static local:Commands.SingleClickSelection}" />
                 <Setter Property="commandBehavior:CommandBehavior.CommandParameter" Value="{Binding}" />
             </DataTrigger>
         </Style.Triggers>
@@ -138,7 +206,7 @@
                 </Image.Opacity>
             </Image>
             <!--, Converter={local:ImageSourceConverter}}-->
-            <TextBlock Grid.Row="2" Text="{Binding Name}" ToolTip="{Binding Name}" TextWrapping="Wrap" TextTrimming="WordEllipsis" />
+            <TextBlock Grid.Row="2" TextWrapping="Wrap" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
         </StackPanel>
     </DataTemplate>
 
@@ -166,7 +234,7 @@
                     </MultiBinding>
                 </Image.Opacity>
             </Image>
-            <TextBlock Grid.Row="2" MaxHeight="32" Text="{Binding Name}" ToolTip="{Binding ShellObject.Name}" TextWrapping="Wrap" TextTrimming="WordEllipsis" TextAlignment="Center" VerticalAlignment="Top" />
+            <TextBlock Grid.Row="2" MaxHeight="32" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Top" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
         </Grid>
     </DataTemplate>
 
@@ -203,7 +271,7 @@
                 </Image.Opacity>
             </Image>
             <!--, Converter={local:ImageSourceConverter}}-->
-            <TextBlock Grid.Row="2" MaxHeight="32" Text="{Binding Name}" ToolTip="{Binding ShellObject.Name}" TextWrapping="Wrap" TextTrimming="WordEllipsis" TextAlignment="Center" />
+            <TextBlock Grid.Row="2" MaxHeight="32" TextWrapping="Wrap" TextAlignment="Center" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
         </Grid>
     </DataTemplate>
 
@@ -238,7 +306,7 @@
                 </Image.Opacity>
             </Image>
             <!--, Converter={local:ImageSourceConverter}}-->
-            <TextBlock Grid.Row="2" MaxHeight="32" Text="{Binding Name}" ToolTip="{Binding ShellObject.Name}" TextWrapping="Wrap" TextTrimming="WordEllipsis" TextAlignment="Center" />
+            <TextBlock Grid.Row="2" MaxHeight="32" TextWrapping="Wrap" TextAlignment="Center" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
         </Grid>
     </DataTemplate>
 
@@ -268,7 +336,7 @@
                 </Image.Opacity>
             </Image>
             <!--, Converter={local:ImageSourceConverter}}-->
-            <TextBlock Text="{Binding Name}" />
+            <TextBlock Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
         </StackPanel>
     </DataTemplate>
 
@@ -299,7 +367,7 @@
             </Image>
             <!--, Converter={local:ImageSourceConverter}}-->
             <StackPanel Margin="10,0,0,0">
-                <TextBlock Text="{Binding Name}" />
+                <TextBlock Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
                 <controls:Label Padding="0" Content="{Binding ShellObject.Properties.System.ItemTypeText.ValueAsObject}" Foreground="Gray" />
                 <controls:Label Padding="0" Content="{Binding ShellObject.Properties.System.Size.ValueAsObject}" Foreground="Gray" />
             </StackPanel>

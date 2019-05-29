@@ -207,6 +207,8 @@ namespace WinCopies.GUI.Controls
 
             if (UnderliningMode == LinkUnderliningMode.UnderlineWhenMouseOverOrFocused)
 
+                // todo: to put in control resources
+
                 TextDecorations = new TextDecorationCollection() { new TextDecoration(TextDecorationLocation.Underline, null, 0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended) };
 
         }

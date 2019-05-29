@@ -188,9 +188,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
         #endregion
 
-        public static ResourceDictionary ResourceDictionary { get; } = null;
-
-        static Generic() => ResourceDictionary = Util.Generic.AddNewDictionary("/WinCopies.GUI.Explorer;component/Themes/Generic.xaml");
+        public static ResourceDictionary ResourceDictionary { get; } = Util.Generic.AddNewDictionary("/WinCopies.GUI.Explorer;component/Themes/Generic.xaml");
 
         private void PreviousButton_Click(object sender, RoutedEventArgs e)
 

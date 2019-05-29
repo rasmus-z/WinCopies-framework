@@ -51,7 +51,7 @@ namespace WinCopies.GUI.Windows.Themes
         /// <summary>
         /// Gets the ArchiveFormats resource.
         /// </summary>
-        public static string[] ArchiveFormats => GetResource<string[]>(nameof(ArchiveFormats));
+        public static ResourceDictionary ArchiveFormats => GetResource<ResourceDictionary>(nameof(ArchiveFormats));
 
         /// <summary>
         /// Gets the CompressionLevel resource.
@@ -61,7 +61,7 @@ namespace WinCopies.GUI.Windows.Themes
         /// <summary>
         /// Gets the CompressionLevels resource.
         /// </summary>
-        public static string[] CompressionLevels => GetResource<string[]>(nameof(CompressionLevels));
+        public static ResourceDictionary CompressionLevels => GetResource<ResourceDictionary>(nameof(CompressionLevels));
 
         /// <summary>
         /// Gets the CompressionMethod resource.
@@ -71,7 +71,7 @@ namespace WinCopies.GUI.Windows.Themes
         /// <summary>
         /// Gets the CompressionMethods resource.
         /// </summary>
-        public static string[] CompressionMethods => GetResource<string[]>(nameof(CompressionMethod));
+        public static ResourceDictionary CompressionMethods => GetResource<ResourceDictionary>(nameof(CompressionMethod));
 
         /// <summary>
         /// Gets the CompressionMode resource.
@@ -81,7 +81,7 @@ namespace WinCopies.GUI.Windows.Themes
         /// <summary>
         /// Gets the CompressionModes resource.
         /// </summary>
-        public static string[] CompressionModes => GetResource<string[]>(nameof(CompressionModes));
+        public static ResourceDictionary CompressionModes => GetResource<ResourceDictionary>(nameof(CompressionModes));
 
         /// <summary>
         /// Gets the PreserveDirectoryStructure resource.
@@ -103,7 +103,7 @@ namespace WinCopies.GUI.Windows.Themes
         /// </summary>
         public static string ItemsAreOnlyThereForInformation => GetResource<string>(nameof(ItemsAreOnlyThereForInformation));
 
-        public static EnumToStringStaticResourceConverter EnumToStringStaticResourceConverter => GetResource<EnumToStringStaticResourceConverter>(nameof(EnumToStringStaticResourceConverter));
+        public static EnumToStringConverter EnumToStringConverter => GetResource<EnumToStringConverter>(nameof(EnumToStringConverter));
 
         public static ArchiveCompressionToolTipConverter ArchiveCompressionToolTipConverter => GetResource<ArchiveCompressionToolTipConverter>(nameof(ArchiveCompressionToolTipConverter));
 
