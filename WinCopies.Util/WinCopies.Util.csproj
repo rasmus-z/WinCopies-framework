@@ -114,6 +114,8 @@
     <Compile Include="DataConverters\EnumToStringArrayConverter.cs" />
     <Compile Include="DataConverters\IsNullConverter.cs" />
     <Compile Include="DataConverters\MultiConverterBase.cs" />
+    <Compile Include="DataConverters\ConverterArray.cs" />
+    <Compile Include="DataConverters\MultiValueConversionAttribute.cs" />
     <Compile Include="DataConverters\ObjectToTypeConverter.cs" />
     <Compile Include="DataConverters\PercentConverter.cs" />
     <Compile Include="DataConverters\ReverseBooleanConverter.cs" />
