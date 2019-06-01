@@ -81,7 +81,7 @@ namespace WinCopies.GUI.Explorer
 
 #if DEBUG 
 
-            filePropertyEditor.Command = new DelegateCommand((object o) => Debug.WriteLine("Je passe par ici..."));
+            filePropertyEditor.Command = new DelegateCommand { ExecuteDelegate = (object o) => Debug.WriteLine("Je passe par ici...") };
 
             Debug.WriteLine(((IShellProperty)e.Parameter).ValueAsObject.GetType().ToString());
 

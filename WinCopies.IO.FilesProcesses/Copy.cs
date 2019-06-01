@@ -3,8 +3,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using WinCopies.Win32NativeInterop;
-using static WinCopies.Win32NativeInterop.NativeMethods;
 
 namespace WinCopies.IO.FileProcesses
 {

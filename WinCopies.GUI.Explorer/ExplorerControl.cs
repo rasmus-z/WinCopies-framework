@@ -948,7 +948,7 @@ namespace WinCopies.GUI.Explorer
 
             List<MenuItem> menuItems = new List<MenuItem>();
 
-            MenuItem menuItem = new MenuItem(Generic.Open, null, new DelegateCommand(Open), Path.SelectedItem, null);
+            MenuItem menuItem = new MenuItem(Generic.Open, null, new DelegateCommand { ExecuteDelegate = Open }, Path.SelectedItem, null);
 
             string extension = System.IO.Path.GetExtension(Path.SelectedItem.Path);
 
@@ -963,9 +963,9 @@ namespace WinCopies.GUI.Explorer
             }
 
             menuItems.AddRange(new MenuItem[] {menuItem,
-                new MenuItem(Generic.Copy, Properties.Resources.page_copy.ToImageSource(), new DelegateCommand(o => Copy(ActionsFromObjects.ListView)), null, null),
-                new MenuItem(Generic.Cut, Properties.Resources.cut.ToImageSource(), new DelegateCommand(o => Cut(ActionsFromObjects.ListView)), null, null),
-                new MenuItem(Generic.CreateShortcut, null, new DelegateCommand<ShellObjectInfo>(o => new ShellLink(o.Path, System.IO.Path.GetDirectoryName(o.Path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(o.Path) + ".lnk")), Path.SelectedItem, null),
+                new MenuItem(Generic.Copy, Properties.Resources.page_copy.ToImageSource(), new DelegateCommand{ ExecuteDelegate =    o => Copy(ActionsFromObjects.ListView) }, null, null),
+                new MenuItem(Generic.Cut, Properties.Resources.cut.ToImageSource(), new DelegateCommand{ ExecuteDelegate =    o => Cut(ActionsFromObjects.ListView) }, null, null),
+                new MenuItem(Generic.CreateShortcut, null, new DelegateCommand<ShellObjectInfo>{ ExecuteDelegate =    o => new ShellLink(o.Path, System.IO.Path.GetDirectoryName(o.Path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(o.Path) + ".lnk") }, Path.SelectedItem, null),
                 new MenuItem(Generic.Rename),
                 new MenuItem(Generic.Delete),
                 new MenuItem(Generic.Properties) });
@@ -1966,16 +1966,19 @@ namespace WinCopies.GUI.Explorer
 
         // todo:
 
-        public static DelegateCommand TrucMuche { get; } = new DelegateCommand((object obj) =>
-          {
-              IBrowsableObjectInfo _obj = (IBrowsableObjectInfo)obj;
+        public static DelegateCommand TrucMuche { get; } = new DelegateCommand
+        {
+            ExecuteDelegate = (object obj) =>
+{
+    IBrowsableObjectInfo _obj = (IBrowsableObjectInfo)obj;
 
-              if (!_obj.AreItemsLoaded)
+    if (!_obj.AreItemsLoaded)
 
-                  _obj.LoadItems(true, false, FileTypesFlags.Folder | FileTypesFlags.Drive | FileTypesFlags.Archive);
+        _obj.LoadItems(true, false, FileTypesFlags.Folder | FileTypesFlags.Drive | FileTypesFlags.Archive);
 
-              // MessageBox.Show(obj.ToString());
-          });
+    // MessageBox.Show(obj.ToString());
+}
+        };
 
         public static RoutedUICommand SingleClickSelection { get; } = new RoutedUICommand();
 

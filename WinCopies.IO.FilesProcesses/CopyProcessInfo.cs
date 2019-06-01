@@ -6,7 +6,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using WinCopies.Util;
-using WinCopies.Win32NativeInterop;
 using static WinCopies.IO.FileProcesses.Copy;
 using Microsoft.WindowsAPICodePack.Shell;
 

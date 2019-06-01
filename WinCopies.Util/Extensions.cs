@@ -6,13 +6,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using static WinCopies.Util.Generic;
-using static WinCopies.Win32NativeInterop.NativeMethods;
 
 namespace WinCopies.Util
 {
@@ -789,9 +789,9 @@ namespace WinCopies.Util
                 Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions());
 
-            if (!DeleteObject(hBitmap))
+            if (!Microsoft.WindowsAPICodePack.Win32Native.Shell.ShellNativeMethods.DeleteObject(hBitmap))
 
-                throw new Win32Exception();
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
 
             //using (MemoryStream stream = new MemoryStream())
             //{

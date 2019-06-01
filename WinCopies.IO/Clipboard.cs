@@ -14,7 +14,6 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WinCopies.Util;
-using WinCopies.Win32NativeInterop;
 using IDataObject = System.Runtime.InteropServices.ComTypes.IDataObject;
 
 // todo

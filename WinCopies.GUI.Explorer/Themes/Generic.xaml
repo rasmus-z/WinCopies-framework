@@ -15,8 +15,7 @@
                     xmlns:dialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs"
                     xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"
                     xmlns:data="clr-namespace:WinCopies.GUI.Explorer.Data"
-                    xmlns:dialogsData="clr-namespace:WinCopies.GUI.Windows.Dialogs.Data"
-                    xmlns:pushBinding="clr-namespace:PushBindingExtension;assembly=PushBinding">
+                    xmlns:dialogsData="clr-namespace:WinCopies.GUI.Windows.Dialogs.Data">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />

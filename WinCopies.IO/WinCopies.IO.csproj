@@ -58,22 +58,14 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IconExtractor, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Third parties\IconExtractor-1.0\IconExtractor\bin\x64\Debug\IconExtractor.dll</HintPath>
+    <Reference Include="IconExtractor, Version=1.0.1.0, Culture=neutral, PublicKeyToken=6a14bad2909fcaa1, processorArchitecture=MSIL">
+      <HintPath>..\packages\IconExtractor.dll.1.0.1\lib\net48\IconExtractor.dll</HintPath>
     </Reference>
-    <Reference Include="IconLib">
-      <HintPath>..\Third parties\IconLib\IconLib_src\IconLib\bin\x64\Debug\IconLib.dll</HintPath>
+    <Reference Include="IconLib, Version=0.74.1.0, Culture=neutral, PublicKeyToken=9c8a655eb595762a, processorArchitecture=MSIL">
+      <HintPath>..\packages\IconLib.0.74.1\lib\net48\IconLib.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\Windows-API-Code-Pack\source\WindowsAPICodePack\Core\bin\x64\Debug\Microsoft.WindowsAPICodePack.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Windows-API-Code-Pack\source\WindowsAPICodePack\Shell\bin\x64\Debug\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Win32Native">
-      <HintPath>..\..\Windows-API-Code-Pack\source\WindowsAPICodePack\Win32Native\bin\Debug\Microsoft.WindowsAPICodePack.Win32Native.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack.Win32Native, Version=1.0.0.0, Culture=neutral, PublicKeyToken=83ecd65d6ddba0f8, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.Win32Native.1.0.0\lib\net48\Microsoft.WindowsAPICodePack.Win32Native.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -84,6 +76,11 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.4.3.1\lib\net462\System.Runtime.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -95,14 +92,6 @@
     <Reference Include="WinCopies.Util, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\WinCopies.Util.dll</HintPath>
-    </Reference>
-    <Reference Include="WinCopies.Win32Interop, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\x64\Debug\WinCopies.Win32Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="WinCopies.Win32NativeInterop, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\x64\Debug\WinCopies.Win32NativeInterop.dll</HintPath>
     </Reference>
     <Reference Include="Windows.ApplicationModel" />
     <Reference Include="Windows.Foundation" />

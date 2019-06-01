@@ -1,5 +1,4 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
-using MS.WindowsAPICodePack.Internal;
 using SevenZip;
 using System;
 using System.Collections;
