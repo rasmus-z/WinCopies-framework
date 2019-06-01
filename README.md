@@ -12,7 +12,7 @@ Usage notes
 
 This framework is currently still on development and *should not* be used in a production environment, even for the code on the master branch.
 
-Licence
+License
 -------
 
 See [LICENSE](https://github.com/pierresprim/WinCopies-framework/blob/master/LICENSE) for the license of the WinCopies framework.
