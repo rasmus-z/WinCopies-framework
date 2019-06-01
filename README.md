@@ -1,7 +1,7 @@
 WinCopies-framework
 ===================
 
-The WinCopies software framework
+The WinCopies® software framework
 
 README
 ======
