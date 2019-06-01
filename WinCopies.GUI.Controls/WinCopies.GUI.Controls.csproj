@@ -92,6 +92,7 @@
     <Compile Include="LinkUnderliningMode.cs" />
     <Compile Include="ListView.cs" />
     <Compile Include="MenuItemData.cs" />
+    <Compile Include="ObservableListBoxSelectedItems.cs" />
     <Compile Include="ProcessStatus.cs" />
     <Compile Include="ResourcesHelper.cs" />
     <Compile Include="TabControl.cs" />

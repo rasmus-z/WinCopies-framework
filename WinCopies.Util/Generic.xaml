@@ -4,17 +4,17 @@
              xmlns:local="clr-namespace:WinCopies.Util"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <!--Command texts-->
-    <sys:String x:Key="NewTab" >_Nouvel onglet</sys:String>
-    <sys:String x:Key="NewWindow" >Nouvelle _fenêtre</sys:String>
-    <sys:String x:Key="NewWindowInNewInstance" >Nouvelle fenêtre dans une nouvelle _instance</sys:String>
-    <sys:String x:Key="CloseTab" >_Fermer l'onglet</sys:String>
-    <sys:String x:Key="CloseAllTabs" >Fermer _tous les onglets</sys:String>
-    <sys:String x:Key="CloseWindow" >Fermer la _fenêtre</sys:String>
-    <sys:String x:Key="NewFolder" >Nouveau _dossier...</sys:String>
-    <sys:String x:Key="NewArchive" >Nouveau _dossier compressé...</sys:String>
-    <sys:String x:Key="ShowFileProperties" >_Propriétés du fichier...</sys:String>
-    <sys:String x:Key="Rename" >_Renommer</sys:String>
-    <sys:String x:Key="DeletePermanently" >Supprimer de façon définitive</sys:String>
+    <sys:String x:Key="NewTab" >New _tab</sys:String>
+    <sys:String x:Key="NewWindow" >New _window</sys:String>
+    <sys:String x:Key="NewWindowInNewInstance" >New Window in a new _process</sys:String>
+    <sys:String x:Key="CloseTab" >C_lose tab</sys:String>
+    <sys:String x:Key="CloseAllTabs" >Close _all tabs</sys:String>
+    <sys:String x:Key="CloseWindow" >Clos_e window</sys:String>
+    <sys:String x:Key="NewFolder" >New _folder</sys:String>
+    <sys:String x:Key="NewArchive" >_New archive</sys:String>
+    <sys:String x:Key="ShowFileProperties" >File _propoerties</sys:String>
+    <sys:String x:Key="Rename" >_Rename</sys:String>
+    <sys:String x:Key="DeletePermanently" >_Delete permanently</sys:String>
     <!--Exception messages-->
     <sys:String x:Key="DeclaringTypesNotCorrespond" >The declaring types of '{0}' and '{1}' are not corresponding. The declaring types of '{0}' and '{1}' must correspond for read-only properties when an integrity check is performed.</sys:String>
     <!--<sys:String x:Key="DeclaringTypeIsNotInObjectInheritanceHierarchyException" >'{0}' is not in the inheritance hierarchy of '{1}'.</sys:String>-->

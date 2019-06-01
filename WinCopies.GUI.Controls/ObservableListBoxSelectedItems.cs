@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Windows.Controls;
 
-namespace WinCopies.Collections
+namespace WinCopies.GUI.Controls
 {
 
     // todo: use PushBinding
