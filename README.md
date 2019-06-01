@@ -9,7 +9,7 @@ README
 Usage notes
 -----------
 
-This framework is currently still on development and *should not* be used in a production environment, even for the code on the master branch.
+This framework is currently still on development and *should not* be used in a production environment, even for the code on the master branch, except for the WinCopies.Util package on the master branch, which is in release version and can be used in a production environment.
 
 License
 -------
