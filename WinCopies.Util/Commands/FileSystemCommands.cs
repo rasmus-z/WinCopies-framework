@@ -11,23 +11,29 @@ namespace WinCopies.Util.Commands
     {
 
         /// <summary>
-        /// Gets a value that represents the new folder command.
+        /// Gets the <b>NewFolder</b> command.
         /// </summary>
         public static RoutedUICommand NewFolder { get; } = new RoutedUICommand(Generic.NewFolder, nameof(NewFolder), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.N, ModifierKeys.Control) });
 
         /// <summary>
-        /// Gets a value that represents the new archive command.
+        /// Gets the <b>NewArchive</b> command.
         /// </summary>
         public static RoutedUICommand NewArchive { get; } = new RoutedUICommand(Generic.NewArchive, nameof(NewArchive), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.N, ModifierKeys.Control | ModifierKeys.Alt) });
 
         /// <summary>
-        /// Gets a value that represents the show file properties command.
+        /// Gets the <b>FileProperties</b> command.
         /// </summary>
         public static RoutedUICommand FileProperties { get; } = new RoutedUICommand(Generic.ShowFileProperties, nameof(FileProperties), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.Enter, ModifierKeys.Alt) });
 
+        /// <summary>
+        /// Gets the <b>Rename</b> command.
+        /// </summary>
         public static RoutedUICommand Rename { get; } = new RoutedUICommand(Generic.Rename, nameof(Rename), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.R, ModifierKeys.Control) });
 
-        public static RoutedUICommand DeletePermanently { get; } = new RoutedUICommand(Generic.DeletePermanently, nameof(DeletePermanently), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.R, ModifierKeys.Alt) });
+        /// <summary>
+        /// Gets the <b>DeletePermanently</b> command.
+        /// </summary>
+        public static RoutedUICommand DeletePermanently { get; } = new RoutedUICommand(Generic.DeletePermanently, nameof(DeletePermanently), typeof(FileSystemCommands), new InputGestureCollection() { new KeyGesture(Key.Delete, ModifierKeys.Shift) });
 
     }
 }

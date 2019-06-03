@@ -839,7 +839,7 @@ namespace WinCopies.Util
         /// <param name="command">The command to execute.</param>
         /// <param name="commandParameter">The parameter of your command.</param>
         /// <remarks>
-        /// This method only evaluates the commands of the common <see cref="ICommand"/> type. To evaluate a command of the <see cref="RoutedCommand"/> type, consider using the <see cref="TryExecute(RoutedCommand, object, IInputElement)"/> method. If you are not sure of the type of your command, so consider using the <see cref="ExecuteCommand(ICommandSource, ICommand, object, IInputElement)"/> method.
+        /// This method only evaluates the commands of the common <see cref="ICommand"/> type. To evaluate a command of the <see cref="RoutedCommand"/> type, consider using the <see cref="TryExecute(RoutedCommand, object, IInputElement)"/> method. If you are not sure of the type of your command, so consider using the <see cref="TryExecute(ICommand, object, IInputElement)"/> method.
         /// </remarks>
         public static bool TryExecute(this ICommand command, object commandParameter)
 
