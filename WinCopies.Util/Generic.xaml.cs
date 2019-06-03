@@ -73,6 +73,16 @@ namespace WinCopies.Util
         public static string DeletePermanently => GetResource<string>(nameof(DeletePermanently));
 
         /// <summary>
+        /// Gets the <see cref="DeselectAll"/> resource.
+        /// </summary>
+        public static string DeselectAll => GetResource<string>(nameof(DeselectAll));
+
+        /// <summary>
+        /// Gets the <see cref="ReverseSelection"/> resource.
+        /// </summary>
+        public static string ReverseSelection => GetResource<string>(nameof(ReverseSelection));
+
+        /// <summary>
         /// Gets the DeclaringTypesNotCorrespond resource.
         /// </summary>
         public static string DeclaringTypesNotCorrespond => GetResource<string>(nameof(DeclaringTypesNotCorrespond));

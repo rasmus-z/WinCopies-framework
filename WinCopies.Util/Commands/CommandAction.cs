@@ -5,86 +5,60 @@ using System.Windows.Input;
 
 namespace WinCopies.Util.Commands
 {
-    public class CommandAction : System.Windows.Interactivity. TriggerAction<DependencyObject>
+    public class CommandAction : System.Windows.Interactivity.TriggerAction<DependencyObject>
     {
 
-        
-            public static readonly DependencyProperty CommandProperty =
-             DependencyProperty.Register("Command", typeof(ICommand), typeof(CommandAction),
-             new PropertyMetadata(null, OnCommandChanged));
 
-            public static readonly DependencyProperty CommandParameterProperty =
-             DependencyProperty.Register("CommandParameter", typeof(object), typeof(CommandAction),
-             new PropertyMetadata(null, OnCommandParameterChanged));
+        public static readonly DependencyProperty CommandProperty =
+         DependencyProperty.Register("Command", typeof(ICommand), typeof(CommandAction),
+         new PropertyMetadata(null, OnCommandChanged));
 
-            private IDisposable canExecuteChanged;
+        public static readonly DependencyProperty CommandParameterProperty =
+         DependencyProperty.Register("CommandParameter", typeof(object), typeof(CommandAction),
+         new PropertyMetadata(null, OnCommandParameterChanged));
 
-            public ICommand Command
+        private IDisposable canExecuteChanged;
+
+        public ICommand Command
+        {
+            get => (ICommand)GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
+
+        public object CommandParameter
+        {
+            get => GetValue(CommandParameterProperty);
+            set => SetValue(CommandParameterProperty, value);
+        }
+
+        private static void OnCommandChanged(DependencyObject sender,
+                        DependencyPropertyChangedEventArgs e)
+        {
+            if (sender is CommandAction ev)
             {
-                get { return (ICommand)GetValue(CommandProperty); }
-                set { SetValue(CommandProperty, value); }
-            }
+                ev.canExecuteChanged?.Dispose();
 
-            public object CommandParameter
-            {
-                get { return GetValue(CommandParameterProperty); }
-                set { SetValue(CommandParameterProperty, value); }
-            }
+                if (e.NewValue is ICommand command)
 
-            private static void OnCommandChanged(DependencyObject sender,
-                            DependencyPropertyChangedEventArgs e)
-            {
-                CommandAction ev = sender as CommandAction;
-                if (ev != null)
-                {
-                    if (ev.canExecuteChanged != null)
-                    {
-                        ev.canExecuteChanged.Dispose();
-                    }
-
-                    ICommand command = e.NewValue as ICommand;
-                    if (command != null)
-                    {
-                        ev.canExecuteChanged = Observable.FromEventPattern(
-                            x => command.CanExecuteChanged += x,
-                            x => command.CanExecuteChanged -= x).Subscribe
-                            (_ => ev.SynchronizeElementState());
-                    }
-                }
+                    ev.canExecuteChanged = Observable.FromEventPattern(
+                        x => command.CanExecuteChanged += x,
+                        x => command.CanExecuteChanged -= x).Subscribe
+                        (_ => ev.SynchronizeElementState());
             }
+        }
 
-            private static void OnCommandParameterChanged(DependencyObject sender,
-                     DependencyPropertyChangedEventArgs e)
-            {
-                CommandAction ev = sender as CommandAction;
-                if (ev != null)
-                {
-                    ev.SynchronizeElementState();
-                }
-            }
+        private static void OnCommandParameterChanged(DependencyObject sender,
+                 DependencyPropertyChangedEventArgs e) => (sender as CommandAction)?.SynchronizeElementState();
 
-            private void SynchronizeElementState()
-            {
-                ICommand command = Command;
-                if (command != null)
-                {
-                    FrameworkElement associatedObject = AssociatedObject as FrameworkElement;
-                    if (associatedObject != null)
-                    {
-                        associatedObject.IsEnabled = command.CanExecute(CommandParameter);
-                    }
-                }
-            }
+        private void SynchronizeElementState()
+        {
+            if (Command != null && AssociatedObject is FrameworkElement associatedObject)
 
-            protected override void Invoke(object parameter)
-            {
-                ICommand command = Command;
-                if (command != null)
-                {
-                    command.Execute(CommandParameter);
-                }
-            }
-        
+                associatedObject.IsEnabled = Command.CanExecute(CommandParameter);
+        }
+
+        protected override void Invoke(object parameter) => Command?.Execute(CommandParameter);
+
 
     }
 }

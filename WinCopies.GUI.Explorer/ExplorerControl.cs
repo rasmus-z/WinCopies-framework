@@ -22,7 +22,6 @@ using System.Windows.Interop;
 using System.ComponentModel;
 using System.Collections;
 using WinCopies.Util.Commands;
-using WinCopies.Util;
 using static WinCopies.Util.Util;
 using System.Activities.Statements;
 using WinCopies.Collections;
@@ -427,7 +426,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="ArchiveFormatsToOpen"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ArchiveFormatsToOpenProperty = DependencyProperty.Register(nameof(ArchiveFormatsToOpen), typeof(InArchiveFormats), typeof(ExplorerControl), new PropertyMetadata(WinCopies.Util.Util.GetEnumAllFlags<InArchiveFormats>()));
+        public static readonly DependencyProperty ArchiveFormatsToOpenProperty = DependencyProperty.Register(nameof(ArchiveFormatsToOpen), typeof(InArchiveFormats), typeof(ExplorerControl), new PropertyMetadata(GetEnumAllFlags<InArchiveFormats>()));
 
         public InArchiveFormats ArchiveFormatsToOpen { get => (InArchiveFormats)GetValue(ArchiveFormatsToOpenProperty); set => SetValue(ArchiveFormatsToOpenProperty, value); }
 
@@ -504,6 +503,9 @@ namespace WinCopies.GUI.Explorer
 
         public OpenMode OpenMode { get => (OpenMode)GetValue(OpenModeProperty); set => SetValue(OpenModeProperty, value); }
 
+        /// <summary>
+        /// Identifies the <see cref="UnderliningMode"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty UnderliningModeProperty = DependencyProperty.Register(nameof(LinkUnderliningMode), typeof(LinkUnderliningMode), typeof(ExplorerControl), new PropertyMetadata(LinkUnderliningMode.None, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
 
         {
@@ -671,6 +673,20 @@ namespace WinCopies.GUI.Explorer
 
             CommandBindings.Add(new CommandBinding(Commands.SingleClickSelection, SingleClickSelection_Executed, SingleClickSelection_CanExecute));
 
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, Copy_Executed, Copy_CanExecute));
+
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, Cut_Executed, Cut_CanExecute));
+
+            CommandBindings.Add(new CommandBinding(FileSystemCommands.Rename, Rename_Executed, Rename_CanExecute));
+
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Delete, Delete_Executed, Delete_CanExecute));
+
+            InputBindings.Add(new InputBinding(ApplicationCommands.SelectAll, new KeyGesture(Key.A, ModifierKeys.Control)));
+
+            // todo: to move the 'e.CanExecute = true' handler to the WinCopies.Util dll
+
+            // CommandBindings.Add(new CommandBinding(ApplicationCommands.SelectAll, (object sender, ExecutedRoutedEventArgs e) => { ListView.Focus(); ListView.SelectAll(); }, ));
+
             SetValue(HistoryPropertyKey, new System.Collections.ObjectModel.ReadOnlyObservableCollection<IHistoryItemData>(history));
 
             history.CollectionChanged += History_CollectionChanged;
@@ -692,14 +708,6 @@ namespace WinCopies.GUI.Explorer
             Open(path);
 
             // InputBindings.Add(new MouseBinding(Commands.Open, new MouseGesture(MouseAction.LeftDoubleClick)));
-
-            CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, Copy_Executed, Copy_CanExecute));
-
-            CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, Cut_Executed, Cut_CanExecute));
-
-            CommandBindings.Add(new CommandBinding(FileSystemCommands.Rename, Rename_Executed, Rename_CanExecute));
-
-            CommandBindings.Add(new CommandBinding(ApplicationCommands.Delete, Delete_Executed, Delete_CanExecute));
 
             // CommandBindings.Add(new CommandBinding(Util.Util.CommonCommand, Open_Execute, Open_CanExecute));
 
