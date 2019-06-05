@@ -136,21 +136,8 @@ namespace WinCopies.Util
 
             if (key == null)
 
-#if DEBUG
-
-            {
-
-#endif 
-
                 key = Assembly.GetCallingAssembly().GetName().Name;
 
-#if DEBUG 
-
-                Debug.WriteLine(key);
-
-            }
-
-#endif
             System.Windows.ResourceDictionary resourceDictionary = new System.Windows.ResourceDictionary
             {
                 Source = new Uri(dictionaryUri, UriKind.RelativeOrAbsolute)

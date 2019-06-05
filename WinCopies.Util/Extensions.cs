@@ -1,6 +1,9 @@
-﻿using System;
+﻿#pragma warning disable IDE0002
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -271,7 +274,53 @@ namespace WinCopies.Util
 
         }
 
-        public static Array ToArray(this IEnumerable array, int startIndex, int length)
+        public static object[] ToArray(this IEnumerable array)
+
+        {
+
+            LinkedList<object> _array = new LinkedList<object>();
+
+            foreach (object value in array)
+
+                _array.AddLast(value);
+
+            return _array.ToArray<object>();
+
+        }
+
+        //public static T[] ToArray<T>(this IEnumerable<T> array)
+
+        //{
+
+        //    T[] _array = new T[length];
+
+        //    int i = 0;
+
+        //    int count = 0;
+
+        //    foreach (T value in array)
+
+        //    {
+
+        //        if (i < startIndex)
+
+        //            i++;
+
+        //        else
+
+        //            _array[count++] = value;
+
+        //        if (count == length)
+
+        //            break;
+
+        //    }
+
+        //    return _array;
+
+        //}
+
+        public static object[] ToArray(this IEnumerable array, int startIndex, int length)
 
         {
 
@@ -371,7 +420,7 @@ namespace WinCopies.Util
 
         }
 
-        public static Array ToArray(this IList arrayList, int startIndex, int length)
+        public static object[] ToArray(this IList arrayList, int startIndex, int length)
 
         {
 
@@ -425,7 +474,7 @@ namespace WinCopies.Util
         /// <param name="array">The source table.</param>
         /// <param name="arrays">The tables to concatenate.</param>
         /// <returns></returns>
-        public static Array Append(this Array array, params Array[] arrays) => Util.Concatenate((object[])array, arrays);
+        public static object[] Append(this Array array, params Array[] arrays) => Util.Concatenate((object[])array, arrays);
 
         /// <summary>
         /// Appends data to the table using the <see cref="Array.LongLength"/> length property. Arrays must have only one dimension.
@@ -433,10 +482,10 @@ namespace WinCopies.Util
         /// <param name="array">The source table.</param>
         /// <param name="arrays">The tables to concatenate.</param>
         /// <returns></returns>
-        public static Array AppendLong(this Array array, params Array[] arrays) => Util.ConcatenateLong((object[])array, arrays);
+        public static object[] AppendLong(this Array array, params Array[] arrays) => Util.ConcatenateLong((object[])array, arrays);
 
         /// <summary>
-        /// Sort an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.
+        /// Sorts an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.
         /// </summary>
         /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
         /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
@@ -453,7 +502,7 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Sort an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> with a user-defined comparer.
+        /// Sorts an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> with a user-defined comparer.
         /// </summary>
         /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
         /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
@@ -469,6 +518,822 @@ namespace WinCopies.Util
                 oc.Move(oc.IndexOf(sorted[i]), i);
 
         }
+
+        #region Contains methods
+
+        #region Non generic methods
+
+        #region ContainsOneValue overloads
+
+        private static bool ContainsOneValue(IEnumerable array, Func<object, object, bool> comparisonDelegate, out bool containsMoreThanOneValue, object[] values)
+
+        {
+
+            bool matchFound = false;
+
+            foreach (object value in array)
+
+                foreach (object _value in values)
+
+                    if (comparisonDelegate(value, _value))
+
+                    {
+
+                        if (matchFound)
+
+                        {
+
+                            containsMoreThanOneValue = true;
+
+                            return false;
+
+                        }
+
+                        matchFound = true;
+
+                    }
+
+            containsMoreThanOneValue = false;
+
+            return matchFound;
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains <i>exactly</i> one value of a given array.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneValue(this IEnumerable array, out bool containsMoreThanOneValue, params object[] values) => ContainsOneValue(array, (object value, object _value) => object.Equals(value, _value), out containsMoreThanOneValue, values);
+
+        /// <summary>
+        /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparer">The <see cref="IComparer"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneValue(this IEnumerable array, IComparer comparer, out bool containsMoreThanOneValue, params object[] values)
+
+        {
+
+            if (comparer == null)
+
+                throw new ArgumentNullException(nameof(comparer));
+
+            return ContainsOneValue(array, (object value, object _value) => comparer.Compare(value, _value) == 0, out containsMoreThanOneValue, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparison">The <see cref="Comparison{T}"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneValue(this IEnumerable array, Comparison<object> comparison, out bool containsMoreThanOneValue, params object[] values)
+
+        {
+
+            if (comparison == null)
+
+                throw new ArgumentNullException(nameof(comparison));
+
+            return ContainsOneValue(array, (object value, object _value) => comparison(value, _value) == 0, out containsMoreThanOneValue, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom equality comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneValue(this IEnumerable array, IEqualityComparer equalityComparer, out bool containsMoreThanOneValue, params object[] values)
+
+        {
+
+            if (equalityComparer == null)
+
+                throw new ArgumentNullException(nameof(equalityComparer));
+
+            return ContainsOneValue(array, (object value, object _value) => equalityComparer.Equals(value, _value), out containsMoreThanOneValue, values); ;
+
+        }
+
+        #endregion
+
+        #region ContainsOneOrMoreValues with notification whether contains more than one values overloads
+
+        private static bool ContainsOneOrMoreValues(IEnumerable array, Func<object, object, bool> comparisonDelegate, out bool containsMoreThanOneValue, object[] values)
+
+        {
+
+            bool matchFound = false;
+
+            foreach (object value in array)
+
+                foreach (object _value in values)
+
+                    if (comparisonDelegate(value, _value))
+
+                    {
+
+                        if (matchFound)
+
+                        {
+
+                            containsMoreThanOneValue = true;
+
+                            return true;
+
+                        }
+
+                        matchFound = true;
+
+                    }
+
+            containsMoreThanOneValue = false;
+
+            return matchFound;
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, out bool containsMoreThanOneValue, params object[] values) => ContainsOneOrMoreValues(array, (object value, object _value) => object.Equals(value, _value), out containsMoreThanOneValue, values);
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparer">The <see cref="IComparer"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, IComparer comparer, out bool containsMoreThanOneValue, params object[] values)
+
+        {
+
+            if (comparer == null)
+
+                throw new ArgumentNullException(nameof(comparer));
+
+            return ContainsOneOrMoreValues(array, (object value, object _value) => comparer.Compare(value, _value) == 0, out containsMoreThanOneValue, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparison">The <see cref="Comparison{T}"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, Comparison<object> comparison, out bool containsMoreThanOneValue, params object[] values)
+
+        {
+
+            if (comparison == null)
+
+                throw new ArgumentNullException(nameof(comparison));
+
+            return ContainsOneOrMoreValues(array, (object value, object _value) => comparison(value, _value) == 0, out containsMoreThanOneValue, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom equality comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, IEqualityComparer equalityComparer, out bool containsMoreThanOneValue, params object[] values)
+
+        {
+
+            if (equalityComparer == null)
+
+                throw new ArgumentNullException(nameof(equalityComparer));
+
+            return ContainsOneOrMoreValues(array, (object value, object _value) => equalityComparer.Equals(value, _value), out containsMoreThanOneValue, values);
+
+        }
+
+        #endregion
+
+        #region ContainsOneOrMoreValues without notification whether contains more than one values overloads
+
+        private static bool ContainsOneOrMoreValues(IEnumerable array, Func<object, object, bool> comparisonDelegate, object[] values)
+
+        {
+
+            foreach (object value in array)
+
+                foreach (object _value in values)
+
+                    if (comparisonDelegate(value, _value))
+
+                        return true;
+
+            return false;
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, params object[] values) => ContainsOneOrMoreValues(array, (object value, object _value) => object.Equals(value, _value), values);
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparer">The <see cref="IComparer"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, IComparer comparer, params object[] values)
+
+        {
+
+            if (comparer == null)
+
+                throw new ArgumentNullException(nameof(comparer));
+
+            return ContainsOneOrMoreValues(array, (object value, object _value) => comparer.Compare(value, _value) == 0, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparison">The <see cref="Comparison{T}"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, Comparison<object> comparison, params object[] values)
+
+        {
+
+            if (comparison == null)
+
+                throw new ArgumentNullException(nameof(comparison));
+
+            return ContainsOneOrMoreValues(array, (object value, object _value) => comparison(value, _value) == 0, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, IEqualityComparer equalityComparer, params object[] values)
+
+        {
+
+            if (equalityComparer == null)
+
+                throw new ArgumentNullException(nameof(equalityComparer));
+
+            return ContainsOneOrMoreValues(array, (object value, object _value) => equalityComparer.Equals(value, _value), values);
+
+        }
+
+        #endregion
+
+        #region Contains array overloads
+
+        private static bool Contains(IEnumerable array, Func<object, object, bool> comparisonDelegate, object[] values)
+
+        {
+
+            bool matchFound;
+
+            foreach (object value in array)
+
+            {
+
+                matchFound = false;
+
+                foreach (object _value in values)
+
+                    if (comparisonDelegate(value, _value))
+
+                    {
+
+                        matchFound = true;
+
+                        break;
+
+                    }
+
+                if (!matchFound)
+
+                    return false;
+
+            }
+
+            return true;
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains all values of a given array.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool Contains(this IEnumerable array, params object[] values) => Contains(array, (object value, object _value) => object.Equals(value, _value), values);
+
+        /// <summary>
+        /// Checks whether an array contains all values of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparer">The <see cref="IComparer"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool Contains(this IEnumerable array, IComparer comparer, params object[] values)
+
+        {
+
+            if (comparer == null)
+
+                throw new ArgumentNullException(nameof(comparer));
+
+            return Contains(array, (object value, object _value) => comparer.Compare(value, _value) == 0, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains all values of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparison">The <see cref="Comparison{T}"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool Contains(this IEnumerable array, Comparison<object> comparison, params object[] values)
+
+        {
+
+            if (comparison == null)
+
+                throw new ArgumentNullException(nameof(comparison));
+
+            return Contains(array, (object value, object _value) => comparison(value, _value) == 0, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains all values of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool Contains(this IEnumerable array, IEqualityComparer equalityComparer, params object[] values)
+
+        {
+
+            if (equalityComparer == null)
+
+                throw new ArgumentNullException(nameof(equalityComparer));
+
+            return Contains(array, (object value, object _value) => equalityComparer.Equals(value, _value), values);
+
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Generic methods
+
+        #region ContainsOneValue overloads
+
+        private static bool ContainsOneValue<T>(IEnumerable<T> array, Func<T, T, bool> comparisonDelegate, out bool containsMoreThanOneValue, T[] values)
+
+        {
+
+            bool matchFound = false;
+
+            foreach (T value in array)
+
+                foreach (T _value in values)
+
+                    if (comparisonDelegate(value, _value))
+
+                    {
+
+                        if (matchFound)
+
+                        {
+
+                            containsMoreThanOneValue = true;
+
+                            return false;
+
+                        }
+
+                        matchFound = true;
+
+                    }
+
+            containsMoreThanOneValue = false;
+
+            return matchFound;
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains <i>exactly</i> one value of a given array.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneValue<T>(this IEnumerable<T> array, out bool containsMoreThanOneValue, params T[] values) => ContainsOneValue(array, (T value, T _value) => object.Equals(value, _value), out containsMoreThanOneValue, values);
+
+        /// <summary>
+        /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparer">The <see cref="IComparer{T}"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneValue<T>(this IEnumerable<T> array, IComparer<T> comparer, out bool containsMoreThanOneValue, params T[] values)
+
+        {
+
+            if (comparer == null)
+
+                throw new ArgumentNullException(nameof(comparer));
+
+            return ContainsOneValue(array, (T value, T _value) => comparer.Compare(value, _value) == 0, out containsMoreThanOneValue, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparison">The <see cref="Comparison{T}"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneValue<T>(this IEnumerable<T> array, Comparison<T> comparison, out bool containsMoreThanOneValue, params T[] values)
+
+        {
+
+            if (comparison == null)
+
+                throw new ArgumentNullException(nameof(comparison));
+
+            return ContainsOneValue(array, (T value, T _value) => comparison(value, _value) == 0, out containsMoreThanOneValue, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer{T}"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneValue<T>(this IEnumerable<T> array, IEqualityComparer<T> equalityComparer, out bool containsMoreThanOneValue, params T[] values)
+
+        {
+
+            if (equalityComparer == null)
+
+                throw new ArgumentNullException(nameof(equalityComparer));
+
+            return ContainsOneValue(array, (T value, T _value) => equalityComparer.Equals(value, _value), out containsMoreThanOneValue, values); ;
+
+        }
+
+        #endregion
+
+        #region ContainsOneOrMoreValues with notification whether contains more than one values overloads
+
+        private static bool ContainsOneOrMoreValues<T>(IEnumerable<T> array, Func<T, T, bool> comparisonDelegate, out bool containsMoreThanOneValue, T[] values)
+
+        {
+
+            bool matchFound = false;
+
+            foreach (T value in array)
+
+                foreach (T _value in values)
+
+                    if (comparisonDelegate(value, _value))
+
+                    {
+
+                        if (matchFound)
+
+                        {
+
+                            containsMoreThanOneValue = true;
+
+                            return true;
+
+                        }
+
+                        matchFound = true;
+
+                    }
+
+            containsMoreThanOneValue = false;
+
+            return matchFound;
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, out bool containsMoreThanOneValue, params T[] values) => ContainsOneOrMoreValues(array, (T value, T _value) => object.Equals(value, _value), out containsMoreThanOneValue, values);
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparer">The <see cref="IComparer{T}"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, IComparer<T> comparer, out bool containsMoreThanOneValue, params T[] values)
+
+        {
+
+            if (comparer == null)
+
+                throw new ArgumentNullException(nameof(comparer));
+
+            return ContainsOneOrMoreValues(array, (T value, T _value) => comparer.Compare(value, _value) == 0, out containsMoreThanOneValue, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparison">The <see cref="Comparison{T}"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, Comparison<T> comparison, out bool containsMoreThanOneValue, params T[] values)
+
+        {
+
+            if (comparison == null)
+
+                throw new ArgumentNullException(nameof(comparison));
+
+            return ContainsOneOrMoreValues(array, (T value, T _value) => comparison(value, _value) == 0, out containsMoreThanOneValue, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer{T}"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, IEqualityComparer<T> equalityComparer, out bool containsMoreThanOneValue, params T[] values)
+
+        {
+
+            if (equalityComparer == null)
+
+                throw new ArgumentNullException(nameof(equalityComparer));
+
+            return ContainsOneOrMoreValues(array, (T value, T _value) => equalityComparer.Equals(value, _value), out containsMoreThanOneValue, values);
+
+        }
+
+        #endregion
+
+        #region ContainsOneOrMoreValues without notification whether contains more than one values overloads
+
+        private static bool ContainsOneOrMoreValues<T>(IEnumerable<T> array, Func<T, T, bool> comparisonDelegate, T[] values)
+
+        {
+
+            foreach (T value in array)
+
+                foreach (T _value in values)
+
+                    if (comparisonDelegate(value, _value))
+
+                        return true;
+
+            return false;
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, params T[] values) => ContainsOneOrMoreValues(array, (T value, T _value) => object.Equals(value, _value), values);
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparer">The <see cref="IComparer{T}"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, IComparer<T> comparer, params T[] values)
+
+        {
+
+            if (comparer == null)
+
+                throw new ArgumentNullException(nameof(comparer));
+
+            return ContainsOneOrMoreValues(array, (T value, T _value) => comparer.Compare(value, _value) == 0, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparison">The <see cref="Comparison{T}"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, Comparison<T> comparison, params T[] values)
+
+        {
+
+            if (comparison == null)
+
+                throw new ArgumentNullException(nameof(comparison));
+
+            return ContainsOneOrMoreValues(array, (T value, T _value) => comparison(value, _value) == 0, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains at least one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer{T}"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, IEqualityComparer<T> equalityComparer, params T[] values)
+
+        {
+
+            if (equalityComparer == null)
+
+                throw new ArgumentNullException(nameof(equalityComparer));
+
+            return ContainsOneOrMoreValues(array, (T value, T _value) => equalityComparer.Equals(value, _value), values);
+
+        }
+
+        #endregion
+
+        #region Contains array overloads
+
+        private static bool Contains<T>(IEnumerable<T> array, Func<T, T, bool> comparisonDelegate, T[] values)
+
+        {
+
+            bool matchFound;
+
+            foreach (T value in array)
+
+            {
+
+                matchFound = false;
+
+                foreach (T _value in values)
+
+                    if (comparisonDelegate(value, _value))
+
+                    {
+
+                        matchFound = true;
+
+                        break;
+
+                    }
+
+                if (!matchFound)
+
+                    return false;
+
+            }
+
+            return true;
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains all values of a given array.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool Contains<T>(this IEnumerable<T> array, params T[] values) => Contains(array, (T value, T _value) => object.Equals(value, _value), values);
+
+        /// <summary>
+        /// Checks whether an array contains all values of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparer">The <see cref="IComparer{T}"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool Contains<T>(this IEnumerable<T> array, IComparer<T> comparer, params T[] values)
+
+        {
+
+            if (comparer == null)
+
+                throw new ArgumentNullException(nameof(comparer));
+
+            return Contains(array, (T value, T _value) => comparer.Compare(value, _value) == 0, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains all values of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="comparison">The <see cref="Comparison{T}"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool Contains<T>(this IEnumerable<T> array, Comparison<T> comparison, params T[] values)
+
+        {
+
+            if (comparison == null)
+
+                throw new ArgumentNullException(nameof(comparison));
+
+            return Contains(array, (T value, T _value) => comparison(value, _value) == 0, values);
+
+        }
+
+        /// <summary>
+        /// Checks whether an array contains all values of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer{T}"/> used to compare the values</param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
+        public static bool Contains<T>(this IEnumerable<T> array, IEqualityComparer<T> equalityComparer, params T[] values)
+
+        {
+
+            if (equalityComparer == null)
+
+                throw new ArgumentNullException(nameof(equalityComparer));
+
+            return Contains(array, (T value, T _value) => equalityComparer.Equals(value, _value), values);
+
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
 
         #endregion
 
