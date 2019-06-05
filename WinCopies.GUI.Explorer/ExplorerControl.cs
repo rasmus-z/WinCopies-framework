@@ -950,11 +950,11 @@ namespace WinCopies.GUI.Explorer
 
         private void Open(object value) => Open();
 
-        public List<MenuItem> GetDefaultListViewItemContextMenu()
+        public LinkedList<MenuItem> GetDefaultListViewItemContextMenu()
 
         {
 
-            List<MenuItem> menuItems = new List<MenuItem>();
+            LinkedList<MenuItem> menuItems = new LinkedList<MenuItem>();
 
             MenuItem menuItem = new MenuItem(Generic.Open, null, new DelegateCommand { ExecuteDelegate = Open }, Path.SelectedItem, null);
 

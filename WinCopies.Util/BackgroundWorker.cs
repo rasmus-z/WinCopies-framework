@@ -279,10 +279,6 @@ namespace WinCopies.Util
         private void ThreadStart(DoWorkEventArgs e)
         {
 
-#if DEBUG
-            Console.WriteLine("Début");
-#endif
-
 
 
             // Dim cancelled As Boolean = False
@@ -307,12 +303,6 @@ namespace WinCopies.Util
 
                 error = ex;
 
-#if DEBUG
-
-                Debug.WriteLine(ex.GetType() + ": " + ex.Message);
-
-#endif
-
             }
 
             _SyncContext.Send(ThreadCompleted, new ValueTuple<object, Exception, bool>(e.Result, error, IsCancelled || CancellationPending || e.Cancel));
@@ -332,12 +322,6 @@ namespace WinCopies.Util
             (object result, Exception ex, bool isCancelled) = (ValueTuple<object, Exception, bool>)args;
 
             RunWorkerCompletedEventArgs e = new RunWorkerCompletedEventArgs(result, ex, isCancelled);
-
-#if DEBUG
-
-            Debug.WriteLine("Fin");
-
-#endif
 
             // IsBusy = false;
 
