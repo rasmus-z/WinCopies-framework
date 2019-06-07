@@ -198,7 +198,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
             if (historyItem is HistoryItemData)
 
-                ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Navigate((IBrowsableObjectInfo)((HistoryItemData)historyItem).Path, false);
+                ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Navigate((IBrowsableObjectInfo)((HistoryItemData)historyItem).Path);
 
         }
 
@@ -210,7 +210,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
             if (historyitem is IHistoryItemData)
 
-                ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Navigate((IBrowsableObjectInfo)((HistoryItemData)historyitem).Path, false);
+                ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Navigate((IBrowsableObjectInfo)((HistoryItemData)historyitem).Path);
 
         }
 
