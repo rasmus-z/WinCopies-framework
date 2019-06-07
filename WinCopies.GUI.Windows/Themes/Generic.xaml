@@ -12,6 +12,7 @@
                     xmlns:commandBehavior="clr-namespace:AttachedCommandBehavior;assembly=AttachedCommandBehavior"
                     xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI"
                     xmlns:guiWindows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
+                    xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"
                     xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp">
     <!--xmlns:guiExplorerDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI.Explorer"-->
 
@@ -77,46 +78,47 @@
 
             <TextBlock x:Key="ArchiveFormatDescription" >
                 <TextBlock.Inlines>
-                    <Run Text="Le format d'archive est le type de fichier dans lequel les fichiers compressés seront stockés."/>
+                    <Run Text="Le format d'archive est le type de fichier dans lequel les fichiers compressés seront stockés." />
                     <LineBreak />
                     <Run Text="Le format d'archive n'est pas toujours dépendant de l'algorithme utilisé pour la compression des fichiers. Si vous choisissez le format ZIP, vous pourrez ouvrir l'archive dans l'Explorateur Windows." />
                     <LineBreak />
                     <Run Text="Si vous souhaitez compresser les fichiers dans un format libre, vous pouvez choisir le format 7-ZIP." />
-                </TextBlock.Inlines></TextBlock>
+                </TextBlock.Inlines>
+            </TextBlock>
             <TextBlock x:Key="ArchiveCompressionMethodDescription" >
                 <TextBlock.Inlines>
-                    <Run Text="La méthode de compression utilisée pour compresser les fichiers."/>
+                    <Run Text="La méthode de compression utilisée pour compresser les fichiers." />
                     <LineBreak />
-                    <Run Text="La méthode de compression n'est pas toujours dépandante du format d'archive."/>
+                    <Run Text="La méthode de compression n'est pas toujours dépandante du format d'archive." />
                     <LineBreak />
-                    <Run Text="Si vous ne savez pas quelle méthode de compression utiliser, vous pouvez laisser cette valeur à la valeur par défaut."/>
+                    <Run Text="Si vous ne savez pas quelle méthode de compression utiliser, vous pouvez laisser cette valeur à la valeur par défaut." />
                     <LineBreak />
-                    <Run Text="Vous pouvez aussi choisir de copier directement les fichiers dans l'archive (non recommandé)."/>
+                    <Run Text="Vous pouvez aussi choisir de copier directement les fichiers dans l'archive (non recommandé)." />
                 </TextBlock.Inlines>
             </TextBlock>
-            <TextBlock x:Key="ArchiveCompressionLevelDescription">
+            <TextBlock x:Key="ArchiveCompressionLevelDescription" >
                 <TextBlock.Inlines>
-                    <Run Text="Le niveau de compression des fichiers."/>
+                    <Run Text="Le niveau de compression des fichiers." />
                     <LineBreak />
-                    <Run Text="Un niveau de compression plus élevé résultera en une taille de fichier généralement plus faible, mais allongera le temps de (dé)compression."/>
+                    <Run Text="Un niveau de compression plus élevé résultera en une taille de fichier généralement plus faible, mais allongera le temps de (dé)compression." />
                     <LineBreak />
-                    <Run Text="Gardez également à l'esprit que tous les fichiers ne sont pas compressables. Certains fichiers, une fois compressés, peuvent même résulter en une taille compressée plus élevée que la taille du/des fichier(s) source."/>
+                    <Run Text="Gardez également à l'esprit que tous les fichiers ne sont pas compressables. Certains fichiers, une fois compressés, peuvent même résulter en une taille compressée plus élevée que la taille du/des fichier(s) source." />
                 </TextBlock.Inlines>
             </TextBlock>
-            <TextBlock x:Key="ArchiveCompressionModeDescription">
+            <TextBlock x:Key="ArchiveCompressionModeDescription" >
                 <TextBlock.Inlines>
-                    <Run Text="Le mode de compression des fichiers."/>
+                    <Run Text="Le mode de compression des fichiers." />
                     <LineBreak />
-                    <Run Text="Si vous choisissez d'ajouter les fichiers dans un nouveau fichier compressé, un nouveau fichier sera créé pour la copie, même si un fichier du même nom existe déjà."/>
+                    <Run Text="Si vous choisissez d'ajouter les fichiers dans un nouveau fichier compressé, un nouveau fichier sera créé pour la copie, même si un fichier du même nom existe déjà." />
                     <LineBreak />
-                    <Run Text="Si vous choisissez d'ajouter les fichiers dans un fichier existant, un nouveau fichier sera créé uniquement si un fichier du même nom ne se trouve pas encore dans l'emplacement spécifié."/>
+                    <Run Text="Si vous choisissez d'ajouter les fichiers dans un fichier existant, un nouveau fichier sera créé uniquement si un fichier du même nom ne se trouve pas encore dans l'emplacement spécifié." />
                 </TextBlock.Inlines>
             </TextBlock>
 
             <!--Control templates-->
 
             <ControlTemplate x:Key="InputBoxContentLabelTemplate" x:Shared="false" >
-                <Label Content="{Binding Label, RelativeSource={RelativeSource AncestorType={x:Type dialogs:InputBox}, Mode=FindAncestor}}" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:InputBox}, Mode=FindAncestor}}" ></Label>
+                <Label Content="{Binding Label, RelativeSource={RelativeSource AncestorType={x:Type dialogs:InputBox}, Mode=FindAncestor}}" FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:InputBox}, Mode=FindAncestor}}" />
             </ControlTemplate>
 
             <ControlTemplate x:Key="InputBoxContentTextBoxTemplate" x:Shared="false" >
@@ -124,12 +126,15 @@
                     <commandBehavior:EventArgsHandler.HandleEventHandler>
                         <x:Array xmlns:s="clr-namespace:System;assembly=mscorlib" Type="{x:Type s:String}">
                             <s:String>
-                                TextChanged</s:String>
+                                TextChanged
+                            </s:String>
                         </x:Array>
                     </commandBehavior:EventArgsHandler.HandleEventHandler>
-                    <commandBehavior:CommandBehavior.Event>TextChanged</commandBehavior:CommandBehavior.Event>
+                    <commandBehavior:CommandBehavior.Event>
+                        TextChanged
+                    </commandBehavior:CommandBehavior.Event>
                     <commandBehavior:CommandBehavior.Command>
-                        <x:Static Member="util:Util.CommonCommand" />
+                        <x:Static Member="commands:Commands.CommonCommand" />
                     </commandBehavior:CommandBehavior.Command>
                     <commandBehavior:CommandBehavior.CommandParameter>
                         <Binding Path="(commandBehavior:EventArgsHandler.LastEventArgs)" RelativeSource="{RelativeSource Mode=Self}" />
@@ -144,15 +149,16 @@
                             <commandBehavior:EventArgsHandler.HandleEventHandler>
                                 <x:Array xmlns:s="clr-namespace:System;assembly=mscorlib" Type="{x:Type s:String}">
                                     <s:String>
-                                        TextChanged</s:String>
+                                        TextChanged
+                                    </s:String>
                                     <s:String>
                                         SelectionChanged
                                     </s:String>
                                 </x:Array>
                             </commandBehavior:EventArgsHandler.HandleEventHandler>
                         </commandBehavior:EventArgsHandler>
-                        <commandBehavior:BehaviorBinding Event="TextChanged" Command="{x:Static util:Util.CommonCommand}" CommandParameter="{Binding (commandBehavior:EventArgsHandler.LastEventArgs), RelativeSource={RelativeSource Mode=Self}}" />
-                        <commandBehavior:BehaviorBinding Event="SelectionChanged" Command="{x:Static util:Util.CommonCommand}" CommandParameter="{Binding (commandBehavior:EventArgsHandler.LastEventArgs), RelativeSource={RelativeSource Mode=Self}}" />
+                        <commandBehavior:BehaviorBinding Event="TextChanged" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{Binding (commandBehavior:EventArgsHandler.LastEventArgs), RelativeSource={RelativeSource Mode=Self}}" />
+                        <commandBehavior:BehaviorBinding Event="SelectionChanged" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{Binding (commandBehavior:EventArgsHandler.LastEventArgs), RelativeSource={RelativeSource Mode=Self}}" />
                     </commandBehavior:CommandBehaviorCollection.Behaviors>
                 </ComboBox>
             </ControlTemplate>
@@ -160,8 +166,8 @@
             <ControlTemplate x:Key="ComboInputBoxTemplate">
                 <Grid >
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" ></RowDefinition>
-                        <RowDefinition ></RowDefinition>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Control Focusable="False">
                         <Control.Style>
@@ -183,8 +189,8 @@
                                                 <ControlTemplate>
                                                     <Grid VerticalAlignment="Top">
                                                         <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" ></ColumnDefinition>
-                                                            <ColumnDefinition ></ColumnDefinition>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition />
                                                         </Grid.ColumnDefinitions>
                                                         <Control Template="{StaticResource InputBoxContentLabelTemplate}" />
                                                         <Control Template="{StaticResource ComboInputBoxContentComboBoxTemplate}" />
@@ -197,7 +203,7 @@
                             </Style>
                         </Control.Style>
                     </Control>
-                    <Label Grid.Row="1" Content="{Binding ErrorText, RelativeSource={RelativeSource Mode=TemplatedParent}}" Visibility="{Binding ErrorText, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={ dialogs:ErrorLabelVisibilityConverter}}" Foreground="Red" ></Label>
+                    <Label Grid.Row="1" Content="{Binding ErrorText, RelativeSource={RelativeSource Mode=TemplatedParent}}" Visibility="{Binding ErrorText, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={ dialogs:ErrorLabelVisibilityConverter}}" Foreground="Red" />
                 </Grid>
             </ControlTemplate>
 
@@ -219,7 +225,7 @@
     </Style>-->
 
     <Style x:Shared="false" BasedOn="{StaticResource {x:Type guiDialogs:DialogWindow}}" TargetType="{x:Type dialogs:InputBox}">
-        <Setter Property="CommandParameter" Value="{Binding Text}" />
+        <Setter Property="CommandParameter" Value="{Binding Text, RelativeSource={RelativeSource Mode=Self}}" />
         <Setter Property="PlaceholderMode" Value="OnTextChange" />
         <Setter Property="DialogButton" Value="OKCancel" />
         <Setter Property="DefaultButton" Value="OK" />
@@ -227,8 +233,8 @@
             <Setter.Value>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" ></RowDefinition>
-                        <RowDefinition ></RowDefinition>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Control Focusable="False">
                         <Control.Style>
@@ -237,8 +243,8 @@
                                     <Setter.Value>
                                         <ControlTemplate TargetType="{x:Type Control}">
                                             <StackPanel FlowDirection="{Binding FlowDirection, RelativeSource={RelativeSource AncestorType={x:Type dialogs:InputBox}, Mode=FindAncestor}}" >
-                                                <Control Template="{StaticResource InputBoxContentLabelTemplate}"></Control>
-                                                <Control Template="{StaticResource InputBoxContentTextBoxTemplate}"></Control>
+                                                <Control Template="{StaticResource InputBoxContentLabelTemplate}" />
+                                                <Control Template="{StaticResource InputBoxContentTextBoxTemplate}" />
                                             </StackPanel>
                                         </ControlTemplate>
                                     </Setter.Value>
@@ -250,11 +256,11 @@
                                                 <ControlTemplate>
                                                     <Grid VerticalAlignment="Top">
                                                         <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" ></ColumnDefinition>
-                                                            <ColumnDefinition ></ColumnDefinition>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition />
                                                         </Grid.ColumnDefinitions>
-                                                        <Control Template="{StaticResource InputBoxContentLabelTemplate}"></Control>
-                                                        <Control Template="{StaticResource InputBoxContentTextBoxTemplate}"></Control>
+                                                        <Control Template="{StaticResource InputBoxContentLabelTemplate}" />
+                                                        <Control Template="{StaticResource InputBoxContentTextBoxTemplate}" />
                                                     </Grid>
                                                 </ControlTemplate>
                                             </Setter.Value>
@@ -264,7 +270,7 @@
                             </Style>
                         </Control.Style>
                     </Control>
-                    <Label Grid.Row="1" Content="{Binding ErrorText, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:InputBox}}}" Visibility="{Binding ErrorText, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:InputBox}}, Converter={ dialogs:ErrorLabelVisibilityConverter}}" Foreground="Red" ></Label>
+                    <Label Grid.Row="1" Content="{Binding ErrorText, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:InputBox}}}" Visibility="{Binding ErrorText, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:InputBox}}, Converter={ dialogs:ErrorLabelVisibilityConverter}}" Foreground="Red" />
                 </Grid>
             </Setter.Value>
         </Setter>
@@ -273,23 +279,23 @@
     <Style x:Shared="false" BasedOn="{ StaticResource {x:Type dialogs:InputBox}}" TargetType="{x:Type dialogs:ComboInputBox}" />
 
     <Style x:Shared="false" BasedOn="{StaticResource {x:Type guiDialogs:DialogWindow}}" TargetType="{x:Type dialogs:ArchiveCompression}" >
+        <Setter Property="DialogButton" Value="OKCancel" />
         <Setter Property="DefaultButton" Value="OK" />
         <Setter Property="Content" >
             <Setter.Value>
-
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" ></RowDefinition>
-                        <RowDefinition ></RowDefinition>
-                        <RowDefinition ></RowDefinition>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
 
                     <GroupBox Header="{StaticResource SourceAndDestPaths}">
                         <Grid >
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" ></ColumnDefinition>
-                                <ColumnDefinition ></ColumnDefinition>
-                                <ColumnDefinition Width="auto" ></ColumnDefinition>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto" />
                             </Grid.ColumnDefinitions>
 
                             <Grid.RowDefinitions>
@@ -297,43 +303,43 @@
                                 <RowDefinition />
                             </Grid.RowDefinitions>
 
-                            <Label Content="{StaticResource SourcePath}" ></Label>
-                            <TextBox Grid.Column="1" Text="{Binding SourcePath, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" ></TextBox>
-                            <Button Grid.Column="2" Command="{x:Static dialogs:Commands.SelectPath}" CommandParameter="SourcePath" Content="{StaticResource SelectPath}" ></Button>
+                            <Label Content="{StaticResource SourcePath}" />
+                            <TextBox Grid.Column="1" Text="{Binding SourcePath, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" />
+                            <Button Grid.Column="2" Command="{x:Static dialogs:Commands.SelectPath}" CommandParameter="SourcePath" Content="{StaticResource SelectPath}" />
 
-                            <Label Grid.Row="1" Content="{StaticResource DestPath}" ></Label>
-                            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding DestPath, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" ></TextBox>
-                            <Button Grid.Column="2" Grid.Row="1" Command="{x:Static dialogs:Commands.SelectPath}" CommandParameter="DestPath" Content="{StaticResource SelectPath}" ></Button>
+                            <Label Grid.Row="1" Content="{StaticResource DestPath}" />
+                            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding DestPath, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" />
+                            <Button Grid.Column="2" Grid.Row="1" Command="{x:Static dialogs:Commands.SelectPath}" CommandParameter="DestPath" Content="{StaticResource SelectPath}" />
                         </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="1" Header="{StaticResource ArchiveFileProperties}" >
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition ></ColumnDefinition>
-                                <ColumnDefinition ></ColumnDefinition>
-                                <ColumnDefinition ></ColumnDefinition>
-                                <ColumnDefinition ></ColumnDefinition>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
 
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" ></RowDefinition>
-                                <RowDefinition Height="auto" ></RowDefinition>
-                                <RowDefinition Height="auto" ></RowDefinition>
-                                <RowDefinition Height="auto" ></RowDefinition>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
 
-                            <Label Content="{StaticResource ArchiveFormat}" ></Label>
+                            <Label Content="{StaticResource ArchiveFormat}" />
                             <ComboBox Grid.Column="1" ItemsSource="{Binding Converter={StaticResource EnumToStringConverter}, ConverterParameter={x:Type sevenZip:OutArchiveFormat}}" SelectedItem="{Binding ArchiveFormat, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringConverter}, ConverterParameter=SelectedItem}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveFormat}" />
-                            <Label Grid.Column="2" Content="{StaticResource CompressionLevel}" ></Label>
+                            <Label Grid.Column="2" Content="{StaticResource CompressionLevel}" />
                             <ComboBox Grid.Column="3" ItemsSource="{Binding Converter={StaticResource EnumToStringConverter}, ConverterParameter={x:Type sevenZip:CompressionLevel}}" SelectedItem="{Binding CompressionLevel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringConverter}, ConverterParameter=SelectedItem}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveCompressionLevel}" />
-                            <Label Grid.Row="1" Content="{StaticResource CompressionMethod}" ></Label>
+                            <Label Grid.Row="1" Content="{StaticResource CompressionMethod}" />
                             <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Converter={StaticResource EnumToStringConverter}, ConverterParameter={x:Type sevenZip:CompressionMethod}}" SelectedItem="{Binding CompressionMethod, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringConverter}, ConverterParameter=SelectedItem}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveCompressionMethod}" >
                                 <ComboBox.ItemContainerStyle>
                                     <Style BasedOn="{StaticResource {x:Type ComboBoxItem}}" TargetType="ComboBoxItem" >
                                         <Setter Property="Visibility" >
                                             <Setter.Value >
                                                 <MultiBinding Converter="{dialogs:CompressionMethodToVisibilityConverter}" >
-                                                    <Binding Path="ArchiveFormat" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}" ></Binding>
+                                                    <Binding Path="ArchiveFormat" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}" />
                                                     <Binding />
                                                 </MultiBinding>
                                             </Setter.Value>
@@ -341,28 +347,27 @@
                                     </Style>
                                 </ComboBox.ItemContainerStyle>
                             </ComboBox>
-                            <Label Grid.Row="1" Grid.Column="2" Content="{StaticResource CompressionMode}" ></Label>
+                            <Label Grid.Row="1" Grid.Column="2" Content="{StaticResource CompressionMode}" />
                             <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding Converter={StaticResource EnumToStringConverter}, ConverterParameter={x:Type sevenZip:CompressionMode}}" SelectedItem="{Binding CompressionMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource EnumToStringConverter}, ConverterParameter=SelectedItem}" ToolTip="{Binding IsInHelpMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}, Converter={StaticResource ArchiveCompressionToolTipsConverter}, ConverterParameter=ArchiveCompressionMode}" />
-                            <CheckBox Grid.Row="2" Content="{StaticResource PreserveDirectoryStructure}" IsChecked="{Binding DirectoryStructure, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" ></CheckBox>
-                            <CheckBox Grid.Row="3" Content="{StaticResource IncludeEmptyDirectories}" IsChecked="{Binding IncludeEmptyDirectories, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" ></CheckBox>
+                            <CheckBox Grid.Row="2" Content="{StaticResource PreserveDirectoryStructure}" IsChecked="{Binding DirectoryStructure, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" />
+                            <CheckBox Grid.Row="3" Content="{StaticResource IncludeEmptyDirectories}" IsChecked="{Binding IncludeEmptyDirectories, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" />
 
                         </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="2" Header="{StaticResource PathsToIncludeToTheArchive}" >
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition ></RowDefinition>
-                                <RowDefinition Height="auto" ></RowDefinition>
+                                <RowDefinition />
+                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBox AcceptsReturn="True" Text="{Binding Paths, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" ></TextBox>
-                            <Label Grid.Row="1" Content="{StaticResource ItemsAreOnlyThereForInformation}" ></Label>
+                            <TextBox AcceptsReturn="True" Text="{Binding Paths, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:ArchiveCompression}}}" />
+                            <Label Grid.Row="1" Content="{StaticResource ItemsAreOnlyThereForInformation}" />
                         </Grid>
                     </GroupBox>
                 </Grid>
             </Setter.Value>
         </Setter>
-        <Setter Property="DialogButton" Value="OKCancel" ></Setter>
         <Setter Property="ShowHelpButton" Value="True" />
     </Style>
 </ResourceDictionary>

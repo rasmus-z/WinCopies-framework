@@ -106,8 +106,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\WinCopies.IO.dll</HintPath>
     </Reference>
-    <Reference Include="WinCopies.Util, Version=1.0.0.0, Culture=neutral, PublicKeyToken=871c137cc337841c, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinCopies.Util.1.0.0\lib\net48\WinCopies.Util.dll</HintPath>
+    <Reference Include="WinCopies.Util, Version=1.1.0.0, Culture=neutral, PublicKeyToken=871c137cc337841c, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.Util.1.1.0\lib\net48\WinCopies.Util.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>

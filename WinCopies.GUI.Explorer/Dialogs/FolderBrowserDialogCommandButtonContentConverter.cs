@@ -31,7 +31,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                 case FolderBrowserDialogMode.OpenFiles:
 
-                    return Generic.Open;
+                    return Explorer.Themes. Generic.Open;
 
                 case FolderBrowserDialogMode.OpenFolder:
 

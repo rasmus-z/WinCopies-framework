@@ -12,9 +12,13 @@ using System.Windows.Input;
 using WinCopies.IO;
 using WinCopies.Util.Data;
 using Registry = WinCopies.IO.Registry;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
+
+    public delegate void MoveHandler(string sourcePath, string destPath);
+
     public class FilePropertiesDialog : DialogWindow
     {
 
@@ -93,17 +97,17 @@ namespace WinCopies.GUI.Windows.Dialogs
         /// </summary>
         public const string Photo = "Photo";
 
-        //        /// <summary>
-        //        /// Identifies the <see cref="ShellObject"/> dependency property.
-        //        /// </summary>
-        //        public static readonly DependencyProperty ShellObjectProperty = DependencyProperty.Register(nameof(ShellObject), typeof(ShellObjectInfo), typeof(FilePropertiesDialog), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
-        //        {
+        /// <summary>
+        /// Identifies the <see cref="ShellObject"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ShellObjectProperty = DependencyProperty.Register(nameof(ShellObject), typeof(ShellObjectInfo), typeof(FilePropertiesDialog), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        {
 
-        //            
+            ((FilePropertiesDialog)d).FilePropertiesDialog_ShellObjectChanged(e);
 
-        //        }));
+        }));
 
-        //        public ShellObjectInfo ShellObject { get => (ShellObjectInfo)GetValue(ShellObjectProperty); set => SetValue(ShellObjectProperty, value); }
+        public ShellObjectInfo ShellObject { get => (ShellObjectInfo)GetValue(ShellObjectProperty); set => SetValue(ShellObjectProperty, value); }
 
         private static readonly DependencyPropertyKey OpenWithSoftwarePropertyKey = DependencyProperty.RegisterReadOnly(nameof(OpenWithSoftware), typeof(ShellObject), typeof(FilePropertiesDialog), new PropertyMetadata(null));
 
@@ -138,9 +142,18 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         public ReadOnlyObservableCollection<NamedObject<ShellPropertyContainer>> Properties { get => (ReadOnlyObservableCollection<NamedObject<ShellPropertyContainer>>)GetValue(PropertiesProperty); }
 
+        // todo: to add a default implementation:
+
+        /// <summary>
+        /// Identifies the <see cref="MoveAction"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MoveActionProperty = DependencyProperty.Register(nameof(MoveAction), typeof(MoveHandler), typeof(FilePropertiesDialog));
+
+        public MoveHandler MoveAction { get => (MoveHandler)GetValue(MoveActionProperty); set => SetValue(MoveActionProperty, value); }
+
         static FilePropertiesDialog() => DefaultStyleKeyProperty.OverrideMetadata(typeof(FilePropertiesDialog), new FrameworkPropertyMetadata(typeof(FilePropertiesDialog)));
 
-        public static RoutedUICommand DefineOpenWithSoftware { get; } = new RoutedUICommand("a", "a", typeof(FilePropertiesDialog), new InputGestureCollection());
+        // public static RoutedUICommand DefineOpenWithSoftware { get; } = new RoutedUICommand("a", "a", typeof(FilePropertiesDialog), new InputGestureCollection());
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilePropertiesDialog"/> class using the specified <see cref="ShellObjectInfo"/> as data context.
@@ -150,24 +163,53 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         {
 
-            DataContextChanged += FilePropertiesDialog_DataContextChanged;
-
-            DataContext = shellObject;
-
-            CommandBindings.Add(new CommandBinding(DefineOpenWithSoftware, (object sender, ExecutedRoutedEventArgs e) =>
-            {
-
-                FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-
-                folderBrowserDialog.ShowDialog();
-
-            }));
+            ShellObject = shellObject;
 
             // Content = new Control { Template = (ControlTemplate)ResourcesHelper.Instance.ResourceDictionary["FilePropertiesDialogTemplate"] };
 
         }
 
-        private void FilePropertiesDialog_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        protected override void OnCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+
+            (FolderBrowserDialog folderBrowserDialog, bool? result) showDialog()
+
+            {
+
+                FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+
+                return (folderBrowserDialog, folderBrowserDialog.ShowDialog());
+
+            }
+
+            switch (e.Parameter)
+            {
+
+                case "DefineOpenWithSoftware":
+
+                    break;
+
+                case "MoveCurrentPath":
+
+                    (FolderBrowserDialog folderBrowserDialog, bool? result) result = showDialog();
+
+                    if (result.result == true)
+
+                        MoveAction?.Invoke(ShellObject.Path, result.folderBrowserDialog.ExplorerControl.Path.Path);
+
+                    break;
+
+                default:
+
+                    base.OnCommandExecuted(sender, e);
+
+                    break;
+
+            }
+
+        }
+
+        private void FilePropertiesDialog_ShellObjectChanged(DependencyPropertyChangedEventArgs e)
 
         {
 
@@ -189,7 +231,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                     if (openWithCommand != null)
 
-                        SetValue(OpenWithSoftwarePropertyKey, ShellObject.FromParsingName(Registry.GetOpenWithSoftwarePathFromCommand(openWithCommand)));
+                        SetValue(OpenWithSoftwarePropertyKey, Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(Registry.GetOpenWithSoftwarePathFromCommand(openWithCommand)));
 
                     WinShellAppInfoInterop winShellAppInfoInterop = new WinShellAppInfoInterop(ext);
 

@@ -36,16 +36,16 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type MenuItem}">-->
                     <Grid>
-                        <ToggleButton Content="{TemplateBinding Header}" IsChecked="{Binding IsSubmenuOpen, RelativeSource={RelativeSource Mode=TemplatedParent}}"></ToggleButton>
+                        <ToggleButton Content="{TemplateBinding Header}" IsChecked="{Binding IsSubmenuOpen, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                         <Popup x:Name="PART_Popup" AllowsTransparency="True" Focusable="False" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" Placement="Bottom">
                             <Border x:Name="SubMenuBorder" BorderBrush="#FF999999" BorderThickness="1" Background="#FFF0F0F0" Padding="2">
                                 <ScrollViewer x:Name="SubMenuScrollViewer" Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
                                     <Grid RenderOptions.ClearTypeHint="Enabled">
                                         <Canvas HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
-                                            <Rectangle x:Name="OpaqueRect" Fill="{Binding Background, ElementName=SubMenuBorder}" Height="{Binding ActualHeight, ElementName=SubMenuBorder}" Width="{Binding ActualWidth, ElementName=SubMenuBorder}"/>
+                                            <Rectangle x:Name="OpaqueRect" Fill="{Binding Background, ElementName=SubMenuBorder}" Height="{Binding ActualHeight, ElementName=SubMenuBorder}" Width="{Binding ActualWidth, ElementName=SubMenuBorder}" />
                                         </Canvas>
-                                        <Rectangle Fill="#FFD7D7D7" HorizontalAlignment="Left" Margin="29,2,0,2" Width="1"/>
-                                        <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Cycle" Grid.IsSharedSizeScope="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" KeyboardNavigation.TabNavigation="Cycle"/>
+                                        <Rectangle Fill="#FFD7D7D7" HorizontalAlignment="Left" Margin="29,2,0,2" Width="1" />
+                                        <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Cycle" Grid.IsSharedSizeScope="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" KeyboardNavigation.TabNavigation="Cycle" />
                                     </Grid>
                                 </ScrollViewer>
                             </Border>
@@ -62,27 +62,27 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC"/>
+    <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC" />
     <Style TargetType="{x:Type local:TabControl}" >
-        <Setter Property="Padding" Value="2"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="Background" Value="{StaticResource TabItem.Selected.Background}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource TabItem.Selected.Border}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-        <Setter Property="Template">
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="{StaticResource TabItem.Selected.Background}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TabItem.Selected.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+        <Setter Property="Template" >
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TabControl}">
                     <Grid x:Name="templateRoot" ClipToBounds="true" SnapsToDevicePixels="true" KeyboardNavigation.TabNavigation="Local">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition x:Name="ColumnDefinition0"/>
-                            <ColumnDefinition x:Name="ColumnDefinition1" Width="0"/>
+                            <ColumnDefinition x:Name="ColumnDefinition0" />
+                            <ColumnDefinition x:Name="ColumnDefinition1" Width="0" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
-                            <RowDefinition x:Name="RowDefinition1" Height="*"/>
+                            <RowDefinition x:Name="RowDefinition0" Height="Auto" />
+                            <RowDefinition x:Name="RowDefinition1" Height="*" />
                         </Grid.RowDefinitions>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -134,41 +134,41 @@
 
                         </Grid>
                         <Border x:Name="contentPanel" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.Column="0" KeyboardNavigation.DirectionalNavigation="Contained" Grid.Row="1" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
-                            <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="TabStripPlacement" Value="Bottom">
-                            <Setter Property="Grid.Row" TargetName="headerPanel" Value="1"/>
-                            <Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
-                            <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
-                            <Setter Property="Height" TargetName="RowDefinition1" Value="Auto"/>
-                            <Setter Property="Margin" TargetName="headerPanel" Value="2,0,2,2"/>
+                            <Setter Property="Grid.Row" TargetName="headerPanel" Value="1" />
+                            <Setter Property="Grid.Row" TargetName="contentPanel" Value="0" />
+                            <Setter Property="Height" TargetName="RowDefinition0" Value="*" />
+                            <Setter Property="Height" TargetName="RowDefinition1" Value="Auto" />
+                            <Setter Property="Margin" TargetName="headerPanel" Value="2,0,2,2" />
                         </Trigger>
                         <Trigger Property="TabStripPlacement" Value="Left">
-                            <Setter Property="Grid.Row" TargetName="headerPanel" Value="0"/>
-                            <Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
-                            <Setter Property="Grid.Column" TargetName="headerPanel" Value="0"/>
-                            <Setter Property="Grid.Column" TargetName="contentPanel" Value="1"/>
-                            <Setter Property="Width" TargetName="ColumnDefinition0" Value="Auto"/>
-                            <Setter Property="Width" TargetName="ColumnDefinition1" Value="*"/>
-                            <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
-                            <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
-                            <Setter Property="Margin" TargetName="headerPanel" Value="2,2,0,2"/>
+                            <Setter Property="Grid.Row" TargetName="headerPanel" Value="0" />
+                            <Setter Property="Grid.Row" TargetName="contentPanel" Value="0" />
+                            <Setter Property="Grid.Column" TargetName="headerPanel" Value="0" />
+                            <Setter Property="Grid.Column" TargetName="contentPanel" Value="1" />
+                            <Setter Property="Width" TargetName="ColumnDefinition0" Value="Auto" />
+                            <Setter Property="Width" TargetName="ColumnDefinition1" Value="*" />
+                            <Setter Property="Height" TargetName="RowDefinition0" Value="*" />
+                            <Setter Property="Height" TargetName="RowDefinition1" Value="0" />
+                            <Setter Property="Margin" TargetName="headerPanel" Value="2,2,0,2" />
                         </Trigger>
                         <Trigger Property="TabStripPlacement" Value="Right">
-                            <Setter Property="Grid.Row" TargetName="headerPanel" Value="0"/>
-                            <Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
-                            <Setter Property="Grid.Column" TargetName="headerPanel" Value="1"/>
-                            <Setter Property="Grid.Column" TargetName="contentPanel" Value="0"/>
-                            <Setter Property="Width" TargetName="ColumnDefinition0" Value="*"/>
-                            <Setter Property="Width" TargetName="ColumnDefinition1" Value="Auto"/>
-                            <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
-                            <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
-                            <Setter Property="Margin" TargetName="headerPanel" Value="0,2,2,2"/>
+                            <Setter Property="Grid.Row" TargetName="headerPanel" Value="0" />
+                            <Setter Property="Grid.Row" TargetName="contentPanel" Value="0" />
+                            <Setter Property="Grid.Column" TargetName="headerPanel" Value="1" />
+                            <Setter Property="Grid.Column" TargetName="contentPanel" Value="0" />
+                            <Setter Property="Width" TargetName="ColumnDefinition0" Value="*" />
+                            <Setter Property="Width" TargetName="ColumnDefinition1" Value="Auto" />
+                            <Setter Property="Height" TargetName="RowDefinition0" Value="*" />
+                            <Setter Property="Height" TargetName="RowDefinition1" Value="0" />
+                            <Setter Property="Margin" TargetName="headerPanel" Value="0,2,2,2" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -350,22 +350,22 @@
     </Style>
 
     <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type local:TextBox}" >
-        <Setter Property="Text" Value="{Binding RealText, RelativeSource={RelativeSource Mode=Self}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ></Setter>
+        <Setter Property="Text" Value="{Binding RealText, RelativeSource={RelativeSource Mode=Self}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Style.Triggers >
             <DataTrigger Binding="{Binding IsPlaceholderActive, RelativeSource={RelativeSource Mode=Self}}" Value="true" >
-                <Setter Property="Text" Value="{Binding PlaceholderProperties.Text, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
+                <Setter Property="Text" Value="{Binding PlaceholderProperties.Text, RelativeSource={RelativeSource Mode=Self}}" />
 
-                <Setter Property="AcceptsReturn" Value="{Binding PlaceholderProperties.AcceptsReturn, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="AcceptsTab" Value="{Binding PlaceholderProperties.AcceptsTab, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="FontFamily" Value="{Binding PlaceholderProperties.FontFamily, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="FontSize" Value="{Binding PlaceholderProperties.FontSize, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="FontStretch" Value="{Binding PlaceholderProperties.FontStretch, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="FontStyle" Value="{Binding PlaceholderProperties.FontStyle, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="FontWeight" Value="{Binding PlaceholderProperties.FontWeight, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="Foreground" Value="{Binding PlaceholderProperties.Foreground, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="TextAlignment" Value="{Binding PlaceholderProperties.TextAlignment, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="TextDecorations" Value="{Binding PlaceholderProperties.TextDecorations, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
-                <Setter Property="TextWrapping" Value="{Binding PlaceholderProperties.TextWrapping, RelativeSource={RelativeSource Mode=Self}}" ></Setter>
+                <Setter Property="AcceptsReturn" Value="{Binding PlaceholderProperties.AcceptsReturn, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="AcceptsTab" Value="{Binding PlaceholderProperties.AcceptsTab, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="FontFamily" Value="{Binding PlaceholderProperties.FontFamily, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="FontSize" Value="{Binding PlaceholderProperties.FontSize, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="FontStretch" Value="{Binding PlaceholderProperties.FontStretch, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="FontStyle" Value="{Binding PlaceholderProperties.FontStyle, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="FontWeight" Value="{Binding PlaceholderProperties.FontWeight, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="Foreground" Value="{Binding PlaceholderProperties.Foreground, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="TextAlignment" Value="{Binding PlaceholderProperties.TextAlignment, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="TextDecorations" Value="{Binding PlaceholderProperties.TextDecorations, RelativeSource={RelativeSource Mode=Self}}" />
+                <Setter Property="TextWrapping" Value="{Binding PlaceholderProperties.TextWrapping, RelativeSource={RelativeSource Mode=Self}}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

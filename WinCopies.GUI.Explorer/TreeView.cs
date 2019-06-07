@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.Util;
 using WinCopies.Util.Commands;
+using ApplicationCommands = System.Windows.Input.ApplicationCommands;
 
 namespace WinCopies.GUI.Explorer
 {

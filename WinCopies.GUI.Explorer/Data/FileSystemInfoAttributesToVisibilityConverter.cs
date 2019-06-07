@@ -16,7 +16,7 @@ namespace WinCopies.GUI.Explorer.Data
 
         {
 
-            get => booleanToVisibilityConverter ?? (booleanToVisibilityConverter = Generic.BooleanToVisibilityConverter);
+            get => booleanToVisibilityConverter ?? (booleanToVisibilityConverter = Themes. Generic.BooleanToVisibilityConverter);
 
             set => booleanToVisibilityConverter = value;
 

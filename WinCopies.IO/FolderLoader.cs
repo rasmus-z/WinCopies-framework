@@ -425,18 +425,18 @@ namespace WinCopies.IO
 
             }
 
-#if DEBUG
-
             catch (IOException ex)
             {
 
+#if DEBUG
+
                 Debug.WriteLine(ex.GetType().ToString() + " " + ex.Message);
+
+#endif
 
                 throw;
 
             }
-
-#endif
 
             paths.Sort(comp);
 

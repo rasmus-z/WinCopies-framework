@@ -13,6 +13,7 @@
                     xmlns:io="clr-namespace:WinCopies.IO;assembly=WinCopies.IO"
                     xmlns:guiWindows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
                     xmlns:dialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs"
+                    xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI"
                     xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"
                     xmlns:data="clr-namespace:WinCopies.GUI.Explorer.Data"
                     xmlns:dialogsData="clr-namespace:WinCopies.GUI.Windows.Dialogs.Data">
@@ -20,6 +21,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.controls;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/wincopies.gui.windows;component/Themes/Generic.xaml" />
         <ResourceDictionary>
 
             <!--String resources-->
@@ -419,7 +421,7 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type DataGridCell}" >
-                                    <TextBox Text="{Binding Mode=OneWay}" ></TextBox>
+                                    <TextBox Text="{Binding Mode=OneWay}" />
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -468,11 +470,12 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Orientation="Horizontal">
+                                <!--todo: commands instead of event handlers:-->
                                 <Button Click="PreviousButton_Click" IsEnabled="{Binding CanMoveToPreviousPath, RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                                    <Image Source="{Binding PreviousPathIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Image Source="WinCopies.GUI.Explorer;component/Resources/resultset_previous.png" />
                                 </Button>
                                 <Button Click="ForwardButton_Click" IsEnabled="{Binding CanMoveToNextPath, RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                                    <Image Source="{Binding NextPathIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Image Source="WinCopies.GUI.Explorer;component/Resources/resultset_next.png" />
                                 </Button>
                                 <controls:PopupMenuButton Header="▼" ItemsSource="{Binding History, RelativeSource={RelativeSource Mode=TemplatedParent}}">
                                     <controls:PopupMenuButton.ItemContainerStyle>
@@ -492,7 +495,7 @@
                                     </controls:PopupMenuButton.ItemContainerStyle>
                                 </controls:PopupMenuButton>
                                 <Button IsEnabled="{Binding CanMoveToParentPath, RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                                    <Image Source="{Binding ParentPathIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Image Source="WinCopies.GUI.Explorer;component/Resources/arrow_up.png" />
                                 </Button>
                             </StackPanel>
 
@@ -501,13 +504,13 @@
 
                             <Button Grid.Column="2" Click="Button_Click">
                                 <StackPanel Orientation="Horizontal">
-                                    <Image Source="{Binding FolderGoIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                                    <Image Source="WinCopies.GUI.Explorer;component/Resources/folder_go.png">
                                         <Image.Style>
                                             <Style TargetType="{x:Type Image}">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsLoading, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="true">
                                                         <!--todo: doesn't work-->
-                                                        <Setter Property="Source" Value="{Binding FolderCancelLoadingIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                        <Setter Property="Source" Value="WinCopies.GUI.Explorer;component/Resources/cancel.png" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -838,7 +841,9 @@
         </Setter>
     </Style>
 
-    <Style x:Shared="false" TargetType="{x:Type dialogs:FilePropertiesDialog}" BasedOn="{StaticResource {x:Type Window}}" >
+    <Style x:Shared="false" TargetType="{x:Type dialogs:FilePropertiesDialog}" BasedOn="{StaticResource {x:Type guiDialogs:DialogWindow}}" >
+        <Setter Property="DialogButton" Value="OK" />
+        <Setter Property="DefaultButton" Value="OK" />
         <Setter Property="Content" >
             <Setter.Value>
 
@@ -860,10 +865,10 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
-                            <Image Source="{Binding ShellObject.Thumbnail.BitmapSource}" Height="64" Width="64" />
-                            <TextBox Grid.Column="1" Text="{Binding Path, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=FileName, Mode=OneWay}" />
+                            <Image Source="{Binding ShellObject.ShellObject.Thumbnail.BitmapSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}}" Height="64" Width="64" />
+                            <TextBox Grid.Column="1" Text="{Binding ShellObject.Path, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=FileName, Mode=OneWay}" />
                             <Label Grid.Row="1" Content="{StaticResource FileType}" />
-                            <TextBox Grid.Column="1" Grid.Row="1" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=FileType, Mode=OneWay}" />
+                            <TextBox Grid.Column="1" Grid.Row="1" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding ShellObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=FileType, Mode=OneWay}" />
                             <Label Grid.Row="2" Content="{StaticResource OpenWith}" />
                             <DockPanel Grid.Column="1" Grid.Row="2">
                                 <StackPanel Orientation="Horizontal">
@@ -871,28 +876,28 @@
                                     <ComboBox IsEditable="True" SelectedItem="{Binding OpenWithSoftware.Path, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Mode=OneWay}" ItemsSource="{Binding OpenWithSoftwares, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Mode=OneWay}" />
                                 </StackPanel>
                                 <StackPanel DockPanel.Dock="Right" >
-                                    <Button Content="{StaticResource Define}" Command="{x:Static dialogs:FilePropertiesDialog.DefineOpenWithSoftware}" />
+                                    <Button Content="{StaticResource Define}" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="DefineOpenWithSoftware" />
                                     <Button Content="Search in Windows Store" />
                                 </StackPanel>
                             </DockPanel>
                             <Label Grid.Row="3" Content="{StaticResource Path}" />
                             <DockPanel Grid.Column="1" Grid.Row="3" >
                                 <StackPanel Orientation="Horizontal" >
-                                    <Image Source="{Binding Path, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=PathBitmapSource, Mode=OneWay}" Height="64" Width="64" />
-                                    <TextBox Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding Path, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=Path, Mode=OneWay}" />
+                                    <Image Source="{Binding ShellObject.Path, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=PathBitmapSource, Mode=OneWay}" Height="64" Width="64" />
+                                    <TextBox Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding ShellObject.Path, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=Path, Mode=OneWay}" />
                                 </StackPanel>
-                                <Button DockPanel.Dock="Right" Content="Move..." ></Button>
+                                <Button DockPanel.Dock="Right" Content="Move..." Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="MoveCurrentPath" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}}" />
                             </DockPanel>
                             <Label Grid.Row="4" Content="{StaticResource Size}" />
-                            <TextBox Grid.Column="1" Grid.Row="4" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=Size, Mode=OneWay}" />
+                            <TextBox Grid.Column="1" Grid.Row="4" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding ShellObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=Size, Mode=OneWay}" />
                             <Label Grid.Row="5" Content="{StaticResource SizeOnDisk}" />
-                            <TextBox Grid.Column="1" Grid.Row="5" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=SizeOnDisk, Mode=OneWay}" />
+                            <TextBox Grid.Column="1" Grid.Row="5" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding ShellObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=SizeOnDisk, Mode=OneWay}" />
                             <Label Grid.Row="6" Content="{StaticResource CreationTime}" />
-                            <TextBox Grid.Column="1" Grid.Row="6" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=CreationTime, Mode=OneWay}" />
+                            <TextBox Grid.Column="1" Grid.Row="6" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding ShellObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=CreationTime, Mode=OneWay}" />
                             <Label Grid.Row="7" Content="{StaticResource LastWriteTime}" />
-                            <TextBox Grid.Column="1" Grid.Row="7" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=LastWriteTime, Mode=OneWay}" />
+                            <TextBox Grid.Column="1" Grid.Row="7" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding ShellObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=LastWriteTime, Mode=OneWay}" />
                             <Label Grid.Row="8" Content="{StaticResource LastAccessTime}" />
-                            <TextBox Grid.Column="1" Grid.Row="8" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=LastAccessTime, Mode=OneWay}" />
+                            <TextBox Grid.Column="1" Grid.Row="8" Style="{StaticResource ReadOnlyTextBoxStyle}" Text="{Binding ShellObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FilePropertiesDialog}}, Converter={StaticResource ShellObjectInfoConverter}, ConverterParameter=LastAccessTime, Mode=OneWay}" />
                         </Grid>
                     </TabItem>
                     <TabItem Header="{StaticResource Details}" >
@@ -990,8 +995,6 @@
                 </TabControl>
             </Setter.Value>
         </Setter>
-        <Setter Property="DialogButton" Value="OKApplyCancel" />
-        <Setter Property="DefaultButton" Value="OK" />
     </Style>
 
     <Style TargetType="{x:Type dialogs:FilePropertyEditorDialog}" BasedOn="{StaticResource {x:Type Window}}" >
@@ -1018,7 +1021,7 @@
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <ContentPresenter Grid.ColumnSpan="2" Content="{Binding ExplorerControl, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FolderBrowserDialog}}}" />
+                        <local:ExplorerControl x:Name="PART_ExplorerControl" Grid.ColumnSpan="2" OpenFilesDirectly="False" />
                         <ContentPresenter Grid.ColumnSpan="2" Grid.Row="1" />
                         <TextBox Grid.ColumnSpan="2" Grid.Row="2" Text="{Binding Text, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FolderBrowserDialog}}}" />
                         <ComboBox Grid.ColumnSpan="2" Grid.Row="3" ItemsSource="{Binding Filters, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FolderBrowserDialog}}}" SelectedItem="{Binding ExplorerControl.Filter, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:FolderBrowserDialog}}, Converter={dialogsData:StringArrayToFoldersDialogFilterConverter}}" />
