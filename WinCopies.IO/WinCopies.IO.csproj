@@ -109,8 +109,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="WinCopies.Util, Version=1.0.0.0, Culture=neutral, PublicKeyToken=871c137cc337841c, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinCopies.Util.1.0.0\lib\net48\WinCopies.Util.dll</HintPath>
+    <Reference Include="WinCopies.Util, Version=1.1.0.0, Culture=neutral, PublicKeyToken=871c137cc337841c, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.Util.1.1.0\lib\net48\WinCopies.Util.dll</HintPath>
     </Reference>
     <Reference Include="Windows.ApplicationModel" />
     <Reference Include="Windows.Foundation" />

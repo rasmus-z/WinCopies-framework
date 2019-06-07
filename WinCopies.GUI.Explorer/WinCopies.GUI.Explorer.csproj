@@ -117,12 +117,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\WinCopies.GUI.Controls.dll</HintPath>
     </Reference>
+    <Reference Include="WinCopies.GUI.Windows, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\WinCopies.GUI.Windows.dll</HintPath>
+    </Reference>
     <Reference Include="WinCopies.IO, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\WinCopies.IO.dll</HintPath>
     </Reference>
-    <Reference Include="WinCopies.Util, Version=1.0.0.0, Culture=neutral, PublicKeyToken=871c137cc337841c, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinCopies.Util.1.0.0\lib\net48\WinCopies.Util.dll</HintPath>
+    <Reference Include="WinCopies.Util, Version=1.1.0.0, Culture=neutral, PublicKeyToken=871c137cc337841c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\WinCopies.Util\bin\Debug\WinCopies.Util.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -147,11 +152,11 @@
     <Compile Include="Data\ShowItemsCheckBoxConverter.cs" />
     <Compile Include="Data\StringArrayToFoldersDialogFilterConverter.cs" />
     <Compile Include="ExplorerControl.cs" />
-    <Compile Include="FilePropertiesDialog.cs" />
-    <Compile Include="FilePropertyEditorDialog.cs" />
+    <Compile Include="Dialogs\FilePropertiesDialog.cs" />
+    <Compile Include="Dialogs\FilePropertyEditorDialog.cs" />
     <Compile Include="FilePropertyGrid.cs" />
-    <Compile Include="FolderBrowserDialog.cs" />
-    <Compile Include="FolderBrowserDialogCommandButtonContentConverter.cs" />
+    <Compile Include="Dialogs\FolderBrowserDialog.cs" />
+    <Compile Include="Dialogs\FolderBrowserDialogCommandButtonContentConverter.cs" />
     <Compile Include="HistoryItemData.cs" />
     <Compile Include="IBrowsableObjectInfo.cs" />
     <Compile Include="Data\PathToItemsConverter.cs" />
@@ -203,13 +208,13 @@
     <Resource Include="Resources\cancel.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\resultset_previous.png" />
+    <Resource Include="Resources\resultset_previous.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\resultset_next.png" />
+    <Resource Include="Resources\resultset_next.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\arrow_up.png" />
+    <Resource Include="Resources\arrow_up.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\page_copy.png" />

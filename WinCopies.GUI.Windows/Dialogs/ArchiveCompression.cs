@@ -47,10 +47,6 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                 }
 
-                try
-
-                {
-
                     string sourcePath = archiveCompression.SourcePath;
 
                     string pathRoot = null;
@@ -84,10 +80,6 @@ namespace WinCopies.GUI.Windows.Dialogs
                         archiveCompression.isAutomaticPathChange = false;
 
                     }
-
-                }
-
-                catch (System.IO.IOException) { return; }
 
             }
 

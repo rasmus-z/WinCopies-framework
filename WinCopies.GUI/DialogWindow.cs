@@ -12,7 +12,7 @@ namespace WinCopies.GUI.Windows.Dialogs
     /// Logique d'interaction pour DialogBase.xaml. See the remarks section.
     /// </summary>
     /// <remarks>
-    /// This class implements the <see cref="CommonCommand"/> with the following string parameters: OK, Apply, Cancel, Yes, No. For more information about this behavior/design pattern, see the WinCopies website.
+    /// This class implements the <see cref="Commands.CommonCommand"/> with the following string parameters: OK, Apply, Cancel, Yes, No. For more information about this behavior/design pattern, see the WinCopies website.
     /// </remarks>
     public partial class DialogWindow : Window, ICommandSource
     {
@@ -24,6 +24,8 @@ namespace WinCopies.GUI.Windows.Dialogs
         {
             // MessageBox.Show(e.NewValue.ToString());
             if (((DialogWindow)d).DefaultButton != DefaultButton.None) throw new Exception("DefaultButton must be set to None in order to perform this action.");
+
+            // ((DialogWindow)d).DefaultButton = DefaultButton.None;
 
         }));
 
@@ -45,11 +47,11 @@ namespace WinCopies.GUI.Windows.Dialogs
         public static readonly DependencyProperty DefaultButtonProperty = DependencyProperty.Register(nameof(DefaultButton), typeof(DefaultButton), typeof(DialogWindow), new PropertyMetadata(DefaultButton.None, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {
 
-            var defaultButton = (DefaultButton)e.NewValue;
+            DefaultButton defaultButton = (DefaultButton)e.NewValue;
 
             if (defaultButton == DefaultButton.None) return;
 
-            var dialogButton = (DialogButton)d.GetValue(DialogButtonProperty);
+            DialogButton dialogButton = (DialogButton)d.GetValue(DialogButtonProperty);
 
             void throwArgumentException() => throw new ArgumentException("DefaultButton must be included in DialogButton value.");
 
@@ -149,7 +151,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             Title = title;
 
-            CommandBindings.Add(new CommandBinding(CommonCommand, OnCommandExecuted, OnCommandCanExecute));
+            CommandBindings.Add(new CommandBinding(Commands.CommonCommand, OnCommandExecuted, OnCommandCanExecute));
 
         }
 

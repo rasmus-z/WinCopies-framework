@@ -5,9 +5,9 @@ namespace WinCopies.GUI.Explorer
     public struct ScrollViewerOffset
     {
 
-        public double HorizontalOffset { get; set; }
+        public double HorizontalOffset { get; }
 
-        public double VerticalOffset { get; set; }
+        public double VerticalOffset { get; }
 
         public ScrollViewerOffset(double horizontalOffset, double verticalOffset)
 
@@ -47,6 +47,8 @@ namespace WinCopies.GUI.Explorer
 
     {
 
+        // todo:
+
         /// <summary>
         /// Gets the header of this history item.
         /// </summary>
@@ -68,7 +70,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Gets the header of this history item.
         /// </summary>
-        public string Header { get; } 
+        public string Header { get; }
 
         /// <summary>
         /// Gets a value that indicates whether this history item is an empty history item. When implemented in this struct, this property is always <see langword="false"/>.
@@ -78,7 +80,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Gets the path of this history item.
         /// </summary>
-        public IO.IBrowsableObjectInfo Path { get; } 
+        public IO.IBrowsableObjectInfo Path { get; }
 
         /// <summary>
         /// Gets the <see cref="WinCopies.GUI.Explorer. ScrollViewerOffset"/> of this history item.
@@ -88,7 +90,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Gets the selected items of this history item.
         /// </summary>
-        public IEnumerable<object> SelectedItems { get; } 
+        public IEnumerable<IBrowsableObjectInfo> SelectedItems { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HistoryItemData"/> class.
@@ -97,7 +99,7 @@ namespace WinCopies.GUI.Explorer
         /// <param name="path">The path of this history item.</param>
         /// <param name="scrollViewerOffset">The <see cref="WinCopies.GUI.Explorer. ScrollViewerOffset"/> of this history item.</param>
         /// <param name="selectedItems">The selected items of this history item.</param>
-        public HistoryItemData(string header, IO.IBrowsableObjectInfo path, ScrollViewerOffset scrollViewerOffset, IEnumerable<object> selectedItems) 
+        public HistoryItemData(string header, IO.IBrowsableObjectInfo path, ScrollViewerOffset scrollViewerOffset, IEnumerable<IBrowsableObjectInfo> selectedItems)
 
         {
 

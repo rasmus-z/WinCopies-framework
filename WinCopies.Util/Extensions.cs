@@ -464,7 +464,7 @@ namespace WinCopies.Util
 
             for (int i = 0; i < length; i++)
 
-                collection.RemoveAt(start + i);
+                collection.RemoveAt(start);
 
         }
 
@@ -1336,6 +1336,29 @@ namespace WinCopies.Util
         #endregion
 
         #endregion
+
+        /// <summary>
+        /// Checks if the current object is assignable from at least one type of a given <see cref="Type"/> array.
+        /// </summary>
+        /// <param name="obj">The object from which check the type</param>
+        /// <param name="typeEquality"><see langword="true"/> to preserve type equality, regardless of the type inheritance, otherwise <see langword="false"/></param>
+        /// <param name="types">The types to compare</param>
+        /// <returns><see langword="true"/> if the current object is assignable from at least one of the given types, otherwise <see langword="false"/>.</returns>
+        public static bool Is(this object obj, bool typeEquality, params Type[] types)
+
+        {
+
+            Type objType = obj.GetType();
+
+            foreach (Type type in types)
+
+                if (typeEquality ? objType == type : objType.IsAssignableFrom(type))
+
+                    return true;
+
+            return false;
+
+        }
 
         public static IEnumerable<TKey> GetKeys<TKey, TValue>(this KeyValuePair<TKey, TValue>[] array)
 

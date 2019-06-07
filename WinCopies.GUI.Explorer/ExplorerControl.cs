@@ -20,14 +20,12 @@ using TextBox = System.Windows.Controls.TextBox;
 using Clipboard = WinCopies.IO.Clipboard;
 using System.Windows.Interop;
 using System.ComponentModel;
-using System.Collections;
 using WinCopies.Util.Commands;
 using static WinCopies.Util.Util;
-using System.Activities.Statements;
 using WinCopies.Collections;
 using WinCopies.Util.Data;
 using MenuItem = WinCopies.Util.Data.MenuItem;
-using System.Runtime.InteropServices;
+using ApplicationCommands = System.Windows.Input.ApplicationCommands;
 
 namespace WinCopies.GUI.Explorer
 {
@@ -41,8 +39,16 @@ namespace WinCopies.GUI.Explorer
     public class ExplorerControl : Control
     {
 
+        // todo: to replace with data binding
+
+        /// <summary>
+        /// Gets this <see cref="ExplorerControl"/>'s <see cref="TreeView"/>.
+        /// </summary>
         public TreeView TreeView { get; private set; } = null;
 
+        /// <summary>
+        /// Gets this <see cref="ExplorerControl"/>'s <see cref="ListView"/>.
+        /// </summary>
         public ListView ListView { get; private set; } = null;
 
         private TextBox PART_TextBox = null;
@@ -86,56 +92,6 @@ namespace WinCopies.GUI.Explorer
         /// Gets or sets a value that indicates if this <see cref="ExplorerControl"/> is loading items. The <see cref="FrameworkElement.IsLoaded"/> property and the <see cref="FrameworkElement.Loaded"/> event are not concerned with this property. This is a dependency property.
         /// </summary>
         public bool IsLoading { get => (bool)GetValue(IsLoadingProperty); set => SetValue(IsLoadingPropertyKey, value); }
-
-        /// <summary>
-        /// Identifies the <see cref="PreviousPathIcon"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty PreviousPathIconProperty = DependencyProperty.Register(nameof(PreviousPathIcon), typeof(ImageSource), typeof(ExplorerControl), new PropertyMetadata(Properties.Resources.resultset_previous.ToImageSource()));
-
-        /// <summary>
-        /// Gets or sets the icon for the 'Previous path' button. This is a dependency property.
-        /// </summary>
-        public ImageSource PreviousPathIcon { get => (ImageSource)GetValue(PreviousPathIconProperty); set => SetValue(PreviousPathIconProperty, value); }
-
-        /// <summary>
-        /// Identifies the <see cref="NextPathIcon"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty NextPathIconProperty = DependencyProperty.Register(nameof(NextPathIcon), typeof(ImageSource), typeof(ExplorerControl), new PropertyMetadata(Properties.Resources.resultset_next.ToImageSource()));
-
-        /// <summary>
-        /// Gets or sets the icon for the 'Next path' button. This is a dependency property.
-        /// </summary>
-        public ImageSource NextPathIcon { get => (ImageSource)GetValue(NextPathIconProperty); set => SetValue(NextPathIconProperty, value); }
-
-        /// <summary>
-        /// Identifies the <see cref="ParentPathIcon"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ParentPathIconProperty = DependencyProperty.Register(nameof(ParentPathIcon), typeof(ImageSource), typeof(ExplorerControl), new PropertyMetadata(Properties.Resources.arrow_up.ToImageSource()));
-
-        /// <summary>
-        /// Gets or sets the icon for the 'Parent path' button. This is a dependency property.
-        /// </summary>
-        public ImageSource ParentPathIcon { get => (ImageSource)GetValue(ParentPathIconProperty); set => SetValue(ParentPathIconProperty, value); }
-
-        /// <summary>
-        /// Identifies the <see cref="FolderGoIcon"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty FolderGoIconProperty = DependencyProperty.Register(nameof(FolderGoIcon), typeof(ImageSource), typeof(ExplorerControl), new PropertyMetadata(Properties.Resources.folder_go.ToImageSource()));
-
-        /// <summary>
-        /// Gets or sets the icon for the 'Go to' button. This is a dependency property.
-        /// </summary>
-        public ImageSource FolderGoIcon { get => (ImageSource)GetValue(FolderGoIconProperty); set => SetValue(FolderGoIconProperty, value); }
-
-        /// <summary>
-        /// Identifies the <see cref="FolderCancelLoadingIcon"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty FolderCancelLoadingIconProperty = DependencyProperty.Register(nameof(FolderCancelLoadingIcon), typeof(ImageSource), typeof(ExplorerControl), new PropertyMetadata(Properties.Resources.cancel.ToImageSource()));
-
-        /// <summary>
-        /// Gets or sets the icon for the 'Go to' button when this button gets the 'Cancel folder loading' state. This is a dependency property.
-        /// </summary>
-        public ImageSource FolderCancelLoadingIcon { get => (ImageSource)GetValue(FolderCancelLoadingIconProperty); set => SetValue(FolderCancelLoadingIconProperty, value); }
 
         private static readonly DependencyPropertyKey HeaderPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Header), typeof(string), typeof(ExplorerControl), new PropertyMetadata(null));
 
@@ -358,6 +314,9 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public static readonly DependencyProperty CanCopyProperty = CanCopyPropertyKey.DependencyProperty;
 
+        /// <summary>
+        /// Gets a value that indicates whether a copy can be made.
+        /// </summary>
         public bool CanCopy => (bool)GetValue(CanCopyProperty);
 
         private static readonly DependencyPropertyKey CanCutPropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanCut), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
@@ -367,6 +326,9 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public static readonly DependencyProperty CanCutProperty = CanCutPropertyKey.DependencyProperty;
 
+        /// <summary>
+        /// Gets a value that indicates whether a cut can be made.
+        /// </summary>
         public bool CanCut => (bool)GetValue(CanCutProperty);
 
         private static readonly DependencyPropertyKey CanPastePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanPaste), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
@@ -376,6 +338,9 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public static readonly DependencyProperty CanPasteProperty = CanPastePropertyKey.DependencyProperty;
 
+        /// <summary>
+        /// Gets a value that indicates whether a paste action can be made.
+        /// </summary>
         public bool CanPaste => (bool)GetValue(CanPasteProperty);
 
         private static readonly DependencyPropertyKey CanRenamePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanRename), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
@@ -385,6 +350,9 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public static readonly DependencyProperty CanRenameProperty = CanRenamePropertyKey.DependencyProperty;
 
+        /// <summary>
+        /// Gets a value that indicates whether a rename can be made.
+        /// </summary>
         public bool CanRename => (bool)GetValue(CanRenameProperty);
 
         private static readonly DependencyPropertyKey CanDeletePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanDelete), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
@@ -394,6 +362,9 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public static readonly DependencyProperty CanDeleteProperty = CanDeletePropertyKey.DependencyProperty;
 
+        /// <summary>
+        /// Gets a value that indicates whether a deletion can be made.
+        /// </summary>
         public bool CanDelete => (bool)GetValue(CanDeleteProperty);
 
         // todo: to add a default implementation:
@@ -950,13 +921,13 @@ namespace WinCopies.GUI.Explorer
 
         private void Open(object value) => Open();
 
-        public LinkedList<MenuItem> GetDefaultListViewItemContextMenu()
+        public List<MenuItem> GetDefaultListViewItemContextMenu()
 
         {
 
-            LinkedList<MenuItem> menuItems = new LinkedList<MenuItem>();
+            List<MenuItem> menuItems = new List<MenuItem>();
 
-            MenuItem menuItem = new MenuItem(Generic.Open, null, new DelegateCommand { ExecuteDelegate = Open }, Path.SelectedItem, null);
+            MenuItem menuItem = new MenuItem(Themes.Generic.Open, null, new DelegateCommand { ExecuteDelegate = Open }, Path.SelectedItem, null);
 
             string extension = System.IO.Path.GetExtension(Path.SelectedItem.Path);
 
@@ -971,12 +942,12 @@ namespace WinCopies.GUI.Explorer
             }
 
             menuItems.AddRange(new MenuItem[] {menuItem,
-                new MenuItem(Generic.Copy, Properties.Resources.page_copy.ToImageSource(), new DelegateCommand{ ExecuteDelegate =    o => Copy(ActionsFromObjects.ListView) }, null, null),
-                new MenuItem(Generic.Cut, Properties.Resources.cut.ToImageSource(), new DelegateCommand{ ExecuteDelegate =    o => Cut(ActionsFromObjects.ListView) }, null, null),
-                new MenuItem(Generic.CreateShortcut, null, new DelegateCommand<ShellObjectInfo>{ ExecuteDelegate =    o => new ShellLink(o.Path, System.IO.Path.GetDirectoryName(o.Path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(o.Path) + ".lnk") }, Path.SelectedItem, null),
-                new MenuItem(Generic.Rename),
-                new MenuItem(Generic.Delete),
-                new MenuItem(Generic.Properties) });
+                new MenuItem(Themes. Generic.Copy, Properties.Resources.page_copy.ToImageSource(), new DelegateCommand{ ExecuteDelegate =    o => Copy(ActionsFromObjects.ListView) }, null, null),
+                new MenuItem(Themes. Generic.Cut, Properties.Resources.cut.ToImageSource(), new DelegateCommand{ ExecuteDelegate =    o => Cut(ActionsFromObjects.ListView) }, null, null),
+                new MenuItem(Themes. Generic.CreateShortcut, null, new DelegateCommand<ShellObjectInfo>{ ExecuteDelegate =    o => new ShellLink(o.Path, System.IO.Path.GetDirectoryName(o.Path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(o.Path) + ".lnk") }, Path.SelectedItem, null),
+                new MenuItem(Themes. Generic.Rename),
+                new MenuItem(Themes. Generic.Delete),
+                new MenuItem(Themes. Generic.Properties) });
 
             if (System.IO.Path.HasExtension(Path.SelectedItem.Path))
 
@@ -1328,7 +1299,7 @@ namespace WinCopies.GUI.Explorer
 
                         {
 
-                            Navigate(path, true);
+                            Navigate(path);
 
                             return true;
 
@@ -1362,7 +1333,7 @@ namespace WinCopies.GUI.Explorer
 
                                     {
 
-                                        Navigate(path, true);
+                                        Navigate(path);
 
                                         return true;
 
@@ -1452,7 +1423,7 @@ namespace WinCopies.GUI.Explorer
 
                     {
 
-                        Navigate(_path, true);
+                        Navigate(_path);
 
                         return true;
 
@@ -1547,9 +1518,9 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        public void Navigate(IBrowsableObjectInfo path, bool addPathToHistory) => Navigate(path, addPathToHistory, null);
+        public void Navigate(IBrowsableObjectInfo path) => Navigate(path, null);
 
-        public void Navigate(IBrowsableObjectInfo path, bool addPathToHistory, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
+        public void Navigate(IBrowsableObjectInfo path, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 
         {
 
@@ -1590,7 +1561,13 @@ namespace WinCopies.GUI.Explorer
 
             if (browsableObjectInfoItemsLoader == null)
 
-                browsableObjectInfoItemsLoader = path is ArchiveItemInfo || path.FileType == FileType.Archive ? (BrowsableObjectInfoItemsLoader)new ArchiveLoader(true, true, FileTypesFlags.All) : (BrowsableObjectInfoItemsLoader)new FolderLoader(true, true, FileTypesFlags.All);
+                if (path is ArchiveItemInfo || path.FileType == FileType.Archive)
+
+                    browsableObjectInfoItemsLoader = new ArchiveLoader(true, true, FileTypesFlags.All);
+
+                else
+
+                    browsableObjectInfoItemsLoader = new FolderLoader(true, true, FileTypesFlags.All);
 
             browsableObjectInfoItemsLoader.RunWorkerCompleted += BrowsableObjectInfoItemsLoader_RunWorkerCompleted;
 
@@ -1598,39 +1575,43 @@ namespace WinCopies.GUI.Explorer
 
 
 
-            if (addPathToHistory)
+            if (HistorySelectedIndex > 0)
 
-                history.Insert(0, new HistoryItemData(Header, path, ListView == null ? new ScrollViewerOffset(0, 0) : new ScrollViewerOffset(ListView.ScrollHost.HorizontalOffset, ListView.ScrollHost.VerticalOffset), null));
+                history.RemoveRange(0, HistorySelectedIndex);
 
-            else
+            //if (addPathToHistory)
 
-            {
+            history.Insert(0, new HistoryItemData(Header, path.Clone(), ListView == null ? new ScrollViewerOffset(0, 0) : new ScrollViewerOffset(ListView.ScrollHost.HorizontalOffset, ListView.ScrollHost.VerticalOffset), ListView?.SelectedItems.OfType<IBrowsableObjectInfo>()));
 
-                bool currentPathIsInHistory = false;
+            //else
 
-                foreach (IHistoryItemData historyItem in history)
+            //{
 
-                    if (historyItem is HistoryItemData && path.Path == ((HistoryItemData)historyItem).Path.Path)
+            //    bool currentPathIsInHistory = false;
 
-                    {
+            //    foreach (IHistoryItemData historyItem in history)
 
-                        SetValue(HistorySelectedIndexPropertyKey, HistorySelectedIndex + 1);
+            //        if (historyItem is HistoryItemData && path.Path == ((HistoryItemData)historyItem).Path.Path)
 
-                        currentPathIsInHistory = true;
+            //        {
 
-                    }
+            //            SetValue(HistorySelectedIndexPropertyKey, HistorySelectedIndex + 1);
 
-                if (!currentPathIsInHistory)
+            //            currentPathIsInHistory = true;
 
-                {
+            //        }
 
-                    history.RemoveRange(0, HistorySelectedIndex + 1);
+            //    if (!currentPathIsInHistory)
 
-                    SetValue(HistorySelectedIndexPropertyKey, 0);
+            //    {
 
-                }
+            //        history.RemoveRange(0, HistorySelectedIndex + 1);
 
-            }
+            //        SetValue(HistorySelectedIndexPropertyKey, 0);
+
+            //    }
+
+            //}
 
             SetValue(CanMoveToPreviousPathPropertyKey, history.Count > 1 && HistorySelectedIndex < history.Count - 1);
 
@@ -1968,9 +1949,9 @@ namespace WinCopies.GUI.Explorer
 
     {
 
-        public static RoutedUICommand Open { get; } = new RoutedUICommand(Generic.Open, nameof(Open), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.Enter) });
+        public static RoutedUICommand Open { get; } = new RoutedUICommand(Themes.Generic.Open, nameof(Open), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.Enter) });
 
-        public static RoutedUICommand EditProperty { get; } = new RoutedUICommand(Generic.EditProperty, nameof(EditProperty), typeof(Commands));
+        public static RoutedUICommand EditProperty { get; } = new RoutedUICommand(Themes.Generic.EditProperty, nameof(EditProperty), typeof(Commands));
 
         // todo:
 

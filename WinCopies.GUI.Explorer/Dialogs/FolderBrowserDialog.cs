@@ -32,19 +32,9 @@ namespace WinCopies.GUI.Windows.Dialogs
     public class FolderBrowserDialog : Window, ICommandSource
     {
 
-        /// <summary>
-        /// Identifies the <see cref="ExplorerControl"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ExplorerControlProperty = DependencyProperty.Register(nameof(ExplorerControl), typeof(ExplorerControl), typeof(FolderBrowserDialog), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
-        {
+        // todo: to replace with data binding
 
-            ExplorerControl explorerControl = (ExplorerControl)e.NewValue;
-
-            explorerControl.OpenFilesDirectly = false;
-
-        }));
-
-        public ExplorerControl ExplorerControl { get => (ExplorerControl)GetValue(ExplorerControlProperty); set => SetValue(ExplorerControlProperty, value); }
+        public ExplorerControl ExplorerControl { get; private set; }
 
         /// <summary>
         /// Identifies the <see cref="Text"/> dependency property.
@@ -103,27 +93,32 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 
 
-        public FolderBrowserDialog() => Init(FolderBrowserDialogMode.OpenFiles, SelectionMode.Single, System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
+        public FolderBrowserDialog() => Init(FolderBrowserDialogMode.OpenFiles, /*SelectionMode.Single,*/ System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
 
-        public FolderBrowserDialog(FolderBrowserDialogMode mode, SelectionMode selectionMode) => Init(mode, selectionMode, mode == FolderBrowserDialogMode.OpenFiles ? selectionMode != SelectionMode.Single ? Explorer.Themes.Generic.OpenFiles : Explorer.Themes.Generic.OpenFile : mode == FolderBrowserDialogMode.OpenFolder ? Explorer.Themes.Generic.OpenFolder : mode == FolderBrowserDialogMode.Save ? Explorer.Themes.Generic.Save : System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
+        public FolderBrowserDialog(FolderBrowserDialogMode mode, SelectionMode selectionMode) => Init(mode, /*selectionMode,*/ mode == FolderBrowserDialogMode.OpenFiles ? selectionMode != SelectionMode.Single ? Explorer.Themes.Generic.OpenFiles : Explorer.Themes.Generic.OpenFile : mode == FolderBrowserDialogMode.OpenFolder ? Explorer.Themes.Generic.OpenFolder : mode == FolderBrowserDialogMode.Save ? Explorer.Themes.Generic.Save : System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
 
-        public FolderBrowserDialog(string title) => Init(FolderBrowserDialogMode.OpenFiles, SelectionMode.Single, title);
+        public FolderBrowserDialog(string title) => Init(FolderBrowserDialogMode.OpenFiles, /*SelectionMode.Single,*/ title);
 
-        public FolderBrowserDialog(FolderBrowserDialogMode mode, SelectionMode selectionMode, string title) => Init(mode, selectionMode, title);
+        public FolderBrowserDialog(FolderBrowserDialogMode mode, /*SelectionMode selectionMode,*/ string title) => Init(mode, /*selectionMode,*/ title);
 
-        private void Init(FolderBrowserDialogMode mode, SelectionMode selectionMode, string title)
+        private void Init(FolderBrowserDialogMode mode, /*SelectionMode selectionMode,*/ string title)
 
         {
 
-            ExplorerControl = new ExplorerControl();
-
             Mode = mode;
-
-            ExplorerControl.SelectionMode = selectionMode;
 
             Title = title;
 
             //CommandBindings.Add(new CommandBinding(CommonCommand, OnCommandExecuted, OnCommandCanExecute));
+
+        }
+
+        public override void OnApplyTemplate()
+        {
+
+            base.OnApplyTemplate();
+
+            ExplorerControl = (ExplorerControl)Template.FindName($"PART_{nameof(ExplorerControl)}", this);
 
         }
 

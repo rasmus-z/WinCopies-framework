@@ -131,7 +131,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         static ComboInputBox() => DefaultStyleKeyProperty.OverrideMetadata(typeof(ComboInputBox), new FrameworkPropertyMetadata(typeof(ComboInputBox)));
 
-        public ComboInputBox() => CommandBindings.Add(new CommandBinding(Util.Util.CommonCommand, OnEvent));
+        public ComboInputBox() => CommandBindings.Add(new CommandBinding(Util.Commands.Commands.CommonCommand, OnEvent));
 
         protected virtual void OnTextChanged(TextChangedEventArgs e) => Command?.TryExecute(CommandParameter, CommandTarget);
 
