@@ -452,8 +452,10 @@ namespace WinCopies.Util
 
         }
 
+        // todo: to add null checks, out-of-range checks, ...
+
         /// <summary>
-        /// Removes multiple items in an <see cref="IList"/> collection, from a start index to a given length.
+        /// Removes multiple items in an <see cref="IList"/> collection, from a given start index for a given length.
         /// </summary>
         /// <param name="collection">The collection from which remove the items.</param>
         /// <param name="start">The start index in the collection from which delete the items.</param>

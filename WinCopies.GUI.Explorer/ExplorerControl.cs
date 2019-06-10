@@ -1520,7 +1520,13 @@ namespace WinCopies.GUI.Explorer
 
         public void Navigate(IBrowsableObjectInfo path) => Navigate(path, null);
 
-        public void Navigate(IBrowsableObjectInfo path, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
+        public virtual void Navigate(IBrowsableObjectInfo path, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader) => NavigateInternal(path, browsableObjectInfoItemsLoader, true);
+
+        public void NavigateToHistoryIndex(int index) => NavigateToHistoryIndex(index, null);
+
+        public virtual void NavigateToHistoryIndex(int index, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader) => NavigateInternal((IBrowsableObjectInfo)((HistoryItemData)History[index]).Path, browsableObjectInfoItemsLoader, false);
+
+        private void NavigateInternal(IBrowsableObjectInfo path, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader, bool addPathToHistory)
 
         {
 
@@ -1575,13 +1581,17 @@ namespace WinCopies.GUI.Explorer
 
 
 
-            if (HistorySelectedIndex > 0)
+            if (addPathToHistory)
 
-                history.RemoveRange(0, HistorySelectedIndex);
+            {
 
-            //if (addPathToHistory)
+                if (HistorySelectedIndex > 0)
 
-            history.Insert(0, new HistoryItemData(Header, path.Clone(), ListView == null ? new ScrollViewerOffset(0, 0) : new ScrollViewerOffset(ListView.ScrollHost.HorizontalOffset, ListView.ScrollHost.VerticalOffset), ListView?.SelectedItems.OfType<IBrowsableObjectInfo>()));
+                    history.RemoveRange(0, HistorySelectedIndex);
+
+                history.Insert(0, new HistoryItemData(Header, path.Clone(), ListView == null ? new ScrollViewerOffset(0, 0) : new ScrollViewerOffset(ListView.ScrollHost.HorizontalOffset, ListView.ScrollHost.VerticalOffset), ListView?.SelectedItems.OfType<IBrowsableObjectInfo>()));
+
+            }
 
             //else
 

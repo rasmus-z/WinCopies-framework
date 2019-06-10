@@ -44,27 +44,51 @@ namespace WinCopies.Util
 
         public static KeyValuePair<TKey, Func<bool>> GetIfKeyValuePairPredicate<TKey>(TKey key, Func<bool> predicate) => new KeyValuePair<TKey, Func<bool>>(key, predicate);
 
+        /// <summary>
+        /// Comparison types for the If functions.
+        /// </summary>
         public enum ComparisonType
 
         {
 
+            /// <summary>
+            /// Check if all conditions are checked.
+            /// </summary>
             And = 0,
 
+            /// <summary>
+            /// Check if at least one condition is checked.
+            /// </summary>
             Or = 1,
 
+            /// <summary>
+            /// Check if exactly one condition is checked.
+            /// </summary>
             Xor = 2
 
         }
 
+        /// <summary>
+        /// Comparison modes for the If functions.
+        /// </summary>
         public enum ComparisonMode
         {
 
+            /// <summary>
+            /// Use a binary comparison
+            /// </summary>
             Binary = 0,
 
+            /// <summary>
+            /// Use a logical comparison
+            /// </summary>
             Logical = 1
 
         }
 
+        /// <summary>
+        /// Comparison to perform.
+        /// </summary>
         public enum Comparison
 
         {
@@ -79,7 +103,9 @@ namespace WinCopies.Util
 
             Greater = 4,
 
-            GreaterOrEqual = 5
+            GreaterOrEqual = 5,
+
+            ReferenceEqual = 6
 
         }
 
@@ -95,9 +121,52 @@ namespace WinCopies.Util
 
         }
 
-        private static bool CheckIfComparison(Comparison comparison, bool predicateResult, int result) => comparison == Comparison.Equal ? predicateResult && result == 0 : comparison == Comparison.LesserOrEqual ? result <= 0 : comparison == Comparison.GreaterOrEqual ? result >= 0 : comparison == Comparison.Lesser ? !predicateResult && result < 0 : comparison == Comparison.Greater ? !predicateResult && result > 0 : comparison == Comparison.NotEqual ? !predicateResult && result != 0 : false;//: comparisonType == ComparisonType.Or ?//(result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||//    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||//    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))
+        private static bool CheckIfComparison(Comparison comparison, bool predicateResult, int result)
+        {
+            switch (comparison)
 
-        private static bool CheckEqualityComparison(Comparison comparison, bool predicateResult, bool result) => (predicateResult && result && comparison == Comparison.Equal) || (!(predicateResult || result) && comparison == Comparison.NotEqual);
+            {
+
+                case Comparison.Equal:
+                case Comparison.ReferenceEqual:
+
+                    return predicateResult && result == 0;
+
+                case Comparison.LesserOrEqual:
+
+                    return result <= 0;
+
+                case Comparison.GreaterOrEqual:
+
+                    return result >= 0;
+
+                case Comparison.Lesser:
+
+                    return !predicateResult && result < 0;
+
+                case Comparison.Greater:
+
+                    return !predicateResult && result > 0;
+
+                case Comparison.NotEqual:
+
+                    return !predicateResult && result != 0;
+
+                default:
+
+                    return false;//: comparisonType == ComparisonType.Or ?//(result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||//    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||//    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))
+
+            }
+        }
+
+        private static bool CheckEqualityComparison(Comparison comparison, object value, bool predicateResult, bool result)
+        {
+
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
+
+            return (predicateResult && result && (comparison == Comparison.Equal || comparison == Comparison.ReferenceEqual)) || (!(predicateResult || result) && comparison == Comparison.NotEqual);
+
+        }
 
         // todo: factoriser au maximum
 
@@ -132,6 +201,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             bool result;
 
@@ -241,6 +314,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             bool result;
 
@@ -353,11 +430,13 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)}, {nameof(Comparison.NotEqual)} or {nameof(Comparison.ReferenceEqual)}");
+
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
 
             bool result;
 
@@ -371,7 +450,7 @@ namespace WinCopies.Util
 
                 foreach (object _value in values)
 
-                    if (!CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (!CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
 
                     {
 
@@ -395,7 +474,7 @@ namespace WinCopies.Util
 
                 foreach (object _value in values)
 
-                    if (CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
 
                     {
 
@@ -426,7 +505,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
 
                     {
 
@@ -436,7 +515,7 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckEqualityComparison(comparison, predicate(__value), equalityComparer.Equals(_value, value)))
+                            if (CheckEqualityComparison(comparison, __value, predicate(__value), comparison == Comparison.Equal ? equalityComparer.Equals(__value, value) : object.ReferenceEquals(__value, value)))
 
                             {
 
@@ -467,6 +546,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             bool result;
 
@@ -576,6 +659,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             bool result;
 
@@ -688,11 +775,13 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
 
                 // todo:
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
+
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
 
             bool result;
 
@@ -706,7 +795,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                    if (!CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
 
                     {
 
@@ -730,7 +819,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, Func<bool>> _value in values)
 
-                    if (CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
 
                     {
 
@@ -761,7 +850,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
 
                     {
 
@@ -771,7 +860,7 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckEqualityComparison(comparison, __value.Value(), equalityComparer.Equals(__value.Key, value)))
+                            if (CheckEqualityComparison(comparison, __value.Key, __value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Key, value) : object.ReferenceEquals(__value.Key, value)))
 
                             {
 
@@ -826,6 +915,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             object _key = null;
 
@@ -949,6 +1042,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             object _key = null;
 
@@ -1075,11 +1172,13 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
 
                 // todo:
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
+
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
 
             object _key = null;
 
@@ -1095,7 +1194,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, object> _value in values)
 
-                    if (!CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
 
                     {
 
@@ -1123,7 +1222,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, object> _value in values)
 
-                    if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
 
                     {
 
@@ -1158,7 +1257,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
 
                     {
 
@@ -1168,7 +1267,7 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                            if (CheckEqualityComparison(comparison, __value.Value, predicate(__value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Value, value) : object.ReferenceEquals(__value.Value, value)))
 
                             {
 
@@ -1203,6 +1302,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             object _key = null;
 
@@ -1326,6 +1429,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             object _key = null;
 
@@ -1452,11 +1559,13 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
 
                 // todo:
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
+
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
 
             object _key = null;
 
@@ -1472,7 +1581,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
 
-                    if (!CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
 
                     {
 
@@ -1500,7 +1609,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
 
-                    if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
 
                     {
 
@@ -1535,7 +1644,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
 
                     {
 
@@ -1545,7 +1654,7 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                            if (CheckEqualityComparison(comparison, __value.Value.Key, __value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Value.Key, value) : object.ReferenceEquals(__value.Value.Key, value)))
 
                             {
 
@@ -1608,6 +1717,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             bool result;
 
@@ -1717,6 +1830,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             bool result;
 
@@ -1829,11 +1946,13 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
 
                 // todo:
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
+
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
 
             bool result;
 
@@ -1847,7 +1966,7 @@ namespace WinCopies.Util
 
                 foreach (T _value in values)
 
-                    if (!CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (!CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
 
                     {
 
@@ -1871,7 +1990,7 @@ namespace WinCopies.Util
 
                 foreach (T _value in values)
 
-                    if (CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
 
                     {
 
@@ -1902,7 +2021,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckEqualityComparison(comparison, predicate(_value), equalityComparer.Equals(_value, value)))
+                    if (CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
 
                     {
 
@@ -1912,7 +2031,7 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckEqualityComparison(comparison, predicate(__value), equalityComparer.Equals(_value, value)))
+                            if (CheckEqualityComparison(comparison, _value, predicate(__value), comparison == Comparison.Equal ? equalityComparer.Equals(__value, value) : object.ReferenceEquals(__value, value)))
 
                             {
 
@@ -1943,6 +2062,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             bool result;
 
@@ -2052,6 +2175,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             bool result;
 
@@ -2164,11 +2291,13 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
 
                 // todo:
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
+
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
 
             bool result;
 
@@ -2182,7 +2311,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                    if (!CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
 
                     {
 
@@ -2206,7 +2335,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<T, Func<bool>> _value in values)
 
-                    if (CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
 
                     {
 
@@ -2237,7 +2366,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckEqualityComparison(comparison, _value.Value(), equalityComparer.Equals(_value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
 
                     {
 
@@ -2247,7 +2376,7 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckEqualityComparison(comparison, __value.Value(), equalityComparer.Equals(__value.Key, value)))
+                            if (CheckEqualityComparison(comparison, __value.Key, __value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Key, value) : object.ReferenceEquals(__value.Key, value)))
 
                             {
 
@@ -2302,6 +2431,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             TKey _key = default;
 
@@ -2425,6 +2558,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             TKey _key = default;
 
@@ -2551,11 +2688,13 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
 
                 // todo:
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
+
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
 
             TKey _key = default;
 
@@ -2571,7 +2710,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<TKey, TValue> _value in values)
 
-                    if (!CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
 
                     {
 
@@ -2599,7 +2738,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<TKey, TValue> _value in values)
 
-                    if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
 
                     {
 
@@ -2634,7 +2773,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
 
                     {
 
@@ -2644,7 +2783,7 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckEqualityComparison(comparison, predicate(_value.Value), equalityComparer.Equals(_value.Value, value)))
+                            if (CheckEqualityComparison(comparison, __value.Value, predicate(__value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Value, value) : object.ReferenceEquals(__value.Value, value)))
 
                             {
 
@@ -2679,6 +2818,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             TKey _key = default;
 
@@ -2802,6 +2945,10 @@ namespace WinCopies.Util
             // First, we check if comparisonType and comparison are in the required value range.
 
             ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual)
+
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
             TKey _key = default;
 
@@ -2928,11 +3075,13 @@ namespace WinCopies.Util
 
             comparisonMode.ThrowIfNotValidEnumValue();
 
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual))
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
 
                 // todo:
 
                 throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
+
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
 
             TKey _key = default;
 
@@ -2948,7 +3097,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
 
-                    if (!CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (!CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
 
                     {
 
@@ -2976,7 +3125,7 @@ namespace WinCopies.Util
 
                 foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
 
-                    if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
 
                     {
 
@@ -3011,7 +3160,7 @@ namespace WinCopies.Util
 
                     result = true;
 
-                    if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                    if (CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
 
                     {
 
@@ -3021,7 +3170,7 @@ namespace WinCopies.Util
 
                             __value = values[j];
 
-                            if (CheckEqualityComparison(comparison, _value.Value.Value(), equalityComparer.Equals(_value.Value.Key, value)))
+                            if (CheckEqualityComparison(comparison, __value.Value.Key, __value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Value.Key, value) : object.ReferenceEquals(__value.Value.Key, value)))
 
                             {
 

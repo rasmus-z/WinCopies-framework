@@ -190,29 +190,9 @@ namespace WinCopies.GUI.Explorer.Themes
 
         public static ResourceDictionary ResourceDictionary { get; } = Util.Generic.AddNewDictionary("/WinCopies.GUI.Explorer;component/Themes/Generic.xaml");
 
-        private void PreviousButton_Click(object sender, RoutedEventArgs e)
+        private void PreviousButton_Click(object sender, RoutedEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).NavigateToHistoryIndex(((ExplorerControl)((FrameworkElement)sender).TemplatedParent).HistorySelectedIndex + 1);
 
-        {
-
-            IHistoryItemData historyItem = ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).History[((ExplorerControl)((FrameworkElement)sender).TemplatedParent).HistorySelectedIndex + 1];
-
-            if (historyItem is HistoryItemData)
-
-                ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Navigate((IBrowsableObjectInfo)((HistoryItemData)historyItem).Path, false);
-
-        }
-
-        private void ForwardButton_Click(object sender, RoutedEventArgs e)
-
-        {
-
-            IHistoryItemData historyitem = ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).History[((ExplorerControl)((FrameworkElement)sender).TemplatedParent).HistorySelectedIndex - 1];
-
-            if (historyitem is IHistoryItemData)
-
-                ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).Navigate((IBrowsableObjectInfo)((HistoryItemData)historyitem).Path, false);
-
-        }
+        private void ForwardButton_Click(object sender, RoutedEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).NavigateToHistoryIndex(((ExplorerControl)((FrameworkElement)sender).TemplatedParent).HistorySelectedIndex - 1);
 
         private void ListView_MouseDoubleClick(object sender, RoutedEventArgs e)
 
