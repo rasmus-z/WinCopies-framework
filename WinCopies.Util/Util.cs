@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
@@ -36,13 +37,25 @@ namespace WinCopies.Util
 
         public static Predicate<T> GetCommonPredicate<T>() => (T value) => true;
 
+        public static void ThrowOnNotValidEnumValue(params Enum[] values)
+
+        {
+
+            foreach (Enum value in values)
+
+                value.ThrowIfNotValidEnumValue();
+
+        }
+
         // public static KeyValuePair<TKey, Func<bool>>[] GetIfKeyValuePairPredicateArray<TKey>(params KeyValuePair<TKey, Func<bool>>[] keyValuePairs) => keyValuePairs;
 
-        #region IfAnd, IfOr and IfXor
+        #region 'If' methods
 
         public static KeyValuePair<TKey, TValue> GetKeyValuePair<TKey, TValue>(TKey key, TValue value) => new KeyValuePair<TKey, TValue>(key, value);
 
         public static KeyValuePair<TKey, Func<bool>> GetIfKeyValuePairPredicate<TKey>(TKey key, Func<bool> predicate) => new KeyValuePair<TKey, Func<bool>>(key, predicate);
+
+        #region Enums
 
         /// <summary>
         /// Comparison types for the If functions.
@@ -93,33 +106,104 @@ namespace WinCopies.Util
 
         {
 
+            /// <summary>
+            /// Check for values equality
+            /// </summary>
             Equal = 0,
 
+            /// <summary>
+            /// Check for values non-equality
+            /// </summary>
             NotEqual = 1,
 
+            /// <summary>
+            /// Check if a value is lesser than a given value. This field only works for methods that use lesser/greater/equal comparers.
+            /// </summary>
             Lesser = 2,
 
+            /// <summary>
+            /// Check if a value is lesser than or equal to a given value. This field only works for methods that use lesser/greater/equal comparers.
+            /// </summary>
             LesserOrEqual = 3,
 
+            /// <summary>
+            /// Check if a value is greater than a given value. This field only works for methods that use lesser/greater/equal comparers.
+            /// </summary>
             Greater = 4,
 
+            /// <summary>
+            /// Check if a value is greater than or equal to a given value. This field only works for methods that use lesser/greater/equal comparers.
+            /// </summary>
             GreaterOrEqual = 5,
 
+            /// <summary>
+            /// Check if an object reference is equal to a given object reference. This field only works for methods that use equality comparers (not lesser/greater ones).
+            /// </summary>
             ReferenceEqual = 6
 
         }
 
-        private static void ThrowIfNotValidEnumValue(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison)
+        #endregion
+
+        #region 'Throw' methods
+
+        private static void ThrowOnInvalidIfMethodArg(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison)
 
         {
 
-            comparisonType.ThrowIfNotValidEnumValue();
+            ThrowOnNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-            comparisonMode.ThrowIfNotValidEnumValue();
+            if (comparison == Comparison.ReferenceEqual)
 
-            comparison.ThrowIfNotValidEnumValue();
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
 
         }
+
+        private static void ThrowOnInvalidEqualityIfMethodEnumValue(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison)
+
+        {
+
+            ThrowOnNotValidEnumValue(comparisonType, comparisonMode);
+
+            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
+
+                // todo:
+
+                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)}, {nameof(Comparison.NotEqual)} or {nameof(Comparison.ReferenceEqual)}");
+
+        }
+
+        private static void ThrowOnInvalidEqualityIfMethodArg(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Type valueType, IEqualityComparer equalityComparer)
+
+        {
+
+            ThrowOnInvalidEqualityIfMethodEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual && equalityComparer != null)
+
+                throw new ArgumentException($"{nameof(equalityComparer)} have to be set to null in order to use this method with the {nameof(Comparison.ReferenceEqual)} enum value.");
+
+            if (comparison == Comparison.ReferenceEqual && !valueType.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
+
+        }
+
+        private static void ThrowOnInvalidEqualityIfMethodArg<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<T> equalityComparer)
+
+        {
+
+            ThrowOnInvalidEqualityIfMethodEnumValue(comparisonType, comparisonMode, comparison);
+
+            if (comparison == Comparison.ReferenceEqual && equalityComparer != null)
+
+                throw new ArgumentException($"{nameof(equalityComparer)} have to be set to null in order to use this method with the {nameof(Comparison.ReferenceEqual)} enum value.");
+
+            if (comparison == Comparison.ReferenceEqual && !typeof(T).IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
+
+        }
+
+        #endregion
+
+        #region 'Check comparison' methods
 
         private static bool CheckIfComparison(Comparison comparison, bool predicateResult, int result)
         {
@@ -159,12 +243,1395 @@ namespace WinCopies.Util
             }
         }
 
-        private static bool CheckEqualityComparison(Comparison comparison, object value, bool predicateResult, bool result)
+        private static bool CheckEqualityComparison(Comparison comparison, object value, object valueToCompare, bool predicateResult, IEqualityComparer equalityComparer)
         {
 
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
+            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
 
-            return (predicateResult && result && (comparison == Comparison.Equal || comparison == Comparison.ReferenceEqual)) || (!(predicateResult || result) && comparison == Comparison.NotEqual);
+            switch (comparison)
+
+            {
+
+                case Comparison.Equal:
+
+                    return predicateResult && equalityComparer.Equals(value, valueToCompare);
+
+                case Comparison.NotEqual:
+
+                    return !predicateResult && !equalityComparer.Equals(value, valueToCompare);
+
+                case Comparison.ReferenceEqual:
+
+#pragma warning disable IDE0002
+                    return object.ReferenceEquals(value, valueToCompare);
+#pragma warning restore IDE0002
+
+                default:
+
+                    return false;
+
+            }
+
+        }
+
+        private static bool CheckEqualityComparison<T>(Comparison comparison, T value, T valueToCompare, bool predicateResult, IEqualityComparer<T> equalityComparer)
+        {
+
+            // Because we've already checked that for the 'T' type in the 'If' method and assuming that 'T' is the base type of all the values to test, if 'T' is actually a class, we don't need to check here if the type of the current value is actually a class when comparison is set to ReferenceEqual.
+
+            switch (comparison)
+
+            {
+
+                case Comparison.Equal:
+
+                    return predicateResult && equalityComparer.Equals(value, valueToCompare);
+
+                case Comparison.NotEqual:
+
+                    return !predicateResult && !equalityComparer.Equals(value, valueToCompare);
+
+                case Comparison.ReferenceEqual:
+
+#pragma warning disable IDE0002
+                    return object.ReferenceEquals(value, valueToCompare);
+#pragma warning restore IDE0002
+
+                default:
+
+                    return false;
+
+            }
+
+        }
+
+        private delegate bool CheckIfComparisonDelegate(object value, Func<bool> predicate);
+
+        private delegate bool CheckIfComparisonDelegate<T>(T value, Func<bool> predicate);
+
+        #endregion
+
+        #region Enumerables
+
+        private interface IIfValuesEnumerable : IEnumerable<KeyValuePair<object, Func<bool>>>
+        {
+
+            Array Array { get; }
+
+            KeyValuePair<object, Func<bool>> GetValue(int index);
+
+        }
+
+        private class IfValuesEnumerable : IIfValuesEnumerable
+        {
+
+            private static KeyValuePair<object, Func<bool>> GetValue(object[] array, int index, Predicate<object> predicate)
+
+            {
+
+                object result = array[index];
+
+                return new KeyValuePair<object, Func<bool>>(result, () => predicate(result));
+
+            }
+
+            private class IfValuesEnumerator : IEnumerator<KeyValuePair<object, Func<bool>>>
+            {
+
+                private int _currentIndex;
+
+                public KeyValuePair<object, Func<bool>> Current => GetValue(_array, _currentIndex, _predicate);
+
+                object IEnumerator.Current => Current;
+
+                private object[] _array;
+
+                private Predicate<object> _predicate;
+
+                public IfValuesEnumerator(object[] array) => _array = array;
+
+                public bool MoveNext()
+                {
+
+                    if (_currentIndex == _array.Length)
+
+                        return false;
+
+                    _currentIndex++;
+
+                    return true;
+
+                }
+
+                public void Reset() => _currentIndex = -1;
+
+                public void Dispose() { }
+            }
+
+            public object[] Array { get; }
+
+            Array IIfValuesEnumerable.Array => Array;
+
+            public Predicate<object> Predicate { get; }
+
+            public IfValuesEnumerable(object[] array, Predicate<object> predicate)
+            {
+
+                Array = array;
+
+                Predicate = predicate;
+
+            }
+
+            public IEnumerator<KeyValuePair<object, Func<bool>>> GetEnumerator() => new IfValuesEnumerator((object[])Array);
+
+            IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
+
+            public KeyValuePair<object, Func<bool>> GetValue(int index) => GetValue(Array, index, Predicate);
+
+        }
+
+        private class IfKeyValuePairEnumerable : IIfValuesEnumerable
+        {
+
+            private class IfKeyValuePairEnumerator : IEnumerator<KeyValuePair<object, Func<bool>>>
+            {
+
+                private int _currentIndex;
+
+                private KeyValuePair<object, Func<bool>>[] _array;
+
+                public KeyValuePair<object, Func<bool>> Current => _array[_currentIndex];
+
+                public IfKeyValuePairEnumerator(KeyValuePair<object, Func<bool>>[] array) => _array = array;
+
+                object IEnumerator.Current => Current;
+
+                public void Dispose() { }
+
+                public bool MoveNext()
+                {
+
+                    if (_currentIndex == _array.Length)
+
+                        return false;
+
+                    _currentIndex++;
+
+                    return true;
+
+                }
+
+                public void Reset() => _currentIndex = -1;
+
+            }
+
+            public KeyValuePair<object, Func<bool>>[] Array { get; }
+
+            Array IIfValuesEnumerable.Array => Array;
+
+            public IfKeyValuePairEnumerable(KeyValuePair<object, Func<bool>>[] array) => Array = array;
+
+            public IEnumerator<KeyValuePair<object, Func<bool>>> GetEnumerator() => new IfKeyValuePairEnumerator(Array);
+
+            IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
+
+            public KeyValuePair<object, Func<bool>> GetValue(int index) => Array[index];
+
+        }
+
+        private interface IIfKeyValuesEnumerable : IEnumerable<KeyValuePair<object, KeyValuePair<object, Func<bool>>>>
+        {
+
+            Array Array { get; }
+
+            KeyValuePair<object, KeyValuePair<object, Func<bool>>> GetValue(int index);
+
+        }
+
+        private class IfKeyValuesEnumerable : IIfKeyValuesEnumerable
+        {
+
+            private static KeyValuePair<object, KeyValuePair<object, Func<bool>>> GetValue(KeyValuePair<object, object>[] array, int index, Predicate<object> predicate)
+
+            {
+
+                KeyValuePair<object, object> result = array[index];
+
+                return new KeyValuePair<object, KeyValuePair<object, Func<bool>>>(result.Key, new KeyValuePair<object, Func<bool>>(result.Value, () => predicate(result.Value)));
+
+            }
+
+            private class IfKeyValuesEnumerator : IEnumerator<KeyValuePair<object, KeyValuePair<object, Func<bool>>>>
+            {
+
+                private int _currentIndex;
+
+                public KeyValuePair<object, KeyValuePair<object, Func<bool>>> Current => GetValue(_array, _currentIndex, _predicate);
+
+                object IEnumerator.Current => Current;
+
+                private KeyValuePair<object, object>[] _array;
+
+                private Predicate<object> _predicate;
+
+                public IfKeyValuesEnumerator(KeyValuePair<object, object>[] array) => _array = array;
+
+                public bool MoveNext()
+                {
+
+                    if (_currentIndex == _array.Length)
+
+                        return false;
+
+                    _currentIndex++;
+
+                    return true;
+
+                }
+
+                public void Reset() => _currentIndex = -1;
+
+                public void Dispose() { }
+            }
+
+            public KeyValuePair<object, object>[] Array { get; }
+
+            Array IIfKeyValuesEnumerable.Array => Array;
+
+            public Predicate<object> Predicate { get; }
+
+            public IfKeyValuesEnumerable(KeyValuePair<object, object>[] array, Predicate<object> predicate)
+            {
+
+                Array = array;
+
+                Predicate = predicate;
+
+            }
+
+            public IEnumerator<KeyValuePair<object, KeyValuePair<object, Func<bool>>>> GetEnumerator() => new IfKeyValuesEnumerator((KeyValuePair<object, object>[])Array);
+
+            IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
+
+            public KeyValuePair<object, KeyValuePair<object, Func<bool>>> GetValue(int index) => GetValue(Array, index, Predicate);
+
+        }
+
+        private class IfKeyKeyValuePairEnumerable : IIfKeyValuesEnumerable
+        {
+
+            private class IfKeyKeyValuePairEnumerator : IEnumerator<KeyValuePair<object, KeyValuePair<object, Func<bool>>>>
+            {
+
+                private int _currentIndex;
+
+                private KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] _array;
+
+                public KeyValuePair<object, KeyValuePair<object, Func<bool>>> Current => _array[_currentIndex];
+
+                public IfKeyKeyValuePairEnumerator(KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] array) => _array = array;
+
+                object IEnumerator.Current => Current;
+
+                public void Dispose() { }
+
+                public bool MoveNext()
+                {
+
+                    if (_currentIndex == _array.Length)
+
+                        return false;
+
+                    _currentIndex++;
+
+                    return true;
+
+                }
+
+                public void Reset() => _currentIndex = -1;
+
+            }
+
+            public KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] Array { get; }
+
+            Array IIfKeyValuesEnumerable.Array => Array;
+
+            public IfKeyKeyValuePairEnumerable(KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] array) => Array = array;
+
+            public IEnumerator<KeyValuePair<object, KeyValuePair<object, Func<bool>>>> GetEnumerator() => new IfKeyKeyValuePairEnumerator(Array);
+
+            IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
+
+            public KeyValuePair<object, KeyValuePair<object, Func<bool>>> GetValue(int index) => Array[index];
+
+        }
+
+        private interface IIfValuesEnumerable<T> : IEnumerable<KeyValuePair<T, Func<bool>>>
+        {
+
+            Array Array { get; }
+
+            KeyValuePair<T, Func<bool>> GetValue(int index);
+
+        }
+
+        private class IfValuesEnumerable<T> : IIfValuesEnumerable<T>
+        {
+
+            private static KeyValuePair<T, Func<bool>> GetValue(T[] array, int index, Predicate<T> predicate)
+
+            {
+
+                T result = array[index];
+
+                return new KeyValuePair<T, Func<bool>>(result, () => predicate(result));
+
+            }
+
+            private class IfValuesEnumerator : IEnumerator<KeyValuePair<T, Func<bool>>>
+            {
+
+                private int _currentIndex;
+
+                public KeyValuePair<T, Func<bool>> Current => GetValue((T[])_array, _currentIndex, _predicate);
+
+                object IEnumerator.Current => Current;
+
+                private T[] _array;
+
+                private Predicate<T> _predicate;
+
+                public IfValuesEnumerator(T[] array) => _array = array;
+
+                public bool MoveNext()
+                {
+
+                    if (_currentIndex == _array.Length)
+
+                        return false;
+
+                    _currentIndex++;
+
+                    return true;
+
+                }
+
+                public void Reset() => _currentIndex = -1;
+
+                public void Dispose() { }
+            }
+
+            public T[] Array { get; }
+
+            Array IIfValuesEnumerable<T>.Array => Array;
+
+            public Predicate<T> Predicate { get; }
+
+            public IfValuesEnumerable(T[] array, Predicate<T> predicate)
+            {
+
+                Array = array;
+
+                Predicate = predicate;
+
+            }
+
+            public IEnumerator<KeyValuePair<T, Func<bool>>> GetEnumerator() => new IfValuesEnumerator((T[])Array);
+
+            IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
+
+            public KeyValuePair<T, Func<bool>> GetValue(int index) => GetValue(Array, index, Predicate);
+
+        }
+
+        private class IfKeyValuePairEnumerable<T> : IIfValuesEnumerable<T>
+        {
+
+            private class IfKeyValuePairEnumerator : IEnumerator<KeyValuePair<T, Func<bool>>>
+            {
+
+                private int _currentIndex;
+
+                private KeyValuePair<T, Func<bool>>[] _array;
+
+                public KeyValuePair<T, Func<bool>> Current => _array[_currentIndex];
+
+                public IfKeyValuePairEnumerator(KeyValuePair<T, Func<bool>>[] array) => _array = array;
+
+                object IEnumerator.Current => Current;
+
+                public void Dispose() { }
+
+                public bool MoveNext()
+                {
+
+                    if (_currentIndex == _array.Length)
+
+                        return false;
+
+                    _currentIndex++;
+
+                    return true;
+
+                }
+
+                public void Reset() => _currentIndex = -1;
+
+            }
+
+            public KeyValuePair<T, Func<bool>>[] Array { get; }
+
+            Array IIfValuesEnumerable<T>.Array => Array;
+
+            public IfKeyValuePairEnumerable(KeyValuePair<T, Func<bool>>[] array) => Array = array;
+
+            public IEnumerator<KeyValuePair<T, Func<bool>>> GetEnumerator() => new IfKeyValuePairEnumerator(Array);
+
+            IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
+
+            public KeyValuePair<T, Func<bool>> GetValue(int index) => Array[index];
+
+        }
+
+        private interface IIfKeyValuesEnumerable<TKey, TValue> : IEnumerable<KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>>
+        {
+
+            Array Array { get; }
+
+            KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> GetValue(int index);
+
+        }
+
+        private class IfKeyValuesEnumerable<TKey, TValue> : IIfKeyValuesEnumerable<TKey, TValue>
+        {
+
+            private static KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> GetValue(KeyValuePair<TKey, TValue>[] array, int index, Predicate<TValue> predicate)
+
+            {
+
+                KeyValuePair<TKey, TValue> result = array[index];
+
+                return new KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>(result.Key, new KeyValuePair<TValue, Func<bool>>(result.Value, () => predicate(result.Value)));
+
+            }
+
+            private class IfKeyValuesEnumerator : IEnumerator<KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>>
+            {
+
+                private int _currentIndex;
+
+                public KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> Current => GetValue(_array, _currentIndex, _predicate);
+
+                object IEnumerator.Current => Current;
+
+                private KeyValuePair<TKey, TValue>[] _array;
+
+                private Predicate<TValue> _predicate;
+
+                public IfKeyValuesEnumerator(KeyValuePair<TKey, TValue>[] array) => _array = array;
+
+                public bool MoveNext()
+                {
+
+                    if (_currentIndex == _array.Length)
+
+                        return false;
+
+                    _currentIndex++;
+
+                    return true;
+
+                }
+
+                public void Reset() => _currentIndex = -1;
+
+                public void Dispose() { }
+            }
+
+            public KeyValuePair<TKey, TValue>[] Array { get; }
+
+            Array IIfKeyValuesEnumerable<TKey, TValue>.Array => Array;
+
+            public Predicate<TValue> Predicate { get; }
+
+            public IfKeyValuesEnumerable(KeyValuePair<TKey, TValue>[] array, Predicate<TValue> predicate)
+            {
+
+                Array = array;
+
+                Predicate = predicate;
+
+            }
+
+            public IEnumerator<KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>> GetEnumerator() => new IfKeyValuesEnumerator((KeyValuePair<TKey, TValue>[])Array);
+
+            IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
+
+            public KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> GetValue(int index) => GetValue(Array, index, Predicate);
+
+        }
+
+        private class IfKeyKeyValuePairEnumerable<TKey, TValue> : IIfKeyValuesEnumerable<TKey, TValue>
+        {
+
+            private class IfKeyKeyValuePairEnumerator : IEnumerator<KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>>
+            {
+
+                private int _currentIndex;
+
+                private KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] _array;
+
+                public KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> Current => _array[_currentIndex];
+
+                public IfKeyKeyValuePairEnumerator(KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] array) => _array = array;
+
+                object IEnumerator.Current => Current;
+
+                public void Dispose() { }
+
+                public bool MoveNext()
+                {
+
+                    if (_currentIndex == _array.Length)
+
+                        return false;
+
+                    _currentIndex++;
+
+                    return true;
+
+                }
+
+                public void Reset() => _currentIndex = -1;
+
+            }
+
+            public KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] Array { get; }
+
+            Array IIfKeyValuesEnumerable<TKey, TValue>.Array => Array;
+
+            public IfKeyKeyValuePairEnumerable(KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] array) => Array = array;
+
+            public IEnumerator<KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>> GetEnumerator() => new IfKeyKeyValuePairEnumerator(Array);
+
+            IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
+
+            public KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> GetValue(int index) => Array[index];
+
+        }
+
+        #endregion
+
+        private static bool IfInternal(ComparisonType comparisonType, ComparisonMode comparisonMode, CheckIfComparisonDelegate comparisonDelegate, IIfValuesEnumerable values)
+
+        {
+
+            bool checkIfComparison(KeyValuePair<object, Func<bool>> value) => comparisonDelegate(value.Key, value.Value);
+
+            bool result;
+
+            if (comparisonMode == ComparisonMode.Binary)
+
+            {
+
+                if (comparisonType == ComparisonType.And)
+
+                {
+
+                    result = true;
+
+                    foreach (KeyValuePair<object, Func<bool>> _value in values)
+
+                        result &= checkIfComparison(_value);
+
+                }
+
+                else
+
+                {
+
+                    result = false;
+
+                    if (comparisonType == ComparisonType.Or)
+
+                        foreach (KeyValuePair<object, Func<bool>> _value in values)
+
+                            result |= checkIfComparison(_value);
+
+                    else // Xor
+
+                    {
+
+                        bool alreadyTrue = false;
+
+                        KeyValuePair<object, Func<bool>> _value;
+
+                        int i;
+
+                        for (i = 0; i < values.Array.Length; i++)
+                        {
+
+                            _value = values.GetValue(i);
+
+                            if (checkIfComparison(_value))
+
+                                if (alreadyTrue)
+
+                                    break;
+
+                                else
+
+                                {
+
+                                    result |= true;
+
+                                    alreadyTrue = true;
+
+                                }
+
+                            else
+
+                                result |= false;
+
+                        }
+
+                        if (alreadyTrue)
+
+                            for (i += 1; i < values.Array.Length; i++)
+
+                            {
+
+                                _value = values.GetValue(i);
+
+                                checkIfComparison(_value);
+
+                            }
+                    }
+
+                }
+
+            }
+
+            // We check the comparison type for the 'and' comparison.
+
+            else if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<object, Func<bool>> _value in values)
+
+                    if (!checkIfComparison(_value))
+
+                    {
+
+                        result = false;
+
+                        break;
+
+                    }
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<object, Func<bool>> _value in values)
+
+                    if (checkIfComparison(_value))
+
+                    {
+
+                        result = true;
+
+                        break;
+
+                    }
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<object, Func<bool>> _value;
+
+                KeyValuePair<object, Func<bool>> __value;
+
+                for (int i = 0; i < values.Array.Length; i++)
+                {
+
+                    _value = values.GetValue(i);
+
+                    result = true;
+
+                    if (checkIfComparison(_value))
+
+                    {
+
+                        for (int j = i + 1; j < values.Array.Length; j++)
+
+                        {
+
+                            __value = values.GetValue(j);
+
+                            if (checkIfComparison(__value))
+
+                            {
+
+                                result = false;
+
+                                break;
+
+                            }
+
+                        }
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+            return result;
+
+        }
+
+        private static bool IfInternal(ComparisonType comparisonType, ComparisonMode comparisonMode, CheckIfComparisonDelegate comparisonDelegate, out object key, IIfKeyValuesEnumerable values)
+
+        {
+
+            bool checkIfComparison(KeyValuePair<object, Func<bool>> value) => comparisonDelegate(value.Key, value.Value);
+
+            object _key = null;
+
+            bool result;
+
+            if (comparisonMode == ComparisonMode.Binary)
+
+            {
+
+                if (comparisonType == ComparisonType.And)
+
+                {
+
+                    result = true;
+
+                    foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                    {
+
+                        result &= checkIfComparison(_value.Value);
+
+                        if (_key == null && !result)
+
+                            _key = _value.Key;
+
+                    }
+
+                }
+
+                else
+
+                {
+
+                    result = false;
+
+                    if (comparisonType == ComparisonType.Or)
+
+                        foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                        {
+
+                            result |= checkIfComparison(_value.Value);
+
+                            if (_key == null && result)
+
+                                _key = _value.Key;
+
+                        }
+
+                    else // Xor
+
+                    {
+
+                        bool alreadyTrue = false;
+
+                        KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
+
+                        int i;
+
+                        for (i = 0; i < values.Array.Length; i++)
+                        {
+
+                            _value = values.GetValue(i);
+
+                            if (checkIfComparison(_value.Value))
+
+                                if (alreadyTrue)
+
+                                {
+
+                                    _key = null;
+
+                                    break;
+
+                                }
+
+                                else
+
+                                {
+
+                                    result |= true;
+
+                                    _key = _value.Key;
+
+                                    alreadyTrue = true;
+
+                                }
+
+                            else
+
+                                result |= false;
+
+                        }
+
+                        if (alreadyTrue)
+
+                            for (i += 1; i < values.Array.Length; i++)
+
+                            {
+
+                                _value = values.GetValue(i);
+
+                                checkIfComparison(_value.Value);
+
+                            }
+                    }
+
+                }
+
+            }
+
+            // We check the comparison type for the 'and' comparison.
+
+            else if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                    if (!checkIfComparison(_value.Value))
+
+                    {
+
+                        result = false;
+
+                        _key = _value.Key;
+
+                        break;
+
+                    }
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
+
+                    if (checkIfComparison(_value.Value))
+
+                    {
+
+                        result = true;
+
+                        _key = _value.Key;
+
+                        break;
+
+                    }
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
+
+                KeyValuePair<object, KeyValuePair<object, Func<bool>>> __value;
+
+                for (int i = 0; i < values.Array.Length; i++)
+                {
+
+                    _value = values.GetValue(i);
+
+                    result = true;
+
+                    if (checkIfComparison(_value.Value))
+
+                    {
+
+                        for (int j = i + 1; j < values.Array.Length; j++)
+
+                        {
+
+                            __value = values.GetValue(j);
+
+                            if (checkIfComparison(__value.Value))
+
+                            {
+
+                                result = false;
+
+                                break;
+
+                            }
+
+                        }
+
+                        if (result)
+
+                            _key = _value.Key;
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+            key = _key;
+
+            return result;
+
+        }
+
+        private static bool IfInternal<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, CheckIfComparisonDelegate<T> comparisonDelegate, IIfValuesEnumerable<T> values)
+
+        {
+
+            bool checkIfComparison(KeyValuePair<T, Func<bool>> value) => comparisonDelegate(value.Key, value.Value);
+
+            bool result;
+
+            if (comparisonMode == ComparisonMode.Binary)
+
+            {
+
+                if (comparisonType == ComparisonType.And)
+
+                {
+
+                    result = true;
+
+                    foreach (KeyValuePair<T, Func<bool>> _value in values)
+
+                        result &= checkIfComparison(_value);
+
+                }
+
+                else
+
+                {
+
+                    result = false;
+
+                    if (comparisonType == ComparisonType.Or)
+
+                        foreach (KeyValuePair<T, Func<bool>> _value in values)
+
+                            result |= checkIfComparison(_value);
+
+                    else // Xor
+
+                    {
+
+                        bool alreadyTrue = false;
+
+                        KeyValuePair<T, Func<bool>> _value;
+
+                        int i;
+
+                        for (i = 0; i < values.Array.Length; i++)
+                        {
+
+                            _value = values.GetValue(i);
+
+                            if (checkIfComparison(_value))
+
+                                if (alreadyTrue)
+
+                                    break;
+
+                                else
+
+                                {
+
+                                    result |= true;
+
+                                    alreadyTrue = true;
+
+                                }
+
+                            else
+
+                                result |= false;
+
+                        }
+
+                        if (alreadyTrue)
+
+                            for (i += 1; i < values.Array.Length; i++)
+
+                            {
+
+                                _value = values.GetValue(i);
+
+                                checkIfComparison(_value);
+
+                            }
+                    }
+
+                }
+
+            }
+
+            // We check the comparison type for the 'and' comparison.
+
+            else if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<T, Func<bool>> _value in values)
+
+                    if (!checkIfComparison(_value))
+
+                    {
+
+                        result = false;
+
+                        break;
+
+                    }
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<T, Func<bool>> _value in values)
+
+                    if (checkIfComparison(_value))
+
+                    {
+
+                        result = true;
+
+                        break;
+
+                    }
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<T, Func<bool>> _value;
+
+                KeyValuePair<T, Func<bool>> __value;
+
+                for (int i = 0; i < values.Array.Length; i++)
+                {
+
+                    _value = values.GetValue(i);
+
+                    result = true;
+
+                    if (checkIfComparison(_value))
+
+                    {
+
+                        for (int j = i + 1; j < values.Array.Length; j++)
+
+                        {
+
+                            __value = values.GetValue(j);
+
+                            if (checkIfComparison(__value))
+
+                            {
+
+                                result = false;
+
+                                break;
+
+                            }
+
+                        }
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+            return result;
+
+        }
+
+        private static bool IfInternal<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, CheckIfComparisonDelegate<TValue> comparisonDelegate, out TKey key, IIfKeyValuesEnumerable<TKey, TValue> values)
+
+        {
+
+            bool checkIfComparison(KeyValuePair<TValue, Func<bool>> value) => comparisonDelegate(value.Key, value.Value);
+
+            object _key = null;
+
+            bool result;
+
+            if (comparisonMode == ComparisonMode.Binary)
+
+            {
+
+                if (comparisonType == ComparisonType.And)
+
+                {
+
+                    result = true;
+
+                    foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                    {
+
+                        result &= checkIfComparison(_value.Value);
+
+                        if (_key == null && !result)
+
+                            _key = _value.Key;
+
+                    }
+
+                }
+
+                else
+
+                {
+
+                    result = false;
+
+                    if (comparisonType == ComparisonType.Or)
+
+                        foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                        {
+
+                            result |= checkIfComparison(_value.Value);
+
+                            if (_key == null && result)
+
+                                _key = _value.Key;
+
+                        }
+
+                    else // Xor
+
+                    {
+
+                        bool alreadyTrue = false;
+
+                        KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
+
+                        int i;
+
+                        for (i = 0; i < values.Array.Length; i++)
+                        {
+
+                            _value = values.GetValue(i);
+
+                            if (checkIfComparison(_value.Value))
+
+                                if (alreadyTrue)
+
+                                {
+
+                                    _key = null;
+
+                                    break;
+
+                                }
+
+                                else
+
+                                {
+
+                                    result |= true;
+
+                                    _key = _value.Key;
+
+                                    alreadyTrue = true;
+
+                                }
+
+                            else
+
+                                result |= false;
+
+                        }
+
+                        if (alreadyTrue)
+
+                            for (i += 1; i < values.Array.Length; i++)
+
+                            {
+
+                                _value = values.GetValue(i);
+
+                                checkIfComparison(_value.Value);
+
+                            }
+                    }
+
+                }
+
+            }
+
+            // We check the comparison type for the 'and' comparison.
+
+            else if (comparisonType == ComparisonType.And)
+
+            {
+
+                result = true;
+
+                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                    if (!checkIfComparison(_value.Value))
+
+                    {
+
+                        result = false;
+
+                        _key = _value.Key;
+
+                        break;
+
+                    }
+
+            }
+
+            // We check the comparison type for the 'or' comparison.
+
+            else if (comparisonType == ComparisonType.Or)
+
+            {
+
+                result = false;
+
+                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
+
+                    if (checkIfComparison(_value.Value))
+
+                    {
+
+                        result = true;
+
+                        _key = _value.Key;
+
+                        break;
+
+                    }
+
+            }
+
+            else
+
+            {
+
+                result = false;
+
+                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
+
+                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> __value;
+
+                for (int i = 0; i < values.Array.Length; i++)
+                {
+
+                    _value = values.GetValue(i);
+
+                    result = true;
+
+                    if (checkIfComparison(_value.Value))
+
+                    {
+
+                        for (int j = i + 1; j < values.Array.Length; j++)
+
+                        {
+
+                            __value = values.GetValue(j);
+
+                            if (checkIfComparison(__value.Value))
+
+                            {
+
+                                result = false;
+
+                                break;
+
+                            }
+
+                        }
+
+                        if (result)
+
+                            _key = _value.Key;
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+            key = (TKey)_key;
+
+            return result;
 
         }
 
@@ -175,14 +1642,15 @@ namespace WinCopies.Util
         #region Comparisons without key notification
 
         /// <summary>
-        /// Performs a comparison by testing a value compared to an array of objects or values.
+        /// Performs a comparison by testing a value compared to an array of values.
         /// </summary>
         /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
+        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison</param>
         /// <param name="comparison">The comparison type</param>
         /// <param name="value">The value to compare the values of the table with.</param>
         /// <param name="values">The values to compare.</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, (IEqualityComparer)EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
@@ -194,118 +1662,7 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<object> comparer, Predicate<object> predicate, object value, params object[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
-
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (object _value in values)
-
-                    if (!CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (object _value in values)
-
-                    if (CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                object _value;
-
-                object __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, predicate(__value), comparer.Compare(__value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
-
-        }
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, Predicate<object> predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
 
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params object[] values)
 
@@ -313,344 +1670,25 @@ namespace WinCopies.Util
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (object _value in values)
-
-                    if (!CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (object _value in values)
-
-                    if (CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                object _value;
-
-                object __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, predicate(__value), comparisonDelegate(__value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfValuesEnumerable(values, predicate));
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<object> equalityComparer, Predicate<object> predicate, object value, params object[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, Predicate<object> predicate, object value, params object[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            comparisonType.ThrowIfNotValidEnumValue();
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
 
-            comparisonMode.ThrowIfNotValidEnumValue();
-
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)}, {nameof(Comparison.NotEqual)} or {nameof(Comparison.ReferenceEqual)}");
-
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (object _value in values)
-
-                    if (!CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (object _value in values)
-
-                    if (CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                object _value;
-
-                object __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckEqualityComparison(comparison, __value, predicate(__value), comparison == Comparison.Equal ? equalityComparer.Equals(__value, value) : object.ReferenceEquals(__value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfValuesEnumerable(values, predicate));
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<object> comparer, object value, params KeyValuePair<object, Func<bool>>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
-
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<object, Func<bool>> _value in values)
-
-                    if (!CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<object, Func<bool>> _value in values)
-
-                    if (CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<object, Func<bool>> _value;
-
-                KeyValuePair<object, Func<bool>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, __value.Value(), comparer.Compare(__value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
-
-        }
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, object value, params KeyValuePair<object, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, (object x, object y) => comparer.Compare(x, y), value, values);
 
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values)
 
@@ -658,229 +1696,21 @@ namespace WinCopies.Util
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<object, Func<bool>> _value in values)
-
-                    if (!CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<object, Func<bool>> _value in values)
-
-                    if (CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<object, Func<bool>> _value;
-
-                KeyValuePair<object, Func<bool>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, __value.Value(), comparisonDelegate(__value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfKeyValuePairEnumerable(values));
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<object> equalityComparer, object value, params KeyValuePair<object, Func<bool>>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, object value, params KeyValuePair<object, Func<bool>>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            comparisonType.ThrowIfNotValidEnumValue();
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
 
-            comparisonMode.ThrowIfNotValidEnumValue();
-
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
-
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<object, Func<bool>> _value in values)
-
-                    if (!CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<object, Func<bool>> _value in values)
-
-                    if (CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<object, Func<bool>> _value;
-
-                KeyValuePair<object, Func<bool>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckEqualityComparison(comparison, __value.Key, __value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Key, value) : object.ReferenceEquals(__value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfKeyValuePairEnumerable(values));
 
         }
 
@@ -896,7 +1726,7 @@ namespace WinCopies.Util
         /// <param name="value">The value to compare the values of the table with.</param>
         /// <param name="values">The values to compare.</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, (IEqualityComparer)EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
@@ -908,132 +1738,7 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer<object> comparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
-
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            object _key = null;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                    if (!CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                    if (CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<object, object> _value;
-
-                KeyValuePair<object, object> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, predicate(__value.Value), comparer.Compare(__value.Value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : null;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = null;
-
-                return result;
-
-            }
-
-        }
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer comparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
 
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
 
@@ -1041,386 +1746,23 @@ namespace WinCopies.Util
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            object _key = null;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                    if (!CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                    if (CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<object, object> _value;
-
-                KeyValuePair<object, object> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, predicate(__value.Value), comparisonDelegate(__value.Value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : null;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = null;
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyValuesEnumerable(values, predicate));
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer<object> equalityComparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
 
         {
 
-            // First, we check if comparisonType and comparison are in the required value range.
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
 
-            comparisonType.ThrowIfNotValidEnumValue();
-
-            comparisonMode.ThrowIfNotValidEnumValue();
-
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
-
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
-
-            object _key = null;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                    if (!CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<object, object> _value in values)
-
-                    if (CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<object, object> _value;
-
-                KeyValuePair<object, object> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckEqualityComparison(comparison, __value.Value, predicate(__value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Value, value) : object.ReferenceEquals(__value.Value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : null;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = null;
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyValuesEnumerable(values, predicate));
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer<object> comparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
-
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            object _key = null;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
-
-                    if (!CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
-
-                    if (CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
-
-                KeyValuePair<object, KeyValuePair<object, Func<bool>>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, __value.Value.Value(), comparer.Compare(__value.Value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : null;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = null;
-
-                return result;
-
-            }
-
-        }
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer comparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, (object x, object y) => comparer.Compare(x, y), value, values);
 
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
 
@@ -1428,257 +1770,19 @@ namespace WinCopies.Util
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            object _key = null;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
-
-                    if (!CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
-
-                    if (CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
-
-                KeyValuePair<object, KeyValuePair<object, Func<bool>>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, __value.Value.Value(), comparisonDelegate(__value.Value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : null;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = null;
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyKeyValuePairEnumerable(values));
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer<object> equalityComparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
 
         {
 
-            // First, we check if comparisonType and comparison are in the required value range.
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
 
-            comparisonType.ThrowIfNotValidEnumValue();
-
-            comparisonMode.ThrowIfNotValidEnumValue();
-
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
-
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
-
-            object _key = null;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
-
-                    if (!CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value in values)
-
-                    if (CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<object, KeyValuePair<object, Func<bool>>> _value;
-
-                KeyValuePair<object, KeyValuePair<object, Func<bool>>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckEqualityComparison(comparison, __value.Value.Key, __value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Value.Key, value) : object.ReferenceEquals(__value.Value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : null;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = null;
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyKeyValuePairEnumerable(values));
 
         }
 
@@ -1710,118 +1814,7 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<T> comparer, Predicate<T> predicate, T value, params T[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
-
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (T _value in values)
-
-                    if (!CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (T _value in values)
-
-                    if (CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                T _value;
-
-                T __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, predicate(_value), comparer.Compare(_value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, predicate(__value), comparer.Compare(__value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
-
-        }
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<T> comparer, Predicate<T> predicate, T value, params T[] values) => If(comparisonType, comparisonMode, comparison, (T x, T y) => comparer.Compare(x, y), predicate, value, values);
 
         public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<T> comparisonDelegate, Predicate<T> predicate, T value, params T[] values)
 
@@ -1829,110 +1822,9 @@ namespace WinCopies.Util
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (T _value in values)
-
-                    if (!CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (T _value in values)
-
-                    if (CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                T _value;
-
-                T __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, predicate(_value), comparisonDelegate(_value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, predicate(__value), comparisonDelegate(__value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfValuesEnumerable<T>(values, predicate));
 
         }
 
@@ -1940,233 +1832,13 @@ namespace WinCopies.Util
 
         {
 
-            // First, we check if comparisonType and comparison are in the required value range.
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, equalityComparer);
 
-            comparisonType.ThrowIfNotValidEnumValue();
-
-            comparisonMode.ThrowIfNotValidEnumValue();
-
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
-
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (T _value in values)
-
-                    if (!CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (T _value in values)
-
-                    if (CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                T _value;
-
-                T __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckEqualityComparison(comparison, _value, predicate(_value), comparison == Comparison.Equal ? equalityComparer.Equals(_value, value) : object.ReferenceEquals(_value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckEqualityComparison(comparison, _value, predicate(__value), comparison == Comparison.Equal ? equalityComparer.Equals(__value, value) : object.ReferenceEquals(__value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfValuesEnumerable<T>(values, predicate));
 
         }
 
-        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<T> comparer, T value, params KeyValuePair<T, Func<bool>>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
-
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<T, Func<bool>> _value in values)
-
-                    if (!CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<T, Func<bool>> _value in values)
-
-                    if (CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<T, Func<bool>> _value;
-
-                KeyValuePair<T, Func<bool>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, _value.Value(), comparer.Compare(_value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, __value.Value(), comparer.Compare(__value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
-
-        }
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer<T> comparer, T value, params KeyValuePair<T, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, (T x, T y) => comparer.Compare(x, y), value, values);
 
         public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<T> comparisonDelegate, T value, params KeyValuePair<T, Func<bool>>[] values)
 
@@ -2174,110 +1846,9 @@ namespace WinCopies.Util
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<T, Func<bool>> _value in values)
-
-                    if (!CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<T, Func<bool>> _value in values)
-
-                    if (CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<T, Func<bool>> _value;
-
-                KeyValuePair<T, Func<bool>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, _value.Value(), comparisonDelegate(_value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, __value.Value(), comparisonDelegate(__value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfKeyValuePairEnumerable<T>(values));
 
         }
 
@@ -2285,118 +1856,9 @@ namespace WinCopies.Util
 
         {
 
-            // First, we check if comparisonType and comparison are in the required value range.
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, equalityComparer);
 
-            comparisonType.ThrowIfNotValidEnumValue();
-
-            comparisonMode.ThrowIfNotValidEnumValue();
-
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
-
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<T, Func<bool>> _value in values)
-
-                    if (!CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
-
-                    {
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<T, Func<bool>> _value in values)
-
-                    if (CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
-
-                    {
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<T, Func<bool>> _value;
-
-                KeyValuePair<T, Func<bool>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckEqualityComparison(comparison, _value.Key, _value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Key, value) : object.ReferenceEquals(_value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckEqualityComparison(comparison, __value.Key, __value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Key, value) : object.ReferenceEquals(__value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        return result;
-
-                    }
-
-                }
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfKeyValuePairEnumerable<T>(values));
 
         }
 
@@ -2424,132 +1886,7 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IComparer<TValue> comparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
-
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            TKey _key = default;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                    if (!CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                    if (CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<TKey, TValue> _value;
-
-                KeyValuePair<TKey, TValue> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, predicate(_value.Value), comparer.Compare(_value.Value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, predicate(__value.Value), comparer.Compare(__value.Value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : default;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = default;
-
-                return result;
-
-            }
-
-        }
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IComparer<TValue> comparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values) => If(comparisonType, comparisonMode, comparison, out key, (TValue x, TValue y) => comparer.Compare(x, y), predicate, value, values);
 
         public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, Comparison<TValue> comparisonDelegate, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
 
@@ -2557,124 +1894,9 @@ namespace WinCopies.Util
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            TKey _key = default;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                    if (!CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                    if (CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<TKey, TValue> _value;
-
-                KeyValuePair<TKey, TValue> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, predicate(_value.Value), comparisonDelegate(_value.Value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, predicate(__value.Value), comparisonDelegate(__value.Value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : default;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = default;
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyValuesEnumerable<TKey, TValue>(values, predicate));
 
         }
 
@@ -2682,386 +1904,21 @@ namespace WinCopies.Util
 
         {
 
-            // First, we check if comparisonType and comparison are in the required value range.
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, equalityComparer);
 
-            comparisonType.ThrowIfNotValidEnumValue();
-
-            comparisonMode.ThrowIfNotValidEnumValue();
-
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
-
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
-
-            TKey _key = default;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                    if (!CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<TKey, TValue> _value in values)
-
-                    if (CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<TKey, TValue> _value;
-
-                KeyValuePair<TKey, TValue> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckEqualityComparison(comparison, _value.Value, predicate(_value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value, value) : object.ReferenceEquals(_value.Value, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckEqualityComparison(comparison, __value.Value, predicate(__value.Value), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Value, value) : object.ReferenceEquals(__value.Value, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : default;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = default;
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyValuesEnumerable<TKey, TValue>(values, predicate));
 
         }
 
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IComparer<TValue> comparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
-
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            TKey _key = default;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
-
-                    if (!CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
-
-                    if (CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
-
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, _value.Value.Value(), comparer.Compare(_value.Value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, __value.Value.Value(), comparer.Compare(__value.Value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : default;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = default;
-
-                return result;
-
-            }
-
-        }
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IComparer<TValue> comparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, (TValue x, TValue y) => comparer.Compare(x, y), value, values);
 
         public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, Comparison<TValue> comparisonDelegate, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
 
         {
 
-            // First, we check if comparisonType and comparison are in the required value range.
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            ThrowIfNotValidEnumValue(comparisonType, comparisonMode, comparison);
-
-            if (comparison == Comparison.ReferenceEqual)
-
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
-
-            TKey _key = default;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
-
-                    if (!CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
-
-                    if (CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
-
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckIfComparison(comparison, _value.Value.Value(), comparisonDelegate(_value.Value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckIfComparison(comparison, __value.Value.Value(), comparisonDelegate(__value.Value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : default;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = default;
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyKeyValuePairEnumerable<TKey, TValue>(values));
 
         }
 
@@ -3069,132 +1926,9 @@ namespace WinCopies.Util
 
         {
 
-            // First, we check if comparisonType and comparison are in the required value range.
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, equalityComparer);
 
-            comparisonType.ThrowIfNotValidEnumValue();
-
-            comparisonMode.ThrowIfNotValidEnumValue();
-
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
-
-                // todo:
-
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)} or {nameof(Comparison.NotEqual)}");
-
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class type.");
-
-            TKey _key = default;
-
-            bool result;
-
-            // If they are, we check the comparison type for the 'and' comparison.
-
-            if (comparisonType == ComparisonType.And)
-
-            {
-
-                result = true;
-
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
-
-                    if (!CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = false;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            // We check the comparison type for the 'or' comparison.
-
-            else if (comparisonType == ComparisonType.Or)
-
-            {
-
-                result = false;
-
-                foreach (KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value in values)
-
-                    if (CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
-
-                    {
-
-                        _key = _value.Key;
-
-                        result = true;
-
-                        if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                    }
-
-                key = _key;
-
-                return result;
-
-            }
-
-            else
-
-            {
-
-                result = false;
-
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> _value;
-
-                KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> __value;
-
-                for (int i = 0; i < values.Length; i++)
-                {
-
-                    _value = values[i];
-
-                    result = true;
-
-                    if (CheckEqualityComparison(comparison, _value.Value.Key, _value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(_value.Value.Key, value) : object.ReferenceEquals(_value.Value.Key, value)))
-
-                    {
-
-                        for (int j = i + 1; j < values.Length; j++)
-
-                        {
-
-                            __value = values[j];
-
-                            if (CheckEqualityComparison(comparison, __value.Value.Key, __value.Value.Value(), comparison == Comparison.Equal ? equalityComparer.Equals(__value.Value.Key, value) : object.ReferenceEquals(__value.Value.Key, value)))
-
-                            {
-
-                                result = false;
-
-                                if (comparisonMode == ComparisonMode.Binary) continue; else /*if (comparisonMode == ComparisonMode.Logical)*/ break;
-
-                            }
-
-                        }
-
-                        key = result ? _value.Key : default;
-
-                        return result;
-
-                    }
-
-                }
-
-                key = default;
-
-                return result;
-
-            }
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyKeyValuePairEnumerable<TKey, TValue>(values));
 
         }
 
