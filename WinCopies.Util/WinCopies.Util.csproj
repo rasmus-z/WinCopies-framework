@@ -110,39 +110,39 @@
     <Compile Include="BackgroundWorker.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CheckableObject.cs" />
+    <Compile Include="Data\CheckableObject.cs" />
     <Compile Include="Commands\CommandAction.cs" />
     <Compile Include="Commands\Commands.cs" />
     <Compile Include="Commands\FileSystemCommands.cs" />
     <Compile Include="Commands\KeyCommandHelper.cs" />
     <Compile Include="Commands\ApplicationCommands.cs" />
-    <Compile Include="DataConverters\BooleanToVisibilityConverter.cs" />
-    <Compile Include="DataConverters\CoalesceConverter.cs" />
-    <Compile Include="DataConverters\ConverterBase.cs" />
-    <Compile Include="DataConverters\EnumToBooleanConverter.cs" />
-    <Compile Include="DataConverters\EnumToReversedBooleanConverter.cs" />
-    <Compile Include="DataConverters\EnumToStringArrayConverter.cs" />
-    <Compile Include="DataConverters\IsNullConverter.cs" />
-    <Compile Include="DataConverters\MultiConverterBase.cs" />
-    <Compile Include="DataConverters\ConverterArray.cs" />
-    <Compile Include="DataConverters\MultiValueConversionAttribute.cs" />
-    <Compile Include="DataConverters\ObjectToTypeConverter.cs" />
-    <Compile Include="DataConverters\PercentConverter.cs" />
-    <Compile Include="DataConverters\ReverseBooleanConverter.cs" />
-    <Compile Include="DataConverters\ReversedBooleanToVisibilityConverter.cs" />
-    <Compile Include="DataConverters\VisibilityToBooleanConverter.cs" />
-    <Compile Include="DataConverters\VisibilityToReversedBooleanConverter.cs" />
+    <Compile Include="Data\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Data\CoalesceConverter.cs" />
+    <Compile Include="Data\ConverterBase.cs" />
+    <Compile Include="Data\EnumToBooleanConverter.cs" />
+    <Compile Include="Data\EnumToReversedBooleanConverter.cs" />
+    <Compile Include="Data\EnumToStringArrayConverter.cs" />
+    <Compile Include="Data\IsNullConverter.cs" />
+    <Compile Include="Data\MultiConverterBase.cs" />
+    <Compile Include="Data\ConverterArray.cs" />
+    <Compile Include="Data\MultiValueConversionAttribute.cs" />
+    <Compile Include="Data\ObjectToTypeConverter.cs" />
+    <Compile Include="Data\PercentConverter.cs" />
+    <Compile Include="Data\ReverseBooleanConverter.cs" />
+    <Compile Include="Data\ReversedBooleanToVisibilityConverter.cs" />
+    <Compile Include="Data\VisibilityToBooleanConverter.cs" />
+    <Compile Include="Data\VisibilityToReversedBooleanConverter.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Generic.xaml.cs">
       <DependentUpon>Generic.xaml</DependentUpon>
     </Compile>
     <Compile Include="IBackgroundWorker.cs" />
     <Compile Include="Collections\INotifyCollectionChanging.cs" />
-    <Compile Include="MenuItem.cs" />
-    <Compile Include="NamedObject.cs" />
+    <Compile Include="Data\MenuItem.cs" />
+    <Compile Include="Data\NamedObject.cs" />
     <Compile Include="Collections\ObservableCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyChangedEventArgs.cs" />
+    <Compile Include="Data\PropertyChangedEventArgs.cs" />
     <Compile Include="Collections\ReadOnlyArrayList.cs" />
     <Compile Include="Collections\ReadOnlyObservableCollection.cs" />
     <Compile Include="RoutedEventArgs.cs" />
@@ -150,8 +150,8 @@
     <Compile Include="SingleInstance.cs" />
     <Compile Include="SucceededEventArgs.cs" />
     <Compile Include="Util.cs" />
-    <Compile Include="ValueChangedEventArgs.cs" />
-    <Compile Include="ValueObject.cs" />
+    <Compile Include="Data\ValueChangedEventArgs.cs" />
+    <Compile Include="Data\ValueObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
