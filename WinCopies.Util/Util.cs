@@ -338,7 +338,7 @@ namespace WinCopies.Util
             private class IfValuesEnumerator : IEnumerator<KeyValuePair<object, Func<bool>>>
             {
 
-                private int _currentIndex;
+                private int _currentIndex = -1;
 
                 public KeyValuePair<object, Func<bool>> Current => GetValue(_array, _currentIndex, _predicate);
 
@@ -348,20 +348,16 @@ namespace WinCopies.Util
 
                 private Predicate<object> _predicate;
 
-                public IfValuesEnumerator(object[] array) => _array = array;
-
-                public bool MoveNext()
+                public IfValuesEnumerator(object[] array, Predicate<object> predicate)
                 {
 
-                    if (_currentIndex == _array.Length)
+                    _array = array;
 
-                        return false;
-
-                    _currentIndex++;
-
-                    return true;
+                    _predicate = predicate;
 
                 }
+
+                public bool MoveNext() => ++_currentIndex < _array.Length;
 
                 public void Reset() => _currentIndex = -1;
 
@@ -383,7 +379,7 @@ namespace WinCopies.Util
 
             }
 
-            public IEnumerator<KeyValuePair<object, Func<bool>>> GetEnumerator() => new IfValuesEnumerator((object[])Array);
+            public IEnumerator<KeyValuePair<object, Func<bool>>> GetEnumerator() => new IfValuesEnumerator((object[])Array, Predicate);
 
             IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
 
@@ -397,7 +393,7 @@ namespace WinCopies.Util
             private class IfKeyValuePairEnumerator : IEnumerator<KeyValuePair<object, Func<bool>>>
             {
 
-                private int _currentIndex;
+                private int _currentIndex = -1;
 
                 private KeyValuePair<object, Func<bool>>[] _array;
 
@@ -409,18 +405,7 @@ namespace WinCopies.Util
 
                 public void Dispose() { }
 
-                public bool MoveNext()
-                {
-
-                    if (_currentIndex == _array.Length)
-
-                        return false;
-
-                    _currentIndex++;
-
-                    return true;
-
-                }
+                public bool MoveNext() => ++_currentIndex < _array.Length;
 
                 public void Reset() => _currentIndex = -1;
 
@@ -465,7 +450,7 @@ namespace WinCopies.Util
             private class IfKeyValuesEnumerator : IEnumerator<KeyValuePair<object, KeyValuePair<object, Func<bool>>>>
             {
 
-                private int _currentIndex;
+                private int _currentIndex = -1;
 
                 public KeyValuePair<object, KeyValuePair<object, Func<bool>>> Current => GetValue(_array, _currentIndex, _predicate);
 
@@ -475,20 +460,16 @@ namespace WinCopies.Util
 
                 private Predicate<object> _predicate;
 
-                public IfKeyValuesEnumerator(KeyValuePair<object, object>[] array) => _array = array;
-
-                public bool MoveNext()
+                public IfKeyValuesEnumerator(KeyValuePair<object, object>[] array, Predicate<object> predicate)
                 {
 
-                    if (_currentIndex == _array.Length)
+                    _array = array;
 
-                        return false;
-
-                    _currentIndex++;
-
-                    return true;
+                    _predicate = predicate;
 
                 }
+
+                public bool MoveNext() => ++_currentIndex < _array.Length;
 
                 public void Reset() => _currentIndex = -1;
 
@@ -510,7 +491,7 @@ namespace WinCopies.Util
 
             }
 
-            public IEnumerator<KeyValuePair<object, KeyValuePair<object, Func<bool>>>> GetEnumerator() => new IfKeyValuesEnumerator((KeyValuePair<object, object>[])Array);
+            public IEnumerator<KeyValuePair<object, KeyValuePair<object, Func<bool>>>> GetEnumerator() => new IfKeyValuesEnumerator((KeyValuePair<object, object>[])Array, Predicate);
 
             IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
 
@@ -524,7 +505,7 @@ namespace WinCopies.Util
             private class IfKeyKeyValuePairEnumerator : IEnumerator<KeyValuePair<object, KeyValuePair<object, Func<bool>>>>
             {
 
-                private int _currentIndex;
+                private int _currentIndex = -1;
 
                 private KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] _array;
 
@@ -536,18 +517,7 @@ namespace WinCopies.Util
 
                 public void Dispose() { }
 
-                public bool MoveNext()
-                {
-
-                    if (_currentIndex == _array.Length)
-
-                        return false;
-
-                    _currentIndex++;
-
-                    return true;
-
-                }
+                public bool MoveNext() => ++_currentIndex < _array.Length;
 
                 public void Reset() => _currentIndex = -1;
 
@@ -592,7 +562,7 @@ namespace WinCopies.Util
             private class IfValuesEnumerator : IEnumerator<KeyValuePair<T, Func<bool>>>
             {
 
-                private int _currentIndex;
+                private int _currentIndex = -1;
 
                 public KeyValuePair<T, Func<bool>> Current => GetValue((T[])_array, _currentIndex, _predicate);
 
@@ -602,20 +572,16 @@ namespace WinCopies.Util
 
                 private Predicate<T> _predicate;
 
-                public IfValuesEnumerator(T[] array) => _array = array;
-
-                public bool MoveNext()
+                public IfValuesEnumerator(T[] array, Predicate<T> predicate)
                 {
 
-                    if (_currentIndex == _array.Length)
+                    _array = array;
 
-                        return false;
-
-                    _currentIndex++;
-
-                    return true;
+                    _predicate = predicate;
 
                 }
+
+                public bool MoveNext() => ++_currentIndex < _array.Length;
 
                 public void Reset() => _currentIndex = -1;
 
@@ -637,7 +603,7 @@ namespace WinCopies.Util
 
             }
 
-            public IEnumerator<KeyValuePair<T, Func<bool>>> GetEnumerator() => new IfValuesEnumerator((T[])Array);
+            public IEnumerator<KeyValuePair<T, Func<bool>>> GetEnumerator() => new IfValuesEnumerator((T[])Array, Predicate);
 
             IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
 
@@ -651,7 +617,7 @@ namespace WinCopies.Util
             private class IfKeyValuePairEnumerator : IEnumerator<KeyValuePair<T, Func<bool>>>
             {
 
-                private int _currentIndex;
+                private int _currentIndex = -1;
 
                 private KeyValuePair<T, Func<bool>>[] _array;
 
@@ -663,18 +629,7 @@ namespace WinCopies.Util
 
                 public void Dispose() { }
 
-                public bool MoveNext()
-                {
-
-                    if (_currentIndex == _array.Length)
-
-                        return false;
-
-                    _currentIndex++;
-
-                    return true;
-
-                }
+                public bool MoveNext() => ++_currentIndex < _array.Length;
 
                 public void Reset() => _currentIndex = -1;
 
@@ -719,7 +674,7 @@ namespace WinCopies.Util
             private class IfKeyValuesEnumerator : IEnumerator<KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>>
             {
 
-                private int _currentIndex;
+                private int _currentIndex = -1;
 
                 public KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>> Current => GetValue(_array, _currentIndex, _predicate);
 
@@ -729,20 +684,16 @@ namespace WinCopies.Util
 
                 private Predicate<TValue> _predicate;
 
-                public IfKeyValuesEnumerator(KeyValuePair<TKey, TValue>[] array) => _array = array;
-
-                public bool MoveNext()
+                public IfKeyValuesEnumerator(KeyValuePair<TKey, TValue>[] array, Predicate<TValue> predicate)
                 {
 
-                    if (_currentIndex == _array.Length)
+                    _array = array;
 
-                        return false;
-
-                    _currentIndex++;
-
-                    return true;
+                    _predicate = predicate;
 
                 }
+
+                public bool MoveNext() => ++_currentIndex < _array.Length;
 
                 public void Reset() => _currentIndex = -1;
 
@@ -764,7 +715,7 @@ namespace WinCopies.Util
 
             }
 
-            public IEnumerator<KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>> GetEnumerator() => new IfKeyValuesEnumerator((KeyValuePair<TKey, TValue>[])Array);
+            public IEnumerator<KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>> GetEnumerator() => new IfKeyValuesEnumerator((KeyValuePair<TKey, TValue>[])Array, Predicate);
 
             IEnumerator IEnumerable.GetEnumerator() => Array.GetEnumerator();
 
@@ -778,7 +729,7 @@ namespace WinCopies.Util
             private class IfKeyKeyValuePairEnumerator : IEnumerator<KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>>
             {
 
-                private int _currentIndex;
+                private int _currentIndex = -1;
 
                 private KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] _array;
 
@@ -790,18 +741,7 @@ namespace WinCopies.Util
 
                 public void Dispose() { }
 
-                public bool MoveNext()
-                {
-
-                    if (_currentIndex == _array.Length)
-
-                        return false;
-
-                    _currentIndex++;
-
-                    return true;
-
-                }
+                public bool MoveNext() => ++_currentIndex < _array.Length;
 
                 public void Reset() => _currentIndex = -1;
 
@@ -2064,7 +2004,7 @@ namespace WinCopies.Util
         /// <returns>A <see cref="bool"/> value that indicates whether the <see cref="string"/> given is a <see cref="decimal"/>.</returns>
         public static bool IsNumeric(string s, out decimal d) => decimal.TryParse(s, out d);
 
-        public static T GetEnumAllFlags<T>() where T : Enum
+        public static T GetAllEnumFlags<T>() where T : Enum
 
         {
 

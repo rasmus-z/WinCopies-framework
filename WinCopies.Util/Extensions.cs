@@ -1338,7 +1338,7 @@ namespace WinCopies.Util
 
         #endregion
 
-        public static string ToString(this IEnumerable array, bool includeSubEnumerables, bool parseStrings = false)
+        public static string ToString(this IEnumerable array, bool parseSubEnumerables, bool parseStrings = false)
 
         {
 
@@ -1346,7 +1346,7 @@ namespace WinCopies.Util
 
             foreach (object value in array)
 
-                result.Append($"{{{ ((value is string && parseStrings) || (!(value is string) && value is IEnumerable && includeSubEnumerables) ? ((IEnumerable)value).ToString(true) : value?.ToString())}}}, ");
+                result.Append($"{{{ ((value is string && parseStrings) || (!(value is string) && value is IEnumerable && parseSubEnumerables) ? ((IEnumerable)value).ToString(true) : value?.ToString())}}}, ");
 
             return result.ToString(0, result.Length - 2);
 

@@ -11,7 +11,7 @@ namespace WinCopies.Util.Data
     /// <summary>
     /// Provides a base class for direct view models.
     /// </summary>
-    public class ViewModelBase : MarkupExtension, INotifyPropertyChanged
+    public abstract class ViewModelBase : MarkupExtension, INotifyPropertyChanged
     {
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace WinCopies.Util.Data
     /// <summary>
     /// Provides a base class for view models.
     /// </summary>
-    public class ViewModel : MarkupExtension, INotifyPropertyChanged
+    public abstract class ViewModel : MarkupExtension, INotifyPropertyChanged
     {
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace WinCopies.Util.Data
     /// <summary>
     /// Provides a base class for view models.
     /// </summary>
-    public class ViewModel<T> : MarkupExtension, INotifyPropertyChanged
+    public abstract class ViewModel<T> : MarkupExtension, INotifyPropertyChanged
     {
 
         /// <summary>
