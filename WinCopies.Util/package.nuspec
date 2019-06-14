@@ -4,7 +4,7 @@
     <!--*-->
     <id>WinCopies.Util</id>
     <!--*-->
-    <version>1.1.0</version>
+    <version>1.3.0</version>
     <title>WinCopies.Util</title>
     <!--*-->
     <authors>Pierre Sprimont</authors>
@@ -18,13 +18,14 @@
     <!--*-->
     <description>WinCopies framework utilities</description>
     <!--*-->
-    <releaseNotes>
-      System requirements:
+    <releaseNotes>System requirements:
       .NET Framework version: 4.8
       OS: Windows
       New in this version:
-      - Bug fixed for the 'RemoveRange' extension method
-      - Extension method added for the 'object' type to check if a type matches with at least one of a given type array
+      - Bug fixed in some of the 'If' methods
+      - 'If' methods speed improvement
+      - 'ToString' extension method added for the 'IEnumerable' type to display the content of a given IEnumerable
+      - Added base classes for view models
       Description:
       Some utilities to extend the .NET framework capabilities, such as:
       - Some commands for WPF;
@@ -35,9 +36,9 @@
       - (ReadOnly)(Observable)Collections;
       - Some extension methods, mainly for array, enumerables and collections and for easier INotifyPropertyChanged and Enum gesture;
       - Some utility static methods, such as advanced 'if' functions
+      - Base view model classes
       Project link: https://github.com/pierresprim/WinCopies-framework
-      License link: https://github.com/pierresprim/WinCopies-framework/blob/master/LICENSE
-    </releaseNotes>
+      License link: https://github.com/pierresprim/WinCopies-framework/blob/master/LICENSE</releaseNotes>
     <copyright>Copyright © 2019 Pierre Sprimont</copyright>
     <tags>
     </tags>
