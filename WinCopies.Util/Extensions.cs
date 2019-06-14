@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -1336,6 +1337,20 @@ namespace WinCopies.Util
         #endregion
 
         #endregion
+
+        public static string ToString(this IEnumerable array, bool includeSubEnumerables, bool parseStrings = false)
+
+        {
+
+            StringBuilder result = new StringBuilder();
+
+            foreach (object value in array)
+
+                result.Append($"{{{ ((value is string && parseStrings) || (!(value is string) && value is IEnumerable && includeSubEnumerables) ? ((IEnumerable)value).ToString(true) : value?.ToString())}}}, ");
+
+            return result.ToString(0, result.Length - 2);
+
+        }
 
         #endregion
 
