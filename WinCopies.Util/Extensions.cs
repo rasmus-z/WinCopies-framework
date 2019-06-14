@@ -1489,6 +1489,24 @@ namespace WinCopies.Util
 
         }
 
+        internal static PropertyInfo GetProperty(string fieldName, Type objectType, BindingFlags bindingFlags)
+
+        {
+
+            BindingFlags flags = bindingFlags;
+
+            // var objectType = obj.GetType(); 
+
+            PropertyInfo property = objectType.GetProperty(fieldName, flags);
+
+            if (property == null)
+
+                throw new ArgumentException(string.Format(FieldOrPropertyNotFound, fieldName, objectType));
+
+            return property;
+
+        }
+
         public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
@@ -1548,6 +1566,36 @@ namespace WinCopies.Util
                 //             BindingFlags.Static | BindingFlags.Instance |
                 //             BindingFlags.DeclaredOnly;
                 //this.GetType().GetField(fieldName, flags).SetValue(this, newValue);
+
+            }
+
+            else
+
+                return (false, previousValue);
+
+        }
+
+        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+
+        {
+
+            string methodName;
+
+            PropertyInfo property = GetProperty(propertyName, declaringType, bindingFlags);
+
+            object previousValue = property.GetValue(obj);
+
+            if (performIntegrityCheck && !CheckPropertySetIntegrity(declaringType, propertyName, out methodName, 3, bindingFlags))
+
+                throw new InvalidOperationException(string.Format(DeclaringTypesNotCorrespond, propertyName, methodName));
+
+            if ((newValue == null && previousValue != null) || (newValue != null && !newValue.Equals(previousValue)))
+
+            {
+
+                property.SetValue(obj, newValue);
+
+                return (true, previousValue);
 
             }
 

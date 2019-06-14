@@ -23,11 +23,11 @@ namespace WinCopies.Util.Data
         /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
         /// </summary>// See the Remarks section.
         /// <param name="propertyName">The name of the property for which set a new value</param>
-        /// <param name="fieldName">The name of the field to store the new value. This must the field that is called by the property accessors (get and set).</param>
+        /// <param name="fieldName">The name of the field to store the new value. This have to be the field that is called by the property accessors (get and set).</param>
         /// <param name="newValue">The value to set in the property</param>
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
         // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
-        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType = null)
+        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
 
         {
 
@@ -65,23 +65,47 @@ namespace WinCopies.Util.Data
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// The model for this instance of view model.
+        /// </summary>
         protected object Model { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewModel"/> class.
+        /// </summary>
+        /// <param name="model">The model to use for this instance of view model.</param>
         public ViewModel(object model) => Model = model;
 
         /// <summary>
         /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
         /// </summary>// See the Remarks section.
         /// <param name="propertyName">The name of the property for which set a new value</param>
-        /// <param name="fieldName">The name of the field to store the new value. This must the field that is called by the property accessors (get and set).</param>
+        /// <param name="fieldName">The name of the field to store the new value. This have to be the field that is called by the property accessors (get and set).</param>
         /// <param name="newValue">The value to set in the property</param>
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
         // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
-        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType = null)
+        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
 
         {
 
             (bool propertyChanged, object oldValue) = Model.SetProperty(propertyName, fieldName, newValue, declaringType);
+
+            if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
+
+        }
+
+        /// <summary>
+        /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
+        /// </summary>// See the Remarks section.
+        /// <param name="propertyName">The name of the property for which set a new value</param>
+        /// <param name="newValue">The value to set in the property</param>
+        /// <param name="declaringType">The declaring type of both the property and its associated field</param>
+        // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
+        protected virtual void OnPropertyChanged(string propertyName, object newValue, Type declaringType)
+
+        {
+
+            (bool propertyChanged, object oldValue) = Model.SetProperty(propertyName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
@@ -115,23 +139,47 @@ namespace WinCopies.Util.Data
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// The model for this instance of view model.
+        /// </summary>
         protected T Model { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewModel"/> class.
+        /// </summary>
+        /// <param name="model">The model to use for this instance of view model.</param>
         public ViewModel(T model) => Model = model;
 
         /// <summary>
         /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
         /// </summary>// See the Remarks section.
         /// <param name="propertyName">The name of the property for which set a new value</param>
-        /// <param name="fieldName">The name of the field to store the new value. This must the field that is called by the property accessors (get and set).</param>
+        /// <param name="fieldName">The name of the field to store the new value. This have to be the field that is called by the property accessors (get and set).</param>
         /// <param name="newValue">The value to set in the property</param>
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
         // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
-        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType = null)
+        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
 
         {
 
             (bool propertyChanged, object oldValue) = Model.SetProperty(propertyName, fieldName, newValue, declaringType);
+
+            if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
+
+        }
+
+        /// <summary>
+        /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
+        /// </summary>// See the Remarks section.
+        /// <param name="propertyName">The name of the property for which set a new value</param>
+        /// <param name="newValue">The value to set in the property</param>
+        /// <param name="declaringType">The declaring type of both the property and its associated field</param>
+        // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
+        protected virtual void OnPropertyChanged(string propertyName, object newValue, Type declaringType)
+
+        {
+
+            (bool propertyChanged, object oldValue) = Model.SetProperty(propertyName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
