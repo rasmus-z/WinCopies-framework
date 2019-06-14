@@ -1474,7 +1474,7 @@ namespace WinCopies.Util
 
         }
 
-        public static (bool propertyChanged, object oldValue) SetProperty(this INotifyPropertyChanged obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
 

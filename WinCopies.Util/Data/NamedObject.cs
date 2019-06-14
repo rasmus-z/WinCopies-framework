@@ -15,23 +15,37 @@
     /// <summary>
     /// Provides an object that defines a value with an associated name and notifies of the name or value change.
     /// </summary>
-    public class NamedObject : ValueObject, INamedObject
+    public interface INamedObject<T> : IValueObject<T>
+
     {
 
-        // The IDE0044 warning is disabled for some fields in this class because they are set in the SetProperty extension method that is defined in the WinCopies.Util namespace (see the file 'Extensions.cs' for more details.
+        string Name { get; set; }
 
-#pragma warning disable IDE0044 // Ajouter un modificateur readonly
-        private string _name = null;
-#pragma warning restore IDE0044 // Ajouter un modificateur readonly
+    }
+
+    /// <summary>
+    /// Provides an object that defines a value with an associated name and notifies of the name or value change.
+    /// </summary>
+    public class NamedObject : ViewModelBase, INamedObject
+    {
+
+        private readonly string _name = null;
 
         /// <summary>
         /// Gets or sets the name of the object.
         /// </summary>
-        public string Name { get => _name; set => OnPropertyChanged(nameof(Name), nameof(_name), value,typeof(NamedObject)); }
+        public string Name { get => _name; set => OnPropertyChanged(nameof(Name), nameof(_name), value, typeof(NamedObject)); }
+
+        private readonly object _value;
+
+        /// <summary>
+        /// Gets or sets the value of the object.
+        /// </summary>
+        public object Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(NamedObject)); }
 
         public NamedObject() { }
 
-        public NamedObject(string name, object value) : base(value) => _name = name;
+        public NamedObject(string name, object value) => _name = name;
 
     }
 
@@ -39,21 +53,30 @@
     /// Provides an object that defines a generic value with an associated name and notifies of the name or value change.
     /// </summary>
     /// <typeparam name="T">The type of the value of this object.</typeparam>
-    public class NamedObject<T> : ValueObject<T>, INamedObject
+    public class NamedObject<T> : ViewModelBase, INamedObject<T>
     {
 
-        // The IDE0044 warning is disabled for some fields in this clas because they are set in the SetProperty extension method that is defined in the WinCopies.Util namespace (see the file 'Extensions.cs' for more details.
+        private readonly string _name = null;
 
-#pragma warning disable IDE0044 // Ajouter un modificateur readonly
-        private string _name = null;
-#pragma warning restore IDE0044 // Ajouter un modificateur readonly
+        public string Name { get => _name; set => OnPropertyChanged(nameof(Name), nameof(_name), value, typeof(NamedObject<T>)); }
 
-        public string Name { get => _name; set => OnPropertyChanged(nameof(Name), nameof(_name), value,typeof(NamedObject<T>)); }
+        private readonly T _value;
+
+        /// <summary>
+        /// Gets or sets the value of the object.
+        /// </summary>
+        public T Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(NamedObject)); }
 
         public NamedObject() { }
 
-        public NamedObject(string name, T value) : base(value) => _name = name;
+        public NamedObject(string name, T value)
+        {
 
+            _value = value;
+
+            _name = name;
+
+        }
     }
 
 }

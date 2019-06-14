@@ -130,6 +130,7 @@
     <Compile Include="Data\PercentConverter.cs" />
     <Compile Include="Data\ReverseBooleanConverter.cs" />
     <Compile Include="Data\ReversedBooleanToVisibilityConverter.cs" />
+    <Compile Include="Data\ViewModels.cs" />
     <Compile Include="Data\VisibilityToBooleanConverter.cs" />
     <Compile Include="Data\VisibilityToReversedBooleanConverter.cs" />
     <Compile Include="Extensions.cs" />

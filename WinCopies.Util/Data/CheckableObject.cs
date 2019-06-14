@@ -13,45 +13,76 @@
     }
 
     /// <summary>
-    /// Provides an object that defines a value that can be checked and notifies of the checked status or value change. For example, this class can be used in a view for items that can be selected.
+    /// Provides an object that defines a value that can be checked and notifies of the checked status or value change. For example, this interface can be used in a view for items that can be selected.
     /// </summary>
-    public class CheckableObject : ValueObject, ICheckableObject
+    public interface ICheckableObject<T> : IValueObject<T>
+
     {
 
-        // The IDE0044 warning is disabled for some fields in this class because they are set in the SetProperty extension method that is defined in the WinCopies.Util namespace (see the file 'Extensions.cs' for more details.
+        bool IsChecked { get; set; }
 
-#pragma warning disable IDE0044 // Ajouter un modificateur readonly
-        private bool _isChecked = false;
-#pragma warning restore IDE0044 // Ajouter un modificateur readonly
+    }
+
+    /// <summary>
+    /// Provides an object that defines a value that can be checked and notifies of the checked status or value change. For example, this class can be used in a view for items that can be selected.
+    /// </summary>
+    public class CheckableObject : ViewModelBase, ICheckableObject
+    {
+
+        private readonly bool _isChecked = false;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the object is checked.
         /// </summary>
         public bool IsChecked { get => _isChecked; set => OnPropertyChanged(nameof(IsChecked), nameof(_isChecked), value, typeof(CheckableObject)); }
 
+        private readonly object _value;
+
+        /// <summary>
+        /// Gets or sets the value of the object.
+        /// </summary>
+        public object Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(CheckableObject)); }
+
         public CheckableObject() { }
 
-        public CheckableObject(bool isChecked, object value) : base(value) => _isChecked = isChecked;
+        public CheckableObject(bool isChecked, object value)
+        {
+
+            _value = value;
+
+            _isChecked = isChecked;
+
+        }
     }
 
     /// <summary>
     /// Provides an object that defines a generic value that can be checked and notifies of the checked status or value change. For example, this class can be used in a view for items that can be selected.
     /// </summary>
     /// <typeparam name="T">The type of the value of this object.</typeparam>
-    public class CheckableObject<T> : ValueObject<T>, ICheckableObject
+    public class CheckableObject<T> : ViewModelBase, ICheckableObject<T>
     {
 
-        // The IDE0044 warning is disabled for some fields in this clas because they are set in the SetProperty extension method that is defined in the WinCopies.Util namespace (see the file 'Extensions.cs' for more details.
-
-#pragma warning disable IDE0044 // Ajouter un modificateur readonly
-        private bool _isChecked = false;
-#pragma warning restore IDE0044 // Ajouter un modificateur readonly
+        private readonly bool _isChecked = false;
 
         public bool IsChecked { get => _isChecked; set => OnPropertyChanged(nameof(IsChecked), nameof(_isChecked), value, typeof(CheckableObject<T>)); }
 
+        private readonly T _value;
+
+        /// <summary>
+        /// Gets or sets the value of the object.
+        /// </summary>
+        public T Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(CheckableObject)); }
+
         public CheckableObject() { }
 
-        public CheckableObject(bool isChecked, T value) : base(value) => _isChecked = isChecked;
+        public CheckableObject(bool isChecked, T value)
+        {
+
+            _value = value;
+
+            _isChecked = isChecked;
+
+        }
 
         //private void SetProperty(string propertyName, string fieldName, object newValue)
 
