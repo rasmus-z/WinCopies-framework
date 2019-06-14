@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -455,7 +456,7 @@ namespace WinCopies.Util
         // todo: to add null checks, out-of-range checks, ...
 
         /// <summary>
-        /// Removes multiple items in an <see cref="IList"/> collection, from a start index to a given length.
+        /// Removes multiple items in an <see cref="IList"/> collection, from a given start index for a given length.
         /// </summary>
         /// <param name="collection">The collection from which remove the items.</param>
         /// <param name="start">The start index in the collection from which delete the items.</param>
@@ -1337,6 +1338,20 @@ namespace WinCopies.Util
 
         #endregion
 
+        public static string ToString(this IEnumerable array, bool parseSubEnumerables, bool parseStrings = false)
+
+        {
+
+            StringBuilder result = new StringBuilder();
+
+            foreach (object value in array)
+
+                result.Append($"{{{ ((value is string && parseStrings) || (!(value is string) && value is IEnumerable && parseSubEnumerables) ? ((IEnumerable)value).ToString(true) : value?.ToString())}}}, ");
+
+            return result.ToString(0, result.Length - 2);
+
+        }
+
         #endregion
 
         /// <summary>
@@ -1474,7 +1489,25 @@ namespace WinCopies.Util
 
         }
 
-        public static (bool propertyChanged, object oldValue) SetProperty(this INotifyPropertyChanged obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+        internal static PropertyInfo GetProperty(string fieldName, Type objectType, BindingFlags bindingFlags)
+
+        {
+
+            BindingFlags flags = bindingFlags;
+
+            // var objectType = obj.GetType(); 
+
+            PropertyInfo property = objectType.GetProperty(fieldName, flags);
+
+            if (property == null)
+
+                throw new ArgumentException(string.Format(FieldOrPropertyNotFound, fieldName, objectType));
+
+            return property;
+
+        }
+
+        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
 
@@ -1533,6 +1566,36 @@ namespace WinCopies.Util
                 //             BindingFlags.Static | BindingFlags.Instance |
                 //             BindingFlags.DeclaredOnly;
                 //this.GetType().GetField(fieldName, flags).SetValue(this, newValue);
+
+            }
+
+            else
+
+                return (false, previousValue);
+
+        }
+
+        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+
+        {
+
+            string methodName;
+
+            PropertyInfo property = GetProperty(propertyName, declaringType, bindingFlags);
+
+            object previousValue = property.GetValue(obj);
+
+            if (performIntegrityCheck && !CheckPropertySetIntegrity(declaringType, propertyName, out methodName, 3, bindingFlags))
+
+                throw new InvalidOperationException(string.Format(DeclaringTypesNotCorrespond, propertyName, methodName));
+
+            if ((newValue == null && previousValue != null) || (newValue != null && !newValue.Equals(previousValue)))
+
+            {
+
+                property.SetValue(obj, newValue);
+
+                return (true, previousValue);
 
             }
 

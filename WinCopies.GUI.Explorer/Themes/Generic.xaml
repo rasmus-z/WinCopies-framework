@@ -184,9 +184,13 @@
 
         <Style.Triggers>
             <DataTrigger Binding="{Binding OpenMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" Value="{x:Static local:OpenMode.OnFirstClick}">
-                <Setter Property="commandBehavior:CommandBehavior.Event" Value="MouseEnter" />
-                <Setter Property="commandBehavior:CommandBehavior.Command" Value="{x:Static local:Commands.SingleClickSelection}" />
-                <Setter Property="commandBehavior:CommandBehavior.CommandParameter" Value="{Binding}" />
+                <Setter Property="commandBehavior:CommandBehaviorCollection.StyleBehaviors">
+                    <Setter.Value>
+                        <commandBehavior:BehaviorBindingCollection>
+                            <commandBehavior:BehaviorBinding Event="MouseEnter" Command="{x:Static local:Commands.SingleClickSelection}" CommandParameter="{Binding}" />
+                        </commandBehavior:BehaviorBindingCollection>
+                    </Setter.Value>
+                </Setter>
             </DataTrigger>
         </Style.Triggers>
         <!--</DataTrigger>
