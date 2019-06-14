@@ -158,6 +158,7 @@
     <None Include="app.config" />
     <None Include="package.nuspec" />
     <None Include="packages.config" />
+    <None Include="README.md" />
     <None Include="WinCopies.Util.snk" />
   </ItemGroup>
   <ItemGroup>
