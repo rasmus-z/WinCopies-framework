@@ -1,27 +1,12 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows.Media.Imaging;
 using WinCopies.Collections;
-using WinCopies.Util;
-using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 
 namespace WinCopies.IO
 {
     public abstract class BrowsableObjectInfo : IBrowsableObjectInfo
     {
-
-        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
-
-        {
-
-            (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
-
-            if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
-
-        }
-
-        protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         /// <summary>
         /// Gets the path of this <see cref="BrowsableObjectInfo"/>.
@@ -63,19 +48,15 @@ namespace WinCopies.IO
         /// </summary>
         public abstract bool IsBrowsable { get; }
 
-        private bool isDisposing = false;
-
         /// <summary>
         /// Gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is disposing.
         /// </summary>
-        public bool IsDisposing { get => isDisposing; private set => OnPropertyChanged(nameof(IsDisposing), nameof(isDisposing), value, typeof(BrowsableObjectInfo)); }
-
-        private bool areItemsLoaded = false;
+        public bool IsDisposing { get; set; }
 
         /// <summary>
         /// Gets a value that indicates if the items of this <see cref="BrowsableObjectInfo"/> are currently loaded.
         /// </summary>
-        public bool AreItemsLoaded { get => areItemsLoaded; internal set => OnPropertyChanged(nameof(AreItemsLoaded), nameof(areItemsLoaded), value, typeof(BrowsableObjectInfo)); }
+        public bool AreItemsLoaded { get; set; }
 
         internal readonly ObservableCollection<IBrowsableObjectInfo> items = new ObservableCollection<IBrowsableObjectInfo>();
 
@@ -103,7 +84,7 @@ namespace WinCopies.IO
 
             }
 
-            protected internal set => OnPropertyChanged(nameof(Parent), nameof(_parent), value, typeof(BrowsableObjectInfo));
+            internal set => _parent = value;
         }
 
         /// <summary>
@@ -127,15 +108,11 @@ namespace WinCopies.IO
 
                     return;
 
-                BrowsableObjectInfoItemsLoader previousValue = itemsLoader;
-
                 itemsLoader = value;
 
                 if (value != null)
 
                     value.Path = this;
-
-                PropertyChanged?.Invoke(this, new WinCopies.Util.Data. PropertyChangedEventArgs(nameof(ItemsLoader), previousValue, value));
 
             }
 
@@ -144,8 +121,6 @@ namespace WinCopies.IO
         // private bool _considerAsPathRoot = false;
 
         // public bool ConsiderAsPathRoot { get => _considerAsPathRoot; set => OnPropertyChanged(nameof(ConsiderAsPathRoot), nameof(_considerAsPathRoot), value, typeof(BrowsableObjectInfo)); }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.

@@ -25,7 +25,7 @@ using System.IO;
 namespace WinCopies.IO
 {
 
-    public class ArchiveLoader : BrowsableObjectInfoItemsLoader, INotifyPropertyChanged
+    public class ArchiveLoader : BrowsableObjectInfoItemsLoader
     {
 
         private static Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();
@@ -93,7 +93,7 @@ namespace WinCopies.IO
         /// </summary>
         public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes) { }
 
-        protected override void Init()
+        protected override void Initialize()
 
         {
 

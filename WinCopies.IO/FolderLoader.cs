@@ -48,7 +48,7 @@ namespace WinCopies.IO
 
         }
 
-        protected override void Init()
+        protected override void Initialize()
 
         {
 

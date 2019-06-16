@@ -31,7 +31,7 @@ namespace WinCopies.IO
 
             path = GetRealPathFromEnvironmentVariables(path);
 
-            List<string> paths = path.Split('\\').ToList();
+            string[] paths = path.Split('\\');
 
             BrowsableObjectInfo browsableObjectInfo;
 
@@ -43,7 +43,7 @@ namespace WinCopies.IO
                 ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolders.OtherFolderOrFile)
                 : new ShellObjectInfo(shellObject, paths[0], FileType.SpecialFolder, ShellObjectInfo.GetSpecialFolderType(shellObject));
 
-            if (paths.Count == 1)
+            if (paths.Length == 1)
 
                 return browsableObjectInfo;
 
@@ -53,7 +53,7 @@ namespace WinCopies.IO
 
             // int archiveSubpathsCount = 0;
 
-            for (int i = 1; i < paths.Count; i++)
+            for (int i = 1; i < paths.Length; i++)
 
             {
 
@@ -163,7 +163,7 @@ namespace WinCopies.IO
 
                 }
 
-                if (!browsableObjectInfo.IsBrowsable && i < paths.Count - 1)
+                if (!browsableObjectInfo.IsBrowsable && i < paths.Length - 1)
 
                     throw new DirectoryNotFoundException("The path isn't a directory.");
 
@@ -178,8 +178,6 @@ namespace WinCopies.IO
         {
 
             string pathWithoutExtension = System.IO.Path.GetDirectoryName(path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path);
-
-            string extension = System.IO.Path.GetExtension(path);
 
             bool checkFilters(string[] filters)
 
@@ -241,145 +239,145 @@ namespace WinCopies.IO
 
         }
 
-        public static ShellObjectInfo GetNormalizedOSPath(string basePath)
+        //        public static ShellObjectInfo GetNormalizedOSPath(string basePath)
 
-        {
+        //        {
 
-            ShellObject shellObject = null;
+        //            ShellObject shellObject = null;
 
-            FileType fileType = FileType.None;
+        //            FileType fileType = FileType.None;
 
-            SpecialFolders specialFolder = SpecialFolders.OtherFolderOrFile;
+        //            SpecialFolders specialFolder = SpecialFolders.OtherFolderOrFile;
 
-            string path = null;
+        //            string path = null;
 
-            void setSpecialFolder(SpecialFolders specialFolder_)
+        //            void setSpecialFolder(SpecialFolders specialFolder_)
 
-            {
+        //            {
 
-                specialFolder = specialFolder_;
+        //                specialFolder = specialFolder_;
 
-                fileType = FileType.SpecialFolder;
+        //                fileType = FileType.SpecialFolder;
 
-            }
+        //            }
 
-            // if (fileType != FileTypes.File && fileType != FileTypes.Folder) throw new ArgumentException("Invalid fileType parameter value. Accepted values are FileTypes.File or FileTypes.Folder.") ; 
+        //            // if (fileType != FileTypes.File && fileType != FileTypes.Folder) throw new ArgumentException("Invalid fileType parameter value. Accepted values are FileTypes.File or FileTypes.Folder.") ; 
 
-#if DEBUG
+        //#if DEBUG
 
-            Debug.WriteLine("KnownFolders.Libraries.CanonicalName: " + KnownFolders.Downloads.CanonicalName);
+        //            Debug.WriteLine("KnownFolders.Libraries.CanonicalName: " + KnownFolders.Downloads.CanonicalName);
 
-            Debug.WriteLine("KnownFolders.Libraries.LocalizedName: " + KnownFolders.Downloads.LocalizedName);
+        //            Debug.WriteLine("KnownFolders.Libraries.LocalizedName: " + KnownFolders.Downloads.LocalizedName);
 
-            Debug.WriteLine("KnownFolders.Libraries.Path: " + KnownFolders.Downloads.Path);
+        //            Debug.WriteLine("KnownFolders.Libraries.Path: " + KnownFolders.Downloads.Path);
 
-            Debug.WriteLine("KnownFolders.Libraries.ParsingName: " + KnownFolders.Downloads.ParsingName);
+        //            Debug.WriteLine("KnownFolders.Libraries.ParsingName: " + KnownFolders.Downloads.ParsingName);
 
-#endif
+        //#endif
 
-            if (basePath.EndsWith("\\"))
+        //            if (basePath.EndsWith("\\"))
 
-                basePath = basePath.Substring(0, basePath.Length - 1);
+        //                basePath = basePath.Substring(0, basePath.Length - 1);
 
-#if DEBUG
+        //#if DEBUG
 
-            Debug.WriteLine(basePath);
+        //            Debug.WriteLine(basePath);
 
-#endif
+        //#endif
 
-            if (basePath.EndsWith(":"))
+        //            if (basePath.EndsWith(":"))
 
-            {
+        //            {
 
-                shellObject = ShellObject.FromParsingName(basePath);
+        //                shellObject = ShellObject.FromParsingName(basePath);
 
-                path = basePath;
+        //                path = basePath;
 
-                fileType = FileType.Drive;
+        //                fileType = FileType.Drive;
 
-            }
+        //            }
 
-            else if (basePath.Contains(":"))
+        //            else if (basePath.Contains(":"))
 
-            {
+        //            {
 
-                shellObject = ShellObject.FromParsingName(basePath);
+        //                shellObject = ShellObject.FromParsingName(basePath);
 
-                if (shellObject is IKnownFolder)
+        //                if (shellObject is IKnownFolder)
 
-                {
+        //                {
 
-                    string shellObjectDisplayName = shellObject.GetDisplayName(DisplayNameType.Default);
+        //                    string shellObjectDisplayName = shellObject.GetDisplayName(DisplayNameType.Default);
 
-                    if (shellObjectDisplayName == KnownFolders.Libraries.LocalizedName)
+        //                    if (shellObjectDisplayName == KnownFolders.Libraries.LocalizedName)
 
-                        setSpecialFolder(SpecialFolders.UsersLibraries);
+        //                        setSpecialFolder(SpecialFolders.UsersLibraries);
 
-                    else if (shellObjectDisplayName == KnownFolders.Desktop.LocalizedName)
+        //                    else if (shellObjectDisplayName == KnownFolders.Desktop.LocalizedName)
 
-                        setSpecialFolder(SpecialFolders.Desktop);
+        //                        setSpecialFolder(SpecialFolders.Desktop);
 
-                    else
+        //                    else
 
-                        fileType = FileType.Folder;
+        //                        fileType = FileType.Folder;
 
-                }
+        //                }
 
-                else if (shellObject is ShellFile)
+        //                else if (shellObject is ShellFile)
 
-                    fileType = FileType.File;
+        //                    fileType = FileType.File;
 
-                path = basePath;
+        //                path = basePath;
 
-            }
+        //            }
 
-            else
+        //            else
 
-            {
+        //            {
 
-                if (basePath == Util.LibrariesName || basePath == Util.LibrariesLocalizedName)
+        //                if (basePath == Util.LibrariesName || basePath == Util.LibrariesLocalizedName)
 
-                {
+        //                {
 
-                    shellObject = (ShellObject)KnownFolders.Libraries;
+        //                    shellObject = (ShellObject)KnownFolders.Libraries;
 
-                    setSpecialFolder(SpecialFolders.UsersLibraries);
+        //                    setSpecialFolder(SpecialFolders.UsersLibraries);
 
-                    path = KnownFolders.Libraries.Path;
+        //                    path = KnownFolders.Libraries.Path;
 
-                }
+        //                }
 
-                else if (basePath == KnownFolders.Desktop.CanonicalName || basePath == KnownFolders.Desktop.LocalizedName)
+        //                else if (basePath == KnownFolders.Desktop.CanonicalName || basePath == KnownFolders.Desktop.LocalizedName)
 
-                {
+        //                {
 
-                    shellObject = (ShellObject)KnownFolders.Desktop;
+        //                    shellObject = (ShellObject)KnownFolders.Desktop;
 
-                    setSpecialFolder(SpecialFolders.Desktop);
+        //                    setSpecialFolder(SpecialFolders.Desktop);
 
-                    path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+        //                    path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
-                }
+        //                }
 
-                else
+        //                else
 
-                    fileType = FileType.Folder;
+        //                    fileType = FileType.Folder;
 
-                // else if (basePath.StartsWith(LibrariesName + "\\") || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
+        //                // else if (basePath.StartsWith(LibrariesName + "\\") || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
 
-                // else if
+        //                // else if
 
-            }
+        //            }
 
-#if DEBUG
+        //#if DEBUG
 
-            Debug.WriteLine("Path: " + path);
+        //            Debug.WriteLine("Path: " + path);
 
-#endif
+        //#endif
 
-            return new ShellObjectInfo(shellObject, path, fileType, specialFolder);
+        //            return new ShellObjectInfo(shellObject, path, fileType, specialFolder);
 
-        }
+        //        }
 
         // todo: to check and translate all the methods below:
 

@@ -1,11 +1,12 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace WinCopies.GUI.Explorer
 {
     /// <summary>
     /// Provides properties to interact with graphical <see cref="WinCopies.IO.IBrowsableObjectInfo"/> objects.
     /// </summary>
-    public interface IBrowsableObjectInfo : WinCopies.IO.IBrowsableObjectInfo
+    public interface IBrowsableObjectInfo : WinCopies.IO.IBrowsableObjectInfo, INotifyPropertyChanged
     {
 
         /// <summary>
