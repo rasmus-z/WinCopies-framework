@@ -90,7 +90,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Gets the selected items of this history item.
         /// </summary>
-        public IEnumerable<IBrowsableObjectInfo> SelectedItems { get; }
+        public IEnumerable<Explorer.IBrowsableObjectInfo> SelectedItems { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HistoryItemData"/> class.
@@ -99,7 +99,7 @@ namespace WinCopies.GUI.Explorer
         /// <param name="path">The path of this history item.</param>
         /// <param name="scrollViewerOffset">The <see cref="WinCopies.GUI.Explorer. ScrollViewerOffset"/> of this history item.</param>
         /// <param name="selectedItems">The selected items of this history item.</param>
-        public HistoryItemData(string header, IO.IBrowsableObjectInfo path, ScrollViewerOffset scrollViewerOffset, IEnumerable<IBrowsableObjectInfo> selectedItems)
+        public HistoryItemData(string header, IO.IBrowsableObjectInfo path, ScrollViewerOffset scrollViewerOffset, IEnumerable<Explorer.IBrowsableObjectInfo> selectedItems)
 
         {
 

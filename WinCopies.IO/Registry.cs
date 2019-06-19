@@ -226,7 +226,7 @@ namespace WinCopies.IO
 
         // todo: add gesture for the 'HKEY_LOCAL_MACHINE\SOFTWARE\Clients' key (ex.: HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\FileAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\MimeAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\URLAssociations, ...).
 
-        public static List<DesktopAppInfo> GetAppInfoByExtension(string extension)
+        public static DesktopAppInfo[] GetAppInfoByExtension(string extension)
 
         {
 
@@ -242,7 +242,7 @@ namespace WinCopies.IO
 
             RegistryKey _registryKey;
 
-            List<DesktopAppInfo> fileTypes = new List<DesktopAppInfo>();
+            LinkedList<DesktopAppInfo> fileTypes = new LinkedList<DesktopAppInfo>();
 
             void checkAndAddFileTypeIfSucceeded(string fileType, RegistryKey registryKey)
 
@@ -258,7 +258,7 @@ namespace WinCopies.IO
 
                         if (GetOpenWithSoftwarePathFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwarePathFromCommand(desktopAppInfo.Command) && GetOpenWithSoftwareArgumentsFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwareArgumentsFromCommand(desktopAppInfo.Command)) return;
 
-                    fileTypes.Add(desktopAppInfo);
+                    fileTypes.Append(desktopAppInfo);
 
                 }
 
@@ -364,7 +364,7 @@ namespace WinCopies.IO
 
             }
 
-            return fileTypes;
+            return fileTypes.ToArray();
 
         }
 

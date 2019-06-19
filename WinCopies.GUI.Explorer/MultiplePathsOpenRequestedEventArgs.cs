@@ -15,9 +15,9 @@
 //        /// <summary>
 //        /// The paths for which an open has been requested.
 //        /// </summary>
-//        public IBrowsableObjectInfo[] Paths { get; }
+//        public Explorer.IBrowsableObjectInfo[] Paths { get; }
 
-//        public MultiplePathsOpenRequestedEventArgs(IBrowsableObjectInfo[] paths) => Paths = paths;
+//        public MultiplePathsOpenRequestedEventArgs(Explorer.IBrowsableObjectInfo[] paths) => Paths = paths;
 
 //    }
 //}

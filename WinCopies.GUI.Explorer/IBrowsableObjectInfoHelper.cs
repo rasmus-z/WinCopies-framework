@@ -10,7 +10,7 @@ namespace WinCopies.GUI.Explorer
     static class BrowsableObjectInfoHelper
     {
 
-        internal static void Init(IBrowsableObjectInfoHelper browsableObjectInfo) => browsableObjectInfo.SelectedItems = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(((IBrowsableObjectInfoInternal)browsableObjectInfo).SelectedItems);
+        internal static void Init(Explorer.IBrowsableObjectInfoHelper browsableObjectInfo) => browsableObjectInfo.SelectedItems = new ReadOnlyObservableCollection<Explorer.IBrowsableObjectInfo>(((Explorer.IBrowsableObjectInfoInternal)browsableObjectInfo).SelectedItems);
 
     }
 }

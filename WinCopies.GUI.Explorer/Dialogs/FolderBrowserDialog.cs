@@ -134,7 +134,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         //    {
 
-        //        Explorer.IBrowsableObjectInfo selectedItem = ExplorerControl.Path.SelectedItem;
+        //        Explorer.Explorer.IBrowsableObjectInfo selectedItem = ExplorerControl.Path.SelectedItem;
 
         //        if (result && selectedItem != null && (selectedItem.FileType == FileType.Folder || (selectedItem.FileType == FileType.SpecialFolder && selectedItem is Explorer.ShellObjectInfo so && so.ShellObject.IsFileSystemObject) || selectedItem.FileType == FileType.Drive))
 

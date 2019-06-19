@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using WinCopies.IO;
-using IBrowsableObjectInfo = WinCopies.GUI.Explorer.IBrowsableObjectInfo;
 using ShellObjectInfo = WinCopies.GUI.Explorer.ShellObjectInfo;
-using Generic = WinCopies.GUI.Explorer.Themes.Generic;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
@@ -16,11 +14,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 
 
-            IBrowsableObjectInfo selectedItem = (IBrowsableObjectInfo)values[0];
+            Explorer.IBrowsableObjectInfo selectedItem = (Explorer.IBrowsableObjectInfo)values[0];
 
 
 
-            if (selectedItem != null && (selectedItem.FileType == FileType.Folder || (selectedItem.FileType == FileType.SpecialFolder && selectedItem is ShellObjectInfo so && so.ShellObject.IsFileSystemObject) || selectedItem.FileType == FileType.Drive))
+            if (selectedItem != null && (selectedItem.FileType == FileType.Folder || (selectedItem.FileType == FileType.SpecialFolder && selectedItem is IShellObjectInfo so && so.ShellObject.IsFileSystemObject) || selectedItem.FileType == FileType.Drive))
 
                 return Explorer.Themes.Generic.Open;
 

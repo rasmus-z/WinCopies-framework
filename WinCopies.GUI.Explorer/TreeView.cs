@@ -74,7 +74,7 @@ namespace WinCopies.GUI.Explorer
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
 
-            if (SelectedItem is IBrowsableObjectInfo browsableObjectInfo)
+            if (SelectedItem is Explorer.IBrowsableObjectInfo browsableObjectInfo)
 
             {
 
@@ -82,7 +82,7 @@ namespace WinCopies.GUI.Explorer
 
                 SetValue(CanDeletePropertyKey, true);
 
-                if (browsableObjectInfo is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject)
+                if (browsableObjectInfo is IShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject)
 
                 {
 
@@ -117,7 +117,7 @@ namespace WinCopies.GUI.Explorer
 
             ExplorerControl explorerControl = (sender as ExplorerControl)?.GetParent<ExplorerControl>(false);
 
-            explorerControl?.RenameAction?.Invoke(explorerControl.TreeView.SelectedItem as IBrowsableObjectInfo, e.Parameter as string);
+            explorerControl?.RenameAction?.Invoke(explorerControl.TreeView.SelectedItem as Explorer.IBrowsableObjectInfo, e.Parameter as string);
 
         }
 
@@ -130,7 +130,7 @@ namespace WinCopies.GUI.Explorer
 
             ExplorerControl explorerControl = (sender as ExplorerControl)?.GetParent<ExplorerControl>(false);
 
-            explorerControl?.DeleteAction?.Invoke(new IBrowsableObjectInfo[] { explorerControl.TreeView.SelectedItem as IBrowsableObjectInfo });
+            explorerControl?.DeleteAction?.Invoke(new Explorer.IBrowsableObjectInfo[] { explorerControl.TreeView.SelectedItem as Explorer.IBrowsableObjectInfo });
 
         }
 

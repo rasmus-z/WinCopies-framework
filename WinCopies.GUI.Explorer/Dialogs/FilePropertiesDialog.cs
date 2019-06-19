@@ -213,7 +213,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         {
 
-            if (e.NewValue is ShellObjectInfo)
+            if (e.NewValue is IShellObjectInfo)
 
             {
 

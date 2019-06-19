@@ -29,13 +29,13 @@ namespace WinCopies.Util
         #region Enumerable extension methods
 
         /// <summary>
-        /// Tries to add a value to an <see cref="IList{T}"/> if it does not contain the value already.
+        /// Tries to add a value to an <see cref="ICollection{T}"/> if it does not contain the value already.
         /// </summary>
         /// <typeparam name="T">The value type</typeparam>
         /// <param name="collection">The collection to which try to add the value</param>
         /// <param name="value">The value to try to add to the collection</param>
         /// <returns><see langword="true"/> if the value has been added to the collection, otherwise <see langword="false"/>.</returns>
-        public static bool AddIfNotContains<T>(this IList<T> collection, T value)
+        public static bool AddIfNotContains<T>(this ICollection<T> collection, T value)
 
         {
 
@@ -47,11 +47,13 @@ namespace WinCopies.Util
 
         }
 
-        public static IList<T> AddRangeIfNotContains<T>(this IList<T> collection, IEnumerable<T> values)
+        public static T[] AddRangeIfNotContains<T>(this ICollection<T> collection, params T[] values) => collection.AddRangeIfNotContains((IEnumerable<T>)values);
+
+        public static T[] AddRangeIfNotContains<T>(this ICollection<T> collection, IEnumerable<T> values)
 
         {
 
-            List<T> addedValues = new List<T>();
+            LinkedList<T> addedValues = new LinkedList<T>();
 
             foreach (T value in values)
 
@@ -61,11 +63,11 @@ namespace WinCopies.Util
 
                 collection.Add(value);
 
-                addedValues.Add(value);
+                addedValues.Append(value);
 
             }
 
-            return addedValues;
+            return addedValues.ToArray<T>();
 
         }
 
@@ -81,11 +83,13 @@ namespace WinCopies.Util
 
         }
 
-        public static IList<T> InsertRangeIfNotContains<T>(this IList<T> collection, int index, IEnumerable<T> values)
+        public static T[] InsertRangeIfNotContains<T>(this IList<T> collection, int index, params T[] values) => collection.InsertRangeIfNotContains(index, (IEnumerable<T>)values);
+
+        public static T[] InsertRangeIfNotContains<T>(this IList<T> collection, int index, IEnumerable<T> values)
 
         {
 
-            List<T> addedValues = new List<T>();
+            LinkedList<T> addedValues = new LinkedList<T>();
 
             foreach (T value in values)
 
@@ -95,15 +99,15 @@ namespace WinCopies.Util
 
                 collection.Insert(index, value);
 
-                addedValues.Add(value);
+                addedValues.Append(value);
 
             }
 
-            return addedValues;
+            return addedValues.ToArray<T>();
 
         }
 
-        public static bool RemoveIfContains<T>(this IList<T> collection, T value)
+        public static bool RemoveIfContains<T>(this ICollection<T> collection, T value)
 
         {
 
@@ -123,6 +127,8 @@ namespace WinCopies.Util
 
         #region AddRange methods
 
+        public static void AddRange(this IList collection, params object[] values) => collection.AddRange((IEnumerable)values);
+
         public static void AddRange(this IList collection, IEnumerable array)
 
         {
@@ -133,19 +139,31 @@ namespace WinCopies.Util
 
         }
 
-        public static void AddRange(this IList collection, IEnumerable array, int start, int length)
+        public static void AddRange(this IList collection, int start, int length, params object[] values)
 
         {
 
-            ArrayList arrayList = array.ToList();
-
             for (int i = start; i < length; i++)
 
-                collection.Add(arrayList[i]);
+                collection.Add(values[i]);
 
         }
 
-        public static void AddRange<T>(this IList<T> collection, IEnumerable<T> array)
+        public static void AddRange(this IList collection, IList values, int start, int length)
+
+        {
+
+            for (int i = start; i < length; i++)
+
+                collection.Add(values[i]);
+
+        }
+
+        public static void AddRange(this IList collection, IEnumerable array, int start, int length) => collection.AddRange(array.ToArray(), start, length);
+
+        public static void AddRange<T>(this ICollection<T> collection, params T[] values) => collection.AddRange((IEnumerable<T>)values);
+
+        public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> array)
 
         {
 
@@ -155,15 +173,185 @@ namespace WinCopies.Util
 
         }
 
-        public static void AddRange<T>(this IList<T> collection, IEnumerable<T> array, int start, int length)
+        public static void AddRange<T>(this ICollection<T> collection, int start, int length, params T[] values)
 
         {
 
-            List<T> arrayList = array.ToList<T>();
+            for (int i = start; i < length; i++)
+
+                collection.Add(values[i]);
+
+        }
+
+        public static void AddRange<T>(this ICollection<T> collection, IList<T> values, int start, int length)
+
+        {
 
             for (int i = start; i < length; i++)
 
-                collection.Add(arrayList[i]);
+                collection.Add(values[i]);
+
+        }
+
+        public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> array, int start, int length) => collection.AddRange(array.ToArray<T>(), start, length);
+
+        public static LinkedListNode<T>[] AddRangeFirst<T>(this LinkedList<T> collection, params T[] values) => collection.AddRangeFirst((IEnumerable<T>)values);
+
+        public static LinkedListNode<T>[] AddRangeFirst<T>(this LinkedList<T> collection, IEnumerable<T> array)
+
+        {
+
+            T[] _array = array.ToArray<T>();
+
+            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+
+            if (_array.Length != 0)
+
+            {
+
+                LinkedListNode<T> node = collection.AddFirst(_array[0]);
+
+                result.AddLast(node);
+
+                for (int i = 1; i < _array.Length; i++)
+
+                {
+
+                    node = collection.AddAfter(node, _array[i]);
+
+                    result.AddLast(node);
+
+                }
+
+            }
+
+            return result.ToArray<LinkedListNode<T>>();
+
+        }
+
+        public static void AddRangeFirst<T>(this LinkedList<T> collection, params LinkedListNode<T>[] values) => collection.AddRangeFirst((IEnumerable<LinkedListNode<T>>)values);
+
+        public static void AddRangeFirst<T>(this LinkedList<T> collection, IEnumerable<LinkedListNode<T>> array)
+
+        {
+
+            LinkedListNode<T>[] _array = array.ToArray<LinkedListNode<T>>();
+
+            if (_array.Length == 0) return;
+
+            LinkedListNode<T> node = _array[0];
+
+            collection.AddFirst(node);
+
+            for (int i = 1; i < _array.Length; i++)
+
+            {
+
+                collection.AddAfter(node, _array[i]);
+
+                node = _array[i];
+
+            }
+
+        }
+
+        public static LinkedListNode<T>[] AddRangeLast<T>(this LinkedList<T> collection, params T[] values) => collection.AddRangeLast((IEnumerable<T>)values);
+
+        public static LinkedListNode<T>[] AddRangeLast<T>(this LinkedList<T> collection, IEnumerable<T> array)
+
+        {
+
+            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+
+            foreach (T item in array)
+
+                result.AddLast(collection.AddLast(item));
+
+            return result.ToArray<LinkedListNode<T>>();
+
+        }
+
+        public static void AddRangeLast<T>(this LinkedList<T> collection, params LinkedListNode<T>[] values) => collection.AddRangeLast((IEnumerable<LinkedListNode<T>>)values);
+
+        public static void AddRangeLast<T>(this LinkedList<T> collection, IEnumerable<LinkedListNode<T>> array)
+
+        {
+
+            foreach (LinkedListNode<T> item in array)
+
+                collection.AddLast(item);
+
+        }
+
+        public static LinkedListNode<T>[] AddRangeBefore<T>(this LinkedList<T> collection, LinkedListNode<T> node, params T[] values) => collection.AddRangeBefore(node, (IEnumerable<T>)values);
+
+        public static LinkedListNode<T>[] AddRangeBefore<T>(this LinkedList<T> collection, LinkedListNode<T> node, IEnumerable<T> array)
+
+        {
+
+            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+
+            foreach (T item in array)
+
+                result.AddLast(collection.AddBefore(node, item));
+
+            return result.ToArray<LinkedListNode<T>>();
+
+        }
+
+        public static void AddRangeBefore<T>(this LinkedList<T> collection, LinkedListNode<T> node, params LinkedListNode<T>[] values) => collection.AddRangeBefore(node, (IEnumerable<LinkedListNode<T>>)values);
+
+        public static void AddRangeBefore<T>(this LinkedList<T> collection, LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
+
+        {
+
+            foreach (LinkedListNode<T> item in array)
+
+                collection.AddBefore(node, item);
+
+        }
+
+        public static LinkedListNode<T>[] AddRangeAfter<T>(this LinkedList<T> collection, LinkedListNode<T> node, params T[] values) => collection.AddRangeAfter(node, (IEnumerable<T>)values);
+
+        public static LinkedListNode<T>[] AddRangeAfter<T>(this LinkedList<T> collection, LinkedListNode<T> node, IEnumerable<T> array)
+
+        {
+
+            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+
+            LinkedListNode<T> _node = node;
+
+            foreach (T item in array)
+
+            {
+
+                _node = collection.AddAfter(_node, item);
+
+                result.AddLast(_node);
+
+            }
+
+            return result.ToArray<LinkedListNode<T>>();
+
+        }
+
+        public static void AddRangeAfter<T>(this LinkedList<T> collection, LinkedListNode<T> node, params LinkedListNode<T>[] values) => collection.AddRangeAfter(node, (IEnumerable<LinkedListNode<T>>)values);
+
+        public static void AddRangeAfter<T>(this LinkedList<T> collection, LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
+
+        {
+
+            LinkedListNode<T> _node = node;
+
+            foreach (LinkedListNode<T> item in array)
+
+            {
+
+                collection.AddAfter(_node, item);
+
+                _node = item;
+
+            }
 
         }
 
@@ -456,7 +644,7 @@ namespace WinCopies.Util
         // todo: to add null checks, out-of-range checks, ...
 
         /// <summary>
-        /// Removes multiple items in an <see cref="IList"/> collection, from a given start index for a given length.
+        /// Removes multiple items in an <see cref="ICollection"/> collection, from a given start index for a given length.
         /// </summary>
         /// <param name="collection">The collection from which remove the items.</param>
         /// <param name="start">The start index in the collection from which delete the items.</param>
@@ -492,7 +680,7 @@ namespace WinCopies.Util
         /// </summary>
         /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
         /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
-        public static void Sort<T>(this System.Collections.ObjectModel.ObservableCollection<T> oc)
+        public static void Sort<T>(this ObservableCollection<T> oc)
 
         {
 
@@ -510,7 +698,7 @@ namespace WinCopies.Util
         /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
         /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
         /// <param name="comparer">An <see cref="IComparer{T}"/> providing comparison for sorting the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</param>
-        public static void Sort<T>(this System.Collections.ObjectModel.ObservableCollection<T> oc, IComparer<T> comparer)
+        public static void Sort<T>(this ObservableCollection<T> oc, IComparer<T> comparer)
 
         {
 

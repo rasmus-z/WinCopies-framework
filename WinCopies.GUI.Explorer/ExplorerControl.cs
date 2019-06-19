@@ -17,7 +17,6 @@ using NotifyCollectionChangedEventArgs = System.Collections.Specialized.NotifyCo
 using Generic = WinCopies.GUI.Explorer.Themes.Generic;
 using WinCopies.GUI.Controls;
 using TextBox = System.Windows.Controls.TextBox;
-using Clipboard = WinCopies.IO.Clipboard;
 using System.Windows.Interop;
 using System.ComponentModel;
 using WinCopies.Util.Commands;
@@ -32,9 +31,9 @@ namespace WinCopies.GUI.Explorer
 
     public delegate void PasteHandler(bool isAFileMoving, StringCollection sc, string destPath);
 
-    public delegate void RenameHandler(IBrowsableObjectInfo path, string newName);
+    public delegate void RenameHandler(Explorer.IBrowsableObjectInfo path, string newName);
 
-    public delegate void DeleteHandler(IBrowsableObjectInfo[] paths);
+    public delegate void DeleteHandler(Explorer.IBrowsableObjectInfo[] paths);
 
     public class ExplorerControl : Control
     {
@@ -69,7 +68,7 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
 
-        private static readonly DependencyPropertyKey PathPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Path), typeof(IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ExplorerControl)d).RaiseEvent(new RoutedEventArgs<ValueChangedEventArgs<IBrowsableObjectInfo>>(PathChangedEvent, d, new ValueChangedEventArgs<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.OldValue, (IBrowsableObjectInfo)e.NewValue)))));
+        private static readonly DependencyPropertyKey PathPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Path), typeof(Explorer.IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((ExplorerControl)d).RaiseEvent(new RoutedEventArgs<ValueChangedEventArgs<Explorer.IBrowsableObjectInfo>>(PathChangedEvent, d, new ValueChangedEventArgs<Explorer.IBrowsableObjectInfo>((Explorer.IBrowsableObjectInfo)e.OldValue, (Explorer.IBrowsableObjectInfo)e.NewValue)))));
 
         /// <summary>
         /// Identifies the <see cref="Path"/> dependency property.
@@ -77,9 +76,9 @@ namespace WinCopies.GUI.Explorer
         public static readonly DependencyProperty PathProperty = PathPropertyKey.DependencyProperty;
 
         /// <summary>
-        /// Gets the <see cref="IBrowsableObjectInfo"/> which represents the path of this <see cref="ExplorerControl"/>. This is a dependency property.
+        /// Gets the <see cref="Explorer.IBrowsableObjectInfo"/> which represents the path of this <see cref="ExplorerControl"/>. This is a dependency property.
         /// </summary>
-        public IBrowsableObjectInfo Path => (IBrowsableObjectInfo)GetValue(PathProperty);
+        public Explorer.IBrowsableObjectInfo Path => (Explorer.IBrowsableObjectInfo)GetValue(PathProperty);
 
         private static readonly DependencyPropertyKey IsLoadingPropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsLoading), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
 
@@ -145,7 +144,7 @@ namespace WinCopies.GUI.Explorer
         /// </summary>
         public bool ShowSystemItems { get => (bool)GetValue(ShowSystemItemsProperty); set => SetValue(ShowSystemItemsProperty, value); }
 
-        //public static readonly DependencyPropertyKey TreeViewSelectedItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(TreeViewSelectedItem), typeof(IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        //public static readonly DependencyPropertyKey TreeViewSelectedItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(TreeViewSelectedItem), typeof(Explorer.IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         //{
 
         //    Debug.WriteLine(((ShellObjectInfo)e.NewValue).Path + " " + ((ShellObjectInfo)e.NewValue).ShellObject.ParsingName);
@@ -160,17 +159,17 @@ namespace WinCopies.GUI.Explorer
         ///// <summary>
         ///// Gets or sets the tree view selected item.
         ///// </summary>
-        //public IBrowsableObjectInfo TreeViewSelectedItem { get => (IBrowsableObjectInfo)GetValue(TreeViewSelectedItemProperty); internal set => SetValue(TreeViewSelectedItemPropertyKey, value); }
+        //public Explorer.IBrowsableObjectInfo TreeViewSelectedItem { get => (Explorer.IBrowsableObjectInfo)GetValue(TreeViewSelectedItemProperty); internal set => SetValue(TreeViewSelectedItemPropertyKey, value); }
 
         ///// <summary>
         ///// Identifies the <see cref="SelectedItem"/> dependency property.
         ///// </summary>
-        //public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(IO.IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null));
+        //public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(IO.Explorer.IBrowsableObjectInfo), typeof(ExplorerControl), new PropertyMetadata(null));
 
         ///// <summary>
         ///// Gets or sets the list view selected item.
         ///// </summary>
-        //public IBrowsableObjectInfo SelectedItem { get => (IBrowsableObjectInfo)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
+        //public Explorer.IBrowsableObjectInfo SelectedItem { get => (Explorer.IBrowsableObjectInfo)GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
 
         //private static readonly DependencyPropertyKey SelectedItemsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(SelectedItems), typeof(ObservableListBoxSelectedItems), typeof(ExplorerControl), new PropertyMetadata(null));
 
@@ -229,13 +228,13 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="TreeViewItems"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty TreeViewItemsProperty = DependencyProperty.Register(nameof(TreeViewItems), typeof(System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfo>), typeof(ExplorerControl), new PropertyMetadata(
+        public static readonly DependencyProperty TreeViewItemsProperty = DependencyProperty.Register(nameof(TreeViewItems), typeof(System.Collections.ObjectModel.ObservableCollection<Explorer.IBrowsableObjectInfo>), typeof(ExplorerControl), new PropertyMetadata(
 
             GetDefaultTreeViewItems(), (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
 
             {
 
-                foreach (IBrowsableObjectInfo item in (ObservableCollection<IBrowsableObjectInfo>)e.OldValue)
+                foreach (Explorer.IBrowsableObjectInfo item in (ObservableCollection<Explorer.IBrowsableObjectInfo>)e.OldValue)
 
                     item.Dispose();
 
@@ -243,7 +242,7 @@ namespace WinCopies.GUI.Explorer
 
             ));
 
-        public System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfo> TreeViewItems { get => (System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfo>)GetValue(TreeViewItemsProperty); set => SetValue(TreeViewItemsProperty, value); }
+        public System.Collections.ObjectModel.ObservableCollection<Explorer.IBrowsableObjectInfo> TreeViewItems { get => (System.Collections.ObjectModel.ObservableCollection<Explorer.IBrowsableObjectInfo>)GetValue(TreeViewItemsProperty); set => SetValue(TreeViewItemsProperty, value); }
 
         private static readonly DependencyPropertyKey CanMoveToPreviousPathPropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanMoveToPreviousPath), typeof(bool), typeof(ExplorerControl), new PropertyMetadata(false));
 
@@ -397,7 +396,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="ArchiveFormatsToOpen"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ArchiveFormatsToOpenProperty = DependencyProperty.Register(nameof(ArchiveFormatsToOpen), typeof(InArchiveFormats), typeof(ExplorerControl), new PropertyMetadata(GetEnumAllFlags<InArchiveFormats>()));
+        public static readonly DependencyProperty ArchiveFormatsToOpenProperty = DependencyProperty.Register(nameof(ArchiveFormatsToOpen), typeof(InArchiveFormats), typeof(ExplorerControl), new PropertyMetadata(GetAllEnumFlags<InArchiveFormats>()));
 
         public InArchiveFormats ArchiveFormatsToOpen { get => (InArchiveFormats)GetValue(ArchiveFormatsToOpenProperty); set => SetValue(ArchiveFormatsToOpenProperty, value); }
 
@@ -506,12 +505,12 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="PathChanged"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent PathChangedEvent = EventManager.RegisterRoutedEvent(nameof(PathChanged), RoutingStrategy.Bubble, typeof(RoutedEventHandler<ValueChangedEventArgs<IBrowsableObjectInfo>>), typeof(ExplorerControl));
+        public static readonly RoutedEvent PathChangedEvent = EventManager.RegisterRoutedEvent(nameof(PathChanged), RoutingStrategy.Bubble, typeof(RoutedEventHandler<ValueChangedEventArgs<Explorer.IBrowsableObjectInfo>>), typeof(ExplorerControl));
 
         /// <summary>
         /// Occurs when the <see cref="Path"/> property has changed.
         /// </summary>
-        public event RoutedEventHandler<ValueChangedEventArgs<IBrowsableObjectInfo>> PathChanged
+        public event RoutedEventHandler<ValueChangedEventArgs<Explorer.IBrowsableObjectInfo>> PathChanged
         {
 
             add => AddHandler(PathChangedEvent, value);
@@ -523,12 +522,12 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="NavigationRequested"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent NavigationRequestedEvent = EventManager.RegisterRoutedEvent(nameof(NavigationRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler<EventArgs<IBrowsableObjectInfo>>), typeof(ExplorerControl));
+        public static readonly RoutedEvent NavigationRequestedEvent = EventManager.RegisterRoutedEvent(nameof(NavigationRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler<EventArgs<Explorer.IBrowsableObjectInfo>>), typeof(ExplorerControl));
 
         /// <summary>
         /// Occurs when a navigation is requested. This event occurs only if the <see cref="OpenDirectoriesDirectly"/> is set to <see langword="false"/>.
         /// </summary>
-        public event RoutedEventHandler<EventArgs<IBrowsableObjectInfo>> NavigationRequested
+        public event RoutedEventHandler<EventArgs<Explorer.IBrowsableObjectInfo>> NavigationRequested
         {
 
             add => AddHandler(NavigationRequestedEvent, value);
@@ -540,12 +539,12 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="MultiplePathsOpeningRequested"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent MultiplePathsOpeningRequestedEvent = EventManager.RegisterRoutedEvent(nameof(MultiplePathsOpeningRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler<EventArgs<IBrowsableObjectInfo[]>>), typeof(ExplorerControl));
+        public static readonly RoutedEvent MultiplePathsOpeningRequestedEvent = EventManager.RegisterRoutedEvent(nameof(MultiplePathsOpeningRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler<EventArgs<Explorer.IBrowsableObjectInfo[]>>), typeof(ExplorerControl));
 
         /// <summary>
         /// Occurs when an array of paths have been requested for opening. When the <see cref="ExplorerControl"/> raises this event, if the <see cref="OpenDirectoriesDirectly"/> is set to <see langword="true"/>, it has also tried to open the first path of the <see cref="EventArgs{T}.Value"/> array. If this property is set to <see langword="false"/>, the <see cref="NavigationRequested"/> event is raised instead.
         /// </summary>
-        public event RoutedEventHandler<EventArgs<IBrowsableObjectInfo[]>> MultiplePathsOpeningRequested
+        public event RoutedEventHandler<EventArgs<Explorer.IBrowsableObjectInfo[]>> MultiplePathsOpeningRequested
         {
 
             add => AddHandler(MultiplePathsOpeningRequestedEvent, value);
@@ -557,9 +556,9 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Identifies the <see cref="FilesOpeningRequested"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent FilesOpeningRequestedEvent = EventManager.RegisterRoutedEvent(nameof(FilesOpeningRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler<EventArgs<IBrowsableObjectInfo[]>>), typeof(ExplorerControl));
+        public static readonly RoutedEvent FilesOpeningRequestedEvent = EventManager.RegisterRoutedEvent(nameof(FilesOpeningRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler<EventArgs<Explorer.IBrowsableObjectInfo[]>>), typeof(ExplorerControl));
 
-        public event RoutedEventHandler<EventArgs<IBrowsableObjectInfo[]>> FilesOpeningRequested
+        public event RoutedEventHandler<EventArgs<Explorer.IBrowsableObjectInfo[]>> FilesOpeningRequested
         {
 
             add => AddHandler(FilesOpeningRequestedEvent, value);
@@ -624,7 +623,7 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Initializes a new instance of the <see cref="ExplorerControl"/> class.
         /// </summary>
-        public ExplorerControl() : this((IBrowsableObjectInfo)null) { }
+        public ExplorerControl() : this((Explorer.IBrowsableObjectInfo)null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExplorerControl"/> class using a custom shell object path.
@@ -634,9 +633,9 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Initializes a new instance of the <see cref="ExplorerControl"/> class using a custom path.
         /// </summary>
-        public ExplorerControl(IBrowsableObjectInfo path) => Init(path);
+        public ExplorerControl(Explorer.IBrowsableObjectInfo path) => Init(path);
 
-        private void Init(IBrowsableObjectInfo path)
+        private void Init(Explorer.IBrowsableObjectInfo path)
 
         {
 
@@ -714,7 +713,7 @@ namespace WinCopies.GUI.Explorer
 
         {
 
-            IBrowsableObjectInfo _obj = (IBrowsableObjectInfo)e.Parameter;
+            Explorer.IBrowsableObjectInfo _obj = (Explorer.IBrowsableObjectInfo)e.Parameter;
 
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
 
@@ -728,7 +727,7 @@ namespace WinCopies.GUI.Explorer
 
                 foreach (IO.IBrowsableObjectInfo browsableObjectInfo in p.Items)
 
-                    if (browsableObjectInfo is IBrowsableObjectInfo _browsableObjectInfo)
+                    if (browsableObjectInfo is Explorer.IBrowsableObjectInfo _browsableObjectInfo)
 
                         _browsableObjectInfo.IsSelected = false;
 
@@ -745,13 +744,13 @@ namespace WinCopies.GUI.Explorer
 
             bool selectedItemIsShellObjectInfo;
 
-            if (ListView.SelectedItem is IBrowsableObjectInfo browsableObjectInfo)
+            if (ListView.SelectedItem is Explorer.IBrowsableObjectInfo browsableObjectInfo)
 
             {
 
                 selectedItemIsBrowsableObjectInfo = true;
 
-                selectedItemIsShellObjectInfo = browsableObjectInfo is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject;
+                selectedItemIsShellObjectInfo = browsableObjectInfo is IShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject;
 
             }
 
@@ -771,7 +770,7 @@ namespace WinCopies.GUI.Explorer
 
         internal void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnOpenCanExecute(e);
 
-        internal void Open_Executed(object sender, ExecutedRoutedEventArgs e) => OnOpening(ListView.SelectedItems.OfType<IBrowsableObjectInfo>().ToArray());
+        internal void Open_Executed(object sender, ExecutedRoutedEventArgs e) => OnOpening(ListView.SelectedItems.OfType<Explorer.IBrowsableObjectInfo>().ToArray());
 
         protected virtual void OnCopyCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanCopy;//e.ContinueRouting = false;//e.Handled = true;//raise
 
@@ -801,7 +800,7 @@ namespace WinCopies.GUI.Explorer
 
             // if (sender == this)
 
-            RenameAction?.Invoke(ListView.SelectedItem as IBrowsableObjectInfo, e.Parameter as string);
+            RenameAction?.Invoke(ListView.SelectedItem as Explorer.IBrowsableObjectInfo, e.Parameter as string);
 
         protected virtual void OnDeleteCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = CanDelete;
 
@@ -811,7 +810,7 @@ namespace WinCopies.GUI.Explorer
 
             // if (sender == this)
 
-            DeleteAction?.Invoke(ListView.SelectedItems.OfType<IBrowsableObjectInfo>().ToArray());
+            DeleteAction?.Invoke(ListView.SelectedItems.OfType<Explorer.IBrowsableObjectInfo>().ToArray());
 
         private bool IsAutomaticItemContainerGeneratorStatusChange = false;
 
@@ -819,7 +818,7 @@ namespace WinCopies.GUI.Explorer
 
         internal void RaiseSelectionChangedEvent(SelectionChangedEventArgs e) => RaiseEvent(e);
 
-        protected virtual void OnPathChanged(IBrowsableObjectInfo oldValue, IBrowsableObjectInfo newValue)
+        protected virtual void OnPathChanged(Explorer.IBrowsableObjectInfo oldValue, Explorer.IBrowsableObjectInfo newValue)
 
         {
             // Console.WriteLine((PART_TextBox != null).ToString()+" "+(!PART_TextBox.IsFocused).ToString());
@@ -837,7 +836,7 @@ namespace WinCopies.GUI.Explorer
 
                 // ((INotifyCollectionChanging)oldValue.Items).CollectionChanging -= Path_CollectionChanging;
 
-                // foreach (IBrowsableObjectInfo value in oldValue.Items)
+                // foreach (Explorer.IBrowsableObjectInfo value in oldValue.Items)
 
                 // {
 
@@ -871,7 +870,7 @@ namespace WinCopies.GUI.Explorer
 
         // if ((e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Reset) && e.ResetItems != null)
 
-        // foreach (IBrowsableObjectInfo value in e.ResetItems)
+        // foreach (Explorer.IBrowsableObjectInfo value in e.ResetItems)
 
         // object value = ((ListViewItem)ListView.ItemContainerGenerator.ContainerFromItem(ListView.ItemContainerGenerator.Items[i]));
 
@@ -999,17 +998,17 @@ namespace WinCopies.GUI.Explorer
 
                 foreach (var oldItem in e.OldItems.OfType<HistoryItemData>())
 
-                    ((IBrowsableObjectInfo)oldItem.Path).Dispose();
+                    ((Explorer.IBrowsableObjectInfo)oldItem.Path).Dispose();
 
         }
 
-        private static System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfo> GetDefaultTreeViewItems()
+        private static System.Collections.ObjectModel.ObservableCollection<Explorer.IBrowsableObjectInfoViewModel> GetDefaultTreeViewItems()
 
         {
 
             object[][] defaultTreeViewFolders = { new object[] { KnownFolders.Desktop, SpecialFolders.Desktop }, new object[] { KnownFolders.Computer, SpecialFolders.Computer }, new object[] { KnownFolders.Libraries, SpecialFolders.Libraries }, new object[] { KnownFolders.RecycleBin, SpecialFolders.RecycleBin } };
 
-            System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfo> oc = new System.Collections.ObjectModel.ObservableCollection<IBrowsableObjectInfo>();
+            List<BrowsableObjectInfoViewModel> browsableObjectInfos = new List<BrowsableObjectInfoViewModel>(defaultTreeViewFolders.Length);
 
             ShellObject shellObject;
 
@@ -1019,16 +1018,16 @@ namespace WinCopies.GUI.Explorer
 
                 shellObject = ShellObject.FromParsingName(((IKnownFolder)defaultTreeViewFolder[0]).ParsingName);
 
-                oc.Add(new ShellObjectInfo(
-                            shellObject, shellObject.IsFileSystemObject ? shellObject.ParsingName : shellObject.GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder, (SpecialFolders)defaultTreeViewFolder[1]));
+                browsableObjectInfos.Add(new BrowsableObjectInfoViewModel(new ShellObjectInfo(
+                            shellObject, shellObject.IsFileSystemObject ? shellObject.ParsingName : shellObject.GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder, (SpecialFolders)defaultTreeViewFolder[1])));
 
             };
 
-            return oc;
+            return new System.Collections.ObjectModel.ObservableCollection<Explorer.IBrowsableObjectInfoViewModel>(browsableObjectInfos);
 
         }
 
-        private void ExplorerControl_PathChanged(object sender, RoutedEventArgs<ValueChangedEventArgs<IBrowsableObjectInfo>> e) => OnPathChanged(e.OriginalEventArgs.OldValue, e.OriginalEventArgs.NewValue);
+        private void ExplorerControl_PathChanged(object sender, RoutedEventArgs<ValueChangedEventArgs<Explorer.IBrowsableObjectInfo>> e) => OnPathChanged(e.OriginalEventArgs.OldValue, e.OriginalEventArgs.NewValue);
 
         private void ExplorerControl_TextChanged(object sender, TextChangedEventArgs e) => OnTextChanged(e);
 
@@ -1072,17 +1071,17 @@ namespace WinCopies.GUI.Explorer
 
                     if (IsAutomaticItemContainerGeneratorStatusChange) return;
 
-                    IBrowsableObjectInfoInternal _path = (IBrowsableObjectInfoInternal)Path;
+                    Explorer.IBrowsableObjectInfoInternal _path = (Explorer.IBrowsableObjectInfoInternal)Path;
 
                     if (e.Action == NotifyCollectionChangedAction.Add)
 
-                        foreach (IBrowsableObjectInfo item in e.NewItems.OfType<IBrowsableObjectInfo>())
+                        foreach (Explorer.IBrowsableObjectInfo item in e.NewItems.OfType<Explorer.IBrowsableObjectInfo>())
 
                             _path.SelectedItems.Add(item);
 
                     else if (e.Action == NotifyCollectionChangedAction.Remove)
 
-                        foreach (IBrowsableObjectInfo item in e.OldItems.OfType<IBrowsableObjectInfo>())
+                        foreach (Explorer.IBrowsableObjectInfo item in e.OldItems.OfType<Explorer.IBrowsableObjectInfo>())
 
                             _path.SelectedItems.Remove(item);
 
@@ -1273,11 +1272,11 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        internal bool? OpenInternal(IBrowsableObjectInfo path, bool firstItem)
+        internal bool? OpenInternal(Explorer.IBrowsableObjectInfo path, bool firstItem)
 
         {
 
-            if (firstItem && path is ArchiveItemInfo && path.FileType == FileType.Archive)
+            if (firstItem && path is IArchiveItemInfo && path.FileType == FileType.Archive)
 
             {
 
@@ -1287,7 +1286,7 @@ namespace WinCopies.GUI.Explorer
 
             }
 
-            if (path is ShellObjectInfo || path is ArchiveItemInfo)
+            if (path is IShellObjectInfo || path is IArchiveItemInfo)
 
             {
 
@@ -1309,7 +1308,7 @@ namespace WinCopies.GUI.Explorer
 
                         {
 
-                            RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo>>(NavigationRequestedEvent, this, new EventArgs<IBrowsableObjectInfo>(path)));
+                            RaiseEvent(new RoutedEventArgs<EventArgs<Explorer.IBrowsableObjectInfo>>(NavigationRequestedEvent, this, new EventArgs<Explorer.IBrowsableObjectInfo>(path)));
 
                             return null;
 
@@ -1343,7 +1342,7 @@ namespace WinCopies.GUI.Explorer
 
                                     {
 
-                                        RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo>>(NavigationRequestedEvent, this, new EventArgs<IBrowsableObjectInfo>(path)));
+                                        RaiseEvent(new RoutedEventArgs<EventArgs<Explorer.IBrowsableObjectInfo>>(NavigationRequestedEvent, this, new EventArgs<Explorer.IBrowsableObjectInfo>(path)));
 
                                         return null;
 
@@ -1433,7 +1432,7 @@ namespace WinCopies.GUI.Explorer
 
                     {
 
-                        RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo>>(NavigationRequestedEvent, this, new EventArgs<IBrowsableObjectInfo>(_path)));
+                        RaiseEvent(new RoutedEventArgs<EventArgs<Explorer.IBrowsableObjectInfo>>(NavigationRequestedEvent, this, new EventArgs<Explorer.IBrowsableObjectInfo>(_path)));
 
                         return null;
 
@@ -1460,8 +1459,8 @@ namespace WinCopies.GUI.Explorer
         /// <summary>
         /// Opens a path array.
         /// </summary>
-        /// <param name="paths">The <see cref="IBrowsableObjectInfo"/> paths array to open.</param>
-        public void Open(params IBrowsableObjectInfo[] paths) => OnOpening(paths);
+        /// <param name="paths">The <see cref="Explorer.IBrowsableObjectInfo"/> paths array to open.</param>
+        public void Open(params Explorer.IBrowsableObjectInfo[] paths) => OnOpening(paths);
 
         public void Open()
 
@@ -1475,9 +1474,9 @@ namespace WinCopies.GUI.Explorer
 
             //foreach (var item in ListViewSelectedItems.ListBox.SelectedItems)
 
-            //    if (item is IBrowsableObjectInfo)
+            //    if (item is Explorer.IBrowsableObjectInfo)
 
-            //        if (((IBrowsableObjectInfo)item).FileType == FileTypes.Folder || ((IBrowsableObjectInfo)item).FileType == FileTypes.Drive || ((IBrowsableObjectInfo)item).FileType == FileTypes.SpecialFolder || ((IBrowsableObjectInfo)item).FileType == FileTypes.Archive)
+            //        if (((Explorer.IBrowsableObjectInfo)item).FileType == FileTypes.Folder || ((Explorer.IBrowsableObjectInfo)item).FileType == FileTypes.Drive || ((Explorer.IBrowsableObjectInfo)item).FileType == FileTypes.SpecialFolder || ((Explorer.IBrowsableObjectInfo)item).FileType == FileTypes.Archive)
 
             //        {
 
@@ -1486,7 +1485,7 @@ namespace WinCopies.GUI.Explorer
             //            break;
             //        }
 
-            //        else if (((IBrowsableObjectInfo)item).FileType == FileTypes.File)
+            //        else if (((Explorer.IBrowsableObjectInfo)item).FileType == FileTypes.File)
 
             //        {
 
@@ -1508,25 +1507,19 @@ namespace WinCopies.GUI.Explorer
 
             //if (areFoldersSelected || areFilesSelected || areOtherObjectsSelected)
 
-            List<IBrowsableObjectInfo> paths = new List<IBrowsableObjectInfo>();
-
-            foreach (object path in _observableListBoxSelectedItems.ListBox.SelectedItems)
-
-                paths.Add((IBrowsableObjectInfo)path);
-
-            OnOpening(paths.ToArray());
+            OnOpening((Explorer.IBrowsableObjectInfo[])_observableListBoxSelectedItems.ListBox.SelectedItems.ToArray());
 
         }
 
-        public void Navigate(IBrowsableObjectInfo path) => Navigate(path, null);
+        public void Navigate(Explorer.IBrowsableObjectInfo path) => Navigate(path, null);
 
-        public virtual void Navigate(IBrowsableObjectInfo path, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader) => NavigateInternal(path, browsableObjectInfoItemsLoader, true);
+        public virtual void Navigate(Explorer.IBrowsableObjectInfo path, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader) => NavigateInternal(path, browsableObjectInfoItemsLoader, true);
 
         public void NavigateToHistoryIndex(int index) => NavigateToHistoryIndex(index, null);
 
-        public virtual void NavigateToHistoryIndex(int index, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader) => NavigateInternal((IBrowsableObjectInfo)((HistoryItemData)History[index]).Path, browsableObjectInfoItemsLoader, false);
+        public virtual void NavigateToHistoryIndex(int index, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader) => NavigateInternal((Explorer.IBrowsableObjectInfo)((HistoryItemData)History[index]).Path, browsableObjectInfoItemsLoader, false);
 
-        private void NavigateInternal(IBrowsableObjectInfo path, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader, bool addPathToHistory)
+        private void NavigateInternal(Explorer.IBrowsableObjectInfo path, BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader, bool addPathToHistory)
 
         {
 
@@ -1544,7 +1537,7 @@ namespace WinCopies.GUI.Explorer
 
             SetValue(IsLoadingPropertyKey, true);
 
-            // if (path is ShellObjectInfo && (((ShellObjectInfo)path).FileType == FileTypes.Folder || ((ShellObjectInfo)path).FileType == FileTypes.Drive))
+            // if (path is IShellObjectInfo && (((ShellObjectInfo)path).FileType == FileTypes.Folder || ((ShellObjectInfo)path).FileType == FileTypes.Drive))
 
             // if (BrowsableObjectInfoItemsLoader == null || BrowsableObjectInfoItemsLoader.GetType() != typeof(FolderLoader))
 
@@ -1559,7 +1552,7 @@ namespace WinCopies.GUI.Explorer
 
             SetValue(CanMoveToParentPathPropertyKey, path.Parent != null);
 
-            if (path is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject)
+            if (path is IShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject)
 
                 SetValue(CanPastePropertyKey, true);
 
@@ -1567,13 +1560,9 @@ namespace WinCopies.GUI.Explorer
 
             if (browsableObjectInfoItemsLoader == null)
 
-                if (path is ArchiveItemInfo || path.FileType == FileType.Archive)
-
-                    browsableObjectInfoItemsLoader = new ArchiveLoader(true, true, FileTypesFlags.All);
-
-                else
-
-                    browsableObjectInfoItemsLoader = new FolderLoader(true, true, FileTypesFlags.All);
+                browsableObjectInfoItemsLoader = path is IArchiveItemInfo || path.FileType == FileType.Archive
+                    ? new ArchiveLoader(true, true, FileTypesFlags.All)
+                    : (BrowsableObjectInfoItemsLoader)new FolderLoader(true, true, FileTypesFlags.All);
 
             browsableObjectInfoItemsLoader.RunWorkerCompleted += BrowsableObjectInfoItemsLoader_RunWorkerCompleted;
 
@@ -1589,7 +1578,7 @@ namespace WinCopies.GUI.Explorer
 
                     history.RemoveRange(0, HistorySelectedIndex);
 
-                history.Insert(0, new HistoryItemData(Header, path.Clone(), ListView == null ? new ScrollViewerOffset(0, 0) : new ScrollViewerOffset(ListView.ScrollHost.HorizontalOffset, ListView.ScrollHost.VerticalOffset), ListView?.SelectedItems.OfType<IBrowsableObjectInfo>()));
+                history.Insert(0, new HistoryItemData(Header, path.Clone(), ListView == null ? new ScrollViewerOffset(0, 0) : new ScrollViewerOffset(ListView.ScrollHost.HorizontalOffset, ListView.ScrollHost.VerticalOffset), ListView?.SelectedItems.OfType<Explorer.IBrowsableObjectInfo>()));
 
             }
 
@@ -1685,14 +1674,14 @@ namespace WinCopies.GUI.Explorer
 
         }
 
-        protected internal virtual void OnOpening(params IBrowsableObjectInfo[] paths)
+        protected internal virtual void OnOpening(params Explorer.IBrowsableObjectInfo[] paths)
         {
 
-            List<IBrowsableObjectInfo> directories = new List<IBrowsableObjectInfo>();
+            LinkedList<Explorer.IBrowsableObjectInfo> directories = new LinkedList<Explorer.IBrowsableObjectInfo>();
 
-            List<IBrowsableObjectInfo> files = new List<IBrowsableObjectInfo>();
+            LinkedList<Explorer.IBrowsableObjectInfo> files = new LinkedList<Explorer.IBrowsableObjectInfo>();
 
-            foreach (IBrowsableObjectInfo path in paths)
+            foreach (Explorer.IBrowsableObjectInfo path in paths)
 
             {
 
@@ -1710,7 +1699,7 @@ namespace WinCopies.GUI.Explorer
 
                 {
 
-                    files.Add(path);
+                    files.Append(path);
 
                     continue;
 
@@ -1750,7 +1739,7 @@ namespace WinCopies.GUI.Explorer
 
                                     OpenLinkInternal(shellLink, directories.Count == 0);
 
-                                    directories.Add(path);
+                                    directories.Append(path);
 
                                 }
 
@@ -1760,23 +1749,23 @@ namespace WinCopies.GUI.Explorer
 
                 else
 
-                    directories.Add(path);
+                    directories.Append(path);
 
             }
 
             if (directories.Count > 1)
 
-                RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo[]>>(MultiplePathsOpeningRequestedEvent, this, new EventArgs<IBrowsableObjectInfo[]>(directories.ToArray())));
+                RaiseEvent(new RoutedEventArgs<EventArgs<Explorer.IBrowsableObjectInfo[]>>(MultiplePathsOpeningRequestedEvent, this, new EventArgs<Explorer.IBrowsableObjectInfo[]>(directories.ToArray())));
 
             if (files.Count > 0)
 
-                RaiseEvent(new RoutedEventArgs<EventArgs<IBrowsableObjectInfo[]>>(FilesOpeningRequestedEvent, this, new EventArgs<IBrowsableObjectInfo[]>(files.ToArray())));
+                RaiseEvent(new RoutedEventArgs<EventArgs<Explorer.IBrowsableObjectInfo[]>>(FilesOpeningRequestedEvent, this, new EventArgs<Explorer.IBrowsableObjectInfo[]>(files.ToArray())));
 
         }
 
         protected internal virtual void OnOpenCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = TreeView?.SelectedItem != null || ListView?.SelectedItem != null;
 
-        internal void OnOpeningInternal(params IBrowsableObjectInfo[] paths) => OnOpening(paths);
+        internal void OnOpeningInternal(params Explorer.IBrowsableObjectInfo[] paths) => OnOpening(paths);
 
         public StringCollection GetFileDropList(ActionsFromObjects copyFrom)
 
@@ -1820,14 +1809,14 @@ namespace WinCopies.GUI.Explorer
 
             {
 
-                Clipboard.EmptyClipboard();
+                Clipboard.Clear();
 
                 //while (true)
 
                 //    try
                 //    {
 
-                Clipboard.SetFileDropList(new WindowInteropHelper(Window.GetWindow(this)), sc, false);
+                Clipboard.SetFileDropList(sc);
 
                 //    break;
 
@@ -1895,11 +1884,13 @@ namespace WinCopies.GUI.Explorer
 
         {
 
+            // todo: handle clipboard exceptions
+
             pasteTo.ThrowIfNotValidEnumValue();
 
             WindowInteropHelper windowHandle = new WindowInteropHelper(Window.GetWindow(this));
 
-            if (!Clipboard.Contains(windowHandle, CommonClipboardFormats.FileDropList, out _)) return;
+            if (!Clipboard.ContainsFileDropList()) return;
 
             string path = null;
 
@@ -1913,13 +1904,13 @@ namespace WinCopies.GUI.Explorer
 
             bool isAFileMoving = false;
 
-            if (Clipboard.Contains(windowHandle, "Preferred DropEffect"))
+            if (Clipboard.ContainsData("Preferred DropEffect"))
 
-                using (MemoryStream dropEffect = (MemoryStream)Clipboard.GetData(windowHandle, "Preferred DropEffect"))
+                using (MemoryStream dropEffect = (MemoryStream)Clipboard.GetData("Preferred DropEffect"))
 
                     isAFileMoving = (DragDropEffects)dropEffect.ReadByte() == DragDropEffects.Move;
 
-            OnPaste(isAFileMoving, Clipboard.GetFileDropList(new WindowInteropHelper(Window.GetWindow(this))), path);
+            OnPaste(isAFileMoving, Clipboard.GetFileDropList(), path);
 
         }
 
@@ -1969,7 +1960,7 @@ namespace WinCopies.GUI.Explorer
         {
             ExecuteDelegate = (object obj) =>
 {
-    IBrowsableObjectInfo _obj = (IBrowsableObjectInfo)obj;
+    Explorer.IBrowsableObjectInfo _obj = (Explorer.IBrowsableObjectInfo)obj;
 
     if (!_obj.AreItemsLoaded)
 

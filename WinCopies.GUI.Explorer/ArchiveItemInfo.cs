@@ -5,27 +5,25 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using WinCopies.IO;
 
 namespace WinCopies.GUI.Explorer
 {
+
     public class ArchiveItemInfo : IO.ArchiveItemInfo, IBrowsableObjectInfo, IBrowsableObjectInfoInternal, IBrowsableObjectInfoHelper
+
     {
-        private readonly bool isSelected = false;
 
-        public bool IsSelected { get => isSelected; set => OnPropertyChanged(nameof(IsSelected), nameof(isSelected), value, typeof(ArchiveItemInfo)); }
+        public bool IsSelected { get; set; }
 
-        private readonly IBrowsableObjectInfo selectedItem = null;
+        public IBrowsableObjectInfo SelectedItem { get; set; }
 
-        public IBrowsableObjectInfo SelectedItem { get => selectedItem; set => OnPropertyChanged(nameof(SelectedItem), nameof(selectedItem), value, typeof(ArchiveItemInfo)); }
+        public bool IsCheckBoxEnabled { get; set; }
 
         public ReadOnlyObservableCollection<IBrowsableObjectInfo> SelectedItems { get; internal set; } = null;
 
         ReadOnlyObservableCollection<IBrowsableObjectInfo> IBrowsableObjectInfoHelper.SelectedItems { set => SelectedItems = value; }
-
-        private readonly bool isCheckBoxEnabled = false;
-
-        public bool IsCheckBoxEnabled { get => isCheckBoxEnabled; set => OnPropertyChanged(nameof(IsCheckBoxEnabled), nameof(isCheckBoxEnabled), value, typeof(ArchiveItemInfo)); }
 
         ObservableCollection<IBrowsableObjectInfo> IBrowsableObjectInfoInternal.SelectedItems { get; set; } = new ObservableCollection<IBrowsableObjectInfo>();
 
@@ -34,5 +32,6 @@ namespace WinCopies.GUI.Explorer
         public ArchiveItemInfo(IO.ArchiveItemInfo archiveItemInfo) : this(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) => BrowsableObjectInfoHelper.Init(this);
 
         public override IO.IBrowsableObjectInfo GetBrowsableObjectInfo(IO.ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) => new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
+
     }
 }

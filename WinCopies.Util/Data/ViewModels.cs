@@ -88,14 +88,14 @@ namespace WinCopies.Util.Data
 
         {
 
-            (bool propertyChanged, object oldValue) = Model.SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = this.SetProperty(propertyName, fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
         }
 
         /// <summary>
-        /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
+        /// Sets a value for a property in this view model's model contained in the <see cref="Model"/> property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
         /// </summary>// See the Remarks section.
         /// <param name="propertyName">The name of the property for which set a new value</param>
         /// <param name="newValue">The value to set in the property</param>
@@ -162,14 +162,14 @@ namespace WinCopies.Util.Data
 
         {
 
-            (bool propertyChanged, object oldValue) = Model.SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = this.SetProperty(propertyName, fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
         }
 
         /// <summary>
-        /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
+        /// Sets a value for a property in this view model's model contained in the <see cref="Model"/> property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
         /// </summary>// See the Remarks section.
         /// <param name="propertyName">The name of the property for which set a new value</param>
         /// <param name="newValue">The value to set in the property</param>

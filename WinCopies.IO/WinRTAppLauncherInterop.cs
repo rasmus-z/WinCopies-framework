@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Linq; 
 using WinCopies.Util;
 using Windows.Foundation;
 using Windows.Storage;
@@ -189,7 +190,7 @@ namespace WinCopies.IO
 
         public bool IsOpenWithAppInfoLoaded { get; private set; } = false;
 
-        public List<AppInfo> OpenWithAppInfos { get; private set; } = null;
+        public AppInfo[] OpenWithAppInfos { get; private set; } = null;
 
         public bool AreOpenWithAppInfosLoaded { get; private set; } = false;
 
@@ -205,7 +206,7 @@ namespace WinCopies.IO
 
         {
 
-            string openWithSoftwareCommand = Registry.GetCommandByExtension("open", Extension);
+            string openWithSoftwareCommand = GetCommandByExtension("open", Extension);
 
             if (openWithSoftwareCommand == null)
 
@@ -233,7 +234,7 @@ namespace WinCopies.IO
 
             {
 
-                OpenWithAppInfo = new DesktopAppInfo(Registry.GetFileTypeByExtension(Extension));
+                OpenWithAppInfo = new DesktopAppInfo(GetFileTypeByExtension(Extension));
 
                 IsOpenWithAppInfoLoaded = true;
 
@@ -259,13 +260,13 @@ namespace WinCopies.IO
 
             // string fileType = null;
 
-            List<AppInfo> appInfos = new List<AppInfo>();
+            LinkedList<AppInfo> appInfos = new LinkedList<AppInfo>();
 
             // foreach (RegistryKey value in subKeys)
 
             // {
 
-            appInfos.AddRange(GetAppInfoByExtension(Extension/*, value*/));
+            appInfos.(GetAppInfoByExtension(Extension/*, value*/));
 
             // }
 

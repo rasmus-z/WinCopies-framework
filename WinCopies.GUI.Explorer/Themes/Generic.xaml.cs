@@ -216,9 +216,9 @@ namespace WinCopies.GUI.Explorer.Themes
 
                 IO.BrowsableObjectInfo path = IO.Path.GetBrowsableObjectInfoFromPath(explorerControl.Text);
 
-                IBrowsableObjectInfo _path = path is IO.ShellObjectInfo shellObjectInfo
+                Explorer.IBrowsableObjectInfo _path = path is IO.ShellObjectInfo shellObjectInfo
                     ? new ShellObjectInfo(shellObjectInfo)
-                    : (IBrowsableObjectInfo)new ArchiveItemInfo((IO.ArchiveItemInfo)path);
+                    : (Explorer.IBrowsableObjectInfo)new ArchiveItemInfo((IO.ArchiveItemInfo)path);
 
                 explorerControl.Open(_path /*new ShellObjectInfo[] { new ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(
                     explorerControl.Text)
@@ -328,7 +328,7 @@ namespace WinCopies.GUI.Explorer.Themes
         //private void TreeViewItem_Selected(object sender, RoutedEventArgs e)
         //{
 
-        //   IBrowsableObjectInfo browsableObjectInfo = (IBrowsableObjectInfo)((TreeViewItem)sender).DataContext;
+        //   Explorer.IBrowsableObjectInfo browsableObjectInfo = (Explorer.IBrowsableObjectInfo)((TreeViewItem)sender).DataContext;
 
         //   ExplorerControl explorerControl = ((DependencyObject)sender).GetParent<ExplorerControl>(false);
 
@@ -336,7 +336,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
         //   // // explorerControl.TreeViewSelectedItem = browsableObjectInfo;
 
-        //   browsableObjectInfo = (IBrowsableObjectInfo)(browsableObjectInfo is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
+        //   browsableObjectInfo = (Explorer.IBrowsableObjectInfo)(browsableObjectInfo is IShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
 
         //   explorerControl.Navigate(browsableObjectInfo, true);
 
@@ -347,7 +347,7 @@ namespace WinCopies.GUI.Explorer.Themes
         //private void TreeViewItem_Selected(object sender, MouseButtonEventArgs e)
         //{
 
-        //    IBrowsableObjectInfo browsableObjectInfo = (IBrowsableObjectInfo)((TreeViewItem)sender).DataContext;
+        //    Explorer.IBrowsableObjectInfo browsableObjectInfo = (Explorer.IBrowsableObjectInfo)((TreeViewItem)sender).DataContext;
 
         //    ExplorerControl explorerControl = ((DependencyObject)sender).GetParent<ExplorerControl>(false);
 
@@ -355,7 +355,7 @@ namespace WinCopies.GUI.Explorer.Themes
 
         //    // // explorerControl.TreeViewSelectedItem = browsableObjectInfo;
 
-        //    browsableObjectInfo = (IBrowsableObjectInfo)(browsableObjectInfo is ShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
+        //    browsableObjectInfo = (Explorer.IBrowsableObjectInfo)(browsableObjectInfo is IShellObjectInfo shellObjectInfo ? shellObjectInfo.GetBrowsableObjectInfo(shellObjectInfo.ShellObject, shellObjectInfo.Path) : browsableObjectInfo is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.GetBrowsableObjectInfo(archiveItemInfo.ArchiveShellObject, archiveItemInfo.ArchiveFileInfo, archiveItemInfo.Path, archiveItemInfo.FileType) : null);
 
         //    explorerControl.Navigate(browsableObjectInfo, true);
 

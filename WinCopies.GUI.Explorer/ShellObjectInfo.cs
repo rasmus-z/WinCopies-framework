@@ -5,7 +5,7 @@ using WinCopies.IO;
 
 namespace WinCopies.GUI.Explorer
 {
-    //    public interface IBrowsableObjectInfo
+    //    public interface Explorer.IBrowsableObjectInfo
 
     //    {
 
@@ -13,7 +13,7 @@ namespace WinCopies.GUI.Explorer
 
     //    }
 
-    public class ShellObjectInfo : IO.ShellObjectInfo, IBrowsableObjectInfo, IBrowsableObjectInfoInternal, IBrowsableObjectInfoHelper
+    public class ShellObjectInfo : IO.ShellObjectInfo, Explorer.IBrowsableObjectInfo, Explorer.IBrowsableObjectInfoInternal, Explorer.IBrowsableObjectInfoHelper
     {
 
         //private void SetProperty(string propertyName, string fieldName, object newValue)
@@ -54,23 +54,17 @@ namespace WinCopies.GUI.Explorer
 
         //protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName)); 
 
-        private readonly bool isSelected = false;
+        public bool IsSelected { get; set; }
 
-        public bool IsSelected { get => isSelected; set => OnPropertyChanged(nameof(IsSelected), nameof(isSelected), value, typeof(ShellObjectInfo)); }
+        public Explorer.IBrowsableObjectInfo SelectedItem { get; set; }
 
-        private readonly IBrowsableObjectInfo selectedItem = null;
+        public bool IsCheckBoxEnabled { get; set; }
 
-        public IBrowsableObjectInfo SelectedItem { get => selectedItem; set => OnPropertyChanged(nameof(SelectedItem), nameof(selectedItem), value, typeof(ShellObjectInfo)); }
+        public ReadOnlyObservableCollection<Explorer.IBrowsableObjectInfo> SelectedItems { get; internal set; } = null;
 
-        ObservableCollection<IBrowsableObjectInfo> IBrowsableObjectInfoInternal.SelectedItems { get; set; } = new ObservableCollection<IBrowsableObjectInfo>();
+        ReadOnlyObservableCollection<Explorer.IBrowsableObjectInfo> Explorer.IBrowsableObjectInfoHelper.SelectedItems { set => SelectedItems = value; }
 
-        public ReadOnlyObservableCollection<IBrowsableObjectInfo> SelectedItems { get; private set; } = null;
-
-        ReadOnlyObservableCollection<IBrowsableObjectInfo> IBrowsableObjectInfoHelper.SelectedItems { set => SelectedItems = value; }
-
-        private readonly bool isCheckBoxEnabled = false;
-
-        public bool IsCheckBoxEnabled { get => isCheckBoxEnabled; set => OnPropertyChanged(nameof(IsCheckBoxEnabled), nameof(isCheckBoxEnabled), value, typeof(ShellObjectInfo)); }
+        ObservableCollection<Explorer.IBrowsableObjectInfo> Explorer.IBrowsableObjectInfoInternal.SelectedItems { get; set; } = new ObservableCollection<Explorer.IBrowsableObjectInfo>();
 
         //public class Machin { public string Truc { get; set; } = "Bidule"; }
 
@@ -515,7 +509,7 @@ namespace WinCopies.GUI.Explorer
 
     //    }
 
-    //    protected override IO.IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(IO.IBrowsableObjectInfo newBrowsableObjectInfo) => new ShellObjectInfo((WinCopies.IO.ShellObjectInfo)newBrowsableObjectInfo);
+    //    protected override IO.Explorer.IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(IO.Explorer.IBrowsableObjectInfo newBrowsableObjectInfo) => new ShellObjectInfo((WinCopies.IO.ShellObjectInfo)newBrowsableObjectInfo);
 
     //    //        public event PropertyChangedEventHandler PropertyChanged;
 
