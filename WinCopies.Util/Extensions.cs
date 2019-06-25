@@ -28,17 +28,153 @@ namespace WinCopies.Util
 
         #region Enumerables extension methods
 
-        #region Contains methods
+        // todo:
 
-        public static bool Contains(this IEnumerable array, object value);
+        //#region Contains methods
 
-        public static bool Contains(this IEnumerable array, object value, IEqualityComparer comparer);
+        //// public static bool Contains(this IEnumerable array, object value) => array.Contains(value, EqualityComparer<object>.Default);
 
-        public static bool Contains(this IEnumerable array, object value, IComparer comparer);
+        //public static bool Contains(this IEnumerable array, object value, IEqualityComparer comparer)
 
-        public static bool Contains(this IEnumerable array, object value, Comparison<object>);
+        //{
 
-        #endregion
+        //    foreach (object _value in array)
+
+        //        if (comparer.Equals(_value, value)) return true;
+
+        //    return false;
+
+        //}
+
+        //public static bool Contains(this IEnumerable array, object value, IComparer comparer) => array.Contains(value, (object x, object y) => comparer.Compare(x, y));
+
+        //public static bool Contains(this IEnumerable array, object value, Comparison comparison)
+
+        //{
+
+        //    foreach (object _value in array)
+
+        //        if (comparison(_value, value) == 0) return true;
+
+        //    return false;
+
+        //}
+
+        //// todo: to add methods for the LongLength's Array property gesture.
+
+        //public static bool Contains(this object[] array, object value, out int index) => array.Contains(value, EqualityComparer<object>.Default, out index);
+
+        //public static bool Contains(this object[] array, object value, IEqualityComparer comparer, out int index)
+
+        //{
+
+        //    for (int i = 0; i < array.Length; i++)
+
+        //        if (comparer.Equals(array[i], value))
+
+        //        {
+
+        //            index = i;
+
+        //            return true;
+
+        //        }
+
+        //    index = -1;
+
+        //    return false;
+
+        //}
+
+        //public static bool Contains(this object[] array, object value, IComparer comparer, out int index) => array.Contains(value, (object x, object y) => comparer.Compare(x, y), out index);
+
+        //public static bool Contains(this object[] array, object value, Comparison comparison, out int index)
+
+        //{
+
+        //    for (int i = 0; i < array.Length; i++)
+
+        //        if (comparison(array[i], value) == 0)
+
+        //        {
+
+        //            index = i;
+
+        //            return true;
+
+        //        }
+
+        //    index = -1;
+
+        //    return false;
+
+        //}
+
+        //public static bool ContainsRange(this IEnumerable array, params object[] values);
+
+        //public static bool ContainsRange(this IEnumerable array, IEnumerable values);
+
+        //public static bool ContainsRange(this IEnumerable array, IEqualityComparer comparer, params object[] values);
+
+        //public static bool ContainsRange(this IEnumerable array, IEqualityComparer comparer, IEnumerable values);
+
+        //public static bool ContainsRange(this IEnumerable array, IComparer comparer, params object[] values);
+
+        //public static bool ContainsRange(this IEnumerable array, IComparer comparer, IEnumerable values);
+
+        //public static bool ContainsRange(this IEnumerable array, Comparison comparison, params object[] values);
+
+        //public static bool ContainsRange(this IEnumerable array, Comparison comparison, IEnumerable values);
+
+        //public static bool ContainsRange(this IEnumerable array, out int index, params object[] values);
+
+        //public static bool ContainsRange(this IEnumerable array, out int index, IEnumerable values);
+
+        //public static bool ContainsRange(this IEnumerable array, IEqualityComparer comparer, out int index, params object[] values);
+
+        //public static bool ContainsRange(this IEnumerable array, IEqualityComparer comparer, out int index, IEnumerable values);
+
+        //public static bool ContainsRange(this IEnumerable array, IComparer comparer, out int index, params object[] values);
+
+        //public static bool ContainsRange(this IEnumerable array, IComparer comparer, out int index, IEnumerable values);
+
+        //public static bool ContainsRange(this IEnumerable array, Comparison comparison, out int index, params object[] values);
+
+        //public static bool ContainsRange(this IEnumerable array, Comparison comparison, out int index, IEnumerable values);
+
+        //public static bool Contains<T>(this IEnumerable<T> array, T value);
+
+        //public static bool Contains<T>(this IEnumerable<T> array, T value, IEqualityComparer comparer);
+
+        //public static bool Contains<T>(this IEnumerable<T> array, T value, IComparer comparer);
+
+        //public static bool Contains<T>(this IEnumerable<T> array, T value, Comparison comparison);
+
+        //public static bool Contains<T>(this IEnumerable<T> array, T value, out int index);
+
+        //public static bool Contains<T>(this IEnumerable<T> array, T value, IEqualityComparer comparer, out int index);
+
+        //public static bool Contains<T>(this IEnumerable<T> array, T value, IComparer comparer, out int index);
+
+        //public static bool Contains<T>(this IEnumerable<T> array, T value, Comparison comparison, out int index);
+
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, params T[] values);
+
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, IEqualityComparer comparer, params T[] values);
+
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, IComparer comparer, params T[] values);
+
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, Comparison comparison, params T[] values);
+
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, out int index, params T[] values);
+
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, IEqualityComparer comparer, out int index, params T[] values);
+
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, IComparer comparer, out int index, params T[] values);
+
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, Comparison comparison, out int index, params T[] values);
+
+        //#endregion
 
         // todo: Add-, Insert-, Remove-If(Not)Contains methods: add parameters like the Contains methods
 

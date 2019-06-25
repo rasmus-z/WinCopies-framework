@@ -334,7 +334,7 @@ namespace WinCopies.Util
             private static KeyValuePair<object, Func<bool>> GetValue(object[] array, int index, Predicate predicate)
 
             {
-
+                ((IEnumerable)array).Contains( (object x, object y)=>0, "");
                 object result = array[index];
 
                 return new KeyValuePair<object, Func<bool>>(result, () => predicate(result));
