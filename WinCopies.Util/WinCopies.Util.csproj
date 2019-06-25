@@ -107,6 +107,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayBuilder.cs" />
     <Compile Include="BackgroundWorker.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -133,6 +134,7 @@
     <Compile Include="Data\ViewModels.cs" />
     <Compile Include="Data\VisibilityToBooleanConverter.cs" />
     <Compile Include="Data\VisibilityToReversedBooleanConverter.cs" />
+    <Compile Include="Date.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Generic.xaml.cs">
       <DependentUpon>Generic.xaml</DependentUpon>

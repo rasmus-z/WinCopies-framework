@@ -200,19 +200,37 @@ namespace WinCopies.IO
 
             string softwareFileName = command.Count(c => c == '"') > 2 && command.StartsWith("\"") ? command.Substring(1, command.Substring(1).IndexOf('"')) : command.Contains(' ') ? command.Substring(0, command.IndexOf(' ')) : command;
 
-            string commandLineArguments = null;
+            string commandLineArguments = command;
 
-            if (command.Length > softwareFileName.Length)
+            if (commandLineArguments.StartsWith("\""))
+
+                commandLineArguments = commandLineArguments.Substring(1);
+
+            if (commandLineArguments.Length > softwareFileName.Length)
 
             {
 
-                commandLineArguments = command.Substring(softwareFileName.Length);
+                if (commandLineArguments.Length > softwareFileName.Length)
 
-                if (commandLineArguments.StartsWith(" "))
+                {
 
-                    commandLineArguments = commandLineArguments.Substring(1);
+                    commandLineArguments = commandLineArguments.Substring(softwareFileName.Length);
 
-                commandLineArguments = commandLineArguments.Replace("%1", fileName);
+                    char[] charsToRemove = { '\"', ' ' };
+
+                    foreach (char c in charsToRemove)
+
+                        if (commandLineArguments.StartsWith(c))
+
+                            commandLineArguments = commandLineArguments.Substring(1);
+
+                    commandLineArguments = commandLineArguments.Replace("%1", fileName);
+
+                }
+
+                else
+
+                    commandLineArguments = "";
 
             }
 
@@ -242,7 +260,7 @@ namespace WinCopies.IO
 
             RegistryKey _registryKey;
 
-            LinkedList<DesktopAppInfo> fileTypes = new LinkedList<DesktopAppInfo>();
+            ArrayBuilder<DesktopAppInfo> fileTypes = new ArrayBuilder<DesktopAppInfo>();
 
             void checkAndAddFileTypeIfSucceeded(string fileType, RegistryKey registryKey)
 
@@ -258,7 +276,7 @@ namespace WinCopies.IO
 
                         if (GetOpenWithSoftwarePathFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwarePathFromCommand(desktopAppInfo.Command) && GetOpenWithSoftwareArgumentsFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwareArgumentsFromCommand(desktopAppInfo.Command)) return;
 
-                    fileTypes.Append(desktopAppInfo);
+                    fileTypes.AddLast(desktopAppInfo);
 
                 }
 

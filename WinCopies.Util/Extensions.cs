@@ -21,15 +21,89 @@ using static WinCopies.Util.Generic;
 namespace WinCopies.Util
 {
     /// <summary>
-    /// Provides some static extensions methods.
+    /// Provides some static extension methods.
     /// </summary>
     public static class Extensions
     {
 
-        #region Enumerable extension methods
+        #region Enumerables extension methods
+
+        #region Contains methods
+
+        public static bool Contains(this IEnumerable array, object value);
+
+        public static bool Contains(this IEnumerable array, object value, IEqualityComparer comparer);
+
+        public static bool Contains(this IEnumerable array, object value, IComparer comparer);
+
+        public static bool Contains(this IEnumerable array, object value, Comparison<object>);
+
+        #endregion
+
+        // todo: Add-, Insert-, Remove-If(Not)Contains methods: add parameters like the Contains methods
+
+        #region Add(Range)IfNotContains methods
 
         /// <summary>
-        /// Tries to add a value to an <see cref="ICollection{T}"/> if it does not contain the value already.
+        /// Tries to add a value to an <see cref="IList"/> if it does not contain it already.
+        /// </summary>
+        /// <param name="collection">The collection to which try to add the value</param>
+        /// <param name="value">The value to try to add to the collection</param>
+        /// <returns><see langword="true"/> if the value has been added to the collection, otherwise <see langword="false"/>.</returns>
+        public static bool AddIfNotContains(this IList collection, object value)
+
+        {
+
+            if (collection.Contains(value)) return false;
+
+            collection.Add(value);
+
+            return true;
+
+        }
+
+        /// <summary>
+        /// Tries to add multiple values to an <see cref="ICollection{T}"/> if it does not contain them already.
+        /// </summary>
+        /// <typeparam name="T">The value type</typeparam>
+        /// <param name="collection">The collection to which try to add the value</param>
+        /// <param name="values">The values to try to add to the collection</param>
+        /// <returns><see langword="true"/> if the value has been added to the collection, otherwise <see langword="false"/>.</returns>
+        public static object[] AddRangeIfNotContains(this IList collection, params object[] values) => collection.AddRangeIfNotContains((IEnumerable)values);
+
+        /// <summary>
+        /// Tries to add multiple values to an <see cref="ICollection{T}"/> if it does not contain them already.
+        /// </summary>
+        /// <typeparam name="T">The value type</typeparam>
+        /// <param name="collection">The collection to which try to add the value</param>
+        /// <param name="values">The values to try to add to the collection</param>
+        /// <returns><see langword="true"/> if the value has been added to the collection, otherwise <see langword="false"/>.</returns>
+        public static object[] AddRangeIfNotContains(this IList collection, IEnumerable values)
+
+        {
+
+            ArrayBuilder<object> addedValues = new ArrayBuilder<object>();
+
+            foreach (object value in values)
+
+            {
+
+                if (collection.Contains(value)) continue;
+
+                collection.Add(value);
+
+                addedValues.AddLast(value);
+
+            }
+
+            return addedValues.ToArray();
+
+        }
+
+
+
+        /// <summary>
+        /// Tries to add a value to an <see cref="ICollection{T}"/> if it does not contain it already.
         /// </summary>
         /// <typeparam name="T">The value type</typeparam>
         /// <param name="collection">The collection to which try to add the value</param>
@@ -47,13 +121,27 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Tries to add multiple values to an <see cref="ICollection{T}"/> if it does not contain them already.
+        /// </summary>
+        /// <typeparam name="T">The value type</typeparam>
+        /// <param name="collection">The collection to which try to add the value</param>
+        /// <param name="values">The values to try to add to the collection</param>
+        /// <returns><see langword="true"/> if the value has been added to the collection, otherwise <see langword="false"/>.</returns>
         public static T[] AddRangeIfNotContains<T>(this ICollection<T> collection, params T[] values) => collection.AddRangeIfNotContains((IEnumerable<T>)values);
 
+        /// <summary>
+        /// Tries to add multiple values to an <see cref="ICollection{T}"/> if it does not contain them already.
+        /// </summary>
+        /// <typeparam name="T">The value type</typeparam>
+        /// <param name="collection">The collection to which try to add the value</param>
+        /// <param name="values">The values to try to add to the collection</param>
+        /// <returns><see langword="true"/> if the value has been added to the collection, otherwise <see langword="false"/>.</returns>
         public static T[] AddRangeIfNotContains<T>(this ICollection<T> collection, IEnumerable<T> values)
 
         {
 
-            LinkedList<T> addedValues = new LinkedList<T>();
+            ArrayBuilder<T> addedValues = new ArrayBuilder<T>();
 
             foreach (T value in values)
 
@@ -63,13 +151,55 @@ namespace WinCopies.Util
 
                 collection.Add(value);
 
-                addedValues.Append(value);
+                addedValues.AddLast(value);
 
             }
 
-            return addedValues.ToArray<T>();
+            return addedValues.ToArray();
 
         }
+
+        #endregion
+
+        #region Insert(Range)IfNotContains methods
+
+        public static bool InsertIfNotContains(this IList collection, int index, object value)
+
+        {
+
+            if (collection.Contains(value)) return false;
+
+            collection.Insert(index, value);
+
+            return true;
+
+        }
+
+        public static object[] InsertRangeIfNotContains(this IList collection, int index, params object[] values) => collection.InsertRangeIfNotContains(index, (IEnumerable)values);
+
+        public static object[] InsertRangeIfNotContains(this IList collection, int index, IEnumerable values)
+
+        {
+
+            ArrayBuilder<object> addedValues = new ArrayBuilder<object>();
+
+            foreach (object value in values)
+
+            {
+
+                if (collection.Contains(value)) continue;
+
+                collection.Insert(index, value);
+
+                addedValues.AddLast(value);
+
+            }
+
+            return addedValues.ToArray();
+
+        }
+
+
 
         public static bool InsertIfNotContains<T>(this IList<T> collection, int index, T value)
 
@@ -89,7 +219,7 @@ namespace WinCopies.Util
 
         {
 
-            LinkedList<T> addedValues = new LinkedList<T>();
+            ArrayBuilder<T> addedValues = new ArrayBuilder<T>();
 
             foreach (T value in values)
 
@@ -99,13 +229,63 @@ namespace WinCopies.Util
 
                 collection.Insert(index, value);
 
-                addedValues.Append(value);
+                addedValues.AddLast(value);
 
             }
 
-            return addedValues.ToArray<T>();
+            return addedValues.ToArray();
 
         }
+
+        #endregion
+
+        #region Remove(Range)IfContains methods
+
+        public static bool RemoveIfContains(this IList collection, object value)
+
+        {
+
+            if (collection.Contains(value))
+
+            {
+
+                collection.Remove(value);
+
+                return true;
+
+            }
+
+            return false;
+
+        }
+
+        public static object[] RemoveRangeIfContains(this IList collection, params object[] values) => collection.RemoveRangeIfContains((IEnumerable)values);
+
+        public static object[] RemoveRangeIfContains(this IList collection, IEnumerable values)
+
+        {
+
+            ArrayBuilder<object> removedValues = new ArrayBuilder<object>();
+
+            foreach (object value in values)
+
+                if (collection.Contains(value))
+
+                {
+
+                    // todo: RemoveAt()
+
+                    collection.Remove(value);
+
+                    removedValues.AddLast(value);
+
+                }
+
+            return removedValues.ToArray();
+
+        }
+
+
 
         public static bool RemoveIfContains<T>(this ICollection<T> collection, T value)
 
@@ -124,6 +304,34 @@ namespace WinCopies.Util
             return false;
 
         }
+
+        public static T[] RemoveRangeIfContains<T>(this ICollection<T> collection, params T[] values) => collection.RemoveRangeIfContains((IEnumerable<T>)values);
+
+        public static T[] RemoveRangeIfContains<T>(this ICollection<T> collection, IEnumerable<T> values)
+
+        {
+
+            ArrayBuilder<T> removedValues = new ArrayBuilder<T>();
+
+            foreach (T value in values)
+
+                if (collection.Contains(value))
+
+                {
+
+                    // todo: RemoveAt()
+
+                    collection.Remove(value);
+
+                    removedValues.AddLast(value);
+
+                }
+
+            return removedValues.ToArray();
+
+        }
+
+        #endregion
 
         #region AddRange methods
 
@@ -149,6 +357,8 @@ namespace WinCopies.Util
 
         }
 
+        // todo: to add a version of the methods like this one with a 'contains' check:
+
         public static void AddRange(this IList collection, IList values, int start, int length)
 
         {
@@ -160,6 +370,8 @@ namespace WinCopies.Util
         }
 
         public static void AddRange(this IList collection, IEnumerable array, int start, int length) => collection.AddRange(array.ToArray(), start, length);
+
+
 
         public static void AddRange<T>(this ICollection<T> collection, params T[] values) => collection.AddRange((IEnumerable<T>)values);
 
@@ -195,29 +407,27 @@ namespace WinCopies.Util
 
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> array, int start, int length) => collection.AddRange(array.ToArray<T>(), start, length);
 
-        public static LinkedListNode<T>[] AddRangeFirst<T>(this LinkedList<T> collection, params T[] values) => collection.AddRangeFirst((IEnumerable<T>)values);
 
-        public static LinkedListNode<T>[] AddRangeFirst<T>(this LinkedList<T> collection, IEnumerable<T> array)
+
+        public static LinkedListNode<T>[] AddRangeFirst<T>(this LinkedList<T> collection, params T[] values)
 
         {
 
-            T[] _array = array.ToArray<T>();
-
             LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
 
-            if (_array.Length != 0)
+            if (values.Length != 0)
 
             {
 
-                LinkedListNode<T> node = collection.AddFirst(_array[0]);
+                LinkedListNode<T> node = collection.AddFirst(values[0]);
 
                 result.AddLast(node);
 
-                for (int i = 1; i < _array.Length; i++)
+                for (int i = 1; i < values.Length; i++)
 
                 {
 
-                    node = collection.AddAfter(node, _array[i]);
+                    node = collection.AddAfter(node, values[i]);
 
                     result.AddLast(node);
 
@@ -229,31 +439,31 @@ namespace WinCopies.Util
 
         }
 
-        public static void AddRangeFirst<T>(this LinkedList<T> collection, params LinkedListNode<T>[] values) => collection.AddRangeFirst((IEnumerable<LinkedListNode<T>>)values);
+        public static LinkedListNode<T>[] AddRangeFirst<T>(this LinkedList<T> collection, IEnumerable<T> array) => collection.AddRangeFirst(array as T[] ?? array.ToArray<T>());
 
-        public static void AddRangeFirst<T>(this LinkedList<T> collection, IEnumerable<LinkedListNode<T>> array)
+        public static void AddRangeFirst<T>(this LinkedList<T> collection, params LinkedListNode<T>[] values)
 
         {
 
-            LinkedListNode<T>[] _array = array.ToArray<LinkedListNode<T>>();
+            if (values.Length == 0) return;
 
-            if (_array.Length == 0) return;
-
-            LinkedListNode<T> node = _array[0];
+            LinkedListNode<T> node = values[0];
 
             collection.AddFirst(node);
 
-            for (int i = 1; i < _array.Length; i++)
+            for (int i = 1; i < values.Length; i++)
 
             {
 
-                collection.AddAfter(node, _array[i]);
+                collection.AddAfter(node, values[i]);
 
-                node = _array[i];
+                node = values[i];
 
             }
 
         }
+
+        public static void AddRangeFirst<T>(this LinkedList<T> collection, IEnumerable<LinkedListNode<T>> array) => collection.AddRangeFirst(array as LinkedListNode<T>[] ?? array.ToArray<LinkedListNode<T>>());
 
         public static LinkedListNode<T>[] AddRangeLast<T>(this LinkedList<T> collection, params T[] values) => collection.AddRangeLast((IEnumerable<T>)values);
 
@@ -370,37 +580,61 @@ namespace WinCopies.Util
 
         {
 
-            ArrayList arrayList = new ArrayList();
-
             int i = 0;
 
-            int count = 0;
-
-            foreach (object value in array)
+            if (length == null)
 
             {
 
-                if (i < startIndex)
+                ArrayBuilder<object> arrayBuilder = new ArrayBuilder<object>();
 
-                    i++;
+                foreach (object value in array)
 
-                else
+                    if (i < startIndex) i++;
 
-                {
+                    else // We don't need to increment i anymore when we are here
 
-                    arrayList.Add(value);
+                        arrayBuilder.AddLast(value);
 
-                    count++;
-
-                }
-
-                if (count == length)
-
-                    break;
+                return arrayBuilder.ToArrayList();
 
             }
 
-            return arrayList;
+            else
+
+            {
+
+                ArrayList arrayList = new ArrayList(length.Value);
+
+                int count = 0;
+
+                foreach (object value in array)
+
+                {
+
+                    if (i < startIndex)
+
+                        i++;
+
+                    else
+
+                    {
+
+                        arrayList.Add(value);
+
+                        count++;
+
+                    }
+
+                    if (count == length)
+
+                        break;
+
+                }
+
+                return arrayList;
+
+            }
 
         }
 
@@ -429,37 +663,61 @@ namespace WinCopies.Util
 
         {
 
-            List<T> arrayList = new List<T>();
-
             int i = 0;
 
-            int count = 0;
-
-            foreach (T value in array)
+            if (length == null)
 
             {
 
-                if (i < startIndex)
+                ArrayBuilder<T> arrayBuilder = new ArrayBuilder<T>();
 
-                    i++;
+                foreach (T value in array)
 
-                else
+                    if (i < startIndex) i++;
 
-                {
+                    else    // We don't need to increment i anymore when we are here
 
-                    arrayList.Add(value);
+                        arrayBuilder.AddLast(value);
 
-                    count++;
-
-                }
-
-                if (count == length)
-
-                    break;
+                return arrayBuilder.ToList();
 
             }
 
-            return arrayList;
+            else
+
+            {
+
+                List<T> arrayList = new List<T>(length.Value);
+
+                int count = 0;
+
+                foreach (T value in array)
+
+                {
+
+                    if (i < startIndex)
+
+                        i++;
+
+                    else
+
+                    {
+
+                        arrayList.Add(value);
+
+                        count++;
+
+                    }
+
+                    if (count == length)
+
+                        break;
+
+                }
+
+                return arrayList;
+
+            }
 
         }
 
@@ -577,7 +835,7 @@ namespace WinCopies.Util
 
         {
 
-            ArrayList arrayList = new ArrayList();
+            ArrayList arrayList = new ArrayList(length);
 
             int count = startIndex + length;
 
@@ -595,7 +853,7 @@ namespace WinCopies.Util
 
         {
 
-            List<T> arrayList = new List<T>();
+            List<T> arrayList = new List<T>(length);
 
             int count = startIndex + length;
 
@@ -2087,7 +2345,12 @@ namespace WinCopies.Util
 
         }
 
-        public static bool Contains(this string s, IEqualityComparer<char> comparer, string value)
+        // todo: add other methods and overloads for StringComparison, IEqualityComparer<char>, Comparer<char>, Comparison<char>, ignore case and CultureInfo parameters
+
+        [Obsolete("This method has been replaced by the Contains(this string, string, IEqualityComparer<char>) method.")]
+        public static bool Contains(this string s, IEqualityComparer<char> comparer, string value) => s.Contains(value, comparer);
+
+        public static bool Contains(this string s, string value, IEqualityComparer<char> comparer)
 
         {
 
@@ -2107,6 +2370,7 @@ namespace WinCopies.Util
 
         }
 
+        [Obsolete("This method has been replaced by arrays-common methods.")]
         public static bool Contains(this string s, char value, out int index)
 
         {
@@ -2157,6 +2421,7 @@ namespace WinCopies.Util
 
         }
 
+        [Obsolete("This method has been replaced by arrays-common methods.")]
         public static bool Contains(this string s, char value, IEqualityComparer<char> comparer, out int index)
 
         {
@@ -2206,6 +2471,8 @@ namespace WinCopies.Util
             return false;
 
         }
+
+        public static bool StartsWith(this string s, char value) => s[0] == value;
 
     }
 }

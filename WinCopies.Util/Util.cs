@@ -9,6 +9,10 @@ using static WinCopies.Util.Generic;
 
 namespace WinCopies.Util
 {
+    public delegate int Comparison(object x, object y);
+
+    public delegate bool Predicate(object value);
+
     public static class Util
     {
 
@@ -34,6 +38,8 @@ namespace WinCopies.Util
                 return bgWorker.SetProperty(propertyName, fieldName, newValue, declaringType, performIntegrityCheck, bindingFlags);
 
         }
+
+        public static Predicate GetCommonPredicate() => (object value) => true;
 
         public static Predicate<T> GetCommonPredicate<T>() => (T value) => true;
 
@@ -325,7 +331,7 @@ namespace WinCopies.Util
         private class IfValuesEnumerable : IIfValuesEnumerable
         {
 
-            private static KeyValuePair<object, Func<bool>> GetValue(object[] array, int index, Predicate<object> predicate)
+            private static KeyValuePair<object, Func<bool>> GetValue(object[] array, int index, Predicate predicate)
 
             {
 
@@ -346,9 +352,9 @@ namespace WinCopies.Util
 
                 private object[] _array;
 
-                private Predicate<object> _predicate;
+                private Predicate _predicate;
 
-                public IfValuesEnumerator(object[] array, Predicate<object> predicate)
+                public IfValuesEnumerator(object[] array, Predicate predicate)
                 {
 
                     _array = array;
@@ -368,9 +374,9 @@ namespace WinCopies.Util
 
             Array IIfValuesEnumerable.Array => Array;
 
-            public Predicate<object> Predicate { get; }
+            public Predicate Predicate { get; }
 
-            public IfValuesEnumerable(object[] array, Predicate<object> predicate)
+            public IfValuesEnumerable(object[] array, Predicate predicate)
             {
 
                 Array = array;
@@ -437,7 +443,7 @@ namespace WinCopies.Util
         private class IfKeyValuesEnumerable : IIfKeyValuesEnumerable
         {
 
-            private static KeyValuePair<object, KeyValuePair<object, Func<bool>>> GetValue(KeyValuePair<object, object>[] array, int index, Predicate<object> predicate)
+            private static KeyValuePair<object, KeyValuePair<object, Func<bool>>> GetValue(KeyValuePair<object, object>[] array, int index, Predicate predicate)
 
             {
 
@@ -458,9 +464,9 @@ namespace WinCopies.Util
 
                 private KeyValuePair<object, object>[] _array;
 
-                private Predicate<object> _predicate;
+                private Predicate _predicate;
 
-                public IfKeyValuesEnumerator(KeyValuePair<object, object>[] array, Predicate<object> predicate)
+                public IfKeyValuesEnumerator(KeyValuePair<object, object>[] array, Predicate predicate)
                 {
 
                     _array = array;
@@ -480,9 +486,9 @@ namespace WinCopies.Util
 
             Array IIfKeyValuesEnumerable.Array => Array;
 
-            public Predicate<object> Predicate { get; }
+            public Predicate Predicate { get; }
 
-            public IfKeyValuesEnumerable(KeyValuePair<object, object>[] array, Predicate<object> predicate)
+            public IfKeyValuesEnumerable(KeyValuePair<object, object>[] array, Predicate predicate)
             {
 
                 Array = array;
@@ -1590,7 +1596,7 @@ namespace WinCopies.Util
         /// <param name="value">The value to compare the values of the table with.</param>
         /// <param name="values">The values to compare.</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, (IEqualityComparer)EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, (IEqualityComparer)EqualityComparer<object>.Default, GetCommonPredicate(), value, values);
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
@@ -1602,9 +1608,35 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, IComparer, Predicate, object, params object[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, Predicate<object> predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
 
+        /// <summary>
+        /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
+        /// </summary>
+        /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
+        /// <param name="comparison">The comparison type</param>
+        /// <param name="comparer">The comparer used to compare the values.</param>
+        /// <param name="value">The value to compare with.</param>
+        /// <param name="values">The values to compare.</param>
+        /// <param name="predicate">The comparison predicate</param>
+        /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, Predicate predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
+
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, WinCopies.Util.Comparison, Predicate, object, params object[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params object[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
+
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfValuesEnumerable(values, (object _value) => predicate(_value)));
+
+        }
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, WinCopies.Util.Comparison comparisonDelegate, Predicate predicate, object value, params object[] values)
 
         {
 
@@ -1616,7 +1648,20 @@ namespace WinCopies.Util
 
         }
 
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, IEqualityComparer, Predicate, object, params object[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, Predicate<object> predicate, object value, params object[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
+
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfValuesEnumerable(values, (object _value) => predicate(_value)));
+
+        }
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, Predicate predicate, object value, params object[] values)
 
         {
 
@@ -1628,9 +1673,22 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, object value, params KeyValuePair<object, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, (object x, object y) => comparer.Compare(x, y), value, values);
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, object value, params KeyValuePair<object, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Util.Comparison( (object x, object y) => comparer.Compare(x, y)), value, values);
 
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, WinCopies.Util.Comparison, object, params KeyValuePair<object, Func<bool>>[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
+
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfKeyValuePairEnumerable(values));
+
+        }
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, WinCopies.Util.Comparison comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values)
 
         {
 
@@ -1666,7 +1724,7 @@ namespace WinCopies.Util
         /// <param name="value">The value to compare the values of the table with.</param>
         /// <param name="values">The values to compare.</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, (IEqualityComparer)EqualityComparer<object>.Default, GetCommonPredicate<object>(), value, values);
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, (IEqualityComparer)EqualityComparer<object>.Default, GetCommonPredicate(), value, values);
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
@@ -1678,9 +1736,35 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, IComparer, Predicate, object, params KeyValuePair<object, object>[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer comparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
 
+        /// <summary>
+        /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
+        /// </summary>
+        /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
+        /// <param name="comparison">The comparison type</param>
+        /// <param name="comparer">The comparer used to compare the values.</param>
+        /// <param name="value">The value to compare with.</param>
+        /// <param name="values">The values to compare.</param>
+        /// <param name="predicate">The comparison predicate</param>
+        /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer comparer, Predicate predicate, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
+
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, WinCopies.Util.Comparison, Predicate, object, params KeyValuePair<object, object>[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
+
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyValuesEnumerable(values, (object _value) => predicate(_value)));
+
+        }
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, WinCopies.Util.Comparison comparisonDelegate, Predicate predicate, object value, params KeyValuePair<object, object>[] values)
 
         {
 
@@ -1692,7 +1776,18 @@ namespace WinCopies.Util
 
         }
 
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, IEqualityComparer, Predicate, object, params KeyValuePair<object, object>[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
+
+        {
+
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
+
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyValuesEnumerable(values, (object _value) => predicate(_value)));
+
+        }
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, Predicate predicate, object value, params KeyValuePair<object, object>[] values)
 
         {
 
@@ -1702,9 +1797,22 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer comparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, (object x, object y) => comparer.Compare(x, y), value, values);
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer comparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, new WinCopies.Util.Comparison((object x, object y) => comparer.Compare(x, y)), value, values);
 
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, WinCopies.Util.Comparison, object, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
+
+        {
+
+            // First, we check if comparisonType and comparison are in the required value range.
+
+            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
+
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyKeyValuePairEnumerable(values));
+
+        }
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, WinCopies.Util.Comparison comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
 
         {
 
@@ -2010,7 +2118,7 @@ namespace WinCopies.Util
 
             Type enumType = typeof(T);
 
-            if (enumType.GetCustomAttributes<FlagsAttribute>().ToList().Count == 0)
+            if (enumType.GetCustomAttributes<FlagsAttribute>().ToArray().Length == 0)
 
                 throw new ArgumentException("Enum is not a 'flags' enum.");
 

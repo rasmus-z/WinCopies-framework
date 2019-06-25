@@ -86,8 +86,9 @@ namespace WinCopies.IO
         public bool Open(string fileName, string commandName)
 
         {
-
-            Process.Start(GetOpenWithSoftwareProcessStartInfoFromCommand(Registry.GetCommandByFileType(commandName, FileType), fileName));
+            var c = Registry.GetCommandByFileType(commandName, FileType);
+            var _c = GetOpenWithSoftwareProcessStartInfoFromCommand(c, fileName);
+            Process.Start(_c);
 
             return true;
 

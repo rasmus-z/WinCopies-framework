@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 
@@ -69,73 +70,63 @@ namespace WinCopies.Collections
 
         }
 
-    protected override void InsertItem(int index, T item)
-    {
+        protected override void InsertItem(int index, T item)
+        {
 
-        OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Add, item, index));
+            OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Add, item, index));
 
-        base.InsertItem(index, item);
+            base.InsertItem(index, item);
 
+        }
+
+        protected override void MoveItem(int oldIndex, int newIndex)
+
+        {
+
+            OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Move, this[oldIndex], oldIndex, newIndex));
+
+            base.MoveItem(oldIndex, newIndex);
+
+        }
+
+        protected override void SetItem(int index, T item)
+
+        {
+
+            OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Replace, this[index], item));
+
+            base.SetItem(index, item);
+
+        }
+
+        protected override void RemoveItem(int index)
+
+        {
+
+            OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Remove, this[index], index));
+
+            base.RemoveItem(index);
+
+        }
+
+        protected override void ClearItems()
+
+        {
+
+            OnCollectionChanging(new NotifyCollectionChangedEventArgs(new ReadOnlyCollection<T>(this. ToList())));
+
+            base.ClearItems();
+
+        }
+
+        protected virtual void OnCollectionChanging(NotifyCollectionChangedEventArgs e)
+
+        {
+            
+            if (!e.IsChangingEvent) throw new ArgumentException($"'{nameof(e)}' must have the IsChangingProperty set to true.");
+
+            CollectionChanging?.Invoke(this, e);
+
+        }
     }
-
-    protected override void MoveItem(int oldIndex, int newIndex)
-
-    {
-
-        OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Move, this[oldIndex], oldIndex, newIndex));
-
-        base.MoveItem(oldIndex, newIndex);
-
-    }
-
-    protected override void SetItem(int index, T item)
-
-    {
-
-        OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Replace, this[index], item));
-
-        base.SetItem(index, item);
-
-    }
-
-    protected override void RemoveItem(int index)
-
-    {
-
-        OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Remove, this[index], index));
-
-        base.RemoveItem(index);
-
-    }
-
-    protected override void ClearItems()
-
-    {
-
-        OnCollectionChanging(new NotifyCollectionChangedEventArgs(Items.ToList()));
-
-        base.ClearItems();
-
-    }
-
-    private void RaiseCollectionChangingEvent(NotifyCollectionChangedEventArgs e)
-
-    {
-
-        if (!e.IsChangingEvent) throw new ArgumentException($"'{nameof(e)}' must have the IsChangingProperty set to true.");
-
-        CollectionChanging(this, e);
-
-    }
-
-    protected virtual void OnCollectionChanging(NotifyCollectionChangedEventArgs e)
-
-    {
-
-        if (CollectionChanging != null)
-
-            RaiseCollectionChangingEvent(e);
-
-    }
-}
 }

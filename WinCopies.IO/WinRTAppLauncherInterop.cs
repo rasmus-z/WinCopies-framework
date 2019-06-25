@@ -260,13 +260,13 @@ namespace WinCopies.IO
 
             // string fileType = null;
 
-            LinkedList<AppInfo> appInfos = new LinkedList<AppInfo>();
+            ArrayBuilder<AppInfo> appInfos = new ArrayBuilder<AppInfo>();
 
             // foreach (RegistryKey value in subKeys)
 
             // {
 
-            appInfos.(GetAppInfoByExtension(Extension/*, value*/));
+            appInfos.AddRangeLast(GetAppInfoByExtension(Extension/*, value*/));
 
             // }
 
@@ -278,9 +278,9 @@ namespace WinCopies.IO
 
                 foreach (Windows.ApplicationModel.AppInfo value in winRTAppHandlersInterop.OpenWithAppInfos)
 
-                    appInfos.Add(new WindowsStoreAppInfo(value));
+                    appInfos.AddLast(new WindowsStoreAppInfo(value));
 
-                OpenWithAppInfos = appInfos;
+                OpenWithAppInfos = appInfos.ToArray();
 
                 AreOpenWithAppInfosLoaded = true;
 
