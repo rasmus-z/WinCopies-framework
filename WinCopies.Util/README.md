@@ -1,5 +1,5 @@
-﻿WinCopies-framework
-===================
+﻿WinCopies-framework (WinCopies.Util package)
+============================================
 
 The WinCopies® software framework
 
@@ -9,10 +9,8 @@ README
 Updates
 -------
 
-- Bug fixed in some of the 'If' methods
-- 'If' methods speed improvement
-- 'ToString' extension method added for the 'IEnumerable' type to display the content of a given IEnumerable
-- Added base classes for view models
+- ArrayAndListBuilder class added to build arrays, lists and observable collections like the .Net's StringBuilder.
+- Extension methods added for the LinkedLists.
 
 Description
 -----------
@@ -28,6 +26,7 @@ Some utilities to extend the .NET framework capabilities, such as:
 - Some extension methods, mainly for array, enumerables and collections and for easier INotifyPropertyChanged and Enum gesture;
 - Some utility static methods, such as advanced 'if' functions;
 - Base view model classes
+- 'ToString' extension method for the 'IEnumerable' type to display the content of a given IEnumerable
 
 Project link
 ------------
