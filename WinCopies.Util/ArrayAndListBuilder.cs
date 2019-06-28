@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace WinCopies.Util
 {
-    public class ArrayBuilder<T> : ISerializable, IDeserializationCallback
+    public class ArrayAndListBuilder<T> : ISerializable, IDeserializationCallback
     {
-
+        
         protected LinkedList<T> InnerList { get; }
 
-        public ArrayBuilder() => InnerList = new LinkedList<T>();
+        public ArrayAndListBuilder() => InnerList = new LinkedList<T>();
 
-        public ArrayBuilder(IEnumerable<T> enumerable) => InnerList = new LinkedList<T>(enumerable);
+        public ArrayAndListBuilder(IEnumerable<T> enumerable) => InnerList = new LinkedList<T>(enumerable);
 
-        protected ArrayBuilder(LinkedList<T> innerList) => InnerList = innerList;
+        protected ArrayAndListBuilder(LinkedList<T> innerList) => InnerList = innerList;
 
         /// <summary>
         /// Gets the last node of the <see cref="System.Collections.Generic.LinkedList{T}"/>.

@@ -218,7 +218,7 @@ namespace WinCopies.Util
 
         {
 
-            ArrayBuilder<object> addedValues = new ArrayBuilder<object>();
+            var addedValues = new ArrayAndListBuilder<object>();
 
             foreach (object value in values)
 
@@ -226,9 +226,9 @@ namespace WinCopies.Util
 
                 if (collection.Contains(value)) continue;
 
-                collection.Add(value);
+                _ = collection.Add(value);
 
-                addedValues.AddLast(value);
+                _ = addedValues.AddLast(value);
 
             }
 
@@ -277,7 +277,7 @@ namespace WinCopies.Util
 
         {
 
-            ArrayBuilder<T> addedValues = new ArrayBuilder<T>();
+            var addedValues = new ArrayAndListBuilder<T>();
 
             foreach (T value in values)
 
@@ -287,7 +287,7 @@ namespace WinCopies.Util
 
                 collection.Add(value);
 
-                addedValues.AddLast(value);
+                _ = addedValues.AddLast(value);
 
             }
 
@@ -317,7 +317,7 @@ namespace WinCopies.Util
 
         {
 
-            ArrayBuilder<object> addedValues = new ArrayBuilder<object>();
+            var addedValues = new ArrayAndListBuilder<object>();
 
             foreach (object value in values)
 
@@ -327,7 +327,7 @@ namespace WinCopies.Util
 
                 collection.Insert(index, value);
 
-                addedValues.AddLast(value);
+                _ = addedValues.AddLast(value);
 
             }
 
@@ -355,7 +355,7 @@ namespace WinCopies.Util
 
         {
 
-            ArrayBuilder<T> addedValues = new ArrayBuilder<T>();
+            var addedValues = new ArrayAndListBuilder<T>();
 
             foreach (T value in values)
 
@@ -365,7 +365,7 @@ namespace WinCopies.Util
 
                 collection.Insert(index, value);
 
-                addedValues.AddLast(value);
+                _ = addedValues.AddLast(value);
 
             }
 
@@ -401,7 +401,7 @@ namespace WinCopies.Util
 
         {
 
-            ArrayBuilder<object> removedValues = new ArrayBuilder<object>();
+            var removedValues = new ArrayAndListBuilder<object>();
 
             foreach (object value in values)
 
@@ -413,7 +413,7 @@ namespace WinCopies.Util
 
                     collection.Remove(value);
 
-                    removedValues.AddLast(value);
+                    _ = removedValues.AddLast(value);
 
                 }
 
@@ -431,7 +431,7 @@ namespace WinCopies.Util
 
             {
 
-                collection.Remove(value);
+                _ = collection.Remove(value);
 
                 return true;
 
@@ -447,7 +447,7 @@ namespace WinCopies.Util
 
         {
 
-            ArrayBuilder<T> removedValues = new ArrayBuilder<T>();
+            var removedValues = new ArrayAndListBuilder<T>();
 
             foreach (T value in values)
 
@@ -457,9 +457,9 @@ namespace WinCopies.Util
 
                     // todo: RemoveAt()
 
-                    collection.Remove(value);
+                    _ = collection.Remove(value);
 
-                    removedValues.AddLast(value);
+                    _ = removedValues.AddLast(value);
 
                 }
 
@@ -479,7 +479,7 @@ namespace WinCopies.Util
 
             foreach (object item in array)
 
-                collection.Add(item);
+                _ = collection.Add(item);
 
         }
 
@@ -489,7 +489,7 @@ namespace WinCopies.Util
 
             for (int i = start; i < length; i++)
 
-                collection.Add(values[i]);
+                _ = collection.Add(values[i]);
 
         }
 
@@ -501,7 +501,7 @@ namespace WinCopies.Util
 
             for (int i = start; i < length; i++)
 
-                collection.Add(values[i]);
+                _ = collection.Add(values[i]);
 
         }
 
@@ -549,7 +549,7 @@ namespace WinCopies.Util
 
         {
 
-            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+            var result = new LinkedList<LinkedListNode<T>>();
 
             if (values.Length != 0)
 
@@ -557,7 +557,7 @@ namespace WinCopies.Util
 
                 LinkedListNode<T> node = collection.AddFirst(values[0]);
 
-                result.AddLast(node);
+                _ = result.AddLast(node);
 
                 for (int i = 1; i < values.Length; i++)
 
@@ -565,7 +565,7 @@ namespace WinCopies.Util
 
                     node = collection.AddAfter(node, values[i]);
 
-                    result.AddLast(node);
+                    _ = result.AddLast(node);
 
                 }
 
@@ -607,11 +607,11 @@ namespace WinCopies.Util
 
         {
 
-            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+            var result = new LinkedList<LinkedListNode<T>>();
 
             foreach (T item in array)
 
-                result.AddLast(collection.AddLast(item));
+                _ = result.AddLast(collection.AddLast(item));
 
             return result.ToArray<LinkedListNode<T>>();
 
@@ -635,11 +635,11 @@ namespace WinCopies.Util
 
         {
 
-            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+            var result = new LinkedList<LinkedListNode<T>>();
 
             foreach (T item in array)
 
-                result.AddLast(collection.AddBefore(node, item));
+                _ = result.AddLast(collection.AddBefore(node, item));
 
             return result.ToArray<LinkedListNode<T>>();
 
@@ -663,7 +663,7 @@ namespace WinCopies.Util
 
         {
 
-            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+            var result = new LinkedList<LinkedListNode<T>>();
 
             LinkedListNode<T> _node = node;
 
@@ -673,7 +673,7 @@ namespace WinCopies.Util
 
                 _node = collection.AddAfter(_node, item);
 
-                result.AddLast(_node);
+                _ = result.AddLast(_node);
 
             }
 
@@ -722,7 +722,7 @@ namespace WinCopies.Util
 
             {
 
-                ArrayBuilder<object> arrayBuilder = new ArrayBuilder<object>();
+                var arrayBuilder = new ArrayAndListBuilder<object>();
 
                 foreach (object value in array)
 
@@ -730,7 +730,7 @@ namespace WinCopies.Util
 
                     else // We don't need to increment i anymore when we are here
 
-                        arrayBuilder.AddLast(value);
+                        _ = arrayBuilder.AddLast(value);
 
                 return arrayBuilder.ToArrayList();
 
@@ -740,7 +740,7 @@ namespace WinCopies.Util
 
             {
 
-                ArrayList arrayList = new ArrayList(length.Value);
+                var arrayList = new ArrayList(length.Value);
 
                 int count = 0;
 
@@ -756,7 +756,7 @@ namespace WinCopies.Util
 
                     {
 
-                        arrayList.Add(value);
+                        _ = arrayList.Add(value);
 
                         count++;
 
@@ -805,7 +805,7 @@ namespace WinCopies.Util
 
             {
 
-                ArrayBuilder<T> arrayBuilder = new ArrayBuilder<T>();
+                var arrayBuilder = new ArrayAndListBuilder<T>();
 
                 foreach (T value in array)
 
@@ -813,7 +813,7 @@ namespace WinCopies.Util
 
                     else    // We don't need to increment i anymore when we are here
 
-                        arrayBuilder.AddLast(value);
+                        _ = arrayBuilder.AddLast(value);
 
                 return arrayBuilder.ToList();
 
@@ -823,7 +823,7 @@ namespace WinCopies.Util
 
             {
 
-                List<T> arrayList = new List<T>(length.Value);
+                var arrayList = new List<T>(length.Value);
 
                 int count = 0;
 
@@ -861,11 +861,11 @@ namespace WinCopies.Util
 
         {
 
-            LinkedList<object> _array = new LinkedList<object>();
+            var _array = new LinkedList<object>();
 
             foreach (object value in array)
 
-                _array.AddLast(value);
+                _ = _array.AddLast(value);
 
             return _array.ToArray<object>();
 
@@ -939,7 +939,7 @@ namespace WinCopies.Util
 
         {
 
-            T[] _array = new T[length];
+            var _array = new T[length];
 
             int i = 0;
 
@@ -971,7 +971,7 @@ namespace WinCopies.Util
 
         {
 
-            ArrayList arrayList = new ArrayList(length);
+            var arrayList = new ArrayList(length);
 
             int count = startIndex + length;
 
@@ -989,7 +989,7 @@ namespace WinCopies.Util
 
         {
 
-            List<T> arrayList = new List<T>(length);
+            var arrayList = new List<T>(length);
 
             int count = startIndex + length;
 
@@ -1023,7 +1023,7 @@ namespace WinCopies.Util
 
         {
 
-            T[] array = new T[length];
+            var array = new T[length];
 
             int i;
 
@@ -1924,11 +1924,11 @@ namespace WinCopies.Util
 
         {
 
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             foreach (object value in array)
 
-                result.Append($"{{{ ((value is string && parseStrings) || (!(value is string) && value is IEnumerable && parseSubEnumerables) ? ((IEnumerable)value).ToString(true) : value?.ToString())}}}, ");
+                _ = result.Append($"{{{ ((value is string && parseStrings) || (!(value is string) && value is IEnumerable && parseSubEnumerables) ? ((IEnumerable)value).ToString(true) : value?.ToString())}}}, ");
 
             return result.ToString(0, result.Length - 2);
 
@@ -2124,15 +2124,13 @@ namespace WinCopies.Util
 
             //#endif
 
-            string methodName;
-
             // var objectType = obj.GetType();
 
             FieldInfo field = GetField(fieldName, declaringType, bindingFlags);
 
             object previousValue = field.GetValue(obj);
 
-            if (performIntegrityCheck && !CheckPropertySetIntegrity(declaringType, propertyName, out methodName, 3, bindingFlags))
+            if (performIntegrityCheck && !CheckPropertySetIntegrity(declaringType, propertyName, out string methodName, 3, bindingFlags))
 
                 throw new InvalidOperationException(string.Format(DeclaringTypesNotCorrespond, propertyName, methodName));
 
@@ -2161,13 +2159,11 @@ namespace WinCopies.Util
 
         {
 
-            string methodName;
-
             PropertyInfo property = GetProperty(propertyName, declaringType, bindingFlags);
 
             object previousValue = property.GetValue(obj);
 
-            if (performIntegrityCheck && !CheckPropertySetIntegrity(declaringType, propertyName, out methodName, 3, bindingFlags))
+            if (performIntegrityCheck && !CheckPropertySetIntegrity(declaringType, propertyName, out string methodName, 3, bindingFlags))
 
                 throw new InvalidOperationException(string.Format(DeclaringTypesNotCorrespond, propertyName, methodName));
 
@@ -2246,7 +2242,7 @@ namespace WinCopies.Util
 
         {
 
-            ArrayList values = new ArrayList(@enum.GetType().GetEnumValues());
+            var values = new ArrayList(@enum.GetType().GetEnumValues());
 
             values.Sort();
 

@@ -1695,7 +1695,7 @@ namespace WinCopies.GUI.Explorer
 
 #endif
 
-                if (!OpenFilesDirectly && If(ComparisonType.And, ComparisonMode.Logical, Comparison.Equal, path.FileType, FileType.File, FileType.Link, FileType.Archive))
+                if (!OpenFilesDirectly && If(ComparisonType.And, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, path.FileType, FileType.File, FileType.Link, FileType.Archive))
 
                 {
 

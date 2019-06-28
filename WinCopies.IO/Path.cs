@@ -137,7 +137,7 @@ namespace WinCopies.IO
 
                                 Debug.WriteLine(_shellObject.GetDisplayName(DisplayNameType.RelativeToParent));
 
-                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, paths[i], _shellObject.Name, _shellObject.GetDisplayName(DisplayNameType.RelativeToParent)))
+                                if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, paths[i], _shellObject.Name, _shellObject.GetDisplayName(DisplayNameType.RelativeToParent)))
 
                                 {
 

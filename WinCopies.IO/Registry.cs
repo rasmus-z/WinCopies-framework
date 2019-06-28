@@ -83,11 +83,11 @@ namespace WinCopies.IO
 
             string key = null;
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out key, /*EqualityComparer<object>.Default, GetCommonPredicate<object>(),*/ null, GetKeyValuePair(nameof(commandName), (object)commandName), GetKeyValuePair(nameof(extension), (object)extension)))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, /*EqualityComparer<object>.Default, GetCommonPredicate<object>(),*/ null, GetKeyValuePair(nameof(commandName), (object)commandName), GetKeyValuePair(nameof(extension), (object)extension)))
 
                 throw new ArgumentNullException(key);
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out key, true, GetKeyValuePair(nameof(commandName), IsNullEmptyOrWhiteSpace(commandName)), GetKeyValuePair(nameof(extension), IsNullEmptyOrWhiteSpace(extension))))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, true, GetKeyValuePair(nameof(commandName), IsNullEmptyOrWhiteSpace(commandName)), GetKeyValuePair(nameof(extension), IsNullEmptyOrWhiteSpace(extension))))
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
 
@@ -104,11 +104,11 @@ namespace WinCopies.IO
 
             string key = null;
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out key, null, GetKeyValuePair(nameof(commandName), commandName), GetKeyValuePair(nameof(commandName), fileType)))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, null, GetKeyValuePair(nameof(commandName), commandName), GetKeyValuePair(nameof(commandName), fileType)))
 
                 throw new ArgumentNullException(key);
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out key, true, GetKeyValuePair(nameof(commandName), IsNullEmptyOrWhiteSpace(commandName)), GetKeyValuePair(nameof(fileType), IsNullEmptyOrWhiteSpace(fileType))))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, true, GetKeyValuePair(nameof(commandName), IsNullEmptyOrWhiteSpace(commandName)), GetKeyValuePair(nameof(fileType), IsNullEmptyOrWhiteSpace(fileType))))
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
 
@@ -190,11 +190,11 @@ namespace WinCopies.IO
 
             string key = null;
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out key, null, GetKeyValuePair(nameof(command), command), GetKeyValuePair(nameof(fileName), fileName)))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, null, GetKeyValuePair(nameof(command), command), GetKeyValuePair(nameof(fileName), fileName)))
 
                 throw new ArgumentNullException(key);
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out key, true, GetKeyValuePair(nameof(command), IsNullEmptyOrWhiteSpace(command)), GetKeyValuePair(nameof(fileName), IsNullEmptyOrWhiteSpace(fileName))))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, true, GetKeyValuePair(nameof(command), IsNullEmptyOrWhiteSpace(command)), GetKeyValuePair(nameof(fileName), IsNullEmptyOrWhiteSpace(fileName))))
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
 
@@ -244,7 +244,7 @@ namespace WinCopies.IO
 
         // todo: add gesture for the 'HKEY_LOCAL_MACHINE\SOFTWARE\Clients' key (ex.: HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\FileAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\MimeAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\URLAssociations, ...).
 
-        public static DesktopAppInfo[] GetAppInfoByExtension(string extension)
+        public static DesktopAppInfo[] GetAppInfosByExtension(string extension)
 
         {
 
@@ -260,7 +260,7 @@ namespace WinCopies.IO
 
             RegistryKey _registryKey;
 
-            ArrayBuilder<DesktopAppInfo> fileTypes = new ArrayBuilder<DesktopAppInfo>();
+            ArrayAndListBuilder<DesktopAppInfo> fileTypes = new ArrayAndListBuilder<DesktopAppInfo>();
 
             void checkAndAddFileTypeIfSucceeded(string fileType, RegistryKey registryKey)
 
@@ -408,7 +408,7 @@ namespace WinCopies.IO
 
             string key = null;
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out key, null, GetKeyValuePair(nameof(fileType), (object)fileType), GetKeyValuePair(nameof(registryKey), (object)registryKey)))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, null, GetKeyValuePair(nameof(fileType), (object)fileType), GetKeyValuePair(nameof(registryKey), (object)registryKey)))
 
                 throw new ArgumentNullException(key);
 
@@ -416,7 +416,7 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(fileType)));
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, registryKey.Name, "HKEY_CURRENT_USER\\Software\\Classes", "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts", "HKEY_CLASSES_ROOT", "HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, registryKey.Name, "HKEY_CURRENT_USER\\Software\\Classes", "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts", "HKEY_CLASSES_ROOT", "HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"))
 
             {
 
@@ -465,7 +465,7 @@ namespace WinCopies.IO
 
             }
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out registryKey, registryKeyName, GetKeyValuePair(Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.ClassesRoot.Name),
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out registryKey, registryKeyName, GetKeyValuePair(Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.ClassesRoot.Name),
                 GetKeyValuePair(Microsoft.Win32.Registry.CurrentConfig, Microsoft.Win32.Registry.CurrentConfig.Name),
                 GetKeyValuePair(Microsoft.Win32.Registry.CurrentUser, Microsoft.Win32.Registry.CurrentUser.Name),
                 GetKeyValuePair(Microsoft.Win32.Registry.DynData, Microsoft.Win32.Registry.DynData.Name),

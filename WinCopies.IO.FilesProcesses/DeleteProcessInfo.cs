@@ -262,11 +262,11 @@ namespace WinCopies.IO.FileProcesses
 
                 {
 
-                    if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, _path.FileType, FileType.Folder, FileType.SpecialFolder))
+                    if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, _path.FileType, FileType.Folder, FileType.SpecialFolder))
 
                         Directory.Delete(_path.FileSystemInfoProperties.FullName);
 
-                    else if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, _path.FileType, FileType.File, FileType.Link, FileType.Archive))
+                    else if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, _path.FileType, FileType.File, FileType.Link, FileType.Archive))
 
                         File.Delete(_path.FileSystemInfoProperties.FullName);
 

@@ -171,11 +171,11 @@ namespace WinCopies.Util
 
             ThrowOnNotValidEnumValue(comparisonType, comparisonMode);
 
-            if (!(comparison == Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
+            if (!(comparison == WinCopies.Util.Util.Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(Comparison.Equal)}, {nameof(Comparison.NotEqual)} or {nameof(Comparison.ReferenceEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(WinCopies.Util.Util.Comparison.Equal)}, {nameof(Comparison.NotEqual)} or {nameof(Comparison.ReferenceEqual)}");
 
         }
 
@@ -217,7 +217,7 @@ namespace WinCopies.Util
 
             {
 
-                case Comparison.Equal:
+                case WinCopies.Util.Util.Comparison.Equal:
                 case Comparison.ReferenceEqual:
 
                     return predicateResult && result == 0;
@@ -258,7 +258,7 @@ namespace WinCopies.Util
 
             {
 
-                case Comparison.Equal:
+                case WinCopies.Util.Util.Comparison.Equal:
 
                     return predicateResult && equalityComparer.Equals(value, valueToCompare);
 
@@ -289,7 +289,7 @@ namespace WinCopies.Util
 
             {
 
-                case Comparison.Equal:
+                case WinCopies.Util.Util.Comparison.Equal:
 
                     return predicateResult && equalityComparer.Equals(value, valueToCompare);
 
