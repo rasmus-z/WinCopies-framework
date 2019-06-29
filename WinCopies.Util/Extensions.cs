@@ -545,6 +545,12 @@ namespace WinCopies.Util
 
 
 
+        /// <summary>
+        /// Add multiple values at the top of this <see cref="ArrayAndListBuilder{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// </summary>
+        /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
+        /// <param name="values">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public static LinkedListNode<T>[] AddRangeFirst<T>(this LinkedList<T> collection, params T[] values)
 
         {
@@ -575,6 +581,12 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Add multiple values at the top of this <see cref="ArrayAndListBuilder{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// </summary>
+        /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
+        /// <param name="array">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public static LinkedListNode<T>[] AddRangeFirst<T>(this LinkedList<T> collection, IEnumerable<T> array) => collection.AddRangeFirst(array as T[] ?? array.ToArray<T>());
 
         public static void AddRangeFirst<T>(this LinkedList<T> collection, params LinkedListNode<T>[] values)

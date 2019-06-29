@@ -8,256 +8,206 @@ using System.Threading.Tasks;
 
 namespace WinCopies.Util
 {
+    /// <summary>
+    /// Builds arrays and lists by sizing them only when required. This class can be used to initialize your array or list before adding or removing values to it.
+    /// </summary>
+    /// <typeparam name="T">The type of the items.</typeparam>
     public class ArrayAndListBuilder<T> : ISerializable, IDeserializationCallback
     {
-        
+
+        /// <summary>
+        /// Gets the <see cref="LinkedList{T}"/> that is used to build the arrays and collections.
+        /// </summary>
         protected LinkedList<T> InnerList { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// </summary>
         public ArrayAndListBuilder() => InnerList = new LinkedList<T>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArrayAndListBuilder{T}"/> class with a given <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <param name="enumerable"></param>
         public ArrayAndListBuilder(IEnumerable<T> enumerable) => InnerList = new LinkedList<T>(enumerable);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArrayAndListBuilder{T}"/> class using a custom <see cref="LinkedList{T}"/> to build the arrays and collections.
+        /// </summary>
+        /// <param name="innerList"></param>
         protected ArrayAndListBuilder(LinkedList<T> innerList) => InnerList = innerList;
 
         /// <summary>
-        /// Gets the last node of the <see cref="System.Collections.Generic.LinkedList{T}"/>.
+        /// Gets the last node of the <see cref="LinkedList{T}"/>.
         /// </summary>
-        /// <returns>The last <see cref="System.Collections.Generic.LinkedListNode{T}"/> of the <see cref="System.Collections.Generic.LinkedList{T}"/>.</returns>
-        public LinkedListNode<T> Last => InnerList.Last;
+        /// <returns>The last <see cref="LinkedListNode{T}"/> of the <see cref="LinkedList{T}"/>.</returns>
+        public virtual LinkedListNode<T> Last => InnerList.Last;
 
-        //
-        // Summary:
-        //     Gets the first node of the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     The first System.Collections.Generic.LinkedListNode`1 of the System.Collections.Generic.LinkedList`1.
-        public LinkedListNode<T> First => InnerList.First;
+        /// <summary>
+        /// Gets the first node of the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <returns>The first <see cref="LinkedListNode{T}"/> of the <see cref="LinkedList{T}"/>.</returns>
+        public virtual LinkedListNode<T> First => InnerList.First;
 
-        //
-        // Summary:
-        //     Gets the number of nodes actually contained in the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     The number of nodes actually contained in the System.Collections.Generic.LinkedList`1.
-        public int Count => InnerList.Count;
+        /// <summary>
+        /// Gets the number of nodes actually contained in the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <returns>The number of nodes actually contained in the <see cref="LinkedList{T}"/>.</returns>
+        public virtual int Count => InnerList.Count;
 
-        //
-        // Summary:
-        //     Adds a new node containing the specified value after the specified existing node
-        //     in the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   node:
-        //     The System.Collections.Generic.LinkedListNode`1 after which to insert a new System.Collections.Generic.LinkedListNode`1
-        //     containing value.
-        //
-        //   value:
-        //     The value to add to the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     The new System.Collections.Generic.LinkedListNode`1 containing value.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     node is null.
-        //
-        //   T:System.InvalidOperationException:
-        //     node is not in the current System.Collections.Generic.LinkedList`1.
-        public LinkedListNode<T> AddAfter(LinkedListNode<T> node, T value) => InnerList.AddAfter(node, value);
+        /// <summary>
+        /// Adds a new node containing the specified value after the specified existing node in the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="node">The <see cref="LinkedListNode{T}"/> after which to insert a new <see cref="LinkedListNode{T}"/> containing value.</param>
+        /// <param name="value">The value to add to the <see cref="LinkedList{T}"/>.</param>
+        /// <returns>The new <see cref="LinkedListNode{T}"/> containing value.</returns>
+        /// <exception cref="ArgumentNullException">node is null.</exception>
+        /// <exception cref="InvalidOperationException">node is not in the current <see cref="LinkedList{T}"/>.</exception>
+        public virtual LinkedListNode<T> AddAfter(LinkedListNode<T> node, T value) => InnerList.AddAfter(node, value);
 
-        //
-        // Summary:
-        //     Adds the specified new node after the specified existing node in the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   node:
-        //     The System.Collections.Generic.LinkedListNode`1 after which to insert newNode.
-        //
-        //   newNode:
-        //     The new System.Collections.Generic.LinkedListNode`1 to add to the System.Collections.Generic.LinkedList`1.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     node is null. -or- newNode is null.
-        //
-        //   T:System.InvalidOperationException:
-        //     node is not in the current System.Collections.Generic.LinkedList`1. -or- newNode
-        //     belongs to another System.Collections.Generic.LinkedList`1.
-        public void AddAfter(LinkedListNode<T> node, LinkedListNode<T> newNode) => InnerList.AddAfter(node, newNode);
-        //
-        // Summary:
-        //     Adds a new node containing the specified value before the specified existing
-        //     node in the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   node:
-        //     The System.Collections.Generic.LinkedListNode`1 before which to insert a new
-        //     System.Collections.Generic.LinkedListNode`1 containing value.
-        //
-        //   value:
-        //     The value to add to the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     The new System.Collections.Generic.LinkedListNode`1 containing value.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     node is null.
-        //
-        //   T:System.InvalidOperationException:
-        //     node is not in the current System.Collections.Generic.LinkedList`1.
-        public LinkedListNode<T> AddBefore(LinkedListNode<T> node, T value) => InnerList.AddBefore(node, value);
-        //
-        // Summary:
-        //     Adds the specified new node before the specified existing node in the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   node:
-        //     The System.Collections.Generic.LinkedListNode`1 before which to insert newNode.
-        //
-        //   newNode:
-        //     The new System.Collections.Generic.LinkedListNode`1 to add to the System.Collections.Generic.LinkedList`1.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     node is null. -or- newNode is null.
-        //
-        //   T:System.InvalidOperationException:
-        //     node is not in the current System.Collections.Generic.LinkedList`1. -or- newNode
-        //     belongs to another System.Collections.Generic.LinkedList`1.
-        public void AddBefore(LinkedListNode<T> node, LinkedListNode<T> newNode) => InnerList.AddBefore(node, newNode);
-        //
-        // Summary:
-        //     Adds a new node containing the specified value at the start of the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   value:
-        //     The value to add at the start of the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     The new System.Collections.Generic.LinkedListNode`1 containing value.
-        public LinkedListNode<T> AddFirst(T value) => InnerList.AddFirst(value);
-        //
-        // Summary:
-        //     Adds the specified new node at the start of the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   node:
-        //     The new System.Collections.Generic.LinkedListNode`1 to add at the start of the
-        //     System.Collections.Generic.LinkedList`1.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     node is null.
-        //
-        //   T:System.InvalidOperationException:
-        //     node belongs to another System.Collections.Generic.LinkedList`1.
-        public void AddFirst(LinkedListNode<T> node) => InnerList.AddFirst(node);
-        //
-        // Summary:
-        //     Adds a new node containing the specified value at the end of the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   value:
-        //     The value to add at the end of the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     The new System.Collections.Generic.LinkedListNode`1 containing value.
-        public LinkedListNode<T> AddLast(T value) => InnerList.AddLast(value);
-        //
-        // Summary:
-        //     Adds the specified new node at the end of the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   node:
-        //     The new System.Collections.Generic.LinkedListNode`1 to add at the end of the
-        //     System.Collections.Generic.LinkedList`1.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     node is null.
-        //
-        //   T:System.InvalidOperationException:
-        //     node belongs to another System.Collections.Generic.LinkedList`1.
-        public void AddLast(LinkedListNode<T> node) => InnerList.AddLast(node);
+        /// <summary>
+        /// Adds the specified new node after the specified existing node in the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="node">The <see cref="LinkedListNode{T}"/> after which to insert newNode.</param>
+        /// <param name="newNode">The new <see cref="LinkedListNode{T}"/> to add to the <see cref="LinkedList{T}"/>.</param>
+        /// <exception cref="ArgumentNullException">node is null. -or- newNode is null.</exception>
+        /// <exception cref="InvalidOperationException">node is not in the current <see cref="LinkedList{T}"/>. -or- newNode belongs to another <see cref="LinkedList{T}"/>.</exception>
+        public virtual void AddAfter(LinkedListNode<T> node, LinkedListNode<T> newNode) => InnerList.AddAfter(node, newNode);
+
+        /// <summary>
+        /// Adds a new node containing the specified value before the specified existing node in the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="node">The <see cref="LinkedListNode{T}"/> before which to insert a new <see cref="LinkedListNode{T}"/> containing value.</param>
+        /// <param name="value">The value to add to the <see cref="LinkedList{T}"/>.</param>
+        /// <returns>The new <see cref="LinkedListNode{T}"/> containing value.</returns>
+        /// <exception cref="ArgumentNullException">node is null.</exception>
+        /// <exception cref="InvalidOperationException">node is not in the current <see cref="LinkedList{T}"/>.</exception>
+        public virtual LinkedListNode<T> AddBefore(LinkedListNode<T> node, T value) => InnerList.AddBefore(node, value);
+
+        /// <summary>
+        /// Adds the specified new node before the specified existing node in the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="node">The <see cref="LinkedListNode{T}"/> before which to insert newNode.</param>
+        /// <param name="newNode">The new <see cref="LinkedListNode{T}"/> to add to the <see cref="LinkedList{T}"/>.</param>
+        /// <exception cref="ArgumentNullException">node is null. -or- newNode is null.</exception>
+        /// <exception cref="InvalidOperationException">node is not in the current <see cref="LinkedList{T}"/>. -or- newNode belongs to another <see cref="LinkedList{T}"/>.</exception>
+        public virtual void AddBefore(LinkedListNode<T> node, LinkedListNode<T> newNode) => InnerList.AddBefore(node, newNode);
+
+        /// <summary>
+        /// Adds a new node containing the specified value at the start of the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="value">The value to add at the start of the <see cref="LinkedList{T}"/>.</param>
+        /// <returns>The new <see cref="LinkedListNode{T}"/> containing value.</returns>
+        public virtual LinkedListNode<T> AddFirst(T value) => InnerList.AddFirst(value);
+
+        /// <summary>
+        /// Adds the specified new node at the start of the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="node">The new <see cref="LinkedListNode{T}"/> to add at the start of the <see cref="LinkedList{T}"/>.</param>
+        /// <exception cref="ArgumentNullException">node is null.</exception>
+        /// <exception cref="InvalidOperationException">node belongs to another <see cref="LinkedList{T}"/>.</exception>
+        public virtual void AddFirst(LinkedListNode<T> node) => InnerList.AddFirst(node);
+
+        /// <summary>
+        /// Adds a new node containing the specified value at the end of the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="value">The value to add at the end of the <see cref="LinkedList{T}"/>.</param>
+        /// <returns>The new <see cref="LinkedListNode{T}"/> containing value.</returns>
+        public virtual LinkedListNode<T> AddLast(T value) => InnerList.AddLast(value);
+
+        /// <summary>
+        /// Adds the specified new node at the end of the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="node">The new <see cref="LinkedListNode{T}"/> to add at the end of the <see cref="LinkedList{T}"/>.</param>
+        /// <exception cref="ArgumentNullException">node is null.</exception>
+        /// <exception cref="InvalidOperationException">node belongs to another <see cref="LinkedList{T}"/>.</exception>
+        public virtual void AddLast(LinkedListNode<T> node) => InnerList.AddLast(node);
 
         #region AddRange methods
 
-        public LinkedListNode<T>[] AddRangeFirst(params T[] values)
+        /// <summary>
+        /// Add multiple values at the top of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="values">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
+        public virtual LinkedListNode<T>[] AddRangeFirst(params T[] values) => InnerList.First == null ? AddRangeLast(values) : AddRangeBefore(InnerList.First, values);
 
+        /// <summary>
+        /// Add multiple values at the top of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="array">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
+        public virtual LinkedListNode<T>[] AddRangeFirst(IEnumerable<T> array) => InnerList.First == null ? AddRangeLast(array) : AddRangeBefore(InnerList.First, array);
+
+        /// <summary>
+        /// Add multiple <see cref="LinkedListNode{T}"/>'s at the top of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="nodes">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
+        public virtual void AddRangeFirst(params LinkedListNode<T>[] nodes) { if (InnerList.First == null) AddRangeLast(nodes); else AddRangeBefore(InnerList.First, nodes); }
+
+        /// <summary>
+        /// Add multiple <see cref="LinkedListNode{T}"/>'s at the top of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="array">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        public virtual void AddRangeFirst(IEnumerable<LinkedListNode<T>> array) { if (InnerList.First == null) AddRangeLast(array); else AddRangeBefore(InnerList.First, array); }
+
+        public virtual LinkedListNode<T>[] AddRangeLast(params T[] values)
         {
 
-            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+            var result = new LinkedListNode<T>[values.Length];
 
-            if (values.Length != 0)
+            for (int i = 0; i < values.Length; i++)
 
-            {
+                result[i] = AddLast(values[i]);
 
-                LinkedListNode<T> node = AddFirst(values[0]);
-
-                result.AddLast(node);
-
-                for (int i = 1; i < values.Length; i++)
-
-                {
-
-                    node = AddAfter(node, values[i]);
-
-                    result.AddLast(node);
-
-                }
-
-            }
-
-            return result.ToArray<LinkedListNode<T>>();
+            return result;
 
         }
 
-        public LinkedListNode<T>[] AddRangeFirst(IEnumerable<T> array) => AddRangeFirst(array as T[] ?? array.ToArray<T>());
-
-        public void AddRangeFirst(params LinkedListNode<T>[] values)
+        public virtual LinkedListNode<T>[] AddRangeLast(IEnumerable<T> array)
 
         {
 
-            if (values.Length == 0) return;
+            if (array is T[] _array) return AddRangeLast(_array);
 
-            LinkedListNode<T> node = values[0];
+            LinkedListNode<T>[] result;
 
-            AddFirst(node);
+            int i = 0;
 
-            for (int i = 1; i < values.Length; i++)
+            if (array is IList<T> __array)
 
             {
 
-                AddAfter(node, values[i]);
+                result = new LinkedListNode<T>[__array.Count];
 
-                node = values[i];
+                for (; i < __array.Count; i++)
+
+                    result[i] = AddLast(__array[i]);
+
+                return result;
 
             }
 
-        }
-
-        public void AddRangeFirst(IEnumerable<LinkedListNode<T>> array) => AddRangeFirst(array as LinkedListNode<T>[] ?? array.ToArray<LinkedListNode<T>>());
-
-        public LinkedListNode<T>[] AddRangeLast(params T[] values) => AddRangeLast((IEnumerable<T>)values);
-
-        public LinkedListNode<T>[] AddRangeLast(IEnumerable<T> array)
-
-        {
-
-            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+            var values = new LinkedList<LinkedListNode<T>>();
 
             foreach (T item in array)
 
-                result.AddLast(AddLast(item));
+                _ = values.AddLast(AddLast(item));
 
-            return result.ToArray<LinkedListNode<T>>();
+            result = new LinkedListNode<T>[values.Count];
+
+            foreach (LinkedListNode<T> item in values)
+
+                result[i++] = item;
+
+            return result;
 
         }
 
-        public void AddRangeLast(params LinkedListNode<T>[] values) => AddRangeLast((IEnumerable<LinkedListNode<T>>)values);
+        public virtual void AddRangeLast(params LinkedListNode<T>[] nodes) => AddRangeLast((IEnumerable<LinkedListNode<T>>)nodes);
 
-        public void AddRangeLast(IEnumerable<LinkedListNode<T>> array)
+        public virtual void AddRangeLast(IEnumerable<LinkedListNode<T>> array)
 
         {
 
@@ -267,25 +217,44 @@ namespace WinCopies.Util
 
         }
 
-        public LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, params T[] values) => AddRangeBefore(node, (IEnumerable<T>)values);
-
-        public LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, IEnumerable<T> array)
-
+        public virtual LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, params T[] values)
         {
 
-            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
+            var result = new LinkedListNode<T>[values.Length];
 
-            foreach (T item in array)
+            for (int i = 0; i < values.Length; i++)
 
-                result.AddLast(AddBefore(node, item));
+                result[i] = AddBefore(node, values[i]);
 
-            return result.ToArray<LinkedListNode<T>>();
+            return result;
 
         }
 
-        public void AddRangeBefore(LinkedListNode<T> node, params LinkedListNode<T>[] values) => AddRangeBefore(node, (IEnumerable<LinkedListNode<T>>)values);
+        public virtual LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, IEnumerable<T> array)
 
-        public void AddRangeBefore(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
+        {
+
+            var values = new LinkedList<LinkedListNode<T>>();
+
+            foreach (T item in array)
+
+                _ = values.AddLast(AddBefore(node, item));
+
+            var result = new LinkedListNode<T>[values.Count];
+
+            int i = 0;
+
+            foreach (LinkedListNode<T> item in values)
+
+                result[i++] = item;
+
+            return result;
+
+        }
+
+        public virtual void AddRangeBefore(LinkedListNode<T> node, params LinkedListNode<T>[] nodes) => AddRangeBefore(node, (IEnumerable<LinkedListNode<T>>)nodes);
+
+        public virtual void AddRangeBefore(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
 
         {
 
@@ -295,208 +264,115 @@ namespace WinCopies.Util
 
         }
 
-        public LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, params T[] values) => AddRangeAfter(node, (IEnumerable<T>)values);
+        public virtual LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, params T[] values) => node.Next == null ? AddRangeLast(values) : AddRangeBefore(node.Next, values);
 
-        public LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, IEnumerable<T> array)
+        public virtual LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, IEnumerable<T> array) => node.Next == null ? AddRangeLast(array) : AddRangeBefore(node.Next, array);
 
+        public virtual void AddRangeAfter(LinkedListNode<T> node, params LinkedListNode<T>[] nodes)
         {
 
-            LinkedList<LinkedListNode<T>> result = new LinkedList<LinkedListNode<T>>();
-
-            LinkedListNode<T> _node = node;
-
-            foreach (T item in array)
-
-            {
-
-                _node = AddAfter(_node, item);
-
-                result.AddLast(_node);
-
-            }
-
-            return result.ToArray<LinkedListNode<T>>();
+            if (node.Next == null) AddRangeLast(nodes); else AddRangeBefore(node.Next, nodes);
 
         }
 
-        public void AddRangeAfter(LinkedListNode<T> node, params LinkedListNode<T>[] values) => AddRangeAfter(node, (IEnumerable<LinkedListNode<T>>)values);
-
-        public void AddRangeAfter(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
-
+        public virtual void AddRangeAfter(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
         {
 
-            LinkedListNode<T> _node = node;
-
-            foreach (LinkedListNode<T> item in array)
-
-            {
-
-                AddAfter(_node, item);
-
-                _node = item;
-
-            }
+            if (node.Next == null) AddRangeLast(array); else AddRangeBefore(node.Next, array);
 
         }
 
         #endregion
 
-        //
-        // Summary:
-        //     Removes all nodes from the System.Collections.Generic.LinkedList`1.
-        public void Clear() => InnerList.Clear();
-        //
-        // Summary:
-        //     Determines whether a value is in the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   value:
-        //     The value to locate in the System.Collections.Generic.LinkedList`1. The value
-        //     can be null for reference types.
-        //
-        // Returns:
-        //     true if value is found in the System.Collections.Generic.LinkedList`1; otherwise,
-        //     false.
-        public bool Contains(T value) => InnerList.Contains(value);
-        //
-        // Summary:
-        //     Copies the entire System.Collections.Generic.LinkedList`1 to a compatible one-dimensional
-        //     System.Array, starting at the specified index of the target array.
-        //
-        // Parameters:
-        //   array:
-        //     The one-dimensional System.Array that is the destination of the elements copied
-        //     from System.Collections.Generic.LinkedList`1. The System.Array must have zero-based
-        //     indexing.
-        //
-        //   index:
-        //     The zero-based index in array at which copying begins.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     array is null.
-        //
-        //   T:System.ArgumentOutOfRangeException:
-        //     index is less than zero.
-        //
-        //   T:System.ArgumentException:
-        //     The number of elements in the source System.Collections.Generic.LinkedList`1
-        //     is greater than the available space from index to the end of the destination
-        //     array.
-        public void CopyTo(T[] array, int index) => InnerList.Contains(array, index);
-        //
-        // Summary:
-        //     Finds the first node that contains the specified value.
-        //
-        // Parameters:
-        //   value:
-        //     The value to locate in the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     The first System.Collections.Generic.LinkedListNode`1 that contains the specified
-        //     value, if found; otherwise, null.
-        public LinkedListNode<T> Find(T value) => InnerList.Find(value);
-        //
-        // Summary:
-        //     Finds the last node that contains the specified value.
-        //
-        // Parameters:
-        //   value:
-        //     The value to locate in the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     The last System.Collections.Generic.LinkedListNode`1 that contains the specified
-        //     value, if found; otherwise, null.
-        public LinkedListNode<T> FindLast(T value) => InnerList.FindLast(value);
-        //
-        // Summary:
-        //     Returns an enumerator that iterates through the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     An System.Collections.Generic.LinkedList`1.Enumerator for the System.Collections.Generic.LinkedList`1.
-        public LinkedList<T>.Enumerator GetEnumerator() => InnerList.GetEnumerator();
-        //
-        // Summary:
-        //     Implements the System.Runtime.Serialization.ISerializable interface and returns
-        //     the data needed to serialize the System.Collections.Generic.LinkedList`1 instance.
-        //
-        // Parameters:
-        //   info:
-        //     A System.Runtime.Serialization.SerializationInfo object that contains the information
-        //     required to serialize the System.Collections.Generic.LinkedList`1 instance.
-        //
-        //   context:
-        //     A System.Runtime.Serialization.StreamingContext object that contains the source
-        //     and destination of the serialized stream associated with the System.Collections.Generic.LinkedList`1
-        //     instance.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     info is null.
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context) => InnerList.GetObjectData(info, context);
-        //
-        // Summary:
-        //     Implements the System.Runtime.Serialization.ISerializable interface and raises
-        //     the deserialization event when the deserialization is complete.
-        //
-        // Parameters:
-        //   sender:
-        //     The source of the deserialization event.
-        //
-        // Exceptions:
-        //   T:System.Runtime.Serialization.SerializationException:
-        //     The System.Runtime.Serialization.SerializationInfo object associated with the
-        //     current System.Collections.Generic.LinkedList`1 instance is invalid.
-        public virtual void OnDeserialization(object sender) => InnerList.OnDeserialization(sender);
-        //
-        // Summary:
-        //     Removes the first occurrence of the specified value from the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   value:
-        //     The value to remove from the System.Collections.Generic.LinkedList`1.
-        //
-        // Returns:
-        //     true if the element containing value is successfully removed; otherwise, false.
-        //     This method also returns false if value was not found in the original System.Collections.Generic.LinkedList`1.
-        public bool Remove(T value) => InnerList.Remove(value);
-        //
-        // Summary:
-        //     Removes the specified node from the System.Collections.Generic.LinkedList`1.
-        //
-        // Parameters:
-        //   node:
-        //     The System.Collections.Generic.LinkedListNode`1 to remove from the System.Collections.Generic.LinkedList`1.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     node is null.
-        //
-        //   T:System.InvalidOperationException:
-        //     node is not in the current System.Collections.Generic.LinkedList`1.
-        public void Remove(LinkedListNode<T> node) => InnerList.Remove(node);
-        //
-        // Summary:
-        //     Removes the node at the start of the System.Collections.Generic.LinkedList`1.
-        //
-        // Exceptions:
-        //   T:System.InvalidOperationException:
-        //     The System.Collections.Generic.LinkedList`1 is empty.
-        public void RemoveFirst() => InnerList.RemoveFirst();
-        //
-        // Summary:
-        //     Removes the node at the end of the System.Collections.Generic.LinkedList`1.
-        //
-        // Exceptions:
-        //   T:System.InvalidOperationException:
-        //     The System.Collections.Generic.LinkedList`1 is empty.
-        public void RemoveLast() => InnerList.RemoveLast();
+        /// <summary>
+        /// Removes all nodes from the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        public virtual void Clear() => InnerList.Clear();
 
-        public T[] ToArray()
+        /// <summary>
+        /// Determines whether a value is in the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="value">The value to locate in the <see cref="LinkedList{T}"/>. The value can be null for reference types.</param>
+        /// <returns>true if value is found in the <see cref="LinkedList{T}"/>; otherwise, false.</returns>
+        public virtual bool Contains(T value) => InnerList.Contains(value);
+
+        /// <summary>
+        /// Copies the entire <see cref="LinkedList{T}"/> to a compatible one-dimensional <see cref="Array"/>, starting at the specified index of the target array.
+        /// </summary>
+        /// <param name="array">The one-dimensional <see cref="Array"/> that is the destination of the elements copied from <see cref="LinkedList{T}"/>. The System.Array must have zero-based indexing.</param>
+        /// <param name="index">The zero-based index in array at which copying begins.</param>
+        /// <exception cref="ArgumentNullException">array is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">index is less than zero.</exception>
+        /// <exception cref="ArgumentException">The number of elements in the source <see cref="LinkedList{T}"/> is greater than the available space from index to the end of the destination array.</exception>
+        public virtual void CopyTo(T[] array, int index) => InnerList.Contains(array, index);
+
+        /// <summary>
+        /// Finds the first node that contains the specified value.
+        /// </summary>
+        /// <param name="value">The value to locate in the <see cref="LinkedList{T}"/>.</param>
+        /// <returns>The first <see cref="LinkedListNode{T}"/> that contains the specified value, if found; otherwise, null.</returns>
+        public virtual LinkedListNode<T> Find(T value) => InnerList.Find(value);
+
+        /// <summary>
+        /// Finds the last node that contains the specified value.
+        /// </summary>
+        /// <param name="value">The value to locate in the <see cref="LinkedList{T}"/>.</param>
+        /// <returns>The last <see cref="LinkedListNode{T}"/> that contains the specified value, if found; otherwise, null.</returns>
+        public virtual LinkedListNode<T> FindLast(T value) => InnerList.FindLast(value);
+
+        /// <summary>
+        /// Returns an enumerator that iterates through the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <returns>An <see cref="LinkedList{T}"/>.Enumerator for the <see cref="LinkedList{T}"/>.</returns>
+        public virtual LinkedList<T>.Enumerator GetEnumerator() => InnerList.GetEnumerator();
+
+        /// <summary>
+        /// Implements the <see cref="ISerializable"/> interface and returns the data needed to serialize the <see cref="LinkedList{T}"/> instance.
+        /// </summary>
+        /// <param name="info">A <see cref="SerializationInfo"/> object that contains the information required to serialize the <see cref="LinkedList{T}"/> instance.</param>
+        /// <param name="context">A <see cref="StreamingContext"/> object that contains the source and destination of the serialized stream associated with the <see cref="LinkedList{T}"/> instance.</param>
+        /// <exception cref="ArgumentNullException">info is null.</exception>
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context) => InnerList.GetObjectData(info, context);
+
+        /// <summary>
+        /// Implements the System.Runtime.Serialization.ISerializable interface and raises the deserialization event when the deserialization is complete.
+        /// </summary>
+        /// <param name="sender">The source of the deserialization event.</param>
+        /// <exception cref="SerializationException">The <see cref="SerializationInfo"/> object associated with the current <see cref="LinkedList{T}"/> instance is invalid.</exception>
+        public virtual void OnDeserialization(object sender) => InnerList.OnDeserialization(sender);
+
+        /// <summary>
+        /// Removes the first occurrence of the specified value from the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="value">The value to remove from the <see cref="LinkedList{T}"/>.</param>
+        /// <returns><see langword="true"/> if the element containing value is successfully removed; otherwise, <see langword="false"/>. This method also returns <see langword="false"/> if value was not found in the original <see cref="LinkedList{T}"/>.</returns>
+        public virtual bool Remove(T value) => InnerList.Remove(value);
+
+        /// <summary>
+        /// Removes the specified node from the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <param name="node">The <see cref="LinkedListNode{T}"/> to remove from the <see cref="LinkedList{T}"/>.</param>
+        /// <exception cref="ArgumentNullException">node is null.</exception>
+        /// <exception cref="InvalidOperationException">node is not in the current <see cref="LinkedList{T}"/>.</exception>
+        public virtual void Remove(LinkedListNode<T> node) => InnerList.Remove(node);
+
+        /// <summary>
+        /// Removes the node at the start of the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The <see cref="LinkedList{T}"/> is empty.</exception>
+        public virtual void RemoveFirst() => InnerList.RemoveFirst();
+
+        /// <summary>
+        /// Removes the node at the end of the <see cref="LinkedList{T}"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The <see cref="LinkedList{T}"/> is empty.</exception>
+        public virtual void RemoveLast() => InnerList.RemoveLast();
+
+        public virtual T[] ToArray()
 
         {
 
-            T[] result = new T[InnerList.Count];
+            var result = new T[InnerList.Count];
 
             int i = 0;
 
@@ -508,17 +384,32 @@ namespace WinCopies.Util
 
         }
 
-        public ArrayList ToArrayList() => new ArrayList(ToArray());
+        public virtual ArrayList ToArrayList()
+        {
 
-        public List<T> ToList()
+            var result = new ArrayList(InnerList.Count);
+
+            int i = 0;
+
+            foreach (T item in InnerList)
+
+                result[i++] = item;
+
+            return result;
+
+        }
+
+        public virtual List<T> ToList()
 
         {
 
-            List<T> result = new List<T>(Count);
+            var result = new List<T>(Count);
 
-            foreach (T item in this)
+            int i = 0;
 
-                result.Add(item);
+            foreach (T item in InnerList)
+
+                result[i++] = item;
 
             return result;
 
