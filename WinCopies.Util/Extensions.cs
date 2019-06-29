@@ -1937,13 +1937,59 @@ namespace WinCopies.Util
 
         {
 
-            var result = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
-            foreach (object value in array)
+            array.ToString(stringBuilder, parseSubEnumerables, parseStrings);
 
-                _ = result.Append($"{{{ ((value is string && parseStrings) || (!(value is string) && value is IEnumerable && parseSubEnumerables) ? ((IEnumerable)value).ToString(true) : value?.ToString())}}}, ");
+            return stringBuilder.ToString(0, stringBuilder.Length - 2);
 
-            return result.ToString(0, result.Length - 2);
+        }
+
+        private static void ToString(this IEnumerable array, StringBuilder stringBuilder, bool parseSubEnumerables, bool parseStrings = false)
+
+        {
+
+            void append(object _value)
+
+            {
+
+                if ((_value is string && parseStrings) || (!(_value is string) && _value is IEnumerable && parseSubEnumerables))
+
+                    ((IEnumerable)_value).ToString(stringBuilder, true);
+
+                else
+
+                    _ = stringBuilder.AppendFormat("{0}, ", _value?.ToString());
+
+            }
+
+            _ = stringBuilder.Append("{");
+
+            IEnumerator enumerator = array.GetEnumerator();
+
+            bool atLeastOneLoop = false;
+
+            if (enumerator.MoveNext())
+
+            {
+
+                atLeastOneLoop = true;
+
+                append(enumerator.Current);
+
+            }
+
+            while (enumerator.MoveNext())
+
+                append(enumerator.Current);
+
+            if (atLeastOneLoop)
+
+                _ = stringBuilder.Insert(stringBuilder.Length - 2, "}");
+
+            else
+
+                _ = stringBuilder.Append("}");
 
         }
 

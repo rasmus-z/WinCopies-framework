@@ -12,7 +12,7 @@ namespace WinCopies.Util
     /// Builds arrays and lists by sizing them only when required. This class can be used to initialize your array or list before adding or removing values to it.
     /// </summary>
     /// <typeparam name="T">The type of the items.</typeparam>
-    public class ArrayAndListBuilder<T> : ISerializable, IDeserializationCallback
+    public class ArrayAndListBuilder<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     {
 
         /// <summary>
@@ -420,6 +420,10 @@ namespace WinCopies.Util
         /// <exception cref="InvalidOperationException">The <see cref="LinkedList{T}"/> is empty.</exception>
         public virtual void RemoveLast() => InnerList.RemoveLast();
 
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>)InnerList).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)InnerList).GetEnumerator();
+
         /// <summary>
         /// Returns an array with the items of this <see cref="ArrayAndListBuilder{T}"/>.
         /// </summary>
@@ -478,6 +482,5 @@ namespace WinCopies.Util
             return result;
 
         }
-
     }
 }
