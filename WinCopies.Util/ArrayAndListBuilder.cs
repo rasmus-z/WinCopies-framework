@@ -143,7 +143,6 @@ namespace WinCopies.Util
         /// Add multiple <see cref="LinkedListNode{T}"/>'s at the top of this <see cref="ArrayAndListBuilder{T}"/>.
         /// </summary>
         /// <param name="nodes">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayAndListBuilder{T}"/></param>
-        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public virtual void AddRangeFirst(params LinkedListNode<T>[] nodes) { if (InnerList.First == null) AddRangeLast(nodes); else AddRangeBefore(InnerList.First, nodes); }
 
         /// <summary>
@@ -152,6 +151,11 @@ namespace WinCopies.Util
         /// <param name="array">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayAndListBuilder{T}"/></param>
         public virtual void AddRangeFirst(IEnumerable<LinkedListNode<T>> array) { if (InnerList.First == null) AddRangeLast(array); else AddRangeBefore(InnerList.First, array); }
 
+        /// <summary>
+        /// Add multiple values at the end of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="values">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public virtual LinkedListNode<T>[] AddRangeLast(params T[] values)
         {
 
@@ -165,6 +169,11 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Add multiple values at the end of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="array">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public virtual LinkedListNode<T>[] AddRangeLast(IEnumerable<T> array)
 
         {
@@ -205,8 +214,17 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Add multiple <see cref="LinkedListNode{T}"/>'s at the end of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="nodes">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public virtual void AddRangeLast(params LinkedListNode<T>[] nodes) => AddRangeLast((IEnumerable<LinkedListNode<T>>)nodes);
 
+        /// <summary>
+        /// Add multiple <see cref="LinkedListNode{T}"/>'s at the end of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="array">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayAndListBuilder{T}"/></param>
         public virtual void AddRangeLast(IEnumerable<LinkedListNode<T>> array)
 
         {
@@ -217,6 +235,12 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Add multiple values before a specified node in this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="node">The node before which to add the values</param>
+        /// <param name="values">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public virtual LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, params T[] values)
         {
 
@@ -230,6 +254,12 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Add multiple values before a specified node in this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="node">The node before which to add the values</param>
+        /// <param name="array">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public virtual LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, IEnumerable<T> array)
 
         {
@@ -252,8 +282,18 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Add multiple values before a specified node in this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="node">The node before which to add the values</param>
+        /// <param name="nodes">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayAndListBuilder{T}"/></param>
         public virtual void AddRangeBefore(LinkedListNode<T> node, params LinkedListNode<T>[] nodes) => AddRangeBefore(node, (IEnumerable<LinkedListNode<T>>)nodes);
 
+        /// <summary>
+        /// Add multiple values before a specified node in this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="node">The node before which to add the values</param>
+        /// <param name="array">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
         public virtual void AddRangeBefore(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
 
         {
@@ -264,23 +304,35 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Add multiple values after a specified node in this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="node">The node after which to add the values</param>
+        /// <param name="values">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public virtual LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, params T[] values) => node.Next == null ? AddRangeLast(values) : AddRangeBefore(node.Next, values);
 
+        /// <summary>
+        /// Add multiple values after a specified node in this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="node">The node after which to add the values</param>
+        /// <param name="array">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
         public virtual LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, IEnumerable<T> array) => node.Next == null ? AddRangeLast(array) : AddRangeBefore(node.Next, array);
 
-        public virtual void AddRangeAfter(LinkedListNode<T> node, params LinkedListNode<T>[] nodes)
-        {
+        /// <summary>
+        /// Add multiple values after a specified node in this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="node">The node after which to add the values</param>
+        /// <param name="nodes">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        public virtual void AddRangeAfter(LinkedListNode<T> node, params LinkedListNode<T>[] nodes) { if (node.Next == null) AddRangeLast(nodes); else AddRangeBefore(node.Next, nodes); }
 
-            if (node.Next == null) AddRangeLast(nodes); else AddRangeBefore(node.Next, nodes);
-
-        }
-
-        public virtual void AddRangeAfter(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
-        {
-
-            if (node.Next == null) AddRangeLast(array); else AddRangeBefore(node.Next, array);
-
-        }
+        /// <summary>
+        /// Add multiple values after a specified node in this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <param name="node">The node after which to add the values</param>
+        /// <param name="array">The values to add to this <see cref="ArrayAndListBuilder{T}"/></param>
+        public virtual void AddRangeAfter(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array) { if (node.Next == null) AddRangeLast(array); else AddRangeBefore(node.Next, array); }
 
         #endregion
 
@@ -368,6 +420,10 @@ namespace WinCopies.Util
         /// <exception cref="InvalidOperationException">The <see cref="LinkedList{T}"/> is empty.</exception>
         public virtual void RemoveLast() => InnerList.RemoveLast();
 
+        /// <summary>
+        /// Returns an array with the items of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <returns>An array with the items of this <see cref="ArrayAndListBuilder{T}"/>.</returns>
         public virtual T[] ToArray()
 
         {
@@ -384,6 +440,10 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Returns an <see cref="ArrayList"/> with the items of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <returns>An <see cref="ArrayList"/> with the items of this <see cref="ArrayAndListBuilder{T}"/>.</returns>
         public virtual ArrayList ToArrayList()
         {
 
@@ -399,6 +459,10 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Returns a <see cref="List{T}"/> with the items of this <see cref="ArrayAndListBuilder{T}"/>.
+        /// </summary>
+        /// <returns>A <see cref="List{T}"/> with the items of this <see cref="ArrayAndListBuilder{T}"/>.</returns>
         public virtual List<T> ToList()
 
         {
