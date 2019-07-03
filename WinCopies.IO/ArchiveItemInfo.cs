@@ -34,24 +34,26 @@ namespace WinCopies.IO
 
         public ShellObjectInfo ArchiveShellObject { get; } = null;
 
-        public sealed override string LocalizedName => ArchiveShellObject.LocalizedName;
+        public override string LocalizedName => ArchiveShellObject.LocalizedName;
 
-        public sealed override string Name => System.IO.Path.GetFileName(Path);
+        public override string Name => System.IO.Path.GetFileName(Path);
 
         private Icon TryGetIcon(System.Drawing.Size size)
         {
 
             if (System.IO.Path.HasExtension(Path))
 
+                // todo: dll's ?
+
                 if (Path.EndsWith(".exe"))
 
-                    return new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\imageres.dll")).GetIcon(11).Split()?.TryGetIcon(size, 32, true, true);
+                    return TryGetIcon(11, "imageres.dll", size);
 
                 else
 
                 {
 
-                    string fileType = Registry.GetFileTypeByExtension(System.IO.Path.GetExtension(Path));
+                    string fileType = Registry.GetFileTypeFromExtension(System.IO.Path.GetExtension(Path));
 
                     Icon icon = null;
 
@@ -59,81 +61,47 @@ namespace WinCopies.IO
 
                         icon = Registry.GetIconVariationsFromFileType(fileType)?.TryGetIcon(size, 32, true, true);
 
-                    return icon ?? new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, 32, true, true);
+                    return icon ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
                 }
 
             else
 
-                return new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\SHELL32.dll")).GetIcon(FileType == FileType.Folder ? 3 : 0).Split()?.TryGetIcon(size, 32, true, true);
+                return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+
+        }
+
+        private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
+
+        {
+
+            using (Icon icon = TryGetIcon(size))
+
+                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         }
 
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public sealed override BitmapSource SmallBitmapSource
-        {
-            get
-            {
-
-                using (Icon icon = TryGetIcon(new System.Drawing.Size(16, 16)))
-
-                    return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
-            }
-
-        }
+        public override BitmapSource SmallBitmapSource => TryGetBitmapSource(new System.Drawing.Size(16, 16));
 
         /// <summary>
         /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public sealed override BitmapSource MediumBitmapSource
-        {
-            get
-            {
-
-                using (Icon icon = TryGetIcon(new System.Drawing.Size(48, 48)))
-
-                    return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
-            }
-
-        }
+        public override BitmapSource MediumBitmapSource => TryGetBitmapSource(new System.Drawing.Size(48, 48));
 
         /// <summary>
         /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public sealed override BitmapSource LargeBitmapSource
-        {
-            get
-            {
-
-                using (Icon icon = TryGetIcon(new System.Drawing.Size(128, 128)))
-
-                    return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromWidthAndHeight(icon.Width, icon.Height));
-
-            }
-
-        }
+        public override BitmapSource LargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(128, 128));
 
         /// <summary>
         /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public sealed override BitmapSource ExtraLargeBitmapSource
-        {
-            get
-            {
+        public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(256, 256));
 
-                using (Icon icon = TryGetIcon(new System.Drawing.Size(256, 256)))
-
-                    return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
-            }
-
-        }
-
-        public sealed override bool IsBrowsable => FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.Archive;
+        public override bool IsBrowsable => FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.Archive;
 
         // public ArchiveFileInfo ArchiveFileInfo { get; } = null;
 
@@ -252,35 +220,13 @@ namespace WinCopies.IO
 
         }
 
-        public sealed override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
+        public override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 
-        public sealed override void LoadItems()
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, FileTypesFlags.All));
 
-        {
-
-            if (ItemsLoader == null)
-
-                LoadItems(true, true, FileTypesFlags.All);
-
-            else
-
-                ItemsLoader.LoadItems();
-
-        }
-
-        public sealed override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) => LoadItems(new ArchiveLoader(true, true, fileTypes));
-
-        public sealed override void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
-
-        {
-
-            ItemsLoader = browsableObjectInfoItemsLoader;
-
-            ItemsLoader.LoadItems();
-
-        }
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, FileTypesFlags.All));
 
         public override void Dispose()
         {
@@ -297,7 +243,7 @@ namespace WinCopies.IO
 
             new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
 
-        public sealed override void Rename(string newValue) =>
+        public override void Rename(string newValue) =>
 
             // string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
 
@@ -313,7 +259,7 @@ namespace WinCopies.IO
 
             throw new NotSupportedException("This feature is currently not supported for the content archive items.");
 
-        public sealed override IBrowsableObjectInfo Clone() => GetBrowsableObjectInfo(new ShellObjectInfo(ArchiveShellObject.ShellObject, ArchiveShellObject.Path, ArchiveShellObject.FileType, ArchiveShellObject.SpecialFolder), ArchiveFileInfo, Path, FileType);
+        public override IBrowsableObjectInfo Clone() => GetBrowsableObjectInfo(new ShellObjectInfo(ArchiveShellObject.ShellObject, ArchiveShellObject.Path, ArchiveShellObject.FileType, ArchiveShellObject.SpecialFolder), ArchiveFileInfo, Path, FileType);
     }
 
 }

@@ -32,7 +32,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides a background process that can be used to load items of a folder.
     /// </summary>
-    public class FolderLoader : BrowsableObjectInfoItemsLoader
+    public class FolderLoader : FileSystemObjectItemsLoader
     {
 
         // todo: to turn on ShellObjectWatcher for better compatibility
@@ -48,7 +48,7 @@ namespace WinCopies.IO
 
         }
 
-        protected override void Initialize()
+        protected override void InitializePath()
 
         {
 
@@ -220,12 +220,37 @@ namespace WinCopies.IO
 
         private void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e) => OnShellObjectDeleted(e.FullPath);
 
-        protected override void OnDoWork(object sender, DoWorkEventArgs e)
+        protected override void OnDoWork()
+
         {
 
-            base.OnDoWork(sender, e);
+            if (FileTypes == FileTypesFlags.None) return;
 
-            List<IFileSystemObject> paths = new List<IFileSystemObject>();
+            else if (FileTypes.HasFlag(FileTypesFlags.All) && FileTypes.HasMultipleFlags())
+
+                throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
+
+#if DEBUG
+
+            Debug.WriteLine("Dowork event started.");
+
+            Debug.WriteLine(FileTypes);
+
+            try
+            {
+
+                Debug.WriteLine("Path == null: " + (Path == null).ToString());
+
+                Debug.WriteLine("Path.Path: " + Path?.Path);
+
+                Debug.WriteLine("Path.ShellObject: " + (Path as ShellObjectInfo)?.ShellObject.ToString());
+
+            }
+            catch (Exception) { }
+
+#endif
+
+            var paths = new ArrayAndListBuilder<IFileSystemObject>();
 
             var comp = FolderLoader.comp.GetInstance();
 
@@ -275,7 +300,7 @@ namespace WinCopies.IO
 
                     browsableObjectInfo = browsableObjectInfo.Parent;
 
-                    while (browsableObjectInfo != null) 
+                    while (browsableObjectInfo != null)
 
                     {
 
@@ -322,7 +347,7 @@ namespace WinCopies.IO
 
                 pathInfo.Normalized_Path = IO.Path.GetNormalizedPath(pathInfo.Path);
 
-                paths.Add(pathInfo);
+                paths.AddLast(pathInfo);
 
             }
 
@@ -438,11 +463,17 @@ namespace WinCopies.IO
 
             }
 
-            paths.Sort(comp);
+
+
+            List<IFileSystemObject> _paths = paths.ToList();
 
 
 
-            void reportProgressAndAddNewPathToObservableCollection(PathInfo path_)
+            _paths.Sort(comp);
+
+
+
+            foreach (PathInfo path_ in _paths)
 
             {
 
@@ -468,10 +499,6 @@ namespace WinCopies.IO
 #endif
 
             }
-
-            foreach (PathInfo path_ in paths)
-
-                reportProgressAndAddNewPathToObservableCollection(path_);
 
         }
 

@@ -141,15 +141,4 @@ namespace WinCopies.IO
     //    string ParsingName { get; }
 
     //}
-
-    /// <summary>
-    /// Provides static methods to interact with file system items.
-    /// </summary>
-    public static class Util
-    {
-
-        public const string LibrariesName = "Libraries";
-        // todo: xml
-        public const string LibrariesLocalizedName = "Bibliothèques";
-    }
 }

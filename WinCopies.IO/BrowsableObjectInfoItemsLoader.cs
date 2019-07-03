@@ -45,30 +45,8 @@ namespace WinCopies.IO
 
                 _path = value;
 
-                Initialize();
+                InitializePath();
             }
-        }
-
-        private FileTypesFlags _fileTypes = FileTypesFlags.All;
-
-        public FileTypesFlags FileTypes
-
-        {
-
-            get => _fileTypes;
-
-            set
-
-            {
-
-                if (backgroundWorker.IsBusy)
-
-                    throw new InvalidOperationException("The BackgroundWorker is busy.");
-
-                _fileTypes = value;
-
-            }
-
         }
 
         private IEnumerable<string> _filter = null;
@@ -83,7 +61,7 @@ namespace WinCopies.IO
 
                 if (IsBusy)
 
-                    throw new InvalidOperationException("The " + nameof(FolderLoader) + " is busy.");
+                    throw new InvalidOperationException("The " + nameof(BrowsableObjectInfoItemsLoader) + " is busy.");
 
                 _filter = value;
 
@@ -116,20 +94,18 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
         /// </summary>
-        public BrowsableObjectInfoItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes)
+        public BrowsableObjectInfoItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation)
         {
 
             WorkerReportsProgress = workerReportsProgress;
 
             WorkerSupportsCancellation = workerSupportsCancellation;
 
-            FileTypes = fileTypes;
-
-            ProgressChanged += OnProgressChanged;
+            ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
 
             backgroundWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => ProgressChanged(this, e);
 
-            DoWork += OnDoWork;
+            DoWork += (object sender, DoWorkEventArgs e) => OnDoWork(e);
 
             backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => DoWork(this, e);
 
@@ -144,25 +120,13 @@ namespace WinCopies.IO
 
         }
 
+        public abstract bool CheckFilter(string path);
+
         public void ReportProgress(int percentProgress) => backgroundWorker.ReportProgress(percentProgress);
 
         public void ReportProgress(int percentProgress, object userState) => backgroundWorker.ReportProgress(percentProgress, userState);
 
-        protected abstract void Initialize();
-
-        public bool CheckFilter(string directory)
-
-        {
-
-            if (Filter == null) return true;
-
-            foreach (string filter in Filter)
-
-                if (!IO.Path.MatchToFilter(directory, filter)) return false;
-
-            return true;
-
-        }
+        protected abstract void InitializePath();
 
         public static FileTypesFlags FileTypeToFileTypeFlags(FileType fileType)
 
@@ -210,44 +174,15 @@ namespace WinCopies.IO
 
         }
 
+        protected abstract void OnDoWork();
+
         /// <summary>
-        /// When overriden in a derived class, provides a handler for the <see cref="DoWork"/> event.
+        /// When overridden in a derived class, provides a handler for the <see cref="DoWork"/> event.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected virtual void OnDoWork(object sender, DoWorkEventArgs e)
+        /// <param name="e">Event args for the current event</param>
+        protected virtual void OnDoWork(DoWorkEventArgs e) => OnDoWork();
 
-        {
-
-            if (FileTypes == FileTypesFlags.None) return;
-
-            else if (FileTypes.HasFlag(FileTypesFlags.All) && FileTypes.HasMultipleFlags())
-
-                throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
-
-#if DEBUG
-
-            Debug.WriteLine("Dowork event started.");
-
-            Debug.WriteLine(FileTypes);
-
-            try
-            {
-
-                Debug.WriteLine("Path == null: " + (Path == null).ToString());
-
-                Debug.WriteLine("Path.Path: " + Path?.Path);
-
-                Debug.WriteLine("Path.ShellObject: " + (Path as ShellObjectInfo)?.ShellObject.ToString());
-
-            }
-            catch (Exception) { }
-
-#endif
-
-        }
-
-        protected virtual void OnProgressChanged(object sender, ProgressChangedEventArgs e) => Path.items.Add((IBrowsableObjectInfo)e.UserState);
+        protected virtual void OnProgressChanged(ProgressChangedEventArgs e) => Path.items.Add((IBrowsableObjectInfo)e.UserState);
 
         // /// <summary>
         // /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class with an <see cref="IBrowsableObjectInfo"/>.
@@ -255,10 +190,7 @@ namespace WinCopies.IO
         // /// <param name="path">The path from which load items.</param>
         // public BrowsableObjectInfoItemsLoader(IBrowsableObjectInfo path) { path.ItemsLoader = this; }
 
-        /// <summary>
-        /// Loads the items of the <see cref="Path"/> object.
-        /// </summary>
-        public void LoadItems()
+        private void InitLoad()
 
         {
 
@@ -273,6 +205,27 @@ namespace WinCopies.IO
                 backgroundWorker.Cancel();
 
             Path.items.Clear();
+
+        }
+
+        /// <summary>
+        /// Loads the items of the <see cref="Path"/> object.
+        /// </summary>
+        public void LoadItems()
+
+        {
+
+            InitLoad();
+
+            OnDoWork();
+
+        }
+
+        public void LoadItemsAsync()
+
+        {
+
+            InitLoad();
 
             backgroundWorker.RunWorkerAsync();
 

@@ -71,7 +71,7 @@ namespace WinCopies.IO
 
                     ArchiveLoader.Path = browsableObjectInfo;
 
-                    ArchiveLoader.OnDoWork();
+                    ArchiveLoader.LoadItems();
 
                     string s = paths[i].ToLower();
 

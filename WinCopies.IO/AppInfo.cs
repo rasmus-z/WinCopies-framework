@@ -72,7 +72,7 @@ namespace WinCopies.IO
 
             FileType = fileType;
 
-            Command = GetCommandByFileType("open", FileType);
+            Command = GetCommandFromFileType("open", FileType);
 
         }
 
@@ -86,7 +86,7 @@ namespace WinCopies.IO
 
         {
 
-            _ = Process.Start(GetOpenWithSoftwareProcessStartInfoFromCommand(GetCommandByFileType(commandName, FileType), fileName));
+            _ = Process.Start(GetOpenWithSoftwareProcessStartInfoFromCommand(GetCommandFromFileType(commandName, FileType), fileName));
 
             return true;
 

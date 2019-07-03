@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using WinCopies.Util;
 
 #endregion
 
@@ -25,7 +26,7 @@ using System.IO;
 namespace WinCopies.IO
 {
 
-    public class ArchiveLoader : BrowsableObjectInfoItemsLoader
+    public class ArchiveLoader : FileSystemObjectItemsLoader
     {
 
         private static Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();
@@ -93,7 +94,7 @@ namespace WinCopies.IO
         /// </summary>
         public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes) { }
 
-        protected override void Initialize()
+        protected override void InitializePath()
 
         {
 
@@ -145,9 +146,35 @@ namespace WinCopies.IO
 
         }
 
-        public virtual void OnDoWork()
+        protected override void OnDoWork()
 
         {
+
+            if (FileTypes == FileTypesFlags.None) return;
+
+            else if (FileTypes.HasFlag(FileTypesFlags.All) && FileTypes.HasMultipleFlags())
+
+                throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
+
+#if DEBUG
+
+            Debug.WriteLine("Dowork event started.");
+
+            Debug.WriteLine(FileTypes);
+
+            try
+            {
+
+                Debug.WriteLine("Path == null: " + (Path == null).ToString());
+
+                Debug.WriteLine("Path.Path: " + Path?.Path);
+
+                Debug.WriteLine("Path.ShellObject: " + (Path as ShellObjectInfo)?.ShellObject.ToString());
+
+            }
+            catch (Exception) { }
+
+#endif
 
 #if DEBUG
 
@@ -414,8 +441,6 @@ namespace WinCopies.IO
             //    reportProgressAndAddNewPathToObservableCollection(path_);
 
         }
-
-        protected override void OnDoWork(object sender, DoWorkEventArgs e) => OnDoWork();
 
         protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path)
 

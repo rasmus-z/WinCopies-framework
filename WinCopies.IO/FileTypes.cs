@@ -4,19 +4,21 @@ namespace WinCopies.IO
 {
     public enum FileType
     {
-        None = 0,
+        None,
 
-        Folder = 1,
+        Folder,
 
-        File = 2,
+        File,
 
-        Drive = 3,
+        Drive,
 
-        Link = 4,
+        Link,
 
-        Archive = 5,
+        Archive,
 
-        SpecialFolder = 6
+        SpecialFolder,
+
+        Other
     }
 
     [Flags]

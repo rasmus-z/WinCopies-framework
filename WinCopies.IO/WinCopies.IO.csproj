@@ -112,10 +112,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\WinCopies.Util\bin\Debug\WinCopies.Util.dll</HintPath>
     </Reference>
-    <Reference Include="Windows.ApplicationModel" />
-    <Reference Include="Windows.Foundation" />
-    <Reference Include="Windows.Storage" />
-    <Reference Include="Windows.System" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +120,7 @@
     <Compile Include="ArchiveLoader.cs" />
     <Compile Include="BrowsableObjectInfo.cs" />
     <Compile Include="BrowsableObjectInfoItemsLoader.cs" />
+    <Compile Include="FileSystemObjectItemsLoader.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="FolderLoader.cs" />
     <Compile Include="FolderLoaderFileSystemWatcher.cs" />
@@ -133,6 +130,9 @@
     <Compile Include="Registry.cs" />
     <Compile Include="RegistryException.cs" />
     <Compile Include="Generic.xaml.cs" />
+    <Compile Include="RegistryItemInfo.cs" />
+    <Compile Include="RegistryItemInfoFactory.cs" />
+    <Compile Include="RegistryKeyItemsLoader.cs" />
     <Compile Include="ShellObjectInfo.cs" />
     <Compile Include="ShellPropertyContainer.cs" />
     <Compile Include="ShellPropertyConverter.cs" />
@@ -188,6 +188,9 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="RegistryReader.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

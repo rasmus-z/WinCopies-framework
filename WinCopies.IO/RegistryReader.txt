@@ -1,0 +1,54 @@
+﻿Windows version: 10;1803-1803
+
+using WinCopies.Util.Util: Util
+
+const DefaultIcon = "DefaultIcon"
+const OpenCommandPath = "shell\\open\\command"
+const DefaultIconDllPath = "%SystemRoot%\\System32\\SHELL32.dll"
+const PerceivedType = "PerceivedType"
+const SystemFileAssociations = "SystemFileAssociations"
+const SoftwareClasses = "Software\\Classes"
+const shellBackslash = "shell\\"
+const UserChoice = "UserChoice"
+const BackslashCommand = "\\command"
+const ProgId = "ProgId"
+const OpenWithProgids = "OpenWithProgids"
+const OpenWithList = "OpenWithList"
+const MRUList = "MRUList"
+const SoftwareClassesApplications = "Software\\Classes\\Applications"
+const ApplicationsBackslash = "Applications\\"
+const SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts"
+
+		<summary>
+        Gets the Windows registry open-with file type for a given extension.
+        </summary>
+        <param name="extension">The file extension from which look for the associated file type.</param>
+        <returns>If found, the Windows registry open-with file type associated to the given extension, otherwise null.</returns>
+        function => GetFileTypeFromExtension; params:: string: extension; string
+
+            if: extension == null => throw new <cs>ArgumentNullException(nameof(extension))
+
+            if: Util.IsNullEmptyOrWhitespace(extension) => throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(extension)))
+
+            RegistryKey value = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + '\\' + extension)
+                ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts + '\\' + extension);
+
+            if (value == null)
+
+            {
+
+                value = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(extension)
+                ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + '\\' + extension);
+
+                return value?.GetValue("") as string;
+
+            }
+
+            else
+
+            {
+
+                return value.OpenSubKey(UserChoice).GetValue(ProgId) as string;
+
+            }
+        }

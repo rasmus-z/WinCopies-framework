@@ -21,13 +21,29 @@ namespace WinCopies.IO
     /// </summary>
     public static class Registry
     {
+        private const string DefaultIcon = "DefaultIcon";
+        private const string OpenCommandPath = "shell\\open\\command";
+        private const string DefaultIconDllPath = "%SystemRoot%\\System32\\SHELL32.dll";
+        private const string PerceivedType = "PerceivedType";
+        private const string SystemFileAssociations = "SystemFileAssociations";
+        private const string SoftwareClasses = "Software\\Classes";
+        private const string shellBackslash = "shell\\";
+        private const string UserChoice = "UserChoice";
+        private const string BackslashCommand = "\\command";
+        private const string ProgId = "ProgId";
+        private const string OpenWithProgids = "OpenWithProgids";
+        private const string OpenWithList = "OpenWithList";
+        private const string MRUList = "MRUList";
+        private const string SoftwareClassesApplications = "Software\\Classes\\Applications";
+        private const string ApplicationsBackslash = "Applications\\";
+        private const string SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts";
 
         /// <summary>
         /// Gets the Windows registry open-with file type for a given extension.
         /// </summary>
         /// <param name="extension">The file extension from which look for the associated file type.</param>
         /// <returns>If found, the Windows registry open-with file type associated to the given extension, otherwise null.</returns>
-        public static string GetFileTypeByExtension(string extension)
+        public static string GetFileTypeFromExtension(string extension)
 
         {
 
@@ -39,34 +55,27 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(extension)));
 
-            RegistryKey value = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Classes\\" + extension) ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + extension);
-
-            string valueName = "";
+            RegistryKey value = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + '\\' + extension)
+                ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts + '\\' + extension);
 
             if (value == null)
 
-                value = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(extension) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE\\Classes\\" + extension);
+            {
+
+                value = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(extension)
+                ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + '\\' + extension);
+
+                return value?.GetValue("") as string;
+
+            }
 
             else
 
             {
 
-                value = value.OpenSubKey("UserChoice");
-
-                if (value == null)
-
-                    value = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(extension) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE\\Classes\\" + extension);
-
-                else
-
-                    valueName = "ProgId";
+                return value.OpenSubKey(UserChoice).GetValue(ProgId) as string;
 
             }
-
-
-
-            return value != null && value.GetValue(valueName) != null && value.GetValue(valueName) is string valueAsString ? valueAsString
-                : null;
         }
 
         /// <summary>
@@ -75,15 +84,13 @@ namespace WinCopies.IO
         /// <param name="commandName">The command name.</param>
         /// <param name="extension">The extension from which look for the associated command.</param>
         /// <returns>The Windows registry command associated to the given extension.</returns>
-        public static string GetCommandByExtension(string commandName, string extension)
+        public static string GetCommandFromExtension(string commandName, string extension)
 
         {
 
-            // todo: public method to avoid argument test for each call of the GetCommandByExtension and GetFileTypeByExtension methods.
+            // todo: public method to avoid argument test for each call of the GetCommandFromExtension and GetFileTypeFromExtension methods.
 
-            string key = null;
-
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, /*EqualityComparer<object>.Default, GetCommonPredicate<object>(),*/ null, GetKeyValuePair(nameof(commandName), (object)commandName), GetKeyValuePair(nameof(extension), (object)extension)))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out string key, /*EqualityComparer<object>.Default, GetCommonPredicate<object>(),*/ null, GetKeyValuePair(nameof(commandName), (object)commandName), GetKeyValuePair(nameof(extension), (object)extension)))
 
                 throw new ArgumentNullException(key);
 
@@ -91,20 +98,24 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
 
-            string fileType = GetFileTypeByExtension(extension);
+            string fileType = GetFileTypeFromExtension(extension);
 
             return fileType == null
                 ? (string)null
-                : GetFileTypeRegistryKey(fileType).OpenSubKey("shell\\" + commandName + "\\command")?.GetValue("") is string valueAsString ? valueAsString : null;
+                : GetFileTypeRegistryKey(fileType).OpenSubKey(shellBackslash + commandName + BackslashCommand)?.GetValue("") is string valueAsString ? valueAsString : null;
         }
 
-        public static string GetCommandByFileType(string commandName, string fileType)
+        /// <summary>
+        /// Gets the Windows registry command associated to a given open-with file type.
+        /// </summary>
+        /// <param name="commandName">The command name.</param>
+        /// <param name="fileType">The Windows registry open-with file type from which look for the associated command.</param>
+        /// <returns>The Windows registry command associated to the given extension.</returns>
+        public static string GetCommandFromFileType(string commandName, string fileType)
 
         {
 
-            string key = null;
-
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, null, GetKeyValuePair(nameof(commandName), commandName), GetKeyValuePair(nameof(commandName), fileType)))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out string key, null, GetKeyValuePair(nameof(commandName), commandName), GetKeyValuePair(nameof(commandName), fileType)))
 
                 throw new ArgumentNullException(key);
 
@@ -112,12 +123,17 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
 
-            RegistryKey fileTypeRegistryKey = GetFileTypeRegistryKey(fileType)?.OpenSubKey("shell\\" + commandName + "\\command");
+            using (RegistryKey fileTypeRegistryKey = GetFileTypeRegistryKey(fileType)?.OpenSubKey(shellBackslash + commandName + BackslashCommand))
 
-            return fileTypeRegistryKey?.GetValue("") is string valueAsString ? valueAsString : null;
+                return fileTypeRegistryKey?.GetValue("") as string;
 
         }
 
+        /// <summary>
+        /// Gets the software path part from a Windows registry open-with command.
+        /// </summary>
+        /// <param name="command">The Windows registry open-with command to parse</param>
+        /// <returns>The software path part of the command.</returns>
         public static string GetOpenWithSoftwarePathFromCommand(string command)
 
         {
@@ -188,9 +204,7 @@ namespace WinCopies.IO
 
         {
 
-            string key = null;
-
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, null, GetKeyValuePair(nameof(command), command), GetKeyValuePair(nameof(fileName), fileName)))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out string key, null, GetKeyValuePair(nameof(command), command), GetKeyValuePair(nameof(fileName), fileName)))
 
                 throw new ArgumentNullException(key);
 
@@ -244,7 +258,7 @@ namespace WinCopies.IO
 
         // todo: add gesture for the 'HKEY_LOCAL_MACHINE\SOFTWARE\Clients' key (ex.: HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\FileAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\MimeAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\URLAssociations, ...).
 
-        public static DesktopAppInfo[] GetAppInfosByExtension(string extension)
+        public static DesktopAppInfo[] GetDesktopAppInfosFromExtension(string extension)
 
         {
 
@@ -256,27 +270,37 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(extension)));
 
-            RegistryKey[] subKeys = { Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Classes\\"), Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\"), Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE\\Classes\\") };
+            RegistryKey[] subKeys = { Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses), Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts), Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses) };
 
-            RegistryKey _registryKey;
+            RegistryKey _registryKey = null;
 
-            ArrayAndListBuilder<DesktopAppInfo> fileTypes = new ArrayAndListBuilder<DesktopAppInfo>();
+            RegistryKey disposeAndGetNewRegistryKey(RegistryKey oldRegistryKey, RegistryKey newRegistryKey)
+
+            {
+
+                oldRegistryKey?.Dispose();
+
+                return newRegistryKey;
+
+            }
+
+            var fileTypes = new ArrayAndListBuilder<DesktopAppInfo>();
 
             void checkAndAddFileTypeIfSucceeded(string fileType, RegistryKey registryKey)
 
             {
 
-                if (GetFileTypeRegistryKey(fileType, registryKey)?.OpenSubKey("shell\\open\\command")?.GetValue("") is string)
+                if (GetFileTypeRegistryKey(fileType, registryKey)?.OpenSubKey(OpenCommandPath)?.GetValue("") is string)
 
                 {
 
-                    DesktopAppInfo desktopAppInfo = new DesktopAppInfo(fileType);
+                    var desktopAppInfo = new DesktopAppInfo(fileType);
 
                     foreach (DesktopAppInfo _desktopAppInfo in fileTypes)
 
                         if (GetOpenWithSoftwarePathFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwarePathFromCommand(desktopAppInfo.Command) && GetOpenWithSoftwareArgumentsFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwareArgumentsFromCommand(desktopAppInfo.Command)) return;
 
-                    fileTypes.AddLast(desktopAppInfo);
+                    _ = fileTypes.AddLast(desktopAppInfo);
 
                 }
 
@@ -286,17 +310,15 @@ namespace WinCopies.IO
 
             {
 
-                registryKey = registryKey?.OpenSubKey("OpenWithList");
-
-                if (registryKey == null) return;
+                if ((registryKey = disposeAndGetNewRegistryKey(registryKey, registryKey?.OpenSubKey(OpenWithList))) == null) return;
 
                 // object obj = registryKey.GetValueKind("MRUList");
 
-                object valueAsObject = registryKey.GetValue("MRUList");
+                object valueAsObject = registryKey.GetValue(MRUList);
 
                 string[] keyValueNames = registryKey.GetValueNames();
 
-                if (!(valueAsObject == null || registryKey.GetValueKind("MRUList") != RegistryValueKind.String || IsNullEmptyOrWhiteSpace((string)valueAsObject)))
+                if (!(valueAsObject == null || registryKey.GetValueKind(MRUList) != RegistryValueKind.String || IsNullEmptyOrWhiteSpace((string)valueAsObject)))
 
                 {
 
@@ -318,13 +340,13 @@ namespace WinCopies.IO
 
                 }
 
-                registryKey = mainRegistryKey.OpenSubKey(extensionOrPerceivedType + "\\OpenWithList");
+                registryKey = disposeAndGetNewRegistryKey(registryKey, mainRegistryKey.OpenSubKey(extensionOrPerceivedType + '\\' + OpenWithList));
 
                 keyValueNames = registryKey?.GetSubKeyNames();
 
                 foreach (string ___value in keyValueNames)
 
-                    checkAndAddFileTypeIfSucceeded(___value, mainRegistryKey.Name.EndsWith("\\SystemFileAssociations") ? OpenRegistryKey(mainRegistryKey.Name.Substring(0, mainRegistryKey.Name.LastIndexOf("\\SystemFileAssociations"))) : mainRegistryKey);
+                    checkAndAddFileTypeIfSucceeded(___value, mainRegistryKey.Name.EndsWith('\\' + SystemFileAssociations) ? OpenRegistryKey(mainRegistryKey.Name.Substring(0, mainRegistryKey.Name.LastIndexOf('\\' + SystemFileAssociations))) : mainRegistryKey);
 
             }
 
@@ -332,13 +354,13 @@ namespace WinCopies.IO
 
             {
 
-                _registryKey = registryKey.OpenSubKey(extension);
+                _registryKey = disposeAndGetNewRegistryKey(_registryKey, registryKey.OpenSubKey(extension));
 
                 if (_registryKey == null) continue;
 
                 #region Progids
 
-                _registryKey = _registryKey.OpenSubKey("OpenWithProgids");
+                _registryKey = disposeAndGetNewRegistryKey(_registryKey, _registryKey.OpenSubKey(OpenWithProgids));
 
                 if (_registryKey != null)
 
@@ -360,7 +382,7 @@ namespace WinCopies.IO
 
                 #region OpenWith
 
-                _registryKey = registryKey.OpenSubKey(extension);
+                _registryKey = disposeAndGetNewRegistryKey(_registryKey, registryKey.OpenSubKey(extension));
 
                 onOpenWithList(registryKey, _registryKey, extension);
 
@@ -370,15 +392,17 @@ namespace WinCopies.IO
 
                 _registryKey = registryKey.OpenSubKey(extension);
 
-                object valueAsObject = _registryKey.GetValue("PerceivedType");
+                object valueAsObject = _registryKey.GetValue(PerceivedType);
 
-                if (valueAsObject == null || _registryKey.GetValueKind("PerceivedType") != RegistryValueKind.String || (string)valueAsObject == "") continue;
+                if (valueAsObject == null || _registryKey.GetValueKind(PerceivedType) != RegistryValueKind.String || (string)valueAsObject == "") continue;
 
                 // checkAndAddFileTypeIfSucceeded((string)valueAsObject, registryKey, true);
 
-                onOpenWithList(_registryKey.OpenSubKey("SystemFileAssociations\\") ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey("SystemFileAssociations\\"), _registryKey.OpenSubKey("SystemFileAssociations\\" + (string)valueAsObject) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey("SystemFileAssociations\\" + (string)valueAsObject), (string)valueAsObject);
+                onOpenWithList(_registryKey.OpenSubKey(SystemFileAssociations) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations), _registryKey.OpenSubKey(SystemFileAssociations + '\\' + (string)valueAsObject) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations + '\\' + (string)valueAsObject), (string)valueAsObject);
 
                 #endregion
+
+                registryKey.Dispose();
 
             }
 
@@ -398,7 +422,7 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(fileType)));
 
-            return Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Classes\\" + fileType) ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Classes\\Applications" + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey("Applications\\" + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey("Software\\Classes\\" + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey("Software\\Classes\\Applications\\" + fileType) ?? null;
+            return Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + '\\' + fileType) ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClassesApplications + '\\' + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ApplicationsBackslash + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + '\\' + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClassesApplications + '\\' + fileType) ?? null;
 
         }
 
@@ -406,9 +430,7 @@ namespace WinCopies.IO
 
         {
 
-            string key = null;
-
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, null, GetKeyValuePair(nameof(fileType), (object)fileType), GetKeyValuePair(nameof(registryKey), (object)registryKey)))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, out string key, null, GetKeyValuePair(nameof(fileType), (object)fileType), GetKeyValuePair(nameof(registryKey), (object)registryKey)))
 
                 throw new ArgumentNullException(key);
 
@@ -416,17 +438,25 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(fileType)));
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, registryKey.Name, "HKEY_CURRENT_USER\\Software\\Classes", "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts", "HKEY_CLASSES_ROOT", "HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"))
+            string fileExtsPath = Microsoft.Win32.Registry.CurrentUser.Name + '\\' + SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts;
+
+            string classesRootName = nameof(Microsoft.Win32.Registry.ClassesRoot.Name);
+
+            if (If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, registryKey.Name, Microsoft.Win32.Registry.CurrentUser.Name + SoftwareClasses, fileExtsPath, classesRootName, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"))
 
             {
 
-                if (registryKey.Name == "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts")
+                if (registryKey.Name == fileExtsPath)
 
-                    registryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Classes");
+                    registryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses);
 
-                return registryKey.Name.StartsWith("HKEY_CLASSES_ROOT")
-                    ? registryKey.OpenSubKey(fileType) ?? registryKey.OpenSubKey("Applications\\" + fileType) ?? null
-                    : registryKey.OpenSubKey(fileType) ?? registryKey.OpenSubKey("Applications\\" + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey("Applications\\" + fileType) ?? null;
+                RegistryKey _registryKey = registryKey.Name.StartsWith(classesRootName)
+                    ? registryKey.OpenSubKey(fileType) ?? registryKey.OpenSubKey(ApplicationsBackslash + fileType)
+                    : registryKey.OpenSubKey(fileType) ?? registryKey.OpenSubKey(ApplicationsBackslash + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ApplicationsBackslash + fileType);
+
+                registryKey.Dispose();
+
+                return _registryKey;
             }
 
             else throw new ArgumentException(string.Format(Generic.NotValidRegistryKey, registryKey));
@@ -439,13 +469,9 @@ namespace WinCopies.IO
 
         {
 
-            RegistryKey registryKey;
-
-            int result;
-
             string registryKeyName;
 
-            if (path.Contains("\\", out result))
+            if (path.Contains('\\', out int result))
 
             {
 
@@ -465,7 +491,7 @@ namespace WinCopies.IO
 
             }
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out registryKey, registryKeyName, GetKeyValuePair(Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.ClassesRoot.Name),
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out RegistryKey registryKey, registryKeyName, GetKeyValuePair(Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.ClassesRoot.Name),
                 GetKeyValuePair(Microsoft.Win32.Registry.CurrentConfig, Microsoft.Win32.Registry.CurrentConfig.Name),
                 GetKeyValuePair(Microsoft.Win32.Registry.CurrentUser, Microsoft.Win32.Registry.CurrentUser.Name),
                 GetKeyValuePair(Microsoft.Win32.Registry.DynData, Microsoft.Win32.Registry.DynData.Name),
@@ -486,21 +512,18 @@ namespace WinCopies.IO
         public static Icon[] GetIconVariationsFromFileTypeRegistryKey(RegistryKey registryKey)
 
         {
-
             RegistryKey _registryKey;
-
-            string defaultIconPath;
 
             string iconName;
 
             int? iconIndex;
 
-            if ((_registryKey = registryKey.OpenSubKey("DefaultIcon")) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null)
+            if ((_registryKey = registryKey.OpenSubKey(DefaultIcon)) == null || !(_registryKey.GetValue("") is string defaultIconPath))
 
             {
 
-                defaultIconPath = (_registryKey = registryKey.OpenSubKey("shell\\open\\command")) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null
-                    ? "%SystemRoot%\\System32\\SHELL32.dll"
+                defaultIconPath = (_registryKey = registryKey.OpenSubKey(OpenCommandPath)) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null
+                    ? DefaultIconDllPath
                     : GetOpenWithSoftwarePathFromCommand(defaultIconPath);
 
                 iconName = null;
@@ -537,9 +560,7 @@ namespace WinCopies.IO
 
                     {
 
-                        int _iconIndex;
-
-                        if (int.TryParse(iconId, out _iconIndex))
+                        if (int.TryParse(iconId, out int _iconIndex))
 
                         {
 
@@ -561,11 +582,11 @@ namespace WinCopies.IO
 
                     }
 
-                    StringBuilder stringBuilder = new StringBuilder();
+                    var stringBuilder = new StringBuilder();
 
                     for (int i = 0; i < subPaths.Length - 1; i++)
 
-                        stringBuilder.Append(subPaths[i]);
+                        _ = stringBuilder.Append(subPaths[i]);
 
                     defaultIconPath = stringBuilder.ToString();
 
@@ -613,9 +634,10 @@ namespace WinCopies.IO
             //}
             //catch (Exception) { }
 
-            System.Drawing.IconLib.MultiIcon m = new System.Drawing.IconLib.MultiIcon();
-
-            m.SelectedIndex = -1;
+            var m = new System.Drawing.IconLib.MultiIcon
+            {
+                SelectedIndex = -1
+            };
 
             m.Load(defaultIconPath);
 

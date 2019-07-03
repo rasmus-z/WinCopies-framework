@@ -227,7 +227,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                     // MessageBox.Show(openWithSoftware);
 
-                    string openWithCommand = Registry.GetCommandByExtension("open", ext);
+                    string openWithCommand = Registry.GetCommandFromExtension("open", ext);
 
                     if (openWithCommand != null)
 

@@ -16,6 +16,8 @@ namespace WinCopies.GUI.Explorer.Themes
     public partial class Generic
     {
 
+        public static ResourceDictionary ResourceDictionary { get; } = Util.Generic.AddNewDictionary("/WinCopies.GUI.Explorer;component/Themes/Generic.xaml");
+
         public static T GetResource<T>(object key) => (T)ResourceDictionary[key];
 
         #region Resources
@@ -187,8 +189,6 @@ namespace WinCopies.GUI.Explorer.Themes
         public static FileSystemInfoAttributesToOpacityConverter FileSystemInfoAttributesToOpacityConverter => GetResource<FileSystemInfoAttributesToOpacityConverter>(nameof(FileSystemInfoAttributesToOpacityConverter));
 
         #endregion
-
-        public static ResourceDictionary ResourceDictionary { get; } = Util.Generic.AddNewDictionary("/WinCopies.GUI.Explorer;component/Themes/Generic.xaml");
 
         private void PreviousButton_Click(object sender, RoutedEventArgs e) => ((ExplorerControl)((FrameworkElement)sender).TemplatedParent).NavigateToHistoryIndex(((ExplorerControl)((FrameworkElement)sender).TemplatedParent).HistorySelectedIndex + 1);
 

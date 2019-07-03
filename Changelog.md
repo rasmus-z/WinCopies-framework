@@ -15,8 +15,9 @@ Updates
 WinCopies.Util (1.4)
 --------------------
 
-- ArrayAndListBuilder class added to build arrays, lists and observable collections like the .Net's StringBuilder.
-- Extension methods added for the LinkedLists.
+- The IsNullConverter class now use the 'is' operator instead of '==';
+- ArrayAndListBuilder class added to build arrays, lists and observable collections like the .Net's StringBuilder;
+- Extension methods added for LinkedLists
 
 WinCopies.IO (1.0)
 ------------------

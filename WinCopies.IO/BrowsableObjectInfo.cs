@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Media.Imaging;
+using TsudaKageyu;
 using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
     public abstract class BrowsableObjectInfo : IBrowsableObjectInfo
     {
+
+        internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
 
         /// <summary>
         /// Gets the path of this <see cref="BrowsableObjectInfo"/>.
@@ -72,17 +76,7 @@ namespace WinCopies.IO
         /// </summary>
         public IBrowsableObjectInfo Parent
         {
-            get
-
-            {
-
-                if (_parent == null)
-
-                    _parent = GetParent();
-
-                return _parent;
-
-            }
+            get => _parent ?? (_parent = GetParent());
 
             internal set => _parent = value;
         }
@@ -99,6 +93,7 @@ namespace WinCopies.IO
         /// </summary>
         public BrowsableObjectInfoItemsLoader ItemsLoader
         {
+
             get => itemsLoader;
 
             set
@@ -144,17 +139,82 @@ namespace WinCopies.IO
         // protected abstract IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileTypes fileType);
 
         /// <summary>
-        /// When overriden in a derived class, loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously.
+        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously.
         /// </summary>
-        public abstract void LoadItems();
+        public virtual void LoadItems()
+
+        {
+
+            if (ItemsLoader == null)
+
+                LoadItems(true, true);
+
+            else
+
+                ItemsLoader.LoadItems();
+
+        }
 
         /// <summary>
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using the given <see cref="BrowsableObjectInfoItemsLoader"/>.
         /// </summary>
-        /// <param name="browsableObjectInfoItemsLoader">Custom loader to load the items of this <see cref="ShellObjectInfo"/>.</param>
-        public abstract void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader);
+        /// <param name="browsableObjectInfoItemsLoader">Custom loader to load the items of this <see cref="BrowsableObjectInfo"/>.</param>
+        public virtual void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 
-        public abstract void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes);
+        {
+
+            if (!IsBrowsable)
+
+                throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, FileType.ToString(), ToString()));
+
+            if (browsableObjectInfoItemsLoader == null)
+
+                throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
+
+            browsableObjectInfoItemsLoader.Path = this;
+
+            browsableObjectInfoItemsLoader.LoadItems();
+
+        }
+
+        public abstract void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation);
+
+        /// <summary>
+        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously.
+        /// </summary>
+        public virtual void LoadItemsAsync()
+
+        {
+
+            if (ItemsLoader == null)
+
+                LoadItemsAsync(true, true);
+
+            else
+
+                ItemsLoader.LoadItemsAsync();
+
+        }
+
+        /// <summary>
+        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using the given <see cref="BrowsableObjectInfoItemsLoader"/>.
+        /// </summary>
+        /// <param name="browsableObjectInfoItemsLoader">Custom loader to load the items of this <see cref="BrowsableObjectInfo"/>.</param>
+        public virtual void LoadItemsAsync(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
+
+        {
+
+            if (!IsBrowsable)
+
+                throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, FileType.ToString(), ToString()));
+
+            ItemsLoader = browsableObjectInfoItemsLoader ?? throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
+
+            ItemsLoader.LoadItemsAsync();
+
+        }
+
+        public abstract void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation);
 
         // /// <summary>
         // /// Frees the <see cref="ArchiveFileStream"/> property to unlock the archive referenced by it and makes it <see langword="null"/>. Calling this method will erase all the <see cref="Items"/> of this <see cref="ShellObjectInfo"/> in memory.

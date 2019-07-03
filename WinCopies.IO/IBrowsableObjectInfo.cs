@@ -71,13 +71,26 @@ namespace WinCopies.IO
         /// </summary>
         void LoadItems();
 
-        void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes);
+        void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation);
 
         /// <summary>
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader"></param>
         void LoadItems(BrowsableObjectInfoItemsLoader itemsLoader);
+
+        /// <summary>
+        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously.
+        /// </summary>
+        void LoadItemsAsync();
+
+        void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation);
+
+        /// <summary>
+        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
+        /// </summary>
+        /// <param name="itemsLoader"></param>
+        void LoadItemsAsync(BrowsableObjectInfoItemsLoader itemsLoader);
 
         void Rename(string newValue);
 

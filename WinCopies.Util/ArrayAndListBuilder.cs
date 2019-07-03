@@ -457,7 +457,7 @@ namespace WinCopies.Util
 
             foreach (T item in InnerList)
 
-                result[i++] = item;
+                result.Add(item);
 
             return result;
 
@@ -477,7 +477,7 @@ namespace WinCopies.Util
 
             foreach (T item in InnerList)
 
-                result[i++] = item;
+                result.Add(item);
 
             return result;
 

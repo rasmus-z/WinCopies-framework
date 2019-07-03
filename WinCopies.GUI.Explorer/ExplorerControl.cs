@@ -934,7 +934,7 @@ namespace WinCopies.GUI.Explorer
 
             {
 
-                string command = Registry.GetCommandByExtension("open", System.IO.Path.GetExtension(Path.SelectedItem.Path));
+                string command = Registry.GetCommandFromExtension("open", System.IO.Path.GetExtension(Path.SelectedItem.Path));
 
                 if (command != null) menuItem.Icon = System.Drawing.Icon.ExtractAssociatedIcon(Registry.GetOpenWithSoftwarePathFromCommand(command)).ToBitmap().ToImageSource();
 

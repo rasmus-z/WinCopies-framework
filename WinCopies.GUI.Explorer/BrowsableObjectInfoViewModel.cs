@@ -87,6 +87,12 @@ namespace WinCopies.GUI.Explorer
 
         public void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) => Model.LoadItems(workerReportsProgress, workerSupportsCancellation, fileTypes);
 
+        public void LoadItemsAsync() => Model.LoadItemsAsync();
+
+        public void LoadItemsAsync(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader) => Model.LoadItemsAsync(browsableObjectInfoItemsLoader);
+
+        public void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) => Model.LoadItemsAsync(workerReportsProgress, workerSupportsCancellation, fileTypes);
+
         public void Rename(string newName) => Model.Rename(newName);
 
         public IO.IBrowsableObjectInfo Clone() => Model.Clone();

@@ -150,7 +150,7 @@
 
 //                AppInfoLoaded -= onAppInfoLoaded;
 
-//                RegistryKey registryKey = GetFileTypeRegistryKey(GetFileTypeByExtension(Extension));
+//                RegistryKey registryKey = GetFileTypeRegistryKey(GetFileTypeFromExtension(Extension));
 
 //                if (registryKey?.OpenSubKey("shell\\open\\command") != null && registryKey.OpenSubKey("Application")?.GetValue("AppUserModelId") is string valueAsString)
 
@@ -212,7 +212,7 @@
 
 //        {
 
-//            string openWithSoftwareCommand = GetCommandByExtension("open", Extension);
+//            string openWithSoftwareCommand = GetCommandFromExtension("open", Extension);
 
 //            if (openWithSoftwareCommand == null)
 
@@ -240,7 +240,7 @@
 
 //            {
 
-//                OpenWithAppInfo = new DesktopAppInfo(GetFileTypeByExtension(Extension));
+//                OpenWithAppInfo = new DesktopAppInfo(GetFileTypeFromExtension(Extension));
 
 //                IsOpenWithAppInfoLoaded = true;
 

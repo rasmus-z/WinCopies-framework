@@ -5,10 +5,23 @@ namespace WinCopies.GUI.Controls.Themes
 {
     public partial class Generic
     {
+
+        public static ResourceDictionary ResourceDictionary { get; } = Util.Generic.AddNewDictionary("/WinCopies.GUI.Controls;component/Themes/Generic.xaml");
+
+        public static T GetResource<T>(object key) => (T)ResourceDictionary[key];
+
+        #region Resources
+
+        public static Style ReadOnlyTextBoxStyle => GetResource<Style>(nameof(ReadOnlyTextBoxStyle));
+
+        #endregion
+
+        // todo: commands
+
         private void ScrollToLeftButton_Click(object sender, RoutedEventArgs e)
         {
 
-            if (sender is TabControl) ((TabControl)sender). OnScrollToLeftButtonClickInternal();
+            if (sender is TabControl) ((TabControl)sender).OnScrollToLeftButtonClickInternal();
 
         }
 
@@ -16,7 +29,7 @@ namespace WinCopies.GUI.Controls.Themes
 
         {
 
-            if (sender is TabControl) ((TabControl)sender). OnScrollToLeftButtonMouseDoubleClickInternal();
+            if (sender is TabControl) ((TabControl)sender).OnScrollToLeftButtonMouseDoubleClickInternal();
 
         }
 
@@ -24,7 +37,7 @@ namespace WinCopies.GUI.Controls.Themes
 
         {
 
-            if (sender is TabControl) ((TabControl)sender). OnScrollToRightButtonClickInternal();
+            if (sender is TabControl) ((TabControl)sender).OnScrollToRightButtonClickInternal();
 
         }
 
