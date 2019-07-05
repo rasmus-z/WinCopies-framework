@@ -33,7 +33,7 @@ namespace WinCopies.IO
 
             {
 
-                this.SetProperty
+                this.set
 
             }
 

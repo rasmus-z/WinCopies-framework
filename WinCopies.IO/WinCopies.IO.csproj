@@ -111,7 +111,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="WinCopies.Util, Version=1.3.0.0, Culture=neutral, PublicKeyToken=871c137cc337841c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\WinCopies.Util\bin\Debug\WinCopies.Util.dll</HintPath>
+      <HintPath>..\WinCopies.Util\bin\Release\WinCopies.Util.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>

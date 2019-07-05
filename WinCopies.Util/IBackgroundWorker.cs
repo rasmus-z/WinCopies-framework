@@ -9,20 +9,20 @@ namespace WinCopies.Util
         /// <summary>
         /// Gets the <see cref="System.Threading.ApartmentState"/> of this thread.
         /// </summary>
-        ApartmentState ApartmentState { get; }
+        ApartmentState ApartmentState { get; set; }
 
         /// <summary>
-        /// Gets a value that indicates if the thread must try to cancel before finished the background tasks.
+        /// Gets a value that indicates whether the thread must try to cancel before finished the background tasks.
         /// </summary>
         bool CancellationPending { get; }
 
         /// <summary>
-        /// Gets a value that indicates if the thread is busy.
+        /// Gets a value that indicates whether the thread is busy.
         /// </summary>
         bool IsBusy { get; }
 
         /// <summary>
-        /// Gets a value that indicates if the working is cancelled.
+        /// Gets a value that indicates whether the working is cancelled.
         /// </summary>
         bool IsCancelled { get; }
 
@@ -32,12 +32,12 @@ namespace WinCopies.Util
         int Progress { get; }
 
         /// <summary>
-        /// Gets or sets a value that indicates if the thread can notify of the progress.
+        /// Gets or sets a value that indicates whether the thread can notify of the progress.
         /// </summary>
         bool WorkerReportsProgress { get; }
 
         /// <summary>
-        /// Gets or sets a value that indicates if the thread supports the cancellation.
+        /// Gets or sets a value that indicates whether the thread supports cancellation.
         /// </summary>
         bool WorkerSupportsCancellation { get; }
 
@@ -75,19 +75,19 @@ namespace WinCopies.Util
         void Resume();
 
         /// <summary>
-        /// <para>This event is called when the background thread starts. Put your background working code here.</para>
+        /// <para>Called when the background thread starts. Put your background working code here.</para>
         /// <para>The event handler is running in the background thread.</para>
         /// </summary>
         event DoWorkEventHandler DoWork;
 
         /// <summary>
-        /// <para>This event is called when the background thread reports progress.</para>
+        /// <para>Called when the background thread reports progress.</para>
         /// <para>The event handler is running in the main thread.</para>
         /// </summary>
         event ProgressChangedEventHandler ProgressChanged;
 
         /// <summary>
-        /// <para>This event is called when the background thread has finished working.</para>
+        /// <para>Called when the background thread has finished working.</para>
         /// <para>The event handler is running in the background thread.</para>
         /// </summary>
         event RunWorkerCompletedEventHandler RunWorkerCompleted;

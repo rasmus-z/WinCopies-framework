@@ -16,8 +16,10 @@ WinCopies.Util (1.4)
 --------------------
 
 - The BackgroundWorker class now resets its properties in background;
+- The ApartmentState property of the IBackgroundWorker interface is now settable.
 - The IsNullConverter class now uses the 'is' operator instead of '==';
 - ArrayAndListBuilder class added to build arrays, lists and observable collections like the .Net's StringBuilder does;
+- Added extension methods for setting properties in BackgroundWorkers with an is-busy check
 - Extension methods added for LinkedLists
 
 WinCopies.IO (1.0)

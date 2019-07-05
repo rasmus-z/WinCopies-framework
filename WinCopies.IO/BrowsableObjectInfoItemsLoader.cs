@@ -3,11 +3,9 @@ using System.ComponentModel;
 
 using WinCopies.Util;
 
-using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
-
 using BackgroundWorker = WinCopies.Util.BackgroundWorker;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace WinCopies.IO
 {
@@ -15,13 +13,13 @@ namespace WinCopies.IO
     /// <summary>
     /// The base class for the <see cref="IBrowsableObjectInfo"/> items loaders.
     /// </summary>
-    public abstract class BrowsableObjectInfoItemsLoader : IDisposable
+    public abstract class BrowsableObjectInfoItemsLoader : IBackgroundWorker, IDisposable
 
     {
 
-        private BackgroundWorker backgroundWorker = new BackgroundWorker();
+        private readonly BackgroundWorker backgroundWorker = new BackgroundWorker();
 
-        private BrowsableObjectInfo _path = null;
+        private readonly BrowsableObjectInfo _path = null;
 
         //public void changePath(IBrowsableObjectInfo newValue)
 
@@ -39,47 +37,52 @@ namespace WinCopies.IO
             get => _path; internal set
             {
 
-                if (backgroundWorker.IsBusy)
+                // We try to set the property and we throw an exception if backgroundWorker is busy.
 
-                    throw new InvalidOperationException("The BackgroundWorker is busy.");
+                _ = this.SetBackgroundWorkerProperty(nameof(Path), nameof(_path), value, typeof(BrowsableObjectInfoItemsLoader), true);
 
-                _path = value;
+                // We reach this point only if the test above succeeded.
 
                 InitializePath();
+
             }
         }
 
-        private IEnumerable<string> _filter = null;
+        private readonly IEnumerable<string> _filter = null;
 
         public IEnumerable<string> Filter
         {
 
             get => _filter;
 
-            set
-            {
-
-                if (IsBusy)
-
-                    throw new InvalidOperationException("The " + nameof(BrowsableObjectInfoItemsLoader) + " is busy.");
-
-                _filter = value;
-
-            }
+            set => this.SetBackgroundWorkerProperty(nameof(Filter), nameof(_filter), value, typeof(BrowsableObjectInfoItemsLoader), true);
 
         }
 
         /// <summary>
-        /// Gets a value that indicates if the thread is busy.
+        /// Gets a value that indicates whether the thread is busy.
         /// </summary>
         public bool IsBusy => backgroundWorker.IsBusy;
 
         /// <summary>
-        /// Gets or sets a value that indicates if the thread can notify of the progress.
+        /// Gets or sets a value that indicates whether the thread can notify of the progress.
         /// </summary>
         public bool WorkerReportsProgress { get => backgroundWorker.WorkerReportsProgress; set => backgroundWorker.WorkerReportsProgress = value; }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether the thread supports cancellation.
+        /// </summary>
         public bool WorkerSupportsCancellation { get => backgroundWorker.WorkerSupportsCancellation; set => backgroundWorker.WorkerSupportsCancellation = value; }
+
+        public ApartmentState ApartmentState { get => backgroundWorker.ApartmentState; set => backgroundWorker.ApartmentState = value; }
+
+        public bool CancellationPending => throw new NotImplementedException();
+
+        public bool IsCancelled => throw new NotImplementedException();
+
+        public int Progress => throw new NotImplementedException();
+
+        public ISite Site { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// <para>This event is called when the background thread starts. Put your background working code here.</para>
@@ -90,6 +93,7 @@ namespace WinCopies.IO
         public event ProgressChangedEventHandler ProgressChanged;
 
         public event RunWorkerCompletedEventHandler RunWorkerCompleted;
+        public event EventHandler Disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
@@ -236,7 +240,8 @@ namespace WinCopies.IO
         public void Cancel() => backgroundWorker.Cancel();
 
         public virtual void Dispose() => backgroundWorker.Dispose();
-
+        public void Suspend() => throw new NotImplementedException();
+        public void Resume() => throw new NotImplementedException();
     }
 
 }
