@@ -128,7 +128,7 @@ namespace WinCopies.IO
 
         protected abstract void InitializePath();
 
-        public static FileTypesFlags FileTypeToFileTypeFlags(FileType fileType)
+        public static FileTypes FileTypeToFileTypeFlags(FileType fileType)
 
         {
 
@@ -142,27 +142,27 @@ namespace WinCopies.IO
 
                 case IO.FileType.None:
 
-                    return FileTypesFlags.None;
+                    return FileTypes.None;
 
                 case IO.FileType.Folder:
 
-                    return FileTypesFlags.Folder;
+                    return FileTypes.Folder;
 
                 case IO.FileType.File:
 
-                    return FileTypesFlags.File;
+                    return FileTypes.File;
 
                 case IO.FileType.Drive:
 
-                    return FileTypesFlags.Drive;
+                    return FileTypes.Drive;
 
                 case IO.FileType.Link:
 
-                    return FileTypesFlags.Link;
+                    return FileTypes.Link;
 
                 case IO.FileType.Archive:
 
-                    return FileTypesFlags.Archive;
+                    return FileTypes.Archive;
 
                 default:
 

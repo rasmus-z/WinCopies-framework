@@ -9,9 +9,9 @@ namespace WinCopies.IO
     public abstract class FileSystemObjectItemsLoader : BrowsableObjectInfoItemsLoader
     {
 
-        private FileTypesFlags _fileTypes = FileTypesFlags.All;
+        private FileTypes _fileTypes = FileTypes.All;
 
-        public FileTypesFlags FileTypes
+        public FileTypes FileTypes
 
         {
 
@@ -31,7 +31,7 @@ namespace WinCopies.IO
 
         }
 
-        public FileSystemObjectItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation) => FileTypes = fileTypes;
+        public FileSystemObjectItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation) => FileTypes = fileTypes;
 
         public override bool CheckFilter(string directory)
 

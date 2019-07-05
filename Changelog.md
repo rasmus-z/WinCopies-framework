@@ -15,8 +15,9 @@ Updates
 WinCopies.Util (1.4)
 --------------------
 
-- The IsNullConverter class now use the 'is' operator instead of '==';
-- ArrayAndListBuilder class added to build arrays, lists and observable collections like the .Net's StringBuilder;
+- The BackgroundWorker class now resets its properties in background;
+- The IsNullConverter class now uses the 'is' operator instead of '==';
+- ArrayAndListBuilder class added to build arrays, lists and observable collections like the .Net's StringBuilder does;
 - Extension methods added for LinkedLists
 
 WinCopies.IO (1.0)

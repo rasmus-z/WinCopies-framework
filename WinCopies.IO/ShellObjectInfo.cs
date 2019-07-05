@@ -356,17 +356,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItems(new FolderLoader(workerReportsProgress, workerSupportsCancellation, FileTypesFlags.All));
+                    LoadItems(new FolderLoader(workerReportsProgress, workerSupportsCancellation, FileTypes.All));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItems(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, FileTypesFlags.All));
+                    LoadItems(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, FileTypes.All));
 
             }
 
             else
 
-                LoadItems(new FolderLoader(workerReportsProgress, workerSupportsCancellation, FileTypesFlags.All));
+                LoadItems(new FolderLoader(workerReportsProgress, workerSupportsCancellation, FileTypes.All));
 
             //else
 
@@ -404,17 +404,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItemsAsync(new FolderLoader(workerReportsProgress, workerSupportsCancellation, FileTypesFlags.All));
+                    LoadItemsAsync(new FolderLoader(workerReportsProgress, workerSupportsCancellation, FileTypes.All));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItemsAsync(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, FileTypesFlags.All));
+                    LoadItemsAsync(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, FileTypes.All));
 
             }
 
             else
 
-                LoadItemsAsync(new FolderLoader(workerReportsProgress, workerSupportsCancellation, FileTypesFlags.All));
+                LoadItemsAsync(new FolderLoader(workerReportsProgress, workerSupportsCancellation, FileTypes.All));
 
             //else
 

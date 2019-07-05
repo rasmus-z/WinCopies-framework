@@ -19,6 +19,7 @@ namespace WinCopies.Util
         public const BindingFlags DefaultBindingFlagsForPropertySet = BindingFlags.Public | BindingFlags.NonPublic |
                          BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
+        [Obsolete("This method has been replaced by the WinCopies.Util.Extensions.SetBackgroundWorkerProperty method overloads.")]
         public static (bool propertyChanged, object oldValue) SetPropertyWhenNotBusy<T>(T bgWorker, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet, bool throwIfBusy = true) where T : IBackgroundWorker, INotifyPropertyChanged
 
         {
@@ -43,6 +44,8 @@ namespace WinCopies.Util
 
         public static Predicate<T> GetCommonPredicate<T>() => (T value) => true;
 
+        // todo: key-value pairs to raise an argument exception
+
         public static void ThrowOnNotValidEnumValue(params Enum[] values)
 
         {
@@ -50,6 +53,18 @@ namespace WinCopies.Util
             foreach (Enum value in values)
 
                 value.ThrowIfNotValidEnumValue();
+
+        }
+
+        public static void ThrowOnEnumNotValidEnumValue(Enum value, params Enum[] values)
+
+        {
+
+            foreach (Enum _value in values)
+
+                if (_value == value)
+
+                    throw new InvalidOperationException($"'{_value.ToString()}' is not an expected value.");
 
         }
 
@@ -334,7 +349,7 @@ namespace WinCopies.Util
             private static KeyValuePair<object, Func<bool>> GetValue(object[] array, int index, Predicate predicate)
 
             {
-                ((IEnumerable)array).Contains( (object x, object y)=>0, "");
+                ((IEnumerable)array).Contains((object x, object y) => 0, "");
                 object result = array[index];
 
                 return new KeyValuePair<object, Func<bool>>(result, () => predicate(result));
@@ -1673,7 +1688,7 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, object value, params KeyValuePair<object, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Util.Comparison( (object x, object y) => comparer.Compare(x, y)), value, values);
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, object value, params KeyValuePair<object, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Util.Comparison((object x, object y) => comparer.Compare(x, y)), value, values);
 
         [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, WinCopies.Util.Comparison, object, params KeyValuePair<object, Func<bool>>[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values)

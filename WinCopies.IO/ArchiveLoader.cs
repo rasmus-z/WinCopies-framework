@@ -92,7 +92,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
         /// </summary>
-        public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes) { }
+        public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes) { }
 
         protected override void InitializePath()
 
@@ -150,9 +150,9 @@ namespace WinCopies.IO
 
         {
 
-            if (FileTypes == FileTypesFlags.None) return;
+            if (FileTypes == FileTypes.None) return;
 
-            else if (FileTypes.HasFlag(FileTypesFlags.All) && FileTypes.HasMultipleFlags())
+            else if (FileTypes.HasFlag(FileTypes.All) && FileTypes.HasMultipleFlags())
 
                 throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
 
@@ -219,7 +219,7 @@ namespace WinCopies.IO
 
                     {
 
-                        if (pathInfo.FileType == FileType.None || (FileTypes != FileTypesFlags.All && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
+                        if (pathInfo.FileType == FileType.None || (FileTypes != FileTypes.All && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
 
                         // We only make a normalized path if we add the path to the paths to load.
 

@@ -2242,6 +2242,70 @@ namespace WinCopies.Util
 
         }
 
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+
+        {
+
+            if (obj.IsBusy)
+
+                if (throwIfBusy)
+
+                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
+
+                else return (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj));
+
+            return obj.SetProperty(propertyName, fieldName, newValue, declaringType, performIntegrityCheck, bindingFlags);
+
+        }
+
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+
+        {
+
+            if (obj.IsBusy)
+
+                if (throwIfBusy)
+
+                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
+
+                else return (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj));
+
+            return obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
+
+        }
+
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+
+        {
+
+            if (obj.IsBusy)
+
+                if (throwIfBusy)
+
+                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
+
+                else return (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj));
+
+            return obj.SetProperty(propertyName, fieldName, newValue, declaringType, performIntegrityCheck, bindingFlags);
+
+        }
+
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+
+        {
+
+            if (obj.IsBusy)
+
+                if (throwIfBusy)
+
+                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
+
+                else return (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj));
+
+            return obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
+
+        }
+
         public static object GetNumValue(this Enum @enum, string enumName) => Convert.ChangeType(@enum.GetType().GetField(enumName).GetValue(@enum), Enum.GetUnderlyingType(@enum.GetType()));
 
         // public static object GetNumValue(this Enum @enum) => GetNumValue(@enum, @enum.ToString());
@@ -2315,7 +2379,7 @@ namespace WinCopies.Util
 
         {
 
-            if (!@enum.IsValidEnumValue()) throw new ArgumentException(string.Format(InvalidEnumValue, @enum.ToString()));
+            if (!@enum.IsValidEnumValue()) throw new InvalidOperationException(string.Format(InvalidEnumValue, @enum.ToString()));
 
         }
 

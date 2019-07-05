@@ -22,7 +22,7 @@ namespace WinCopies.IO
     }
 
     [Flags]
-    public enum FileTypesFlags
+    public enum FileTypes
     {
         None = 0,
 
@@ -34,8 +34,6 @@ namespace WinCopies.IO
 
         Link = 8,
 
-        Archive = 16,
-
-        All = 32
+        Archive = 16
     }
 }
