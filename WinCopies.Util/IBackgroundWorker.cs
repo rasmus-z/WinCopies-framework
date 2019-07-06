@@ -34,12 +34,12 @@ namespace WinCopies.Util
         /// <summary>
         /// Gets or sets a value that indicates whether the thread can notify of the progress.
         /// </summary>
-        bool WorkerReportsProgress { get; }
+        bool WorkerReportsProgress { get; set; }
 
         /// <summary>
         /// Gets or sets a value that indicates whether the thread supports cancellation.
         /// </summary>
-        bool WorkerSupportsCancellation { get; }
+        bool WorkerSupportsCancellation { get; set; }
 
         /// <summary>
         /// Cancels the working asynchronously.
@@ -70,8 +70,14 @@ namespace WinCopies.Util
         /// </param>
         void ReportProgress(int percentProgress, object userState);
 
+        /// <summary>
+        /// Suspends the current thread.
+        /// </summary>
         void Suspend();
 
+        /// <summary>
+        /// Resumes the current thread.
+        /// </summary>
         void Resume();
 
         /// <summary>

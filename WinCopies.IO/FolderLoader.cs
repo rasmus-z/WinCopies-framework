@@ -226,7 +226,7 @@ namespace WinCopies.IO
 
             if (FileTypes == FileTypes.None) return;
 
-            else if (FileTypes.HasFlag(FileTypes.All) && FileTypes.HasMultipleFlags())
+            else if (FileTypes.HasFlag(Util.Util.GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
 
                 throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
 
@@ -262,7 +262,7 @@ namespace WinCopies.IO
 
                     Debug.WriteLine("");
 
-                if (pathInfo.FileType == FileType.None || (pathInfo.FileType != FileType.SpecialFolder && FileTypes != FileTypes.All && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
+                if (pathInfo.FileType == FileType.None || (pathInfo.FileType != FileType.SpecialFolder && FileTypes != Util.Util.GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
 
                 // We only make a normalized path if we add the path to the paths to load.
 

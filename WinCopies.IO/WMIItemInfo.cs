@@ -23,18 +23,18 @@ namespace WinCopies.IO
         Instance
 
     }
-    
+
     [Flags]
     public enum WMIItemTypes
     {
 
-        None=0,
+        None = 0,
 
-        Namespace=1,
+        Namespace = 1,
 
-        Class=2,
+        Class = 2,
 
-        Instance=4
+        Instance = 4
 
     }
 
@@ -43,7 +43,7 @@ namespace WinCopies.IO
 
         public ManagementBaseObject ManagementObject { get; }
 
-        public WMIItemInfo() : this(new ManagementClass(@"\\.\ROOT:__NAMESPACE"), WMIItemType.Namespace) { }
+        public WMIItemInfo() : this(new ManagementClass(@"\\.\ROOT:__NAMESPACE"), WMIItemType.Namespace) => IsRootNode = true;
 
         private static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
 
@@ -84,6 +84,10 @@ namespace WinCopies.IO
             Name = GetName(managementObject, wmiItemType);
 
             WMIItemType = wmiItemType;
+
+            if (Path.ToUpper().EndsWith("ROOT:__NAMESPACE"))
+
+                IsRootNode = true;
 
         }
 
@@ -135,30 +139,21 @@ namespace WinCopies.IO
 
             int iconIndex = 0;
 
-            switch (WMIItemType)
+            if (IsRootNode)
 
-            {
+                iconIndex = 15;
 
-                case WMIItemType.Namespace:
-                case WMIItemType.Class:
+            else if (WMIItemType == WMIItemType.Namespace || WMIItemType == WMIItemType.Class)
 
-                    iconIndex = 15;
-
-                    break;
-
-                case WMIItemType.Instance:
-
-                    iconIndex = 3;
-
-                    break;
-
-            }
+                iconIndex = 3;
 
             using (Icon icon = TryGetIcon(iconIndex, "shell32.dll", size))
 
                 return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         }
+
+        public bool IsRootNode { get; }
 
         public override string LocalizedName => Name;
 

@@ -30,7 +30,7 @@ namespace WinCopies.IO
         //} 
 
         /// <summary>
-        /// Gets the path from which load items.
+        /// Gets the path from which to load the items.
         /// </summary>
         public BrowsableObjectInfo Path
         {
@@ -74,25 +74,55 @@ namespace WinCopies.IO
         /// </summary>
         public bool WorkerSupportsCancellation { get => backgroundWorker.WorkerSupportsCancellation; set => backgroundWorker.WorkerSupportsCancellation = value; }
 
+        /// <summary>
+        /// Gets the <see cref="System.Threading.ApartmentState"/> of this thread.
+        /// </summary>
         public ApartmentState ApartmentState { get => backgroundWorker.ApartmentState; set => backgroundWorker.ApartmentState = value; }
 
-        public bool CancellationPending => throw new NotImplementedException();
-
-        public bool IsCancelled => throw new NotImplementedException();
-
-        public int Progress => throw new NotImplementedException();
-
-        public ISite Site { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        /// <summary>
+        /// Gets a value that indicates whether the thread must try to cancel before finished the background tasks.
+        /// </summary>
+        public bool CancellationPending => backgroundWorker.CancellationPending;
 
         /// <summary>
-        /// <para>This event is called when the background thread starts. Put your background working code here.</para>
+        /// Gets a value that indicates whether the working has been cancelled.
+        /// </summary>
+        public bool IsCancelled => backgroundWorker.IsCancelled;
+
+        /// <summary>
+        /// Gets the current progress of the working in percent.
+        /// </summary>
+        public int Progress => backgroundWorker.Progress;
+
+        /// <summary>
+        /// Gets or sets the <see cref="ISite"/> associated with the <see cref="IComponent"/>.
+        /// </summary>
+        /// <value>The <see cref="ISite"/> object associated with the component; or <see langword="null"/>, if the component does not have a site.</value>
+        /// <remarks>Sites can also serve as a repository for container-specific, per-component information, such as the component name.</remarks>
+        public ISite Site { get => backgroundWorker.Site; set => backgroundWorker.Site = value; }
+
+        /// <summary>
+        /// <para>Called when the background thread starts. Put your background working code here.</para>
         /// <para>The event handler is running in the background thread.</para>
         /// </summary>
         public event DoWorkEventHandler DoWork;
 
+        /// <summary>
+        /// <para>Called when the background thread reports progress.</para>
+        /// <para>The event handler is running in the main thread.</para>
+        /// </summary>
         public event ProgressChangedEventHandler ProgressChanged;
 
+        /// <summary>
+        /// <para>Called when the background thread has finished working.</para>
+        /// <para>The event handler is running in the background thread.</para>
+        /// </summary>
         public event RunWorkerCompletedEventHandler RunWorkerCompleted;
+
+        /// <summary>
+        /// Represents the method that handles the <see cref="Disposed"/> event of a component.
+        /// </summary>
+        /// <remarks>When you create a <see cref="Disposed"/> delegate, you identify the method that handles the event. To associate the event with your event handler, add an instance of the delegate to the event. The event handler is called whenever the event occurs, unless you remove the delegate. For more information about event handler delegates, see <a href="https://docs.microsoft.com/fr-fr/dotnet/standard/events/index?view=netframework-4.8">Handling and Raising Events</a>.</remarks>
         public event EventHandler Disposed;
 
         /// <summary>
@@ -113,21 +143,35 @@ namespace WinCopies.IO
 
             backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => DoWork(this, e);
 
-            backgroundWorker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) =>
-            {
+            RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => OnRunWorkerCompleted(e);
 
-                _path.AreItemsLoaded = true;
+            backgroundWorker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => RunWorkerCompleted(this, e);
 
-                RunWorkerCompleted?.Invoke(this, e);
-
-            };
+            backgroundWorker.Disposed += (object sender, EventArgs e) => Disposed?.Invoke(this, e);
 
         }
 
+        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => _path.AreItemsLoaded = true;
+
         public abstract bool CheckFilter(string path);
 
+        /// <summary>
+        /// Notifies of the progress.
+        /// </summary>
+        /// <param name="percentProgress">
+        /// Progress percentage.
+        /// </param>
         public void ReportProgress(int percentProgress) => backgroundWorker.ReportProgress(percentProgress);
 
+        /// <summary>
+        /// Notifies of the progress.
+        /// </summary>
+        /// <param name="percentProgress">
+        /// Progress percentage.
+        /// </param>
+        /// <param name="userState">
+        /// User object.
+        /// </param>
         public void ReportProgress(int percentProgress, object userState) => backgroundWorker.ReportProgress(percentProgress, userState);
 
         protected abstract void InitializePath();
@@ -138,39 +182,39 @@ namespace WinCopies.IO
 
             fileType.ThrowIfNotValidEnumValue();
 
-            if (fileType == IO.FileType.SpecialFolder) throw new ArgumentException("'" + nameof(fileType) + "' must be None, Folder, File, Drive, Link or Archive. '" + nameof(fileType) + "' is " + fileType.ToString() + ".");
+            if (fileType == FileType.SpecialFolder) throw new ArgumentException("'" + nameof(fileType) + "' must be None, Folder, File, Drive, Link or Archive. '" + nameof(fileType) + "' is " + fileType.ToString() + ".");
 
             switch (fileType)
 
             {
 
-                case IO.FileType.None:
+                case FileType.None:
 
                     return FileTypes.None;
 
-                case IO.FileType.Folder:
+                case FileType.Folder:
 
                     return FileTypes.Folder;
 
-                case IO.FileType.File:
+                case FileType.File:
 
                     return FileTypes.File;
 
-                case IO.FileType.Drive:
+                case FileType.Drive:
 
                     return FileTypes.Drive;
 
-                case IO.FileType.Link:
+                case FileType.Link:
 
                     return FileTypes.Link;
 
-                case IO.FileType.Archive:
+                case FileType.Archive:
 
                     return FileTypes.Archive;
 
                 default:
 
-                    // This code should never be reached.
+                    // This point should never be reached.
 
                     throw new NotImplementedException();
 
@@ -225,6 +269,9 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Loads the items of the <see cref="Path"/> object asynchronously.
+        /// </summary>
         public void LoadItemsAsync()
 
         {
@@ -235,13 +282,30 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Cancels the working asynchronously.
+        /// </summary>
         public void CancelAsync() => backgroundWorker.CancelAsync();
 
+        /// <summary>
+        /// Cancels the working.
+        /// </summary>
         public void Cancel() => backgroundWorker.Cancel();
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public virtual void Dispose() => backgroundWorker.Dispose();
-        public void Suspend() => throw new NotImplementedException();
-        public void Resume() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Suspends the current thread.
+        /// </summary>
+        public void Suspend() => backgroundWorker.Suspend();
+
+        /// <summary>
+        /// Resumes the current thread.
+        /// </summary>
+        public void Resume() => backgroundWorker.Resume();
     }
 
 }

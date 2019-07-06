@@ -16,7 +16,9 @@ WinCopies.Util (1.4)
 --------------------
 
 - The BackgroundWorker class now resets its properties in background;
-- The ApartmentState property of the IBackgroundWorker interface is now settable.
+- The ApartmentState, WorkerReportsProgress and WorkerSupportsCancellation properties of the IBackgroundWorker interface are now settable;
+- Bug fixed in the BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice;
+- Bug fiwed in the BackgroundWorker class: when finalizing, an invalid operation exception was thrown if the BackgroundWorker was busy; now, the BackgroundWorker aborts the working instead of throwing an exception;
 - The IsNullConverter class now uses the 'is' operator instead of '==';
 - ArrayAndListBuilder class added to build arrays, lists and observable collections like the .Net's StringBuilder does;
 - Added extension methods for setting properties in BackgroundWorkers with an is-busy check

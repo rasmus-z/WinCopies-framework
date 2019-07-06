@@ -152,7 +152,7 @@ namespace WinCopies.IO
 
             if (FileTypes == FileTypes.None) return;
 
-            else if (FileTypes.HasFlag(FileTypes.All) && FileTypes.HasMultipleFlags())
+            else if (FileTypes.HasFlag(Util.Util.GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
 
                 throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
 
@@ -186,9 +186,9 @@ namespace WinCopies.IO
 
             //List<FolderLoader.IPathInfo> files = new List<FolderLoader.IPathInfo>();
 
-            List<IFileSystemObject> paths = new List<IFileSystemObject>();
+            var paths = new ArrayAndListBuilder<IFileSystemObject>();
 
-            FolderLoader.comp comp = FolderLoader.comp.GetInstance();
+            var comp = FolderLoader.comp.GetInstance();
 
 #if DEBUG
 
@@ -204,7 +204,7 @@ namespace WinCopies.IO
 
             string archiveFileName = (Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject).Path;
 
-            using (FileStream archiveFileStream = new FileStream(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            using (var archiveFileStream = new FileStream(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
             {
 
                 //try
@@ -212,20 +212,20 @@ namespace WinCopies.IO
 
                 // archiveShellObject.ArchiveFileStream = archiveFileStream;
 
-                using (SevenZipExtractor archiveExtractor = new SevenZipExtractor(archiveFileStream))
+                using (var archiveExtractor = new SevenZipExtractor(archiveFileStream))
                 {
 
                     void AddPath(ref PathInfo pathInfo)
 
                     {
 
-                        if (pathInfo.FileType == FileType.None || (FileTypes != FileTypes.All && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
+                        if (pathInfo.FileType == FileType.None || (FileTypes != Util.Util.GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
 
                         // We only make a normalized path if we add the path to the paths to load.
 
-                        pathInfo.Normalized_Path = IO.Path.GetNormalizedPath(pathInfo.Path);
+                        pathInfo.NormalizedPath = IO.Path.GetNormalizedPath(pathInfo.Path);
 
-                        paths.Add(pathInfo);
+                        paths.AddLast(pathInfo);
 
                     }
 
@@ -263,9 +263,13 @@ namespace WinCopies.IO
 
                     PathInfo path;
 
+#if DEBUG
+
                     foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
 
                         Debug.WriteLine(archiveFileInfo.FileName);
+
+#endif
 
                     void addPath(ArchiveFileInfo archiveFileInfo)
 
@@ -325,13 +329,9 @@ namespace WinCopies.IO
 
                     foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
 
-                    {
-
                         // _path = archiveFileInfo.FileName.Replace('/', '\\');
 
                         addPath(archiveFileInfo);
-
-                    }
 
                     //if (Path is ArchiveItemInfo)
 
@@ -382,7 +382,9 @@ namespace WinCopies.IO
 
             // }
 
-            paths.Sort(comp);
+            var sortedPaths = paths.ToList();
+
+            sortedPaths.Sort(comp);
 
             // for (int i = 0; i < files.Count; i++)
 
@@ -412,7 +414,7 @@ namespace WinCopies.IO
 
                 Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
                 Debug.WriteLine("path_.Path: " + path.Path);
-                Debug.WriteLine("path_.Normalized_Path: " + path.Normalized_Path);
+                Debug.WriteLine("path_.Normalized_Path: " + path.NormalizedPath);
                 // Debug.WriteLine("path_.Shell_Object: " + path.ArchiveShellObject);
 
 #endif
@@ -432,7 +434,7 @@ namespace WinCopies.IO
 
             // this._Paths = new ObservableCollection<IBrowsableObjectInfo>();
 
-            foreach (PathInfo path_ in paths)
+            foreach (PathInfo path_ in sortedPaths)
 
                 reportProgressAndAddNewPathToObservableCollection(path_);
 
@@ -467,7 +469,7 @@ namespace WinCopies.IO
             /// </summary>
             public string Path { get; set; }
 
-            public string Normalized_Path { get; set; }
+            public string NormalizedPath { get; set; }
 
             public ArchiveFileInfo? ArchiveFileInfo { get; set; }
 

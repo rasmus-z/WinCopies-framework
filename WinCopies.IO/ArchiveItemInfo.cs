@@ -224,9 +224,9 @@ namespace WinCopies.IO
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, FileTypes.All));
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, Util.Util.GetAllEnumFlags<FileTypes>()));
 
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, FileTypes.All));
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, Util.Util.GetAllEnumFlags<FileTypes>()));
 
         public override void Dispose()
         {

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
     public abstract class FileSystemObjectItemsLoader : BrowsableObjectInfoItemsLoader
     {
 
-        private FileTypes _fileTypes = FileTypes.All;
+        private readonly FileTypes _fileTypes = Util.Util.GetAllEnumFlags<FileTypes>();
 
         public FileTypes FileTypes
 
@@ -17,17 +18,7 @@ namespace WinCopies.IO
 
             get => _fileTypes;
 
-            set
-
-            {
-
-                if (IsBusy)
-
-                    throw new InvalidOperationException("The BackgroundWorker is busy.");
-
-                _fileTypes = value;
-
-            }
+            set => this.SetBackgroundWorkerProperty(nameof(FileTypes), nameof(_fileTypes), value, typeof(FileSystemObjectItemsLoader), true);
 
         }
 

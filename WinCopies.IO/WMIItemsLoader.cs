@@ -15,101 +15,39 @@ namespace WinCopies.IO
     public class WMIItemsLoader : BrowsableObjectInfoItemsLoader
     {
 
-        private WMIItemTypes _wmiItemTypes = WinCopies.Util.Util.GetAllEnumFlags<WMIItemTypes>();
+        private readonly WMIItemTypes _wmiItemTypes = Util.Util.GetAllEnumFlags<WMIItemTypes>();
 
-        private ConnectionOptions _connectionOptions;
+#pragma warning disable CS0649 // Set up using reflection.
+        private readonly ConnectionOptions _connectionOptions;
 
-        private ObjectGetOptions _objectGetOptions;
+        private readonly ObjectGetOptions _objectGetOptions;
 
-        private EnumerationOptions _enumerationOptions;
+        private readonly EnumerationOptions _enumerationOptions;
+#pragma warning restore CS0649
 
-        public WMIItemTypes WMIItemTypes
-
-        {
-
-            get => _wmiItemTypes;
-
-            set
-
-            {
-
-                this.set
-
-            }
-
-        }
+        /// <summary>
+        /// Gets or sets the WMI item types to load.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
+        public WMIItemTypes WMIItemTypes { get => _wmiItemTypes; set => this.SetBackgroundWorkerProperty(nameof(WMIItemTypes), nameof(_wmiItemTypes), value, typeof(WMIItemsLoader), true); }
 
         /// <summary>
         /// Gets or sets options for the WMI connections.
         /// </summary>
         /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
-        public ConnectionOptions ConnectionOptions
-
-        {
-
-            get => _connectionOptions;
-
-            set
-
-            {
-
-                if (IsBusy)
-
-                    throw new InvalidOperationException($"The {nameof(WMIItemsLoader)} is busy.");
-
-                _connectionOptions = value;
-
-            }
-
-        }
+        public ConnectionOptions ConnectionOptions { get => _connectionOptions; set => this.SetBackgroundWorkerProperty(nameof(ConnectionOptions), nameof(_connectionOptions), value, typeof(WMIItemsLoader), true); }
 
         /// <summary>
         /// Gets or sets options for getting management objects.
         /// </summary>
         /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
-        public ObjectGetOptions ObjectGetOptions
-
-        {
-
-            get => _objectGetOptions;
-
-            set
-
-            {
-
-                if (IsBusy)
-
-                    throw new InvalidOperationException($"The {nameof(WMIItemsLoader)} is busy.");
-
-                _objectGetOptions = value;
-
-            }
-
-        }
+        public ObjectGetOptions ObjectGetOptions { get => _objectGetOptions; set => this.SetBackgroundWorkerProperty(nameof(ObjectGetOptions), nameof(_objectGetOptions), value, typeof(WMIItemsLoader), true); }
 
         /// <summary>
         /// Gets or sets options for management objects.
         /// </summary>
         /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
-        public EnumerationOptions EnumerationOptions
-
-        {
-
-            get => _enumerationOptions;
-
-            set
-
-            {
-
-                if (IsBusy)
-
-                    throw new InvalidOperationException($"The {nameof(WMIItemsLoader)} is busy.");
-
-                _enumerationOptions = value;
-
-            }
-
-        }
+        public EnumerationOptions EnumerationOptions { get => _enumerationOptions; set => this.SetBackgroundWorkerProperty(nameof(EnumerationOptions), nameof(_enumerationOptions), value, typeof(WMIItemsLoader), true); }
 
         public WMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) : base(workerReportsProgress, workerSupportsCancellation)
         {

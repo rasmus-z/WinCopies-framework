@@ -41,7 +41,7 @@ namespace WinCopies.Util
 
         private Thread _Thread = null;
 
-        private ApartmentState _ApartmentState = ApartmentState.MTA;
+        private readonly ApartmentState _ApartmentState = ApartmentState.MTA;
 
         private readonly SynchronizationContext _SyncContext;
 
@@ -128,15 +128,7 @@ namespace WinCopies.Util
 
                     throw new ArgumentException(string.Format("The {0} value is not valid for the {1} class.", nameof(ApartmentState.Unknown), nameof(BackgroundWorker)));
 
-                else if (IsBusy)
-
-                    // todo:
-
-                    //Le thread est déjà en cours d'exécution ; son ApartmentState ne peut pas encore changer.
-
-                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
-
-                _ApartmentState = value;
+                _ = this.SetBackgroundWorkerProperty(nameof(ApartmentState), nameof(_ApartmentState), value, typeof(BackgroundWorker), true);
 
             }
 
@@ -194,13 +186,13 @@ namespace WinCopies.Util
 
             IsCancelled = isCancelled;
 
-            IsBusy = false;
-
             if (!isCancelled)
 
                 Progress = 0;
 
             _Thread = null;
+
+            IsBusy = false;
         }
 
         // DoWorkEventArgs e = null;
@@ -226,7 +218,7 @@ namespace WinCopies.Util
 
                 // todo:
 
-                throw new InvalidOperationException("Le BackgroundWorker est déjà en cours d'exécution.");
+                throw new InvalidOperationException(BackgroundWorkerIsBusy);
 
             Reset(false);
 
@@ -236,9 +228,7 @@ namespace WinCopies.Util
 
             //Exception error = null;
 
-            var e = new DoWorkEventArgs(argument);
-
-            _Thread = new Thread(() => ThreadStart(e));
+            _Thread = new Thread(() => ThreadStart(new DoWorkEventArgs(argument)));
 
             _Thread.IsBackground = true;
 
@@ -286,7 +276,7 @@ namespace WinCopies.Util
 
             Reset(isCancelled);
 
-            _SyncContext.Send(ThreadCompleted, new ValueTuple<object, Exception, bool>(e.Result, error, isCancelled ));
+            _SyncContext.Send(ThreadCompleted, new ValueTuple<object, Exception, bool>(e.Result, error, isCancelled));
 
         }
 
@@ -345,18 +335,15 @@ namespace WinCopies.Util
 
 
 
-            CancellationPending = true;
-
-
-
             if (abort)
-            {
 
                 _Thread.Abort();
 
-                ThreadCompleted(new ValueTuple<object, Exception, bool>(null, null, true));
+            //ThreadCompleted(new ValueTuple<object, Exception, bool>(null, null, true));
 
-            }
+            else
+
+                CancellationPending = true;
 
         }
 
@@ -444,7 +431,9 @@ namespace WinCopies.Util
 
             if (IsBusy)
 
-                throw new InvalidOperationException(BackgroundWorkerIsBusy);
+            //    throw new InvalidOperationException(BackgroundWorkerIsBusy);
+
+            Cancel(true);
 
             base.Dispose(disposing);
 

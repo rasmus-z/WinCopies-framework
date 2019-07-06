@@ -67,7 +67,7 @@ namespace WinCopies.IO
 
                     if (browsableObjectInfo.FileType == FileType.Archive)
 
-                        ArchiveLoader = new ArchiveLoader(true, false, FileTypes.All);
+                        ArchiveLoader = new ArchiveLoader(true, false, GetAllEnumFlags<FileTypes>());
 
                     ArchiveLoader.Path = browsableObjectInfo;
 
