@@ -448,7 +448,7 @@ namespace WinCopies.IO
 
         {
 
-            IBrowsableObjectInfo browsableObjectInfo = ((IArchiveItemInfoProvider)Path).GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType);
+            IBrowsableObjectInfo browsableObjectInfo = ((IArchiveItemInfoProvider)Path).ArchiveItemInfoFactory. GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType);
 
             if (browsableObjectInfo is BrowsableObjectInfo _browsableObjectInfo)
 

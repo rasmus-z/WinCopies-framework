@@ -47,7 +47,7 @@ namespace WinCopies.IO
 
         public RegistryItemInfo(IRegistryItemInfoFactory factory) : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder)
         {
-            Factory = factory;
+            RegistryItemInfoFactory = factory;
 
             Name = Path;
 
@@ -58,7 +58,7 @@ namespace WinCopies.IO
 
         public RegistryItemInfo(RegistryKey registryKey, IRegistryItemInfoFactory factory) : base(registryKey.Name, FileType.SpecialFolder)
         {
-            Factory = factory;
+            RegistryItemInfoFactory = factory;
 
             string[] name = registryKey.Name.Split('\\');
 
@@ -73,7 +73,7 @@ namespace WinCopies.IO
 
         public RegistryItemInfo(string path, IRegistryItemInfoFactory factory) : base(path, FileType.SpecialFolder)
         {
-            Factory = factory;
+            RegistryItemInfoFactory = factory;
 
             string[] name = path.Split('\\');
 
@@ -97,7 +97,7 @@ namespace WinCopies.IO
         public RegistryItemInfo(RegistryKey registryKey, string valueName, IRegistryItemInfoFactory factory) : base(registryKey.Name, FileType.Other)
 
         {
-            Factory = factory;
+            RegistryItemInfoFactory = factory;
 
             Name = valueName;
 
@@ -154,7 +154,7 @@ namespace WinCopies.IO
 
         public override bool IsBrowsable => RegistryItemType == RegistryItemType.RegistryRoot || RegistryItemType == RegistryItemType.RegistryKey;
 
-        public IRegistryItemInfoFactory Factory { get; set; }
+        public IRegistryItemInfoFactory RegistryItemInfoFactory { get; set; }
 
         public override IBrowsableObjectInfo Clone()
         {
@@ -165,15 +165,15 @@ namespace WinCopies.IO
 
                 case RegistryItemType.RegistryRoot:
 
-                    return Factory.GetBrowsableObjectInfo();
+                    return RegistryItemInfoFactory.GetBrowsableObjectInfo();
 
                 case RegistryItemType.RegistryKey:
 
-                    return Factory.GetBrowsableObjectInfo(RegistryKey);
+                    return RegistryItemInfoFactory.GetBrowsableObjectInfo(RegistryKey);
 
                 case RegistryItemType.RegistryValue:
 
-                    return Factory.GetBrowsableObjectInfo(RegistryKey, Name);
+                    return RegistryItemInfoFactory.GetBrowsableObjectInfo(RegistryKey, Name);
 
                 default:
 
@@ -196,7 +196,7 @@ namespace WinCopies.IO
 
                     if (path.Length == 1)
 
-                        return Factory.GetBrowsableObjectInfo();
+                        return RegistryItemInfoFactory.GetBrowsableObjectInfo();
 
                     StringBuilder stringBuilder = new StringBuilder();
 
@@ -204,11 +204,11 @@ namespace WinCopies.IO
 
                         stringBuilder.Append(path);
 
-                    return Factory.GetBrowsableObjectInfo(stringBuilder.ToString());
+                    return RegistryItemInfoFactory.GetBrowsableObjectInfo(stringBuilder.ToString());
 
                 case RegistryItemType.RegistryValue:
 
-                    return Factory.GetBrowsableObjectInfo(RegistryKey);
+                    return RegistryItemInfoFactory.GetBrowsableObjectInfo(RegistryKey);
 
                 default:
 

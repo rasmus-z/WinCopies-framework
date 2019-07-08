@@ -137,7 +137,7 @@ namespace WinCopies.IO
 
                             if (CheckFilter(fieldInfo.Name))
 
-                                ReportProgress(0, registryItemInfo.Factory.GetBrowsableObjectInfo((RegistryKey)fieldInfo.GetValue(null)));
+                                ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo((RegistryKey)fieldInfo.GetValue(null)));
 
                         break;
 
@@ -159,7 +159,7 @@ namespace WinCopies.IO
 
                                     if (CheckFilter(item))
 
-                                        ReportProgress(0, registryItemInfo.Factory.GetBrowsableObjectInfo(registryItemInfo.Path + '\\' + item));
+                                        ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo(registryItemInfo.Path + '\\' + item));
 
                             }
 
@@ -179,7 +179,7 @@ namespace WinCopies.IO
 
                                     if (CheckFilter(item))
 
-                                        ReportProgress(0, registryItemInfo.Factory.GetBrowsableObjectInfo(registryItemInfo.RegistryKey, item));
+                                        ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo(registryItemInfo.RegistryKey, item));
 
                             }
 

@@ -116,11 +116,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppInfo.cs" />
     <Compile Include="ArchiveItemInfo.cs" />
     <Compile Include="ArchiveLoader.cs" />
     <Compile Include="BrowsableObjectInfo.cs" />
     <Compile Include="BrowsableObjectInfoItemsLoader.cs" />
+    <Compile Include="DesktopAppInfo.cs" />
     <Compile Include="FileSystemObjectItemsLoader.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="FolderLoader.cs" />
@@ -135,8 +135,6 @@
     <Compile Include="RegistryItemInfoFactory.cs" />
     <Compile Include="RegistryKeyItemsLoader.cs" />
     <Compile Include="ShellObjectInfo.cs" />
-    <Compile Include="ShellPropertyContainer.cs" />
-    <Compile Include="ShellPropertyConverter.cs" />
     <Compile Include="Size.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="WindowsStoreAppLauncherInterop.cs" />

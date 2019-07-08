@@ -11,24 +11,24 @@ namespace WinCopies.IO
     //{
 
     //    /// <summary>
-    //    /// When overriden in a derived class, gets the display name of this <see cref="AppInfo"/>.
+    //    /// When overridden in a derived class, gets the display name of this <see cref="AppInfo"/>.
     //    /// </summary>
     //    public abstract string DisplayName { get; }
 
     //    /// <summary>
-    //    /// When overriden in a derived class, opens a given <see cref="ShellObject"/> using the application represented by this <see cref="AppInfo"/>.
+    //    /// When overridden in a derived class, opens a given <see cref="ShellObject"/> using the application represented by this <see cref="AppInfo"/>.
     //    /// </summary>
     //    /// <param name="shellObject">The <see cref="ShellObject"/> to open.</param>
     //    public abstract void Open(ShellObject shellObject);
 
     //    /// <summary>
-    //    /// When overriden in a derived class, opens a given <see cref="StorageFile"/> using the application represented by this <see cref="AppInfo"/>.
+    //    /// When overridden in a derived class, opens a given <see cref="StorageFile"/> using the application represented by this <see cref="AppInfo"/>.
     //    /// </summary>
     //    /// <param name="storageFile">The <see cref="StorageFile"/> to open.</param>
     //    public abstract void Open(StorageFile storageFile);
 
     //    /// <summary>
-    //    /// When overriden in a derived class, opens a given file using the application represented by this <see cref="AppInfo"/>.
+    //    /// When overridden in a derived class, opens a given file using the application represented by this <see cref="AppInfo"/>.
     //    /// </summary>
     //    /// <param name="fileName">The path to the file to open.</param>
     //    public abstract void Open(string fileName);

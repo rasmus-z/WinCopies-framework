@@ -2,11 +2,16 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Media.Imaging;
+
 using TsudaKageyu;
+
 using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
+    /// <summary>
+    /// Provides a base class for all I/O objects of the WinCopies framework.
+    /// </summary>
     public abstract class BrowsableObjectInfo : IBrowsableObjectInfo
     {
 
@@ -15,40 +20,40 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the path of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        public string Path { get; } = null;
+        public string Path { get; }
 
         /// <summary>
-        /// When overriden in a derived class, gets the localized path of this <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets the localized path of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         public abstract string LocalizedName { get; }
 
         /// <summary>
-        /// When overriden in a derived class, gets the name of this <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets the name of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         public abstract string Name { get; }
 
         /// <summary>
-        /// When overriden in a derived class, gets the small <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets the small <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         public abstract BitmapSource SmallBitmapSource { get; }
 
         /// <summary>
-        /// When overriden in a derived class, gets the medium <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets the medium <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         public abstract BitmapSource MediumBitmapSource { get; }
 
         /// <summary>
-        /// When overriden in a derived class, gets the large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets the large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         public abstract BitmapSource LargeBitmapSource { get; }
 
         /// <summary>
-        /// When overriden in a derived class, gets the extra large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets the extra large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         public abstract BitmapSource ExtraLargeBitmapSource { get; }
 
         /// <summary>
-        /// When overriden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
+        /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
         /// </summary>
         public abstract bool IsBrowsable { get; }
 
@@ -134,12 +139,16 @@ namespace WinCopies.IO
 
         }
 
-        public abstract IBrowsableObjectInfo GetParent();
+        /// <summary>
+        /// When overridden in a derived class, returns the parent of this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        /// <returns>the parent of this <see cref="BrowsableObjectInfo"/>.</returns>
+        protected abstract IBrowsableObjectInfo GetParent();
 
         // protected abstract IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileTypes fileType);
 
         /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously.
+        /// Loads the items of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         public virtual void LoadItems()
 
@@ -156,7 +165,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using the given <see cref="BrowsableObjectInfoItemsLoader"/>.
+        /// Loads the items of this <see cref="BrowsableObjectInfo"/> using the given <see cref="BrowsableObjectInfoItemsLoader"/>.
         /// </summary>
         /// <param name="browsableObjectInfoItemsLoader">Custom loader to load the items of this <see cref="BrowsableObjectInfo"/>.</param>
         public virtual void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
@@ -177,6 +186,11 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// When overridden in a derived class, loads the items of this <see cref="BrowsableObjectInfo"/> using custom worker behavior options.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         public abstract void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation);
 
         /// <summary>
@@ -208,17 +222,32 @@ namespace WinCopies.IO
 
                 throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, FileType.ToString(), ToString()));
 
-            ItemsLoader = browsableObjectInfoItemsLoader ?? throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
+            if (browsableObjectInfoItemsLoader == null)
 
-            ItemsLoader.LoadItemsAsync();
+                throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
+
+            // ItemsLoader = browsableObjectInfoItemsLoader ?? throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
+
+            browsableObjectInfoItemsLoader.Path = this;
+
+            browsableObjectInfoItemsLoader.LoadItemsAsync();
 
         }
 
+        /// <summary>
+        /// When overridden in a derived class, loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         public abstract void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation);
 
         // /// <summary>
         // /// Frees the <see cref="ArchiveFileStream"/> property to unlock the archive referenced by it and makes it <see langword="null"/>. Calling this method will erase all the <see cref="Items"/> of this <see cref="ShellObjectInfo"/> in memory.
         // /// </summary>
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public virtual void Dispose() => Dispose(true);
 
         private void Dispose(bool disposeParentBrowsableObjectInfo)
@@ -256,13 +285,21 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// When overriden in a derived class, renames or move to a relative path, or both, the current <see cref="BrowsableObjectInfo"/> with the specified name.
+        /// When overridden in a derived class, renames or move to a relative path, or both, the current <see cref="BrowsableObjectInfo"/> with the specified name.
         /// </summary>
-        /// <param name="newValue">The new name or relative path for this <see cref="ShellObjectInfo"/>.</param>
+        /// <param name="newValue">The new name or relative path for this <see cref="BrowsableObjectInfo"/>.</param>
         public abstract void Rename(string newValue);
 
-        public override string ToString() => Name;
+        /// <summary>
+        /// Returns a string representation for this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        /// <returns>The <see cref="LocalizedName"/> of this <see cref="BrowsableObjectInfo"/>.</returns>
+        public override string ToString() => LocalizedName;
 
+        /// <summary>
+        /// When overridden in a derived class, returns an <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        /// <returns>An <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
         public abstract IBrowsableObjectInfo Clone();
 
         /// <summary>
@@ -270,23 +307,12 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
-        public override bool Equals(object obj)
-        {
-            if (obj is IBrowsableObjectInfo _obj)
-
-            {
-
-                if (ReferenceEquals(this, obj)) return true;
-
-                return FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower();
-
-            }
-
-            else return false;
-        }
+        public override bool Equals(object obj) => obj is IBrowsableObjectInfo _obj
+                ? ReferenceEquals(this, obj) ? true : FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
+                : false;
 
         /// <summary>
-        /// Get an hash code for this <see cref="IBrowsableObjectInfo"/>.
+        /// Gets an hash code for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         /// <returns>The hash codes of the <see cref="FileType"/> and the <see cref="Path"/> property.</returns>
         public override int GetHashCode() => FileType.GetHashCode() ^ Path.ToLower().GetHashCode();

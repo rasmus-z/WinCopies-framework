@@ -183,6 +183,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ShellObjectInfoConverter.cs" />
+    <Compile Include="ShellPropertyContainer.cs" />
+    <Compile Include="ShellPropertyConverter.cs" />
     <Compile Include="Themes\Generic.xaml.cs">
       <DependentUpon>Generic.xaml</DependentUpon>
     </Compile>

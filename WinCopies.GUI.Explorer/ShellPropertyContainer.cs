@@ -3,7 +3,7 @@ using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell.PropertySystem;
 using System.ComponentModel;
 
-namespace WinCopies.IO
+namespace WinCopies.GUI.Explorer
 {
     /// <summary>
     /// Provides a container for the <see cref="IShellProperty"/> interface that notifies when the property has changed.
