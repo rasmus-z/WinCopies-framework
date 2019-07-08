@@ -175,7 +175,7 @@ namespace WinCopies.IO
 
         public override IBrowsableObjectInfo Clone() => throw new NotImplementedException();
 
-        public override IBrowsableObjectInfo GetParent() => throw new NotImplementedException();
+        protected override IBrowsableObjectInfo GetParent() => throw new NotImplementedException();
 
         public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMIItemsLoader(workerReportsProgress, workerSupportsCancellation) { Path = this }).LoadItems();
 

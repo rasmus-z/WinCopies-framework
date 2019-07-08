@@ -10,10 +10,21 @@ using System.Threading;
 namespace WinCopies.IO
 {
 
+    public interface IBrowsableObjectInfoItemsLoader : IDisposable
+    {
+
+        IBrowsableObjectInfo Path { get; }
+
+        void LoadItems();
+
+        void LoadItemsAsync();
+
+    }
+
     /// <summary>
     /// The base class for the <see cref="IBrowsableObjectInfo"/> items loaders.
     /// </summary>
-    public abstract class BrowsableObjectInfoItemsLoader : IBackgroundWorker, IDisposable
+    public abstract class BrowsableObjectInfoItemsLoader : IBrowsableObjectInfoItemsLoader, IBackgroundWorker
 
     {
 
@@ -32,7 +43,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the path from which to load the items.
         /// </summary>
-        public BrowsableObjectInfo Path
+        public IBrowsableObjectInfo Path
         {
             get => _path; internal set
             {
@@ -230,7 +241,7 @@ namespace WinCopies.IO
         /// <param name="e">Event args for the current event</param>
         protected virtual void OnDoWork(DoWorkEventArgs e) => OnDoWork();
 
-        protected virtual void OnProgressChanged(ProgressChangedEventArgs e) => Path.items.Add((IBrowsableObjectInfo)e.UserState);
+        protected virtual void OnProgressChanged(ProgressChangedEventArgs e) =>((BrowsableObjectInfo) Path).items.Add((IBrowsableObjectInfo)e.UserState);
 
         // /// <summary>
         // /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class with an <see cref="IBrowsableObjectInfo"/>.
@@ -252,7 +263,7 @@ namespace WinCopies.IO
 
                 backgroundWorker.Cancel();
 
-            Path.items.Clear();
+            ((BrowsableObjectInfo)Path).items.Clear();
 
         }
 

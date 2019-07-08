@@ -253,7 +253,13 @@ namespace WinCopies.IO
 
                 ArchiveFileInfo = archiveFileInfo.Value;
 
+            ArchiveItemInfoFactory = new ArchiveItemInfoFactory();
+
+#if DEBUG
+
             Debug.WriteLine("path: " + path);
+
+#endif
 
             #region Comments
 

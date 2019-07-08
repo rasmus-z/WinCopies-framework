@@ -91,12 +91,12 @@ namespace WinCopies.IO
         /// </summary>
         public FileType FileType { get; private set; } = FileType.None;
 
-        private BrowsableObjectInfoItemsLoader itemsLoader = null;
+        private IBrowsableObjectInfoItemsLoader itemsLoader = null;
 
         /// <summary>
         /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        public BrowsableObjectInfoItemsLoader ItemsLoader
+        public virtual IBrowsableObjectInfoItemsLoader ItemsLoader
         {
 
             get => itemsLoader;
@@ -110,9 +110,9 @@ namespace WinCopies.IO
 
                 itemsLoader = value;
 
-                if (value != null)
+                if (value is BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 
-                    value.Path = this;
+                    browsableObjectInfoItemsLoader.Path = this;
 
             }
 
@@ -256,7 +256,7 @@ namespace WinCopies.IO
 
             IsDisposing = true;
 
-            if (ItemsLoader != null && ItemsLoader.IsBusy)
+            if (ItemsLoader != null && ItemsLoader is BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader && browsableObjectInfoItemsLoader.IsBusy)
 
                 throw new InvalidOperationException("The items loader is busy.");
 

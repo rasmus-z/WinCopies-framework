@@ -50,7 +50,7 @@ namespace WinCopies.IO
         // todo: really needed? :
 
         /// <summary>
-        /// Gets a value that indicates if the items of this <see cref="IBrowsableObjectInfo"/> are currently loaded.
+        /// Gets a value that indicates whether the items of this <see cref="IBrowsableObjectInfo"/> are currently loaded.
         /// </summary>
         bool AreItemsLoaded { get; }
 
@@ -59,15 +59,15 @@ namespace WinCopies.IO
         /// </summary>
         IBrowsableObjectInfo Parent { get; }
 
-        /// <summary>
-        /// Gets or sets the items loader for this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        BrowsableObjectInfoItemsLoader ItemsLoader { get; set; }
+        ///// <summary>
+        ///// Gets or sets the items loader for this <see cref="IBrowsableObjectInfo"/>.
+        ///// </summary>
+        //IBrowsableObjectInfoItemsLoader ItemsLoader { get; set; }
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 
         /// <summary>
-        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously.
+        /// Loads the items of this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
         void LoadItems();
 

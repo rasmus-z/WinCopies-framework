@@ -263,13 +263,21 @@ namespace WinCopies.IO
 
         {
 
+#if DEBUG
+
             if (shellObject.ParsingName != Path)
 
                 Debug.WriteLine("");
 
+#endif
+
             if ((FileType == FileType.SpecialFolder && specialFolder == SpecialFolders.OtherFolderOrFile) || (FileType != FileType.SpecialFolder && specialFolder != SpecialFolders.OtherFolderOrFile))
 
                 throw new ArgumentException(string.Format(Generic.FileTypeAndSpecialFolderNotCorrespond, fileTypeParameterName, nameof(specialFolder), FileType, specialFolder));
+
+            ShellObjectInfoFactory = new ShellObjectInfoFactory();
+
+            ArchiveItemInfoFactory = new ArchiveItemInfoFactory();
 
             ShellObject = shellObject;
 
@@ -303,7 +311,7 @@ namespace WinCopies.IO
 
         }
 
-        public override IBrowsableObjectInfo GetParent()
+        protected override IBrowsableObjectInfo GetParent()
         {
 
             IBrowsableObjectInfo parent;
@@ -320,7 +328,7 @@ namespace WinCopies.IO
 
                     string _parent = parentDirectoryInfo.FullName;
 
-                    parent = GetBrowsableObjectInfo(ShellObject.FromParsingName(_parent), _parent);
+                    parent = ShellObjectInfoFactory. GetBrowsableObjectInfo(ShellObject.FromParsingName(_parent), _parent);
 
                 }
 
@@ -329,9 +337,9 @@ namespace WinCopies.IO
             }
 
             else parent = FileType == FileType.Drive
-                ? GetBrowsableObjectInfo(ShellObject.Parent, KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolders.Computer)
+                ? ShellObjectInfoFactory. GetBrowsableObjectInfo(ShellObject.Parent, KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolders.Computer)
                 : FileType == FileType.SpecialFolder && SpecialFolder != SpecialFolders.Computer
-                ? GetBrowsableObjectInfo(ShellObject.Parent, KnownFolderHelper.FromParsingName(ShellObject.Parent.ParsingName).Path)
+                ? ShellObjectInfoFactory. GetBrowsableObjectInfo(ShellObject.Parent, KnownFolderHelper.FromParsingName(ShellObject.Parent.ParsingName).Path)
                 : null;
 
             return parent;
@@ -458,13 +466,9 @@ namespace WinCopies.IO
 
         public override string ToString() => string.IsNullOrEmpty(Path) ? ShellObject.GetDisplayName(DisplayNameType.Default) : System.IO.Path.GetFileName(Path);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path) => new ShellObjectInfo(shellObject, path);
+        public IShellObjectInfoFactory ShellObjectInfoFactory { get; set; }
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolders specialFolder) => new ShellObjectInfo(shellObject, path, fileType, specialFolder);
-
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) =>
-
-            new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
+        public IArchiveItemInfoFactory ArchiveItemInfoFactory { get; set; }
 
         /// <summary>
         /// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.
@@ -505,7 +509,25 @@ namespace WinCopies.IO
 
         }
 
-        public override IBrowsableObjectInfo Clone() => GetBrowsableObjectInfo(ShellObject.FromParsingName(ShellObject.ParsingName), Path, FileType, SpecialFolder);
+        public override IBrowsableObjectInfo Clone() => ShellObjectInfoFactory. GetBrowsableObjectInfo(ShellObject.FromParsingName(ShellObject.ParsingName), Path, FileType, SpecialFolder);
+
+    }
+
+    public interface IShellObjectInfoFactory
+    {
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path);
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolders specialFolder);
+
+    }
+
+    public class ShellObjectInfoFactory : IShellObjectInfoFactory
+    {
+
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path) => new ShellObjectInfo(shellObject, path);
+
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolders specialFolder) => new ShellObjectInfo(shellObject, path, fileType, specialFolder);
 
     }
 

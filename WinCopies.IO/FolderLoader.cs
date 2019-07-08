@@ -141,7 +141,7 @@ namespace WinCopies.IO
                 try
                 {
 
-                    Path.items.Add(OnAddingNewBrowsableObjectInfo(ShellObject.FromParsingName(path), path));
+                    ((BrowsableObjectInfo)Path).items.Add(OnAddingNewBrowsableObjectInfo(ShellObject.FromParsingName(path), path));
 
                 }
 #if DEBUG
@@ -150,7 +150,7 @@ namespace WinCopies.IO
             catch { }
 #endif
 
-                Path.items.Sort(comp.GetInstance());
+                ((BrowsableObjectInfo)Path).items.Sort(comp.GetInstance());
             }
 
         }
@@ -167,9 +167,9 @@ namespace WinCopies.IO
 
         }
 
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(ShellObject shellObject, string path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).GetBrowsableObjectInfo(shellObject, path));
+        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(ShellObject shellObject, string path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).ShellObjectInfoFactory.GetBrowsableObjectInfo(shellObject, path));
 
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).GetBrowsableObjectInfo(path.ShellObject, path.Path, path.FileType, ShellObjectInfo.GetFileType(path.Path, path.ShellObject).specialFolder));
+        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).ShellObjectInfoFactory.GetBrowsableObjectInfo(path.ShellObject, path.Path, path.FileType, ShellObjectInfo.GetFileType(path.Path, path.ShellObject).specialFolder));
 
         protected virtual void OnShellObjectRenamed(string oldPath, string newPath)
 
@@ -200,13 +200,13 @@ namespace WinCopies.IO
 
             else
 
-                for (int i = 0; i < Path.items.Count; i++)
+                for (int i = 0; i < ((BrowsableObjectInfo)Path).items.Count; i++)
 
-                    if (Path.items[i].Path == path)
+                    if (((BrowsableObjectInfo)Path).items[i].Path == path)
 
                     {
 
-                        Path.items.RemoveAt(i);
+                        ((BrowsableObjectInfo)Path).items.RemoveAt(i);
 
                         return;
 

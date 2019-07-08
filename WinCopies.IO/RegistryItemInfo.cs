@@ -183,7 +183,7 @@ namespace WinCopies.IO
 
         }
 
-        public override IBrowsableObjectInfo GetParent()
+        protected override IBrowsableObjectInfo GetParent()
         {
 
             switch (RegistryItemType)
