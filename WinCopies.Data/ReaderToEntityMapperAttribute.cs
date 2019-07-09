@@ -21,13 +21,7 @@ namespace WinCopies.Data
 
         public CultureInfo ConverterCultureInfo { get; set; }
 
-    }
-
-    public class SqlReaderToEntityMapperAttribute : ReaderToEntityMapperAttribute
-
-    {
-
-        public string TableColumnName { get; set; }
+        public string TableFieldName { get; set; }
 
     }
 }

@@ -229,56 +229,23 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class.
+        /// </summary>
+        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
+        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         public ShellObjectInfo(ShellObject shellObject, string path) : base(path, GetFileType(path, shellObject).fileType) =>
-
-            //#if DEBUG
-
-            //            Debug.WriteLine("ShellObjectInfo(ShellObject shellObject, string path): shellObject == null: " + (shellObject == null).ToString());
-
-            //#endif
-
-            // void checkFileType()
-
-            // {
-
-            // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;
-
-            // PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
-
-            // if (specialFolder == SpecialFolders.OtherFolderOrFile)
-
-            // {
-
-            // }
-
-            // }
-
-            // checkFileType();
-
-            // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;
-
-            // PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
-
-            // todo:
-
-            // }
 
             Init(shellObject, nameof(FileType), GetFileType(path, shellObject).specialFolder);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class.
         /// </summary>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.</param>
+        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
         public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder) : base(path, fileType) =>
-
-            //#if DEBUG
-
-            //            Debug.WriteLine("ShellObjectInfo(ShellObject shellObject, string path, FileTypes fileType, WinCopies.IO.SpecialFolders specialFolder): shellObject == null: " + (shellObject == null).ToString());
-
-            //#endif
 
             Init(shellObject, nameof(fileType), specialFolder);// string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
 

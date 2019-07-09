@@ -10,23 +10,23 @@ namespace WinCopies.Data
     public class Command
     {
 
-        public string Query { get; }
+        public string Query { get; private set; }
 
-        public IDictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
+        public IDictionary<string, object> Parameters { get; set; }
 
-        public Command(string query)
+        public Command(string query) : this(query, new Dictionary<string, object>()) { }
+
+        public Command(string query, IDictionary<string, object> parameters)
+
         {
 
-            if (query == null)
+            Init(query);
 
-                throw new ArgumentNullException(nameof(query));
-
-            if (string.IsNullOrWhiteSpace(query))
-
-                throw new ArgumentException(string.Format(WinCopies.Util.Generic.StringParameterEmptyOrWhiteSpaces, nameof(query)));
-
-            Query = query;
+            Parameters = parameters;
 
         }
+
+        private void Init(string query) => Query = Util.Util.IsNullEmptyOrWhiteSpace(query) ? throw new ArgumentException(string.Format(Util.Generic.StringParameterEmptyOrWhiteSpaces, nameof(query))) : query;
+
     }
 }

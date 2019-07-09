@@ -33,18 +33,24 @@ namespace WinCopies.Data
             return connection;
         }
 
-
         private IDbCommand CreateCommand(IDbConnection conn, Command cmd)
         {
             IDbCommand command = conn.CreateCommand();
+
             command.CommandText = cmd.Query;
+
+            IDataParameter parameter;
+
             foreach (KeyValuePair<string, object> kvp in cmd.Parameters)
             {
-                IDataParameter parameter = command.CreateParameter();
+                parameter = command.CreateParameter();
+
                 parameter.ParameterName = kvp.Key;
                 parameter.Value = kvp.Value;
-                command.Parameters.Add(parameter);
+
+                _ = command.Parameters.Add(parameter);
             }
+
             return command;
         }
 
@@ -61,7 +67,6 @@ namespace WinCopies.Data
                     while (reader.Read())
 
                         yield return selector(reader);
-
                 }
             }
         }
@@ -75,7 +80,6 @@ namespace WinCopies.Data
                 using (IDbCommand command = CreateCommand(conn, cmd))
 
                     return command.ExecuteNonQuery();
-
             }
         }
 
@@ -88,7 +92,6 @@ namespace WinCopies.Data
                 using (IDbCommand command = CreateCommand(conn, cmd))
 
                     return command.ExecuteScalar();
-
             }
         }
     }
