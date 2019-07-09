@@ -38,9 +38,9 @@ namespace WinCopies.IO
             ShellObject shellObject = ShellObject.FromParsingName(paths[0]);
 
             browsableObjectInfo = Directory.Exists(paths[0])
-                ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolders.OtherFolderOrFile)
+                ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile)
                 : File.Exists(paths[0])
-                ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolders.OtherFolderOrFile)
+                ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolder.OtherFolderOrFile)
                 : new ShellObjectInfo(shellObject, paths[0], FileType.SpecialFolder, ShellObjectInfo.GetSpecialFolderType(shellObject));
 
             if (paths.Length == 1)
@@ -381,11 +381,11 @@ namespace WinCopies.IO
 
         // todo: to check and translate all the methods below:
 
-        public static SpecialFolders GetSpecialFolderFromPath(string path, ShellObject shellObject)
+        public static SpecialFolder GetSpecialFolderFromPath(string path, ShellObject shellObject)
 
         {
 
-            SpecialFolders specialFolder = SpecialFolders.OtherFolderOrFile;
+            SpecialFolder specialFolder = SpecialFolder.OtherFolderOrFile;
 
             if (path.EndsWith("\\")) path = path.Substring(0, path.Length - 1);
 
@@ -397,7 +397,7 @@ namespace WinCopies.IO
 
             if (path.EndsWith(":"))
 
-                specialFolder = SpecialFolders.OtherFolderOrFile;
+                specialFolder = SpecialFolder.OtherFolderOrFile;
 
             else if (path.Contains(":"))
 
@@ -409,9 +409,9 @@ namespace WinCopies.IO
 
                     string shellObjectParsingName = shellObject.ParsingName;
 
-                    if (shellObjectParsingName == KnownFolders.Libraries.ParsingName) specialFolder = SpecialFolders.UsersLibraries;
+                    if (shellObjectParsingName == KnownFolders.Libraries.ParsingName) specialFolder = SpecialFolder.UsersLibraries;
 
-                    else if (shellObjectParsingName == KnownFolders.Desktop.ParsingName) specialFolder = SpecialFolders.Desktop;
+                    else if (shellObjectParsingName == KnownFolders.Desktop.ParsingName) specialFolder = SpecialFolder.Desktop;
 
                 }
 
@@ -419,7 +419,7 @@ namespace WinCopies.IO
 
                 if (path == KnownFolders.UsersLibraries.ParsingName || path == KnownFolders.UsersLibraries.LocalizedName)
 
-                    specialFolder = SpecialFolders.UsersLibraries;
+                    specialFolder = SpecialFolder.UsersLibraries;
 
             // else if (basePath.StartsWith(LibrariesName + "\\") || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
 
