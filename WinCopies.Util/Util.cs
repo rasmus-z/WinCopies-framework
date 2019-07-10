@@ -20,7 +20,7 @@ namespace WinCopies.Util
                          BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
         [Obsolete("This method has been replaced by the WinCopies.Util.Extensions.SetBackgroundWorkerProperty method overloads.")]
-        public static (bool propertyChanged, object oldValue) SetPropertyWhenNotBusy<T>(T bgWorker, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet, bool throwIfBusy = true) where T : IBackgroundWorker, INotifyPropertyChanged
+        public static (bool propertyChanged, object oldValue) SetPropertyWhenNotBusy<T>(T bgWorker, string propertyName, string fieldName, object newValue, Type declaringType, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet, bool throwIfBusy = true) where T : IBackgroundWorker, INotifyPropertyChanged
 
         {
 
@@ -36,7 +36,7 @@ namespace WinCopies.Util
 
             else
 
-                return bgWorker.SetProperty(propertyName, fieldName, newValue, declaringType, performIntegrityCheck, bindingFlags);
+                return bgWorker.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
 
         }
 

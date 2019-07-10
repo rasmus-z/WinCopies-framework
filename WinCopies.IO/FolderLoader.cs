@@ -37,7 +37,11 @@ namespace WinCopies.IO
 
         // todo: to turn on ShellObjectWatcher for better compatibility
 
-        public FolderLoaderFileSystemWatcher FileSystemWatcher { get; private set; } = null;
+#pragma warning disable CS0649 // Set up using reflection.
+        private readonly FolderLoaderFileSystemWatcher _folderLoaderFileSystemWatcher;
+#pragma warning restore CS0649
+
+        public FolderLoaderFileSystemWatcher FileSystemWatcher { get => _folderLoaderFileSystemWatcher; private set => this.SetBackgroundWorkerProperty(nameof(FileSystemWatcher), nameof(_folderLoaderFileSystemWatcher), typeof(FolderLoader), true); }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
@@ -141,7 +145,7 @@ namespace WinCopies.IO
                 try
                 {
 
-                    ((BrowsableObjectInfo)Path).items.Add(OnAddingNewBrowsableObjectInfo(ShellObject.FromParsingName(path), path));
+                    ((BrowsableObjectInfo)Path).items.Add(((ShellObjectInfo)Path).ShellObjectInfoFactory.GetBrowsableObjectInfo(ShellObject.FromParsingName(path), path));
 
                 }
 #if DEBUG
@@ -154,22 +158,6 @@ namespace WinCopies.IO
             }
 
         }
-
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo)
-
-        {
-
-            if (browsableObjectInfo is BrowsableObjectInfo _browsableObjectInfo)
-
-                _browsableObjectInfo.Parent = Path;
-
-            return browsableObjectInfo;
-
-        }
-
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(ShellObject shellObject, string path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).ShellObjectInfoFactory.GetBrowsableObjectInfo(shellObject, path));
-
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).ShellObjectInfoFactory.GetBrowsableObjectInfo(path.ShellObject, path.Path, path.FileType, ShellObjectInfo.GetFileType(path.Path, path.ShellObject).specialFolder));
 
         protected virtual void OnShellObjectRenamed(string oldPath, string newPath)
 
@@ -490,7 +478,7 @@ namespace WinCopies.IO
 
                 // new_Path.LoadThumbnail();
 
-                ReportProgress(0, OnAddingNewBrowsableObjectInfo(path_));
+                ReportProgress(0, ((ShellObjectInfo)Path).ShellObjectInfoFactory.GetBrowsableObjectInfo(path_.ShellObject, path_.Path, path_.FileType, ShellObjectInfo.GetFileType(path_.Path, path_.ShellObject).specialFolder));
 
 #if DEBUG
 

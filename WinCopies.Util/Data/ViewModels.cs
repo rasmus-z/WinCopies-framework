@@ -26,12 +26,13 @@ namespace WinCopies.Util.Data
         /// <param name="fieldName">The name of the field to store the new value. This have to be the field that is called by the property accessors (get and set).</param>
         /// <param name="newValue">The value to set in the property</param>
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
+        /// <param name="performIntegrityCheck">Whether to throw when the property is not settable or declaring types of the property and the setter method do not correspond</param>
         // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
-        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
+        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true)
 
         {
 
-            (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = performIntegrityCheck ? this.SetProperty(propertyName, fieldName, newValue, declaringType) : ((INotifyPropertyChanged)this).SetField(fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
@@ -44,6 +45,23 @@ namespace WinCopies.Util.Data
         /// <param name="oldValue">The old value of the property. This parameter is ignored by default. You can override this method and use the <see cref="PropertyChangedEventArgs"/> if you want for the <see cref="PropertyChanged"/> event to notify for this value.</param>
         /// <param name="newValue">The new value of the property. This parameter is ignored by default. You can override this method and use the <see cref="PropertyChangedEventArgs"/> if you want for the <see cref="PropertyChanged"/> event to notify for this value.</param>
         protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+
+        /// <summary>
+        /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
+        /// </summary>
+        /// <param name="propertyName">The name of the property for which set a new value</param>
+        /// <param name="newValue">The value to set in the property</param>
+        /// <param name="declaringType">The declaring type of both the property and its associated field</param>
+        /// <param name="performIntegrityCheck">Whether to throw when the property is not settable</param>
+        protected virtual void OnAutoPropertyChanged(string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true)
+
+        {
+
+            (bool propertyChanged, object oldValue) = this.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck);
+
+            if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
+
+        }
 
         /// <summary>
         /// Returns the current instance of this class as the value of the target property for this markup extension.
@@ -83,12 +101,13 @@ namespace WinCopies.Util.Data
         /// <param name="fieldName">The name of the field to store the new value. This have to be the field that is called by the property accessors (get and set).</param>
         /// <param name="newValue">The value to set in the property</param>
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
+        /// <param name="performIntegrityCheck">Whether to throw when the property is not settable or declaring types of the property and the setter method do not correspond</param>
         // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
-        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
+        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true)
 
         {
 
-            (bool propertyChanged, object oldValue) = this.SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = performIntegrityCheck ? this.SetProperty(propertyName, fieldName, newValue, declaringType) : ((INotifyPropertyChanged)this).SetField(fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
@@ -118,6 +137,23 @@ namespace WinCopies.Util.Data
         /// <param name="oldValue">The old value of the property. This parameter is ignored by default. You can override this method and use the <see cref="PropertyChangedEventArgs"/> if you want for the <see cref="PropertyChanged"/> event to notify for this value.</param>
         /// <param name="newValue">The new value of the property. This parameter is ignored by default. You can override this method and use the <see cref="PropertyChangedEventArgs"/> if you want for the <see cref="PropertyChanged"/> event to notify for this value.</param>
         protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+
+        /// <summary>
+        /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
+        /// </summary>
+        /// <param name="propertyName">The name of the property for which set a new value</param>
+        /// <param name="newValue">The value to set in the property</param>
+        /// <param name="declaringType">The declaring type of both the property and its associated field</param>
+        /// <param name="performIntegrityCheck">Whether to throw when the property is not settable</param>
+        protected virtual void OnAutoPropertyChanged(string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true)
+
+        {
+
+            (bool propertyChanged, object oldValue) = this.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck);
+
+            if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
+
+        }
 
         /// <summary>
         /// Returns the current instance of this class as the value of the target property for this markup extension.
@@ -157,12 +193,13 @@ namespace WinCopies.Util.Data
         /// <param name="fieldName">The name of the field to store the new value. This have to be the field that is called by the property accessors (get and set).</param>
         /// <param name="newValue">The value to set in the property</param>
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
+        /// <param name="performIntegrityCheck">Whether to throw when the property is not settable or declaring types of the property and the setter method do not correspond</param>
         // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
-        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
+        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true)
 
         {
 
-            (bool propertyChanged, object oldValue) = this.SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = performIntegrityCheck ? this.SetProperty(propertyName, fieldName, newValue, declaringType) : ((INotifyPropertyChanged)this).SetField(fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
@@ -192,6 +229,23 @@ namespace WinCopies.Util.Data
         /// <param name="oldValue">The old value of the property. This parameter is ignored by default. You can override this method and use the <see cref="PropertyChangedEventArgs"/> if you want for the <see cref="PropertyChanged"/> event to notify for this value.</param>
         /// <param name="newValue">The new value of the property. This parameter is ignored by default. You can override this method and use the <see cref="PropertyChangedEventArgs"/> if you want for the <see cref="PropertyChanged"/> event to notify for this value.</param>
         protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+
+        /// <summary>
+        /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
+        /// </summary>
+        /// <param name="propertyName">The name of the property for which set a new value</param>
+        /// <param name="newValue">The value to set in the property</param>
+        /// <param name="declaringType">The declaring type of both the property and its associated field</param>
+        /// <param name="performIntegrityCheck">Whether to throw when the property is not settable</param>
+        protected virtual void OnAutoPropertyChanged(string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true)
+
+        {
+
+            (bool propertyChanged, object oldValue) = this.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck);
+
+            if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
+
+        }
 
         /// <summary>
         /// Returns the current instance of this class as the value of the target property for this markup extension.

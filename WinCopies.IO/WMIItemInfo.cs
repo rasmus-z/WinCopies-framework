@@ -51,7 +51,13 @@ namespace WinCopies.IO
 
             (managementObject as ManagementClass)?.Get();
 
-            return wmiItemType == WMIItemType.Namespace ? (string)managementObject["Name"] : managementObject.ClassPath.ClassName;
+            try
+            {
+
+                return wmiItemType == WMIItemType.Namespace ? (string)managementObject["Name"] : managementObject.ClassPath.ClassName;
+
+            }
+            catch (Exception) { return managementObject.ClassPath.ClassName; }
 
         }
 
@@ -81,11 +87,13 @@ namespace WinCopies.IO
 
             ManagementObject = managementObject;
 
-            Name = GetName(managementObject, wmiItemType);
+            if (wmiItemType != WMIItemType.Instance)
+
+                Name = GetName(managementObject, wmiItemType);
 
             WMIItemType = wmiItemType;
 
-            if (Path.ToUpper().EndsWith("ROOT:__NAMESPACE"))
+            if (wmiItemType == WMIItemType.Namespace && Path.ToUpper().EndsWith("ROOT:__NAMESPACE"))
 
                 IsRootNode = true;
 
@@ -95,17 +103,17 @@ namespace WinCopies.IO
 
         {
 
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
-            stringBuilder.Append(@"\\");
+            _ = stringBuilder.Append(@"\\");
 
-            stringBuilder.Append(computerName);
+            _ = stringBuilder.Append(computerName);
 
-            stringBuilder.Append(@"\");
+            _ = stringBuilder.Append(@"\");
 
-            stringBuilder.Append(WinCopies.Util.Util.IsNullEmptyOrWhiteSpace(serverClassRelativePath) ? "ROOT" : serverClassRelativePath);
+            _ = stringBuilder.Append(IsNullEmptyOrWhiteSpace(serverClassRelativePath) ? "ROOT" : serverClassRelativePath);
 
-            stringBuilder.Append(":__NAMESPACE");
+            _ = stringBuilder.Append(":__NAMESPACE");
 
             return new WMIItemInfo(new ManagementClass(stringBuilder.ToString()), WMIItemType.Namespace);
 
@@ -177,9 +185,11 @@ namespace WinCopies.IO
 
         protected override IBrowsableObjectInfo GetParent() => throw new NotImplementedException();
 
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMIItemsLoader(workerReportsProgress, workerSupportsCancellation) { Path = this }).LoadItems();
+        private WMIItemsLoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMIItemsLoader(workerReportsProgress, workerSupportsCancellation) { Path = this, ObjectGetOptions = new ObjectGetOptions() { UseAmendedQualifiers = true }, EnumerationOptions = new EnumerationOptions() { EnumerateDeep = true, UseAmendedQualifiers = true } });
 
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMIItemsLoader(workerReportsProgress, workerSupportsCancellation) { Path = this }).LoadItemsAsync();
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItems();
+
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItemsAsync();
 
         /// <summary>
         /// Not implemented.

@@ -6,6 +6,7 @@ using WinCopies.Util;
 using BackgroundWorker = WinCopies.Util.BackgroundWorker;
 using System.Collections.Generic;
 using System.Threading;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
@@ -55,6 +56,17 @@ namespace WinCopies.IO
                 // We reach this point only if the test above succeeded.
 
                 InitializePath();
+
+                Path.Items.CollectionChanging += (object sender, NotifyCollectionChangedEventArgs e) =>
+                {
+
+                    foreach (var item in e.NewItems)
+
+                        if (item is BrowsableObjectInfo _browsableObjectInfo)
+
+                            _browsableObjectInfo.Parent = Path;
+
+                };
 
             }
         }
@@ -241,7 +253,7 @@ namespace WinCopies.IO
         /// <param name="e">Event args for the current event</param>
         protected virtual void OnDoWork(DoWorkEventArgs e) => OnDoWork();
 
-        protected virtual void OnProgressChanged(ProgressChangedEventArgs e) =>((BrowsableObjectInfo) Path).items.Add((IBrowsableObjectInfo)e.UserState);
+        protected virtual void OnProgressChanged(ProgressChangedEventArgs e) => OnAddingPath(e.UserState as IBrowsableObjectInfo);
 
         // /// <summary>
         // /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class with an <see cref="IBrowsableObjectInfo"/>.
@@ -317,6 +329,8 @@ namespace WinCopies.IO
         /// Resumes the current thread.
         /// </summary>
         public void Resume() => backgroundWorker.Resume();
+
+        protected virtual void OnAddingPath(IBrowsableObjectInfo path) => (Path as BrowsableObjectInfo)?.items.Add(path);
     }
 
 }

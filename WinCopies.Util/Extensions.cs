@@ -2108,6 +2108,8 @@ namespace WinCopies.Util
 
             //#endif 
 
+            // todo: tuple and check DeclaringTypeNotCorrespond throws
+
             return (property.CanWrite && property.GetSetMethod() != null) || property.DeclaringType == method.DeclaringType;
 
         }
@@ -2148,7 +2150,33 @@ namespace WinCopies.Util
 
         }
 
-        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+        public static (bool fieldChanged, object oldValue) SetField(this object obj, string fieldName, object newValue, Type declaringType, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+
+        {
+
+            FieldInfo field = GetField(fieldName, declaringType, bindingFlags);
+
+            object previousValue = field.GetValue(obj);
+
+            if ((newValue == null && previousValue != null) || (newValue != null && !newValue.Equals(previousValue)))
+
+            {
+
+                field.SetValue(obj, newValue);
+
+                return (true, previousValue);
+
+            }
+
+            else
+
+                return (false, previousValue);
+
+        }
+
+        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
+
+        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
 
@@ -2189,7 +2217,7 @@ namespace WinCopies.Util
 
             object previousValue = field.GetValue(obj);
 
-            if (performIntegrityCheck && !CheckPropertySetIntegrity(declaringType, propertyName, out string methodName, 3, bindingFlags))
+            if (!CheckPropertySetIntegrity(declaringType, propertyName, out string methodName, 3, bindingFlags))
 
                 throw new InvalidOperationException(string.Format(DeclaringTypesNotCorrespond, propertyName, methodName));
 
@@ -2222,9 +2250,15 @@ namespace WinCopies.Util
 
             object previousValue = property.GetValue(obj);
 
-            if (performIntegrityCheck && !CheckPropertySetIntegrity(declaringType, propertyName, out string methodName, 3, bindingFlags))
+            if (!property.CanWrite || property.SetMethod == null)
 
-                throw new InvalidOperationException(string.Format(DeclaringTypesNotCorrespond, propertyName, methodName));
+                if (performIntegrityCheck)
+
+                    throw new InvalidOperationException(string.Format("This property is not settable. Property name: {0}, declaring type: {1}.", propertyName, declaringType));
+
+                else
+
+                    return (false, previousValue);
 
             if ((newValue == null && previousValue != null) || (newValue != null && !newValue.Equals(previousValue)))
 
@@ -2242,21 +2276,9 @@ namespace WinCopies.Util
 
         }
 
-        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
-
-        {
-
-            if (obj.IsBusy)
-
-                if (throwIfBusy)
-
-                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
-
-                else return (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj));
-
-            return obj.SetProperty(propertyName, fieldName, newValue, declaringType, performIntegrityCheck, bindingFlags);
-
-        }
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
+                ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj))
+                : obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
 
         public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
@@ -2264,29 +2286,37 @@ namespace WinCopies.Util
 
             if (obj.IsBusy)
 
+            {
+
                 if (throwIfBusy)
 
                     throw new InvalidOperationException(BackgroundWorkerIsBusy);
 
-                else return (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj));
+                return (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj));
+
+            }
 
             return obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
 
         }
 
-        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
 
             if (obj.IsBusy)
 
+            {
+
                 if (throwIfBusy)
 
                     throw new InvalidOperationException(BackgroundWorkerIsBusy);
 
-                else return (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj));
+                return (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj));
 
-            return obj.SetProperty(propertyName, fieldName, newValue, declaringType, performIntegrityCheck, bindingFlags);
+            }
+
+            return obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
 
         }
 
@@ -2296,11 +2326,15 @@ namespace WinCopies.Util
 
             if (obj.IsBusy)
 
+            {
+
                 if (throwIfBusy)
 
                     throw new InvalidOperationException(BackgroundWorkerIsBusy);
 
-                else return (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj));
+                return (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj));
+
+            }
 
             return obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
 

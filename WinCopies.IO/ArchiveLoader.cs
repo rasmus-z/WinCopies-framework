@@ -422,7 +422,7 @@ namespace WinCopies.IO
                 // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;
                 // new_Path.LoadThumbnail();
 
-                ReportProgress(0, OnAddingNewBrowsableObjectInfo(path));
+                ReportProgress(0, ((IArchiveItemInfoProvider)Path).ArchiveItemInfoFactory.GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType));
 
                 // #if DEBUG
 
@@ -441,20 +441,6 @@ namespace WinCopies.IO
             //foreach (FolderLoader.PathInfo path_ in files)
 
             //    reportProgressAndAddNewPathToObservableCollection(path_);
-
-        }
-
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path)
-
-        {
-
-            IBrowsableObjectInfo browsableObjectInfo = ((IArchiveItemInfoProvider)Path).ArchiveItemInfoFactory. GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType);
-
-            if (browsableObjectInfo is BrowsableObjectInfo _browsableObjectInfo)
-
-                _browsableObjectInfo.Parent = Path;
-
-            return browsableObjectInfo;
 
         }
 

@@ -49,9 +49,7 @@ namespace WinCopies.IO
         /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
         public EnumerationOptions EnumerationOptions { get => _enumerationOptions; set => this.SetBackgroundWorkerProperty(nameof(EnumerationOptions), nameof(_enumerationOptions), value, typeof(WMIItemsLoader), true); }
 
-        public WMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) : base(workerReportsProgress, workerSupportsCancellation)
-        {
-        }
+        public WMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) : base(workerReportsProgress, workerSupportsCancellation)        {        }
 
         public override bool CheckFilter(string path) => throw new NotImplementedException();
 
@@ -64,26 +62,30 @@ namespace WinCopies.IO
 
             {
 
-                try
+                if (wmiItemInfo.WMIItemType == WMIItemType.Namespace)
+
                 {
 
-                    if (wmiItemInfo.WMIItemType == WMIItemType.Namespace)
+                    ManagementClass managementClass = wmiItemInfo.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(wmiItemInfo.Path, ConnectionOptions), new ManagementPath(wmiItemInfo.Path), ObjectGetOptions);
 
+                    ManagementObjectCollection instances;
+
+                    var arrayBuilder = new ArrayAndListBuilder<ManagementBaseObject>();
+
+                    List<ManagementBaseObject> sortedInstances;
+
+                    try
                     {
-
-                        ManagementClass managementClass = wmiItemInfo.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(wmiItemInfo.Path, ConnectionOptions), new ManagementPath(wmiItemInfo.Path + ":__NAMESPACE"), ObjectGetOptions);
 
                         managementClass.Get();
 
-                        ManagementObjectCollection instances = EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(EnumerationOptions);
-
-                        var arrayBuilder = new ArrayAndListBuilder<ManagementBaseObject>();
+                        instances = EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(EnumerationOptions);
 
                         foreach (ManagementBaseObject instance in instances)
 
                             _ = arrayBuilder.AddLast(instance);
 
-                        var sortedInstances = arrayBuilder.ToList();
+                        sortedInstances = arrayBuilder.ToList();
 
                         arrayBuilder.Clear();
 
@@ -93,7 +95,59 @@ namespace WinCopies.IO
 
                             ReportProgress(0, new WMIItemInfo(item, WMIItemType.Namespace));
 
-                        instances = EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(EnumerationOptions);
+                    }
+                    catch (Exception ex)
+
+                    {
+                        // MessageBox.Show(ex.Message);
+                    }
+
+                    // MessageBox.Show(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length));
+                    managementClass = new ManagementClass(new ManagementScope(wmiItemInfo.Path, ConnectionOptions), new ManagementPath(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length)), ObjectGetOptions);
+
+                    instances = EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(EnumerationOptions);
+
+                    if (wmiItemInfo.Path.Contains("CIM"))
+                        MessageBox.Show(instances.Count.ToString());
+                    foreach (ManagementBaseObject instance in instances)
+
+                        _ = arrayBuilder.AddLast(instance);
+
+                    sortedInstances = arrayBuilder.ToList();
+
+                    sortedInstances.Sort((ManagementBaseObject x, ManagementBaseObject y) => x.ClassPath.Path.CompareTo(y.ClassPath.Path));
+
+                    foreach (ManagementBaseObject item in sortedInstances)
+
+                        try
+
+                        {
+
+                            ReportProgress(0, new WMIItemInfo(item, WMIItemType.Class));
+
+                        }
+                        catch (Exception ex) { /*MessageBox.Show(ex.Message);*/ }
+
+                }
+
+                else if (wmiItemInfo.WMIItemType == WMIItemType.Class)
+
+                {
+
+                    ManagementClass managementClass = wmiItemInfo.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(wmiItemInfo.Path, ConnectionOptions), new ManagementPath(wmiItemInfo.Path), ObjectGetOptions);
+
+                    ManagementObjectCollection instances;
+
+                    ArrayAndListBuilder<ManagementBaseObject> arrayBuilder = new ArrayAndListBuilder<ManagementBaseObject>();
+
+                    List<ManagementBaseObject> sortedInstances;
+
+                    try
+                    {
+
+                        managementClass.Get();
+
+                        instances = EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(EnumerationOptions);
 
                         foreach (ManagementBaseObject instance in instances)
 
@@ -101,25 +155,20 @@ namespace WinCopies.IO
 
                         sortedInstances = arrayBuilder.ToList();
 
-                        sortedInstances.Sort((ManagementBaseObject x, ManagementBaseObject y) => x.ClassPath.Path.CompareTo(y.ClassPath.Path));
+                        arrayBuilder.Clear();
+
+                        sortedInstances.Sort((ManagementBaseObject x, ManagementBaseObject y) => x.ClassPath.ClassName.CompareTo(y.ClassPath.ClassName)); // ((string)x["Name"]).CompareTo((string)y["Name"]));
 
                         foreach (ManagementBaseObject item in sortedInstances)
 
-                            try
-
-                            {
-
-                                ReportProgress(0, new WMIItemInfo(item, WMIItemType.Class));
-
-                            }
-                            catch (Exception) { }
+                            ReportProgress(0, new WMIItemInfo(item, WMIItemType.Instance));
 
                     }
+                    catch (Exception ex)
 
-                }
-                catch (Exception ex)
-
-                {
+                    {
+                        // MessageBox.Show(ex.Message);
+                    }
 
                 }
 

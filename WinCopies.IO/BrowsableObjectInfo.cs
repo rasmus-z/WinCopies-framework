@@ -294,7 +294,7 @@ namespace WinCopies.IO
         /// Returns a string representation for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         /// <returns>The <see cref="LocalizedName"/> of this <see cref="BrowsableObjectInfo"/>.</returns>
-        public override string ToString() => LocalizedName;
+        public override string ToString() => Util.Util.IsNullEmptyOrWhiteSpace( LocalizedName) ? Path : LocalizedName;
 
         /// <summary>
         /// When overridden in a derived class, returns an <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.
