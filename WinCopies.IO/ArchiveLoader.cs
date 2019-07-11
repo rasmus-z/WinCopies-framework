@@ -188,7 +188,7 @@ namespace WinCopies.IO
 
             var paths = new ArrayAndListBuilder<IFileSystemObject>();
 
-            var comp = FolderLoader.comp.GetInstance();
+            var comp = FolderLoader.Comp.GetInstance();
 
 #if DEBUG
 

@@ -6,6 +6,7 @@
 
 using Microsoft.WindowsAPICodePack.Shell;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -46,11 +47,9 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
         /// </summary>
-        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes)
+        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this(workerReportsProgress, workerSupportsCancellation, FileSystemObjectComparer.GetInstance(), fileTypes) { }
 
-        {
-
-        }
+        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IBrowsableObjectInfo> browsableObjectInfoComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, browsableObjectInfoComparer, fileTypes) { }
 
         protected override void InitializePath()
 
@@ -154,7 +153,7 @@ namespace WinCopies.IO
             catch { }
 #endif
 
-                ((BrowsableObjectInfo)Path).items.Sort(comp.GetInstance());
+                ((BrowsableObjectInfo)Path).items.Sort(BrowsableObjectInfoComparer);
             }
 
         }
@@ -165,7 +164,7 @@ namespace WinCopies.IO
 
             if (!Application.Current.Dispatcher.CheckAccess())
 
-                Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectRenamed(oldPath, newPath));
+                _ = Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectRenamed(oldPath, newPath));
 
             else
             {
@@ -240,15 +239,17 @@ namespace WinCopies.IO
 
             var paths = new ArrayAndListBuilder<IFileSystemObject>();
 
-            var comp = FolderLoader.comp.GetInstance();
-
             void AddPath(ref PathInfo pathInfo)
 
             {
 
+#if DEBUG
+
                 if (pathInfo.Path.EndsWith(".lnk"))
 
                     Debug.WriteLine("");
+
+#endif
 
                 if (pathInfo.FileType == FileType.None || (pathInfo.FileType != FileType.SpecialFolder && FileTypes != Util.Util.GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
 
@@ -333,7 +334,7 @@ namespace WinCopies.IO
 
                 //    }
 
-                pathInfo.Normalized_Path = IO.Path.GetNormalizedPath(pathInfo.Path);
+                pathInfo.NormalizedPath = IO.Path.GetNormalizedPath(pathInfo.Path);
 
                 paths.AddLast(pathInfo);
 
@@ -356,7 +357,7 @@ namespace WinCopies.IO
             {
 
                 pathInfo.FileType = isLink
-                    ? IO.FileType.Link
+                    ? FileType.Link
                     : ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
 
                 // We only make a normalized path if we add the path to the paths to load.
@@ -447,8 +448,6 @@ namespace WinCopies.IO
 
 #endif
 
-                throw;
-
             }
 
 
@@ -457,7 +456,7 @@ namespace WinCopies.IO
 
 
 
-            _paths.Sort(comp);
+            _paths.Sort(BrowsableObjectInfoComparer);
 
 
 
@@ -469,22 +468,14 @@ namespace WinCopies.IO
 
                 Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
                 Debug.WriteLine("path_.Path: " + path_.Path);
-                Debug.WriteLine("path_.Normalized_Path: " + path_.Normalized_Path);
+                Debug.WriteLine("path_.Normalized_Path: " + path_.NormalizedPath);
                 Debug.WriteLine("path_.Shell_Object: " + path_.ShellObject);
 
 #endif
 
-                var new_Path = path_.ShellObject;
-
                 // new_Path.LoadThumbnail();
 
                 ReportProgress(0, ((ShellObjectInfo)Path).ShellObjectInfoFactory.GetBrowsableObjectInfo(path_.ShellObject, path_.Path, path_.FileType, ShellObjectInfo.GetFileType(path_.Path, path_.ShellObject).specialFolder));
-
-#if DEBUG
-
-                Debug.WriteLine("Ceci est un " + new_Path.GetType().ToString());
-
-#endif
 
             }
 
@@ -496,59 +487,15 @@ namespace WinCopies.IO
 
             public string Path { get; set; }
 
-            public string Normalized_Path { get; set; }
+            public string NormalizedPath { get; set; }
 
             public ShellObject ShellObject { get; set; }
 
-            public string LocalizedName { get => ShellObject.GetDisplayName(DisplayNameType.Default); }
+            public string LocalizedName => ShellObject.GetDisplayName(DisplayNameType.Default);
 
             public string Name { get; set; }
 
             public FileType FileType { get; set; }
-
-        }
-
-        public class comp : Comparer<IFileSystemObject> // Variable locale pour stocker une référence vers l'instance
-
-        {
-
-
-            private static comp instance = null;
-
-            private static readonly object mylock = new object();
-
-            public StringComparer bidule { get; set; } = StringComparer.Create(CultureInfo.CurrentCulture, true);
-
-            // Le constructeur est Private
-            private comp()
-            {
-                //
-            }
-
-            // La méthode GetInstance doit être Shared
-            public static comp GetInstance()
-            {
-                if (instance == null)
-
-                    lock (mylock)
-
-                        // Si pas d'instance existante on en crée une...
-                        if (instance == null)
-
-                            instance = new comp();
-
-                // On retourne l'instance de Singleton
-                return instance;
-
-            }
-
-            public override int Compare(IFileSystemObject x, IFileSystemObject y) => x.FileType == y.FileType || (x.FileType == IO.FileType.File && (y.FileType == IO.FileType.Link || y.FileType == IO.FileType.Archive)) || (y.FileType == IO.FileType.File && (x.FileType == IO.FileType.Link || x.FileType == IO.FileType.Archive))
-                    ? bidule.Compare(IO.Path.GetNormalizedPath(x.LocalizedName), IO.Path.GetNormalizedPath(y.LocalizedName))
-                    : (x.FileType == IO.FileType.Folder || x.FileType == IO.FileType.Drive) && (y.FileType == IO.FileType.File || y.FileType == IO.FileType.Archive || y.FileType == IO.FileType.Link)
-                    ? -1
-                    : (x.FileType == IO.FileType.File || x.FileType == IO.FileType.Archive || x.FileType == IO.FileType.Link) && (y.FileType == IO.FileType.Folder || y.FileType == IO.FileType.Drive)
-                    ? 1
-                    : 0;
 
         }
 

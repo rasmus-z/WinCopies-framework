@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,17 +13,9 @@ namespace WinCopies.IO
 
         private readonly FileTypes _fileTypes = Util.Util.GetAllEnumFlags<FileTypes>();
 
-        public FileTypes FileTypes
+        public FileTypes FileTypes { get => _fileTypes; set => this.SetBackgroundWorkerProperty(nameof(FileTypes), nameof(_fileTypes), value, typeof(FileSystemObjectItemsLoader), true); }
 
-        {
-
-            get => _fileTypes;
-
-            set => this.SetBackgroundWorkerProperty(nameof(FileTypes), nameof(_fileTypes), value, typeof(FileSystemObjectItemsLoader), true);
-
-        }
-
-        public FileSystemObjectItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation) => FileTypes = fileTypes;
+        public FileSystemObjectItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IBrowsableObjectInfo> browsableObjectInfoComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, browsableObjectInfoComparer) => FileTypes = fileTypes;
 
         public override bool CheckFilter(string directory)
 

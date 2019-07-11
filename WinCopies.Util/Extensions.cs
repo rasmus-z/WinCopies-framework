@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -1123,9 +1124,13 @@ namespace WinCopies.Util
 
         #region ContainsOneValue overloads
 
-        private static bool ContainsOneValue(IEnumerable array, Func<object, object, bool> comparisonDelegate, out bool containsMoreThanOneValue, object[] values)
+        public static bool ContainsOneValue(this IEnumerable array, EqualityComparison comparison, out bool containsMoreThanOneValue, object[] values)
 
         {
+
+            if (array == null)
+
+                throw new ArgumentNullException(nameof(array));
 
             bool matchFound = false;
 
@@ -1133,7 +1138,7 @@ namespace WinCopies.Util
 
                 foreach (object _value in values)
 
-                    if (comparisonDelegate(value, _value))
+                    if (comparison(value, _value))
 
                     {
 
@@ -1190,11 +1195,22 @@ namespace WinCopies.Util
         /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom comparer.
         /// </summary>
         /// <param name="array">The array to browse</param>
+        /// <param name="comparison">The <see cref="Comparison"/> used to compare the values</param>
+        /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
+        /// <param name="values">The values to compare</param>
+        /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
+        [Obsolete("This method has been replaced by the overload with the comparison parameter from WinCopies.Util.Comparison.")]
+        public static bool ContainsOneValue(this IEnumerable array, Comparison<object> comparison, out bool containsMoreThanOneValue, params object[] values) => ContainsOneValue(array, new Comparison((object x, object y) => comparison(x, y)), out containsMoreThanOneValue, values);
+
+        /// <summary>
+        /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom comparer.
+        /// </summary>
+        /// <param name="array">The array to browse</param>
         /// <param name="comparison">The <see cref="Comparison{T}"/> used to compare the values</param>
         /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
-        public static bool ContainsOneValue(this IEnumerable array, Comparison<object> comparison, out bool containsMoreThanOneValue, params object[] values)
+        public static bool ContainsOneValue(this IEnumerable array, Comparison comparison, out bool containsMoreThanOneValue, params object[] values)
 
         {
 
@@ -1222,7 +1238,7 @@ namespace WinCopies.Util
 
                 throw new ArgumentNullException(nameof(equalityComparer));
 
-            return ContainsOneValue(array, (object value, object _value) => equalityComparer.Equals(value, _value), out containsMoreThanOneValue, values); ;
+            return ContainsOneValue(array, (object value, object _value) => equalityComparer.Equals(value, _value), out containsMoreThanOneValue, values);
 
         }
 
@@ -1230,9 +1246,13 @@ namespace WinCopies.Util
 
         #region ContainsOneOrMoreValues with notification whether contains more than one values overloads
 
-        private static bool ContainsOneOrMoreValues(IEnumerable array, Func<object, object, bool> comparisonDelegate, out bool containsMoreThanOneValue, object[] values)
+        public static bool ContainsOneOrMoreValues(IEnumerable array, EqualityComparison comparison, out bool containsMoreThanOneValue, object[] values)
 
         {
+
+            if (array == null)
+
+                throw new ArgumentNullException(nameof(array));
 
             bool matchFound = false;
 
@@ -1240,7 +1260,7 @@ namespace WinCopies.Util
 
                 foreach (object _value in values)
 
-                    if (comparisonDelegate(value, _value))
+                    if (comparison(value, _value))
 
                     {
 
@@ -1337,15 +1357,19 @@ namespace WinCopies.Util
 
         #region ContainsOneOrMoreValues without notification whether contains more than one values overloads
 
-        private static bool ContainsOneOrMoreValues(IEnumerable array, Func<object, object, bool> comparisonDelegate, object[] values)
+        public static bool ContainsOneOrMoreValues(IEnumerable array, Func<object, object, bool> comparison, object[] values)
 
         {
+
+            if (array == null)
+
+                throw new ArgumentNullException(nameof(array));
 
             foreach (object value in array)
 
                 foreach (object _value in values)
 
-                    if (comparisonDelegate(value, _value))
+                    if (comparison(value, _value))
 
                         return true;
 
@@ -1422,9 +1446,13 @@ namespace WinCopies.Util
 
         #region Contains array overloads
 
-        private static bool Contains(IEnumerable array, Func<object, object, bool> comparisonDelegate, object[] values)
+        public static bool Contains(IEnumerable array, EqualityComparison comparison, object[] values)
 
         {
+
+            if (array == null)
+
+                throw new ArgumentNullException(nameof(array));
 
             bool matchFound;
 
@@ -1436,7 +1464,7 @@ namespace WinCopies.Util
 
                 foreach (object _value in values)
 
-                    if (comparisonDelegate(value, _value))
+                    if (comparison(value, _value))
 
                     {
 
@@ -1529,9 +1557,13 @@ namespace WinCopies.Util
 
         #region ContainsOneValue overloads
 
-        private static bool ContainsOneValue<T>(IEnumerable<T> array, Func<T, T, bool> comparisonDelegate, out bool containsMoreThanOneValue, T[] values)
+        public static bool ContainsOneValue<T>(IEnumerable<T> array, EqualityComparison<T> comparison, out bool containsMoreThanOneValue, T[] values)
 
         {
+
+            if (array == null)
+
+                throw new ArgumentNullException(nameof(array));
 
             bool matchFound = false;
 
@@ -1539,7 +1571,7 @@ namespace WinCopies.Util
 
                 foreach (T _value in values)
 
-                    if (comparisonDelegate(value, _value))
+                    if (comparison(value, _value))
 
                     {
 
@@ -1636,9 +1668,13 @@ namespace WinCopies.Util
 
         #region ContainsOneOrMoreValues with notification whether contains more than one values overloads
 
-        private static bool ContainsOneOrMoreValues<T>(IEnumerable<T> array, Func<T, T, bool> comparisonDelegate, out bool containsMoreThanOneValue, T[] values)
+        public static bool ContainsOneOrMoreValues<T>(IEnumerable<T> array, EqualityComparison<T> comparison, out bool containsMoreThanOneValue, T[] values)
 
         {
+
+            if (array == null)
+
+                throw new ArgumentNullException(nameof(array));
 
             bool matchFound = false;
 
@@ -1646,7 +1682,7 @@ namespace WinCopies.Util
 
                 foreach (T _value in values)
 
-                    if (comparisonDelegate(value, _value))
+                    if (comparison(value, _value))
 
                     {
 
@@ -1743,15 +1779,19 @@ namespace WinCopies.Util
 
         #region ContainsOneOrMoreValues without notification whether contains more than one values overloads
 
-        private static bool ContainsOneOrMoreValues<T>(IEnumerable<T> array, Func<T, T, bool> comparisonDelegate, T[] values)
+        public static bool ContainsOneOrMoreValues<T>(IEnumerable<T> array, EqualityComparison<T> comparison, T[] values)
 
         {
+
+            if (array == null)
+
+                throw new ArgumentNullException(nameof(array));
 
             foreach (T value in array)
 
                 foreach (T _value in values)
 
-                    if (comparisonDelegate(value, _value))
+                    if (comparison(value, _value))
 
                         return true;
 
@@ -1828,9 +1868,13 @@ namespace WinCopies.Util
 
         #region Contains array overloads
 
-        private static bool Contains<T>(IEnumerable<T> array, Func<T, T, bool> comparisonDelegate, T[] values)
+        public static bool Contains<T>(IEnumerable<T> array, EqualityComparison<T> comparison, T[] values)
 
         {
+
+            if (array == null)
+
+                throw new ArgumentNullException(nameof(array));
 
             bool matchFound;
 
@@ -1842,7 +1886,7 @@ namespace WinCopies.Util
 
                 foreach (T _value in values)
 
-                    if (comparisonDelegate(value, _value))
+                    if (comparison(value, _value))
 
                     {
 
@@ -1939,29 +1983,29 @@ namespace WinCopies.Util
 
             var stringBuilder = new StringBuilder();
 
-            array.ToString(stringBuilder, parseSubEnumerables, parseStrings);
+            array.ToString(ref stringBuilder, parseSubEnumerables, parseStrings);
 
             return stringBuilder.ToString(0, stringBuilder.Length - 2);
 
         }
 
-        private static void ToString(this IEnumerable array, StringBuilder stringBuilder, bool parseSubEnumerables, bool parseStrings = false)
+        static void Append(object _value, ref StringBuilder stringBuilder, bool parseStrings, bool parseSubEnumerables)
 
         {
 
-            void append(object _value)
+            if ((_value is string && parseStrings) || (!(_value is string) && _value is IEnumerable && parseSubEnumerables))
 
-            {
+                ((IEnumerable)_value).ToString(ref stringBuilder, true);
 
-                if ((_value is string && parseStrings) || (!(_value is string) && _value is IEnumerable && parseSubEnumerables))
+            else
 
-                    ((IEnumerable)_value).ToString(stringBuilder, true);
+                _ = stringBuilder.AppendFormat("{0}, ", _value?.ToString());
 
-                else
+        }
 
-                    _ = stringBuilder.AppendFormat("{0}, ", _value?.ToString());
+        private static void ToString(this IEnumerable array, ref StringBuilder stringBuilder, bool parseSubEnumerables, bool parseStrings = false)
 
-            }
+        {
 
             _ = stringBuilder.Append("{");
 
@@ -1975,13 +2019,13 @@ namespace WinCopies.Util
 
                 atLeastOneLoop = true;
 
-                append(enumerator.Current);
+                Append(enumerator.Current, ref stringBuilder, parseStrings, parseSubEnumerables);
 
             }
 
             while (enumerator.MoveNext())
 
-                append(enumerator.Current);
+                Append(enumerator.Current, ref stringBuilder, parseStrings, parseSubEnumerables);
 
             if (atLeastOneLoop)
 
@@ -2086,7 +2130,7 @@ namespace WinCopies.Util
 
         }
 
-        public static bool CheckPropertySetIntegrity(Type propertyObjectType, string propertyName, out string methodName, int skipFramesForStackFrame, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+        public static bool CheckPropertySetIntegrity(Type propertyObjectType, string propertyName, out string methodName, int skipFrames, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
 
@@ -2096,7 +2140,7 @@ namespace WinCopies.Util
 
                 throw new ArgumentException(string.Format(FieldOrPropertyNotFound, propertyName, propertyObjectType));
 
-            MethodBase method = new StackFrame(skipFramesForStackFrame).GetMethod();
+            MethodBase method = new StackFrame(skipFrames).GetMethod();
 
             methodName = method.Name;
 
@@ -2174,6 +2218,7 @@ namespace WinCopies.Util
 
         }
 
+        [Obsolete("This method has been replaced by the same method without the redundant 'performIntegrityCheck' parameter and will be removed in later versions.")]
         public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
 
         public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
@@ -2554,6 +2599,7 @@ namespace WinCopies.Util
             if (command.CanExecute(commandParameter, commandTarget))
 
             {
+
                 // try
                 // {
 
@@ -2633,6 +2679,8 @@ namespace WinCopies.Util
             return (T)source;
 
         }
+
+        #region String extension methods
 
         // todo: add other methods and overloads for StringComparison, IEqualityComparer<char>, Comparer<char>, Comparison<char>, ignore case and CultureInfo parameters
 
@@ -2762,6 +2810,26 @@ namespace WinCopies.Util
         }
 
         public static bool StartsWith(this string s, char value) => s[0] == value;
+        
+        public static string ToStringWithoutAccents( this string s)
+
+        {
+
+            var currentNormalized = string.Empty;
+
+            s = s.Normalize(System.Text.NormalizationForm.FormD);
+
+            foreach (char c in s)
+
+                if (char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+
+                    currentNormalized += c;
+
+            return currentNormalized.Normalize(System.Text.NormalizationForm.FormC);
+
+        }
+
+        #endregion
 
     }
 }

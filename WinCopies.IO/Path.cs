@@ -135,9 +135,13 @@ namespace WinCopies.IO
 
                             {
 
+#if DEBUG
+
                                 Debug.WriteLine(_shellObject.GetDisplayName(DisplayNameType.RelativeToParent));
 
-                                if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, paths[i], _shellObject.Name, _shellObject.GetDisplayName(DisplayNameType.RelativeToParent)))
+#endif
+
+                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, paths[i], _shellObject.Name, _shellObject.GetDisplayName(DisplayNameType.RelativeToParent)))
 
                                 {
 
@@ -218,24 +222,6 @@ namespace WinCopies.IO
             else
 
                 return checkFilters(filter.Split('*'));
-
-        }
-
-        public static string GetNormalizedPath(string path)
-
-        {
-
-            var currentFile_Normalized = string.Empty;
-
-            path = path.Normalize(System.Text.NormalizationForm.FormD);
-
-            foreach (char ch in path)
-
-                if (char.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark)
-
-                    currentFile_Normalized += ch;
-
-            return currentFile_Normalized.Normalize(System.Text.NormalizationForm.FormC);
 
         }
 

@@ -7,6 +7,7 @@ using BackgroundWorker = WinCopies.Util.BackgroundWorker;
 using System.Collections.Generic;
 using System.Threading;
 using WinCopies.Collections;
+using System.Globalization;
 
 namespace WinCopies.IO
 {
@@ -30,8 +31,11 @@ namespace WinCopies.IO
     {
 
         private readonly BackgroundWorker backgroundWorker = new BackgroundWorker();
+        private readonly IComparer<IFileSystemObject> _browsableObjectInfoComparer;
+        private readonly BrowsableObjectInfo _path;
+        private readonly IEnumerable<string> _filter;
 
-        private readonly BrowsableObjectInfo _path = null;
+        public IComparer<IFileSystemObject> BrowsableObjectInfoComparer { get => _browsableObjectInfoComparer; set => this.SetBackgroundWorkerProperty(nameof(BrowsableObjectInfoComparer), nameof(_browsableObjectInfoComparer), value, typeof(FolderLoader), true); }
 
         //public void changePath(IBrowsableObjectInfo newValue)
 
@@ -71,16 +75,7 @@ namespace WinCopies.IO
             }
         }
 
-        private readonly IEnumerable<string> _filter = null;
-
-        public IEnumerable<string> Filter
-        {
-
-            get => _filter;
-
-            set => this.SetBackgroundWorkerProperty(nameof(Filter), nameof(_filter), value, typeof(BrowsableObjectInfoItemsLoader), true);
-
-        }
+        public IEnumerable<string> Filter { get => _filter; set => this.SetBackgroundWorkerProperty(nameof(Filter), nameof(_filter), value, typeof(BrowsableObjectInfoItemsLoader), true); }
 
         /// <summary>
         /// Gets a value that indicates whether the thread is busy.
@@ -151,12 +146,14 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
         /// </summary>
-        public BrowsableObjectInfoItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation)
+        public BrowsableObjectInfoItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> browsableObjectItemComparer)
         {
 
             WorkerReportsProgress = workerReportsProgress;
 
             WorkerSupportsCancellation = workerSupportsCancellation;
+
+            BrowsableObjectInfoComparer = browsableObjectItemComparer;
 
             ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
 
@@ -331,6 +328,47 @@ namespace WinCopies.IO
         public void Resume() => backgroundWorker.Resume();
 
         protected virtual void OnAddingPath(IBrowsableObjectInfo path) => (Path as BrowsableObjectInfo)?.items.Add(path);
+    }
+
+
+
+    public sealed class FileSystemObjectComparer : Comparer<IFileSystemObject>
+
+    {
+
+        private static FileSystemObjectComparer instance = null;
+
+        private static readonly object mylock = new object();
+
+        public StringComparer StringComparer { get; set; }
+
+        private FileSystemObjectComparer() : this(StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
+
+        private FileSystemObjectComparer(StringComparer stringComparer) => StringComparer = stringComparer;
+
+        public static FileSystemObjectComparer GetInstance()
+        {
+            StringComparer.
+            if (instance == null)
+
+                lock (mylock)
+
+                    if (instance == null)
+
+                        instance = new FileSystemObjectComparer();
+
+            return instance;
+
+        }
+
+        public override int Compare(IFileSystemObject x, IFileSystemObject y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
+                ? StringComparer.Compare(IO.Path.GetNormalizedPath(x.LocalizedName), Path.GetNormalizedPath(y.LocalizedName))
+                : (x.FileType == FileType.Folder || x.FileType == FileType.Drive) && (y.FileType == FileType.File || y.FileType == FileType.Archive || y.FileType == FileType.Link)
+                ? -1
+                : (x.FileType == FileType.File || x.FileType == FileType.Archive || x.FileType == FileType.Link) && (y.FileType == FileType.Folder || y.FileType == FileType.Drive)
+                ? 1
+                : 0;
+
     }
 
 }

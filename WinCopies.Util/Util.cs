@@ -11,6 +11,10 @@ namespace WinCopies.Util
 {
     public delegate int Comparison(object x, object y);
 
+    public delegate bool EqualityComparison(object x, object y);
+
+    public delegate bool EqualityComparison<T>(T x, T y);
+
     public delegate bool Predicate(object value);
 
     public static class Util
@@ -194,29 +198,29 @@ namespace WinCopies.Util
 
         }
 
-        private static void ThrowOnInvalidEqualityIfMethodArg(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Type valueType, IEqualityComparer equalityComparer)
+        private static void ThrowOnInvalidEqualityIfMethodArg(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Type valueType, EqualityComparison comparisonDelegate)
 
         {
 
             ThrowOnInvalidEqualityIfMethodEnumValue(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual && equalityComparer != null)
+            if (comparison == Comparison.ReferenceEqual && comparisonDelegate != null)
 
-                throw new ArgumentException($"{nameof(equalityComparer)} have to be set to null in order to use this method with the {nameof(Comparison.ReferenceEqual)} enum value.");
+                throw new ArgumentException($"{nameof(comparisonDelegate)} have to be set to null in order to use this method with the {nameof(Comparison.ReferenceEqual)} enum value.");
 
             if (comparison == Comparison.ReferenceEqual && !valueType.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
 
         }
 
-        private static void ThrowOnInvalidEqualityIfMethodArg<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<T> equalityComparer)
+        private static void ThrowOnInvalidEqualityIfMethodArg<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, EqualityComparison<T> comparisonDelegate)
 
         {
 
             ThrowOnInvalidEqualityIfMethodEnumValue(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual && equalityComparer != null)
+            if (comparison == Comparison.ReferenceEqual && comparisonDelegate != null)
 
-                throw new ArgumentException($"{nameof(equalityComparer)} have to be set to null in order to use this method with the {nameof(Comparison.ReferenceEqual)} enum value.");
+                throw new ArgumentException($"{nameof(comparisonDelegate)} have to be set to null in order to use this method with the {nameof(Comparison.ReferenceEqual)} enum value.");
 
             if (comparison == Comparison.ReferenceEqual && !typeof(T).IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
 
@@ -264,7 +268,7 @@ namespace WinCopies.Util
             }
         }
 
-        private static bool CheckEqualityComparison(Comparison comparison, object value, object valueToCompare, bool predicateResult, IEqualityComparer equalityComparer)
+        private static bool CheckEqualityComparison(Comparison comparison, object value, object valueToCompare, bool predicateResult, EqualityComparison comparisonDelegate)
         {
 
             if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
@@ -275,11 +279,11 @@ namespace WinCopies.Util
 
                 case WinCopies.Util.Util.Comparison.Equal:
 
-                    return predicateResult && equalityComparer.Equals(value, valueToCompare);
+                    return predicateResult && comparisonDelegate(value, valueToCompare);
 
                 case Comparison.NotEqual:
 
-                    return !predicateResult && !equalityComparer.Equals(value, valueToCompare);
+                    return !predicateResult && !comparisonDelegate(value, valueToCompare);
 
                 case Comparison.ReferenceEqual:
 
@@ -295,7 +299,7 @@ namespace WinCopies.Util
 
         }
 
-        private static bool CheckEqualityComparison<T>(Comparison comparison, T value, T valueToCompare, bool predicateResult, IEqualityComparer<T> equalityComparer)
+        private static bool CheckEqualityComparison<T>(Comparison comparison, T value, T valueToCompare, bool predicateResult, EqualityComparison<T> comparisonDelegate)
         {
 
             // Because we've already checked that for the 'T' type in the 'If' method and assuming that 'T' is the base type of all the values to test, if 'T' is actually a class, we don't need to check here if the type of the current value is actually a class when comparison is set to ReferenceEqual.
@@ -306,11 +310,11 @@ namespace WinCopies.Util
 
                 case WinCopies.Util.Util.Comparison.Equal:
 
-                    return predicateResult && equalityComparer.Equals(value, valueToCompare);
+                    return predicateResult && comparisonDelegate(value, valueToCompare);
 
                 case Comparison.NotEqual:
 
-                    return !predicateResult && !equalityComparer.Equals(value, valueToCompare);
+                    return !predicateResult && !comparisonDelegate(value, valueToCompare);
 
                 case Comparison.ReferenceEqual:
 
@@ -1596,8 +1600,6 @@ namespace WinCopies.Util
 
         }
 
-        // todo: factoriser au maximum
-
         #region Non generic methods
 
         #region Comparisons without key notification
@@ -1664,27 +1666,19 @@ namespace WinCopies.Util
         }
 
         [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, IEqualityComparer, Predicate, object, params object[])")]
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, Predicate<object> predicate, object value, params object[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, Predicate<object> predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, equalityComparer, new Predicate(o => predicate(o)), value, values);
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, Predicate predicate, object value, params object[] values) => equalityComparer == null ? If(comparisonType, comparisonMode, comparison, (EqualityComparison)null, predicate, value, values) : If(comparisonType, comparisonMode, comparison, (object x, object y) => equalityComparer.Equals(x, y), predicate, value, values);
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, EqualityComparison comparisonDelegate, Predicate predicate, object value, params object[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfValuesEnumerable(values, (object _value) => predicate(_value)));
-
-        }
-
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, Predicate predicate, object value, params object[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
-
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfValuesEnumerable(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), new IfValuesEnumerable(values, predicate));
 
         }
 
@@ -1715,15 +1709,17 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, object value, params KeyValuePair<object, Func<bool>>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, object value, params KeyValuePair<object, Func<bool>>[] values) => equalityComparer == null ? If(comparisonType, comparisonMode, comparison, (EqualityComparison)null, value, values) : If(comparisonType, comparisonMode, comparison, new EqualityComparison((object x, object y) => equalityComparer.Equals(x, y)), value, values);
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, EqualityComparison comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values)
 
         {
 
             // First, we check if comparisonType and comparison are in the required value range.
 
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfKeyValuePairEnumerable(values));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), new IfKeyValuePairEnumerable(values));
 
         }
 
@@ -1767,17 +1763,7 @@ namespace WinCopies.Util
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IComparer comparer, Predicate predicate, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
 
         [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, WinCopies.Util.Comparison, Predicate, object, params KeyValuePair<object, object>[])")]
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
-
-        {
-
-            // First, we check if comparisonType and comparison are in the required value range.
-
-            ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
-
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyValuesEnumerable(values, (object _value) => predicate(_value)));
-
-        }
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, new WinCopies.Util.Comparison((object x, object y) => comparisonDelegate(x, y)), new Predicate(o => predicate(o)), value, values);
 
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, WinCopies.Util.Comparison comparisonDelegate, Predicate predicate, object value, params KeyValuePair<object, object>[] values)
 
@@ -1792,23 +1778,17 @@ namespace WinCopies.Util
         }
 
         [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, IEqualityComparer, Predicate, object, params KeyValuePair<object, object>[])")]
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, equalityComparer, new Predicate(o => predicate(o)), value, values);
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, Predicate predicate, object value, params KeyValuePair<object, object>[] values) => equalityComparer == null ? If(comparisonType, comparisonMode, comparison, out key, (EqualityComparison)null, predicate, value, values) : If(comparisonType, comparisonMode, comparison, out key, (object x, object y) => equalityComparer.Equals(x, y), predicate, value, values);
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, EqualityComparison comparisonDelegate, Predicate predicate, object value, params KeyValuePair<object, object>[] values)
 
         {
 
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyValuesEnumerable(values, (object _value) => predicate(_value)));
-
-        }
-
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, Predicate predicate, object value, params KeyValuePair<object, object>[] values)
-
-        {
-
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
-
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyValuesEnumerable(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), out key, new IfKeyValuesEnumerable(values, predicate));
 
         }
 
@@ -1839,13 +1819,15 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, IEqualityComparer equalityComparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values) => equalityComparer == null ? If(comparisonType, comparisonMode, comparison, out key, (EqualityComparison)null, value, values) : If(comparisonType, comparisonMode, comparison, out key, new EqualityComparison((object x, object y) => equalityComparer.Equals(x, y)), value, values);
+
+        public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out object key, EqualityComparison comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
 
         {
 
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), equalityComparer);
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyKeyValuePairEnumerable(values));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), out key, new IfKeyKeyValuePairEnumerable(values));
 
         }
 
@@ -1891,13 +1873,15 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<T> equalityComparer, Predicate<T> predicate, T value, params T[] values)
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<T> equalityComparer, Predicate<T> predicate, T value, params T[] values) => equalityComparer == null ? If(comparisonType, comparisonMode, comparison, (EqualityComparison<T>)null, predicate, value, values) : If(comparisonType, comparisonMode, comparison, (T x, T y) => equalityComparer.Equals(x, y), predicate, value, values);
+
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, EqualityComparison<T> comparisonDelegate, Predicate<T> predicate, T value, params T[] values)
 
         {
 
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, equalityComparer);
+            ThrowOnInvalidEqualityIfMethodArg<T>(comparisonType, comparisonMode, comparison, comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfValuesEnumerable<T>(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), new IfValuesEnumerable<T>(values, predicate));
 
         }
 
@@ -1915,13 +1899,15 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<T> equalityComparer, T value, params KeyValuePair<T, Func<bool>>[] values)
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer<T> equalityComparer, T value, params KeyValuePair<T, Func<bool>>[] values) => equalityComparer == null ? If(comparisonType, comparisonMode, comparison, (EqualityComparison<T>)null, value, values) : If(comparisonType, comparisonMode, comparison, (T x, T y) => equalityComparer.Equals(x, y), value, values);
+
+        public static bool If<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, EqualityComparison<T> comparisonDelegate, T value, params KeyValuePair<T, Func<bool>>[] values)
 
         {
 
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, equalityComparer);
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), new IfKeyValuePairEnumerable<T>(values));
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), new IfKeyValuePairEnumerable<T>(values));
 
         }
 
@@ -1963,13 +1949,15 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IEqualityComparer<TValue> equalityComparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IEqualityComparer<TValue> equalityComparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values) => equalityComparer == null ? If(comparisonType, comparisonMode, comparison, out key, (EqualityComparison<TValue>)null, predicate, value, values) : If(comparisonType, comparisonMode, comparison, out key, (TValue x, TValue y) => equalityComparer.Equals(x, y), predicate, value, values);
+
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, EqualityComparison<TValue> comparisonDelegate, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
 
         {
 
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, equalityComparer);
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyValuesEnumerable<TKey, TValue>(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), out key, new IfKeyValuesEnumerable<TKey, TValue>(values, predicate));
 
         }
 
@@ -1985,13 +1973,15 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IEqualityComparer<TValue> equalityComparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, IEqualityComparer<TValue> equalityComparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values) => equalityComparer == null ? If(comparisonType, comparisonMode, comparison, out key, (EqualityComparison<TValue>)null, value, values) : If(comparisonType, comparisonMode, comparison, out key, (TValue x, TValue y) => equalityComparer.Equals(x, y), value, values);
+
+        public static bool If<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, out TKey key, EqualityComparison<TValue> comparisonDelegate, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
 
         {
 
-            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, equalityComparer);
+            ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), equalityComparer), out key, new IfKeyKeyValuePairEnumerable<TKey, TValue>(values));
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), out key, new IfKeyKeyValuePairEnumerable<TKey, TValue>(values));
 
         }
 
