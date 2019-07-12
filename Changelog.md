@@ -26,6 +26,7 @@ WinCopies.Util (1.4)
 --------------------
 
 - The BackgroundWorker class now resets its properties in background.
+- The 'If' methods perform a real 'xor' comparison in binary mode and are now faster.
 - The redundant 'performIntegrityCheck' parameter in one of the 'SetProperty' methods has been removed.
 - 'SetField' static method added.
 - The view model classes now have the OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
