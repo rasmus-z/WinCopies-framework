@@ -144,7 +144,7 @@ namespace Microsoft.Shell
         APP = 0x8000,
     }
 
-    [Obsolete("These methods has been replaced by the same methods of the version 1.1.0 of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
+    [Obsolete("These methods have been replaced by the same methods of the version 1.1.0 of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
     [SuppressUnmanagedCodeSecurity]
     public static class NativeMethods
     {

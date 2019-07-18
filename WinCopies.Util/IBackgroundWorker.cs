@@ -3,6 +3,11 @@ using System.Threading;
 
 namespace WinCopies.Util
 {
+
+    ///// <para>FR: Représente un BackgroundWorker qui s'exécute par défaut dans un thread MTA et qui arrête automatiquement l'exécution en arrière-plan lors d'un rapport du progrès.</para>
+    /// <summary>
+    /// Represents a BackgroundWorker that runs in a MTA thread by default and automatically stops on background when reports progress.
+    /// </summary>
     public interface IBackgroundWorker : IComponent
     {
 

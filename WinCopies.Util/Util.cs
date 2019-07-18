@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
+using WinCopies.Util;
 using static WinCopies.Util.Generic;
 
 namespace WinCopies.Util
@@ -1051,18 +1053,19 @@ namespace WinCopies.Util
         /// Performs a comparison by testing a value compared to an array of values.
         /// </summary>
         /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
-        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison</param>
-        /// <param name="comparison">The comparison type</param>
+        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison.</param>
+        /// <param name="comparison">Whether to perform an equality or an inequality comparison, and, if to perform an inequality comparison, the type of the inequality comparison to perform.</param>
         /// <param name="value">The value to compare the values of the table with.</param>
         /// <param name="values">The values to compare.</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, (IEqualityComparer)EqualityComparer<object>.Default, GetCommonPredicate(), value, values);
 
         /// <summary>
-        /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
+        /// Performs a comparison by testing a value compared to an array of values using a custom <see cref="IComparer{T}"/> and <see cref="Predicate{T}"/>.
         /// </summary>
         /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
-        /// <param name="comparison">The comparison type</param>
+        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison.</param>
+        /// <param name="comparison">Whether to perform an equality or an inequality comparison, and, if to perform an inequality comparison, the type of the inequality comparison to perform.</param>
         /// <param name="comparer">The comparer used to compare the values.</param>
         /// <param name="value">The value to compare with.</param>
         /// <param name="values">The values to compare.</param>
@@ -1072,10 +1075,11 @@ namespace WinCopies.Util
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, Predicate<object> predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
 
         /// <summary>
-        /// Performs a comparison by testing a value compared to an array of objects or values using a custom <see cref="IComparer{Object}"/> and <see cref="Predicate{Object}"/>.
+        /// Performs a comparison by testing a value compared to an array of values using a custom <see cref="IComparer"/> and <see cref="Predicate"/>.
         /// </summary>
         /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
-        /// <param name="comparison">The comparison type</param>
+        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison.</param>
+        /// <param name="comparison">Whether to perform an equality or an inequality comparison, and, if to perform an inequality comparison, the type of the inequality comparison to perform.</param>
         /// <param name="comparer">The comparer used to compare the values.</param>
         /// <param name="value">The value to compare with.</param>
         /// <param name="values">The values to compare.</param>
@@ -1083,9 +1087,31 @@ namespace WinCopies.Util
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IComparer comparer, Predicate predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
 
+        /// <summary>
+        /// Performs a comparison by testing a value compared to an array of values using a custom <see cref="Comparison{T}"/> and <see cref="Predicate{T}"/>.
+        /// </summary>
+        /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
+        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison.</param>
+        /// <param name="comparison">Whether to perform an equality or an inequality comparison, and, if to perform an inequality comparison, the type of the inequality comparison to perform.</param>
+        /// <param name="comparisonDelegate">The comparison delegate used to compare the values.</param>
+        /// <param name="value">The value to compare with.</param>
+        /// <param name="values">The values to compare.</param>
+        /// <param name="predicate">The comparison predicate</param>
+        /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
         [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, WinCopies.Util.Comparison, Predicate, object, params object[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Util.Comparison((object x, object y) => comparisonDelegate(x, y)), new Predicate(o => predicate(o)), value, values);
 
+        /// <summary>
+        /// Performs a comparison by testing a value compared to an array of values using a custom <see cref="WinCopies.Util.Comparison"/> and <see cref="Predicate"/>.
+        /// </summary>
+        /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
+        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison.</param>
+        /// <param name="comparison">Whether to perform an equality or an inequality comparison, and, if to perform an inequality comparison, the type of the inequality comparison to perform.</param>
+        /// <param name="comparisonDelegate">The comparison delegate used to compare the values.</param>
+        /// <param name="value">The value to compare with.</param>
+        /// <param name="values">The values to compare.</param>
+        /// <param name="predicate">The comparison predicate</param>
+        /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, WinCopies.Util.Comparison comparisonDelegate, Predicate predicate, object value, params object[] values)
 
         {
@@ -1098,11 +1124,44 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Performs a comparison by testing a value compared to an array of values using a custom <see cref="IComparer"/> and <see cref="Predicate{T}"/>.
+        /// </summary>
+        /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
+        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison.</param>
+        /// <param name="comparison">Whether to perform an equality or an inequality comparison, and, if to perform an inequality comparison, the type of the inequality comparison to perform.</param>
+        /// <param name="equalityComparer">The equality comparer used to compare the values.</param>
+        /// <param name="value">The value to compare with.</param>
+        /// <param name="values">The values to compare.</param>
+        /// <param name="predicate">The comparison predicate</param>
+        /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
         [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, IEqualityComparer, Predicate, object, params object[])")]
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, Predicate<object> predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, equalityComparer, new Predicate(o => predicate(o)), value, values);
 
+        /// <summary>
+        /// Performs a comparison by testing a value compared to an array of values using a custom <see cref="IComparer"/> and <see cref="Predicate"/>.
+        /// </summary>
+        /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
+        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison.</param>
+        /// <param name="comparison">Whether to perform an equality or an inequality comparison, and, if to perform an inequality comparison, the type of the inequality comparison to perform.</param>
+        /// <param name="equalityComparer">The equality comparer used to compare the values.</param>
+        /// <param name="value">The value to compare with.</param>
+        /// <param name="values">The values to compare.</param>
+        /// <param name="predicate">The comparison predicate</param>
+        /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, IEqualityComparer equalityComparer, Predicate predicate, object value, params object[] values) => equalityComparer == null ? If(comparisonType, comparisonMode, comparison, (EqualityComparison)null, predicate, value, values) : If(comparisonType, comparisonMode, comparison, (object x, object y) => equalityComparer.Equals(x, y), predicate, value, values);
 
+        /// <summary>
+        /// Performs a comparison by testing a value compared to an array of values using a custom <see cref="EqualityComparison"/> and <see cref="Predicate"/>.
+        /// </summary>
+        /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
+        /// <param name="comparisonMode">Whether to perform a binary or a logical comparison.</param>
+        /// <param name="comparison">Whether to perform an equality or an inequality comparison, and, if to perform an inequality comparison, the type of the inequality comparison to perform.</param>
+        /// <param name="comparisonDelegate">The comparison delegate used to compare the values.</param>
+        /// <param name="value">The value to compare with.</param>
+        /// <param name="values">The values to compare.</param>
+        /// <param name="predicate">The comparison predicate</param>
+        /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
         public static bool If(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, EqualityComparison comparisonDelegate, Predicate predicate, object value, params object[] values)
 
         {
@@ -1530,13 +1589,18 @@ namespace WinCopies.Util
         /// <returns>A <see cref="bool"/> value that indicates whether the <see cref="string"/> given is a <see cref="decimal"/>.</returns>
         public static bool IsNumeric(string s, out decimal d) => decimal.TryParse(s, out d);
 
+        /// <summary>
+        /// Get all the flags in a flags enum.
+        /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
+        /// <returns>All the flags in the given enum type.</returns>
         public static T GetAllEnumFlags<T>() where T : Enum
 
         {
 
             Type enumType = typeof(T);
 
-            if (enumType.GetCustomAttributes<FlagsAttribute>().ToArray().Length == 0)
+            if (enumType.GetCustomAttribute<FlagsAttribute>() == null)
 
                 throw new ArgumentException("Enum is not a 'flags' enum.");
 
@@ -1552,5 +1616,98 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Gets the numeric value for a field in an enum.
+        /// </summary>
+        /// <param name="enumType">The enum type in which to look for the specified enum field value.</param>
+        /// <param name="fieldName">The enum field to look for.</param>
+        /// <returns>The numeric value corresponding to this enum, in the given enum type underlying type.</returns>
+        public static object GetNumValue(Type enumType, string fieldName) => enumType.IsEnum ? Convert.ChangeType(enumType.GetField(fieldName).GetValue(null), Enum.GetUnderlyingType(enumType)) : throw new ArgumentException("'enumType' is not an enum type.");
+
     }
+
+    public class EnumComparer : IComparer<Enum>
+
+    {
+        public int Compare(Enum x, object y)
+        {
+
+            if (Util.IsNumber(y))
+
+            {
+
+                object o = x.GetNumValue();
+
+                if (o is sbyte sb) return sb.CompareTo(y);
+
+                else if (o is byte b) return b.CompareTo(y);
+
+                else if (o is short s) return s.CompareTo(y);
+
+                else if (o is ushort us) return us.CompareTo(y);
+
+                else if (o is int i) return i.CompareTo(y);
+
+                else if (o is uint ui) return ui.CompareTo(y);
+
+                else if (o is long l) return l.CompareTo(y);
+
+                else if (o is ulong ul) return ul.CompareTo(y);
+
+                else
+
+                // We shouldn't reach this point.
+
+                return 0;
+
+            }
+
+            else
+
+            throw new ArgumentException("'y' is not from a numeric type.");
+
+        }
+
+        public int Compare(object x, Enum y)
+        {
+
+            if (Util.IsNumber(x))
+
+            {
+
+                object o = y. GetNumValue();
+
+                if (o is sbyte sb) return - sb.CompareTo(x);
+
+                else if (o is byte b) return - b.CompareTo(x);
+
+                else if (o is short s) return - s.CompareTo(x);
+
+                else if (o is ushort us) return - us.CompareTo(x);
+
+                else if (o is int i) return - i.CompareTo(x);
+
+                else if (o is uint ui) return - ui.CompareTo(x);
+
+                else if (o is long l) return - l.CompareTo(x);
+
+                else if (o is ulong ul) return - ul.CompareTo(x);
+
+                else
+
+                // We shouldn't reach this point.
+
+                return 0;
+
+            }
+
+            else
+
+            throw new ArgumentException("'x' is not from a numeric type.");
+
+        }
+
+        public int Compare(Enum x, Enum y) => x.CompareTo(y);
+    }
+
 }

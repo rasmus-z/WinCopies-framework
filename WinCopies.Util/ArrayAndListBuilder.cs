@@ -453,11 +453,9 @@ namespace WinCopies.Util
 
             var result = new ArrayList(InnerList.Count);
 
-            int i = 0;
-
             foreach (T item in InnerList)
 
-                result.Add(item);
+                _ = result.Add(item);
 
             return result;
 
@@ -472,8 +470,6 @@ namespace WinCopies.Util
         {
 
             var result = new List<T>(Count);
-
-            int i = 0;
 
             foreach (T item in InnerList)
 

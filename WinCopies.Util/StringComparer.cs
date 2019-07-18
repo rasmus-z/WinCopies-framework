@@ -1,4 +1,4 @@
-﻿#if DEBUG
+﻿#if STRINGCOMPARER
 
 using System;
 using System.Collections;

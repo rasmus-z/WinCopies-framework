@@ -1049,10 +1049,12 @@ namespace WinCopies.Util
 
         }
 
-        // todo: to add null checks, out-of-range checks, ...
+        // todo: adding null checks, out-of-range checks, ...
+
+        // todo: adding same methods for arrays
 
         /// <summary>
-        /// Removes multiple items in an <see cref="ICollection"/> collection, from a given start index for a given length.
+        /// Removes multiple items in an <see cref="IList"/> collection, from a given start index for a given length.
         /// </summary>
         /// <param name="collection">The collection from which remove the items.</param>
         /// <param name="start">The start index in the collection from which delete the items.</param>
@@ -2054,7 +2056,7 @@ namespace WinCopies.Util
 
             foreach (Type type in types)
 
-                if (typeEquality ? objType == type : objType.IsAssignableFrom(type))
+                if (typeEquality ? objType == type : type.IsAssignableFrom(objType))
 
                     return true;
 
@@ -2325,72 +2327,46 @@ namespace WinCopies.Util
                 ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj))
                 : obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
 
-        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
+                ? throwIfBusy ? (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj)) : throw new InvalidOperationException(BackgroundWorkerIsBusy)
+                : obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
 
-        {
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
+                ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj))
+                : obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
 
-            if (obj.IsBusy)
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
+                ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj))
+                : obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
 
-            {
+        /// <summary>
+        /// Gets the numeric value for an enum.
+        /// </summary>
+        /// <param name="enum">The enum for which get the corresponding numeric value.</param>
+        /// <param name="enumName">Not used.</param>
+        /// <returns>The numeric value corresponding to this enum, in the given enum type underlying type.</returns>
+        [Obsolete("This method has been replaced by the GetNumValue(this Enum @enum) and the WinCopies.Util.GetNumValue(Type enumType, string fieldName) methods and will be removed in later versions.")]
+        public static object GetNumValue(this Enum @enum, string enumName) => @enum.GetNumValue();
 
-                if (throwIfBusy)
+        // todo: IFormatProvider
 
-                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
-
-                return (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj));
-
-            }
-
-            return obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
-
-        }
-
-        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
-
-        {
-
-            if (obj.IsBusy)
-
-            {
-
-                if (throwIfBusy)
-
-                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
-
-                return (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj));
-
-            }
-
-            return obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
-
-        }
-
-        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
-
-        {
-
-            if (obj.IsBusy)
-
-            {
-
-                if (throwIfBusy)
-
-                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
-
-                return (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj));
-
-            }
-
-            return obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
-
-        }
-
-        public static object GetNumValue(this Enum @enum, string enumName) => Convert.ChangeType(@enum.GetType().GetField(enumName).GetValue(@enum), Enum.GetUnderlyingType(@enum.GetType()));
+        /// <summary>
+        /// Gets the numeric value for an enum.
+        /// </summary>
+        /// <param name="enum">The enum for which get the corresponding numeric value.</param>
+        /// <returns>The numeric value corresponding to this enum, in the given enum type underlying type.</returns>
+        public static object GetNumValue(this Enum @enum) => Convert.ChangeType(@enum, Enum.GetUnderlyingType(@enum.GetType()));
 
         // public static object GetNumValue(this Enum @enum) => GetNumValue(@enum, @enum.ToString());
 
         // todo : to test if Math.Log(Convert.ToInt64(flagsEnum), 2) == 'SomeInt64'; (no float, double ...) would be faster.
 
+        /// <summary>
+        /// Determines whether an enum has multiple flags.
+        /// </summary>
+        /// <param name="flagsEnum">The enum to check.</param>
+        /// <returns><see langword="true"/> if <b>flagsEnum</b> type has the <see cref="FlagsAttribute"/> and has multiple flags; otherwise, <see langword="false"/>.</returns>
+        /// <remarks><b>flagsEnum</b> type must have the <see cref="FlagsAttribute"/>.</remarks>
         public static bool HasMultipleFlags(this Enum flagsEnum)
 
         {
@@ -2419,15 +2395,15 @@ namespace WinCopies.Util
 
 
 
-                if (enumValue.GetNumValue(s).Equals(0)) continue;
+                if (enumValue.GetNumValue().Equals(0)) continue;
 
 
 
                 if (flagsEnum.HasFlag(enumValue))
 
-                    if (!alreadyFoundAFlag) alreadyFoundAFlag = true;
+                    if (alreadyFoundAFlag) return true;
 
-                    else return true;
+                    else alreadyFoundAFlag = true;
 
             }
 
@@ -2436,10 +2412,15 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Determines whether the current enum value is within the enum values range.
+        /// Determines whether the current enum value is within the enum values range delimited by the first and the last fields; see the Remarks section for more information.
         /// </summary>
         /// <param name="enum">The enum value to check.</param>
         /// <returns><see langword="true"/> if the given value is in the enum values range, otherwise <see langword="false"/>.</returns>
+        /// <remarks>This method doesn't read all the enum fields, but only takes care of the first and last numeric enum fields, so if the value is 1, and the enum has only defined fields for 0 and 2, this method still returns <see langword="true"/>. For a method that actually reads all the enum fields, see the <see cref="Type.IsEnumDefined(object)"/> method.</remarks>
+        /// <seealso cref="ThrowIfNotValidEnumValue(Enum)"/>
+        /// <seealso cref="ThrowIfNotDefinedEnumValue(Enum)"/>
+        /// <seealso cref="ThrowIfNotValidEnumValue(Enum, string)"/>
+        /// <seealso cref="ThrowIfNotDefinedEnumValue(Enum, string)"/>
         public static bool IsValidEnumValue(this Enum @enum)
 
         {
@@ -2454,11 +2435,189 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Throws an <see cref="InvalidOperationException"/> if the enum value is not in the required enum value range. See the Remarks section.
+        /// </summary>
+        /// <param name="enum">The enum value to check.</param>
+        /// <remarks>This method doesn't read all the enum fields, but only takes care of the first and last numeric enum fields, so if the value is 1, and the enum has only defined fields for 0 and 2, this method still doesn't throw. For a method that actually reads all the enum fields, see the <see cref="ThrowIfNotDefinedEnumValue(Enum)"/> method.</remarks>
+        /// <seealso cref="IsValidEnumValue(Enum)"/>
+        /// <seealso cref="ThrowIfNotValidEnumValue(Enum, string)"/>
         public static void ThrowIfNotValidEnumValue(this Enum @enum)
 
         {
 
             if (!@enum.IsValidEnumValue()) throw new InvalidOperationException(string.Format(InvalidEnumValue, @enum.ToString()));
+
+        }
+
+        /// <summary>
+        /// Throws an <see cref="InvalidEnumArgumentException"/> if the enum value is not in the required enum value range. See the Remarks section.
+        /// </summary>
+        /// <param name="enum">The enum value to check.</param>
+        /// <param name="argumentName">The parameter name.</param>
+        /// <remarks>This method doesn't read all the enum fields, but only takes care of the first and last numeric enum fields, so if the value is 1, and the enum has only defined fields for 0 and 2, this method still doesn't throw. For a method that actually reads all the enum fields, see the <see cref="ThrowIfNotDefinedEnumValue(Enum)"/> method.</remarks>
+        /// <seealso cref="IsValidEnumValue(Enum)"/>
+        /// <seealso cref="ThrowIfNotValidEnumValue(Enum)"/>
+        public static void ThrowIfNotValidEnumValue(this Enum @enum, string argumentName)
+
+        {
+
+                    if (!@enum.IsValidEnumValue()) throw new InvalidEnumArgumentException(argumentName, (int)Convert.ChangeType(@enum, TypeCode.Int32), @enum.GetType());
+                    // .GetType().IsEnumDefined(@enum)
+
+        }
+
+        /// <summary>
+        /// Throws an <see cref="InvalidOperationException"/> if the enum value is not in the required enum value range.
+        /// </summary>
+        /// <param name="enum">The enum value to check.</param>
+        /// <seealso cref="Type.IsEnumDefined(object)"/>
+        /// <seealso cref="ThrowIfNotDefinedEnumValue(Enum, string)"/>
+        public static void ThrowIfNotDefinedEnumValue(this Enum @enum)
+
+        {
+
+            if (!@enum.GetType().IsEnumDefined(@enum)) throw new InvalidOperationException(string.Format(InvalidEnumValue, @enum.ToString()));
+
+        }
+
+        /// <summary>
+        /// Throws an <see cref="InvalidEnumArgumentException"/> if the enum value is not in the required enum value range. See the Remarks section.
+        /// </summary>
+        /// <param name="enum">The enum value to check.</param>
+        /// <param name="argumentName">The parameter name.</param>
+        /// <remarks>This method doesn't read all the enum fields, but only takes care of the first and last numeric enum fields, so if the value is 1, and the enum has only defined fields for 0 and 2, this method still doesn't throw. For a method that actually reads all the enum fields, see the <see cref="ThrowIfNotDefinedEnumValue(Enum)"/> method.</remarks>
+        /// <seealso cref="IsValidEnumValue(Enum)"/>
+        /// <seealso cref="ThrowIfNotDefinedEnumValue(Enum)"/>
+        public static void ThrowIfNotDefinedEnumValue(this Enum @enum, string argumentName)
+
+        {
+
+                    if (!@enum.GetType().IsEnumDefined(@enum)) throw new InvalidEnumArgumentException(argumentName, @enum);
+
+        }
+
+        /// <summary>
+        /// Determines whether the current enum value is within the enum values range.
+        /// </summary>
+        /// <param name="enum">The enum value to check.</param>
+        /// <param name="throwIfNotFlagsEnum">Whether to throw if the given enum does not have the <see cref="FlagsAttribute"/> attribute.</param>
+        /// <param name="throwIfZero">Whether to throw if the given enum is zero.</param>
+        /// <returns><see langword="true"/> if the given value is in the enum values range, otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentException"><b>enum</b> does not have the <see cref="FlagsAttribute"/> and <b>throwIfNotFlags</b> is set to <see langword="true"/>.</exception>
+        /// <exception cref="InvalidEnumArgumentException"><b>enum</b> is equal to zero and the <b>throwIfZero</b> parameter is set to true or <b>enum</b> is lesser than zero.</exception>
+        /// <seealso cref="ThrowIfNotValidFlagsEnumValue( Enum, bool, bool)"/>
+        /// <seealso cref="ThrowIfNotValidFlagsEnumValue(Enum, string, bool, bool)"/>
+        public static bool IsValidFlagsEnumValue(this Enum @enum, bool throwIfNotFlagsEnum, bool throwIfZero)
+
+        {
+
+            Type enumType = @enum.GetType();
+
+            var enumComparer = new EnumComparer();
+
+            int comparisonResult = enumComparer.Compare(@enum, 0);
+
+            object value = @enum.GetNumValue();
+
+            // If the value is lesser than zero, this is not a flags enum value.
+
+            if (comparisonResult < 0 || (comparisonResult == 0 && throwIfZero))
+
+                throw new InvalidEnumArgumentException("The given value must be greater than zero if the 'throwIfZero' parameter is set to true, or greater or equal to zero otherwise.", nameof(@enum), value is long ? (long)value : (int)value, enumType);
+
+            if (enumType.GetCustomAttribute<FlagsAttribute>() == null)
+
+                if (throwIfNotFlagsEnum)
+
+                    throw new ArgumentException("The given enum does not have the FlagsAttribute.", nameof(@enum));
+
+                else
+
+                    return false;
+
+            // Now, we have to check if the given value is directly defined in the enum.
+
+            if (enumType.IsEnumDefined(@enum))
+
+                return true;
+
+            // If not, we have to check if the given value is a power of 2.
+
+            double valueDouble = (double)Convert.ChangeType(value, TypeCode.Double);
+
+            // If yes and if we reached this point, that means that the value is a power of 2 -- and therefore represents a flag in the enum --, but is not defined in the enum.
+
+            double log = Math.Log(valueDouble, 2);
+
+            if (Math.Truncate(log) == log) return false;
+
+            // If not, we have to check if all the flags represented by the given value are actually set in the enum.
+
+            double _value = Math.Pow(2, Math.Ceiling(log));
+
+            double valueToCheck;
+
+            do
+
+            {
+
+                valueToCheck = _value - valueDouble;
+
+                if (valueToCheck > long.MaxValue)
+
+                {
+
+                    if (!enumType.IsEnumDefined(Enum.ToObject(enumType, (ulong)valueToCheck))) return false;
+
+                }
+
+                else                            if (!enumType.IsEnumDefined(Enum.ToObject(enumType, (long)valueToCheck))) return false;
+
+                valueDouble -= valueToCheck;
+
+            }
+
+            while (valueDouble > 0);
+
+            return true;
+
+        }
+
+        /// <summary>
+        /// Throws an <see cref="InvalidOperationException"/> if the enum value is not in the required enum value range.
+        /// </summary>
+        /// <param name="enum">The enum value to check.</param>
+        /// <param name="throwIfNotFlagsEnum">Whether to throw if the given enum does not have the <see cref="FlagsAttribute"/> attribute.</param>
+        /// <param name="throwIfZero">Whether to throw if the given enum is zero.</param>
+        /// <exception cref="ArgumentException"><b>enum</b> does not have the <see cref="FlagsAttribute"/> and <b>throwIfNotFlags</b> is set to <see langword="true"/>.</exception>
+        /// <exception cref="InvalidEnumArgumentException"><b>enum</b> is equal to zero and the <b>throwIfZero</b> parameter is set to true or <b>enum</b> is lesser than zero.</exception>
+        /// <seealso cref="IsValidEnumValue(Enum)"/>
+        /// <seealso cref="ThrowIfNotValidEnumValue(Enum, string)"/>
+        public static void ThrowIfNotValidFlagsEnumValue(this Enum @enum, bool throwIfNotFlagsEnum, bool throwIfZero)
+
+        {
+
+            if (!@enum.IsValidFlagsEnumValue(throwIfNotFlagsEnum, throwIfZero)) throw new InvalidOperationException(string.Format(InvalidEnumValue, @enum.ToString()));
+
+        }
+
+        /// <summary>
+        /// Throws an <see cref="InvalidEnumArgumentException"/> if the enum value is not in the required enum value range.
+        /// </summary>
+        /// <param name="enum">The enum value to check.</param>
+        /// <param name="argumentName">The parameter name.</param>
+        /// <param name="throwIfNotFlagsEnum">Whether to throw if the given enum does not have the <see cref="FlagsAttribute"/> attribute.</param>
+        /// <param name="throwIfZero">Whether to throw if the given enum is zero.</param>
+        /// <exception cref="ArgumentException"><b>enum</b> does not have the <see cref="FlagsAttribute"/> and <b>throwIfNotFlags</b> is set to <see langword="true"/>.</exception>
+        /// <exception cref="InvalidEnumArgumentException"><b>enum</b> is equal to zero and the <b>throwIfZero</b> parameter is set to true or <b>enum</b> is lesser than zero.</exception>
+        /// <seealso cref="IsValidEnumValue(Enum)"/>
+        /// <seealso cref="ThrowIfNotValidEnumValue(Enum)"/>
+        public static void ThrowIfNotValidFlagsEnumValue(this Enum @enum, string argumentName, bool throwIfNotFlagsEnum, bool throwIfZero)
+
+        {
+
+                    if (!@enum.IsValidFlagsEnumValue(throwIfNotFlagsEnum, throwIfZero)) throw new InvalidEnumArgumentException(argumentName, (int)Convert.ChangeType(@enum, TypeCode.Int32), @enum.GetType());
 
         }
 
@@ -2810,12 +2969,12 @@ namespace WinCopies.Util
         }
 
         public static bool StartsWith(this string s, char value) => s[0] == value;
-        
-        public static string ToStringWithoutAccents( this string s)
+
+        public static string RemoveAccents(this string s)
 
         {
 
-            var currentNormalized = string.Empty;
+            var stringBuilder = new StringBuilder();
 
             s = s.Normalize(System.Text.NormalizationForm.FormD);
 
@@ -2823,9 +2982,9 @@ namespace WinCopies.Util
 
                 if (char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
 
-                    currentNormalized += c;
+                    _ = stringBuilder.Append(c); 
 
-            return currentNormalized.Normalize(System.Text.NormalizationForm.FormC);
+            return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
 
         }
 
