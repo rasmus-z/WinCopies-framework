@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using WinCopies.Util;
 
 namespace WinCopies.IO
@@ -15,7 +10,9 @@ namespace WinCopies.IO
 
         public FileTypes FileTypes { get => _fileTypes; set => this.SetBackgroundWorkerProperty(nameof(FileTypes), nameof(_fileTypes), value, typeof(FileSystemObjectItemsLoader), true); }
 
-        public FileSystemObjectItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IBrowsableObjectInfo> browsableObjectInfoComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, browsableObjectInfoComparer) => FileTypes = fileTypes;
+        public FileSystemObjectItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), fileTypes) { }
+
+        public FileSystemObjectItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> browsableObjectInfoComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, browsableObjectInfoComparer) => _fileTypes = fileTypes;
 
         public override bool CheckFilter(string directory)
 

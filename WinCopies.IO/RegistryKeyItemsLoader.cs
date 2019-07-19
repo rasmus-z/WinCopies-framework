@@ -40,11 +40,9 @@ namespace WinCopies.IO
             set
             {
 
-                if (IsBusy) throw new InvalidOperationException($"The {nameof(RegistryKeyItemsLoader)} is busy.");
-
                 ThrowOnInvalidRegistryTypesOption();
 
-                _registryItemTypes = value;
+                _ = this.SetBackgroundWorkerProperty(nameof(RegistryItemTypes), nameof(_registryItemTypes), value, typeof(RegistryKeyItemsLoader), true);
 
             }
 
@@ -53,10 +51,19 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryKeyItemsLoader"/> class.
         /// </summary>
-        /// <param name="workerReportsProgress">Whether the <see cref="RegistryKeyItemsLoader"/> notifies of the progress</param>
-        /// <param name="workerSupportsCancellation">Whether the <see cref="RegistryKeyItemsLoader"/> supports cancellation</param>
-        /// <param name="registryItemTypes">The item types to load</param>
-        public RegistryKeyItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : base(workerReportsProgress, workerSupportsCancellation) => RegistryItemTypes = registryItemTypes;
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="registryItemTypes">The registry item types to load.</param>
+        public RegistryKeyItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RegistryKeyItemsLoader"/> class using a custom comparer.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+        /// <param name="registryItemTypes">The registry item types to load.</param>
+        public RegistryKeyItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base(workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
 
         public override bool CheckFilter(string path)
 

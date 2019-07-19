@@ -45,11 +45,21 @@ namespace WinCopies.IO
         public FolderLoaderFileSystemWatcher FileSystemWatcher { get => _folderLoaderFileSystemWatcher; private set => this.SetBackgroundWorkerProperty(nameof(FileSystemWatcher), nameof(_folderLoaderFileSystemWatcher), typeof(FolderLoader), true); }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
+        /// Initializes a new instance of the <see cref="FolderLoader"/> class.
         /// </summary>
-        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this(workerReportsProgress, workerSupportsCancellation, FileSystemObjectComparer.GetInstance(), fileTypes) { }
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileTypes">The file types to load.</param>
+        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), fileTypes) { }
 
-        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IBrowsableObjectInfo> browsableObjectInfoComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, browsableObjectInfoComparer, fileTypes) { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FolderLoader"/> class using a custom comparer.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+        /// <param name="fileTypes">The file types to load.</param>
+        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes) { }
 
         protected override void InitializePath()
 
@@ -153,7 +163,7 @@ namespace WinCopies.IO
             catch { }
 #endif
 
-                ((BrowsableObjectInfo)Path).items.Sort(BrowsableObjectInfoComparer);
+                ((BrowsableObjectInfo)Path).items.Sort(FileSystemObjectComparer);
             }
 
         }
@@ -334,7 +344,7 @@ namespace WinCopies.IO
 
                 //    }
 
-                pathInfo.NormalizedPath = IO.Path.GetNormalizedPath(pathInfo.Path);
+                pathInfo.NormalizedPath = pathInfo.Path.RemoveAccents();
 
                 paths.AddLast(pathInfo);
 
@@ -456,7 +466,7 @@ namespace WinCopies.IO
 
 
 
-            _paths.Sort(BrowsableObjectInfoComparer);
+            _paths.Sort(FileSystemObjectComparer);
 
 
 

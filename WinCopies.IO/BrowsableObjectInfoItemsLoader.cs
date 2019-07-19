@@ -31,11 +31,11 @@ namespace WinCopies.IO
     {
 
         private readonly BackgroundWorker backgroundWorker = new BackgroundWorker();
-        private readonly IComparer<IFileSystemObject> _browsableObjectInfoComparer;
+        private readonly IComparer<IFileSystemObject> _fileSystemObjectComparer;
         private readonly BrowsableObjectInfo _path;
         private readonly IEnumerable<string> _filter;
 
-        public IComparer<IFileSystemObject> BrowsableObjectInfoComparer { get => _browsableObjectInfoComparer; set => this.SetBackgroundWorkerProperty(nameof(BrowsableObjectInfoComparer), nameof(_browsableObjectInfoComparer), value, typeof(FolderLoader), true); }
+        public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(FolderLoader), true); }
 
         //public void changePath(IBrowsableObjectInfo newValue)
 
@@ -146,14 +146,24 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
         /// </summary>
-        public BrowsableObjectInfoItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> browsableObjectItemComparer)
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        public BrowsableObjectInfoItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class using a custom comparer.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+        public BrowsableObjectInfoItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer)
         {
 
             WorkerReportsProgress = workerReportsProgress;
 
             WorkerSupportsCancellation = workerSupportsCancellation;
 
-            BrowsableObjectInfoComparer = browsableObjectItemComparer;
+            FileSystemObjectComparer = fileSystemObjectComparer;
 
             ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
 
@@ -332,34 +342,15 @@ namespace WinCopies.IO
 
 
 
-    public sealed class FileSystemObjectComparer : Comparer<IFileSystemObject>
+    public class FileSystemObjectComparer : Comparer<IFileSystemObject>
 
     {
 
-        private static FileSystemObjectComparer instance = null;
-
-        private static readonly object mylock = new object();
-
         public StringComparer StringComparer { get; set; }
 
-        private FileSystemObjectComparer() : this(StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
+        public FileSystemObjectComparer() : this(StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
 
-        private FileSystemObjectComparer(StringComparer stringComparer) => StringComparer = stringComparer;
-
-        public static FileSystemObjectComparer GetInstance()
-        {
-            StringComparer.
-            if (instance == null)
-
-                lock (mylock)
-
-                    if (instance == null)
-
-                        instance = new FileSystemObjectComparer();
-
-            return instance;
-
-        }
+        public FileSystemObjectComparer(StringComparer stringComparer) => StringComparer = stringComparer;
 
         public override int Compare(IFileSystemObject x, IFileSystemObject y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
                 ? StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents())

@@ -90,9 +90,21 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
+        /// Initializes a new instance of the <see cref="ArchiveLoader"/> class.
         /// </summary>
-        public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes) { }
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileTypes">The file types to load.</param>
+        public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), fileTypes) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArchiveLoader"/> class using a custom comparer.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+        /// <param name="fileTypes">The file types to load.</param>
+        public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes) { }
 
         protected override void InitializePath()
 
@@ -188,8 +200,6 @@ namespace WinCopies.IO
 
             var paths = new ArrayAndListBuilder<IFileSystemObject>();
 
-            var comp = FolderLoader.Comp.GetInstance();
-
 #if DEBUG
 
             Debug.WriteLine("Path == null: " + (Path == null).ToString());
@@ -223,7 +233,7 @@ namespace WinCopies.IO
 
                         // We only make a normalized path if we add the path to the paths to load.
 
-                        pathInfo.NormalizedPath = IO.Path.GetNormalizedPath(pathInfo.Path);
+                        pathInfo.NormalizedPath = pathInfo.Path.RemoveAccents();
 
                         paths.AddLast(pathInfo);
 
@@ -384,7 +394,7 @@ namespace WinCopies.IO
 
             var sortedPaths = paths.ToList();
 
-            sortedPaths.Sort(comp);
+            sortedPaths.Sort(FileSystemObjectComparer);
 
             // for (int i = 0; i < files.Count; i++)
 
