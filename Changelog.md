@@ -36,6 +36,7 @@ WinCopies.Util (2.0)
 		- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
 		- 'SetField' static method.
 		- The view model classes now have the OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
+		- Between methods for the other numeric types.
 
 - Bug fixes:
 	- Bug fixed in the BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.

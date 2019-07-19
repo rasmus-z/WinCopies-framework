@@ -2220,9 +2220,35 @@ namespace WinCopies.Util
 
         }
 
-        [Obsolete("This method has been replaced by the same method without the redundant 'performIntegrityCheck' parameter and will be removed in later versions.")]
-        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
+        /// <summary>
+        /// Sets a value to a property if the new value is different. This method is obsolete and it will be removed in a later version.
+        /// </summary>
+        /// <param name="obj">The object in which to set the property.</param>
+        /// <param name="propertyName">The name of the property to set.</param>
+        /// <param name="fieldName">The field related to the property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the property to set (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <remarks><para>If <b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the property (or <see langword="null"/> if the property does not contain any value nor reference) without modify it.</para>
+        /// <para>If the property is read-only and the <b>throwIfReadOnly</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the property (or <see langword="null"/> if the property does not contain any value nor reference).</para></remarks>
+        /// <exception cref="InvalidOperationException"><b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="true"/>.</exception>
+        [Obsolete("This method has been replaced by the same method without the redundant 'throwIfReadOnly' parameter and will be removed in a later version.")]
+        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfReadOnly, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
 
+        /// <summary>
+        /// Sets a value to a property if the new value is different.
+        /// </summary>
+        /// <param name="obj">The object in which to set the property.</param>
+        /// <param name="propertyName">The name of the property to set.</param>
+        /// <param name="fieldName">The field related to the property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of both the property and the field.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the field that is related to the property to set (or <see langword="null"/> if the field does not contain any value nor reference).</returns>
+        /// <remarks>If <b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the field (or <see langword="null"/> if the field does not contain any value nor reference) without modify it.</remarks>
+        /// <exception cref="InvalidOperationException"><b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="true"/>.</exception>
         public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, string fieldName, object newValue, Type declaringType, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
@@ -2289,7 +2315,20 @@ namespace WinCopies.Util
 
         }
 
-        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
+        /// <summary>
+        /// Sets a value to a property if the new value is different.
+        /// </summary>
+        /// <param name="obj">The object in which to set the property.</param>
+        /// <param name="propertyName">The name of the property to set.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the property to set (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <remarks><para>If <b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the property (or <see langword="null"/> if the property does not contain any value nor reference) without modify it.</para>
+        /// <para>If the property is read-only and the <b>throwIfReadOnly</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the property (or <see langword="null"/> if the property does not contain any value nor reference).</para></remarks>
+        /// <exception cref="InvalidOperationException"><b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="true"/>.</exception>
+        public static (bool propertyChanged, object oldValue) SetProperty(this object obj, string propertyName, object newValue, Type declaringType, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet)
 
         {
 
@@ -2299,7 +2338,7 @@ namespace WinCopies.Util
 
             if (!property.CanWrite || property.SetMethod == null)
 
-                if (performIntegrityCheck)
+                if (throwIfReadOnly)
 
                     throw new InvalidOperationException(string.Format("This property is not settable. Property name: {0}, declaring type: {1}.", propertyName, declaringType));
 
@@ -2323,21 +2362,75 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Sets a value to a property of a <see cref="System.ComponentModel.BackgroundWorker"/> if the new value is different and if the <see cref="System.ComponentModel.BackgroundWorker"/> is not running.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.ComponentModel.BackgroundWorker"/> in which to set the property.</param>
+        /// <param name="propertyName">The name of the property to set.</param>
+        /// <param name="fieldName">The field related to the property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of both the property and the field.</param>
+        /// <param name="throwIfBusy">Whether to throw if <b>obj</b> is busy.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the field that is related to the property to set (or <see langword="null"/> if the field does not contain any value nor reference).</returns>
+        /// <remarks>If <b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the field (or <see langword="null"/> if the field does not contain any value nor reference) without modify it.</remarks>
+        /// <exception cref="InvalidOperationException"><b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="true"/>.</exception>
         public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
                 ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj))
                 : obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
 
-        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
+        /// <summary>
+        /// Sets a value to a property of a <see cref="System.ComponentModel.BackgroundWorker"/> if the new value is different and if the <see cref="System.ComponentModel.BackgroundWorker"/> is not running.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.ComponentModel.BackgroundWorker"/> in which to set the property.</param>
+        /// <param name="propertyName">The name of the property to set.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfBusy">Whether to throw if <b>obj</b> is busy.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the property to set (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <remarks><para>If <b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the property (or <see langword="null"/> if the property does not contain any value nor reference) without modify it.</para>
+        /// <para>If the property is read-only and the <b>throwIfReadOnly</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the property (or <see langword="null"/> if the property does not contain any value nor reference).</para></remarks>
+        /// <exception cref="InvalidOperationException"><b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="true"/>.</exception>
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
                 ? throwIfBusy ? (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj)) : throw new InvalidOperationException(BackgroundWorkerIsBusy)
-                : obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
+                : obj.SetProperty(propertyName, newValue, declaringType, throwIfReadOnly, bindingFlags);
 
+        /// <summary>
+        /// Sets a value to a property of a <see cref="IBackgroundWorker"/> if the <see cref="IBackgroundWorker"/> is not running.
+        /// </summary>
+        /// <param name="obj">The <see cref="IBackgroundWorker"/> in which to set the property.</param>
+        /// <param name="propertyName">The name of the property to set.</param>
+        /// <param name="fieldName">The field related to the property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of both the property and the field.</param>
+        /// <param name="throwIfBusy">Whether to throw if <b>obj</b> is busy.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the field that is related to the property to set (or <see langword="null"/> if the field does not contain any value nor reference).</returns>
+        /// <remarks>If <b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the field (or <see langword="null"/> if the field does not contain any value nor reference) without modify it.</remarks>
+        /// <exception cref="InvalidOperationException"><b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="true"/>.</exception>
         public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, string fieldName, object newValue, Type declaringType, bool throwIfBusy, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
                 ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, GetField(fieldName, declaringType, bindingFlags).GetValue(obj))
                 : obj.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
 
-        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool performIntegrityCheck = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
+        /// <summary>
+        /// Sets a value to a property of a <see cref="IBackgroundWorker"/> if the <see cref="IBackgroundWorker"/> is not running.
+        /// </summary>
+        /// <param name="obj">The <see cref="IBackgroundWorker"/> in which to set the property.</param>
+        /// <param name="propertyName">The name of the property to set.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfBusy">Whether to throw if <b>obj</b> is busy.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the property to set (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <remarks><para>If <b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the property (or <see langword="null"/> if the property does not contain any value nor reference) without modify it.</para>
+        /// <para>If the property is read-only and the <b>throwIfReadOnly</b> parameter is set to <see langword="false"/>, this method just returns <see langword="false"/> and the value that is already in the property (or <see langword="null"/> if the property does not contain any value nor reference).</para></remarks>
+        /// <exception cref="InvalidOperationException"><b>obj</b> is busy and the <b>throwIfBusy</b> parameter is set to <see langword="true"/>.</exception>
+        public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet) => obj.IsBusy
                 ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj))
-                : obj.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck, bindingFlags);
+                : obj.SetProperty(propertyName, newValue, declaringType, throwIfReadOnly, bindingFlags);
 
         /// <summary>
         /// Gets the numeric value for an enum.
@@ -2462,8 +2555,8 @@ namespace WinCopies.Util
 
         {
 
-                    if (!@enum.IsValidEnumValue()) throw new InvalidEnumArgumentException(argumentName, (int)Convert.ChangeType(@enum, TypeCode.Int32), @enum.GetType());
-                    // .GetType().IsEnumDefined(@enum)
+            if (!@enum.IsValidEnumValue()) throw new InvalidEnumArgumentException(argumentName, (int)Convert.ChangeType(@enum, TypeCode.Int32), @enum.GetType());
+            // .GetType().IsEnumDefined(@enum)
 
         }
 
@@ -2493,7 +2586,7 @@ namespace WinCopies.Util
 
         {
 
-                    if (!@enum.GetType().IsEnumDefined(@enum)) throw new InvalidEnumArgumentException(argumentName, @enum);
+            if (!@enum.GetType().IsEnumDefined(@enum)) throw new InvalidEnumArgumentException(argumentName, @enum);
 
         }
 
@@ -2572,7 +2665,7 @@ namespace WinCopies.Util
 
                 }
 
-                else                            if (!enumType.IsEnumDefined(Enum.ToObject(enumType, (long)valueToCheck))) return false;
+                else if (!enumType.IsEnumDefined(Enum.ToObject(enumType, (long)valueToCheck))) return false;
 
                 valueDouble -= valueToCheck;
 
@@ -2617,7 +2710,7 @@ namespace WinCopies.Util
 
         {
 
-                    if (!@enum.IsValidFlagsEnumValue(throwIfNotFlagsEnum, throwIfZero)) throw new InvalidEnumArgumentException(argumentName, (int)Convert.ChangeType(@enum, TypeCode.Int32), @enum.GetType());
+            if (!@enum.IsValidFlagsEnumValue(throwIfNotFlagsEnum, throwIfZero)) throw new InvalidEnumArgumentException(argumentName, (int)Convert.ChangeType(@enum, TypeCode.Int32), @enum.GetType());
 
         }
 
@@ -2667,6 +2760,11 @@ namespace WinCopies.Util
 
         //}
 
+        /// <summary>
+        /// Converts a <see cref="Bitmap"/> to an <see cref="ImageSource"/>.
+        /// </summary>
+        /// <param name="bitmap">The <see cref="Bitmap"/> to convert.</param>
+        /// <returns>The <see cref="ImageSource"/> obtained from the given <see cref="Bitmap"/>.</returns>
         public static ImageSource ToImageSource(this Bitmap bitmap)
 
         {
@@ -2705,7 +2803,104 @@ namespace WinCopies.Util
 
         }
 
-        public static bool Between(this int i, int start, int length) => i >= start && i <= length;
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="b">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this sbyte b, sbyte x, sbyte y) => b >= x && b <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="b">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this byte b, byte x, byte y) => b >= x && b <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="s">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this short s, short x, short y) => s >= x && s <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="s">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this ushort s, ushort x, ushort y) => s >= x && s <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="i">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this int i, int x, int y) => i >= x && i <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="i">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this uint i, uint x, uint y) => i >= x && i <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="l">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this long l, long x, long y) => l >= x && l <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="l">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this ulong l, ulong x, ulong y) => l >= x && l <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="f">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this float f, float x, float y) => f >= x && f <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="d">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this double d, double x, double y) => d >= x && d <= y;
+
+        /// <summary>
+        /// Checks if a number is between two given numbers.
+        /// </summary>
+        /// <param name="d">The number to check.</param>
+        /// <param name="x">The left operand.</param>
+        /// <param name="y">The right operand.</param>
+        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        public static bool Between(this decimal d, decimal x, decimal y) => d >= x && d <= y;
 
         public static void Execute(this ICommand command, object commandParameter, IInputElement commandTarget)
 
@@ -2982,7 +3177,7 @@ namespace WinCopies.Util
 
                 if (char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
 
-                    _ = stringBuilder.Append(c); 
+                    _ = stringBuilder.Append(c);
 
             return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
 
