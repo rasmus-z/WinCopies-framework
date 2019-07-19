@@ -18,6 +18,8 @@ namespace WinCopies.IO
     /// </summary>
     public class ShellObjectInfo : BrowsableObjectInfo, IArchiveItemInfoProvider
     {
+        private IShellObjectInfoFactory _shellObjectInfoFactory;
+        private IArchiveItemInfoFactory _archiveItemInfoFactory;
 
         /// <summary>
         /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.
@@ -91,65 +93,15 @@ namespace WinCopies.IO
         /// </summary>
         public SpecialFolder SpecialFolder { get; private set; } = SpecialFolder.OtherFolderOrFile;
 
-        public static (FileType fileType, SpecialFolder specialFolder) GetFileType(string path, ShellObject shellObject)
-
-        {
-
-            FileType fileType;
-
-            if (// shellObject.Parent is Microsoft.WindowsAPICodePack.Shell.FileSystemKnownFolder
-                // || shellObject.Parent is Microsoft.WindowsAPICodePack.Shell.IKnownFolder
-                // || shellObject.Parent is Microsoft.WindowsAPICodePack.Shell.NonFileSystemKnownFolder
-                // || shellObject.Parent is Microsoft.WindowsAPICodePack.Shell.ShellNonFileSystemFolder
-                // !path.Contains(":\\")
-                    !shellObject.IsFileSystemObject
-                    )
-
-                fileType = FileType.SpecialFolder;
-
-            // todo: checking the special folder type and assign it to the specialFolder variable
-
-            // todo : making a function for both fileType and specialFolder variables
-
-            else if (shellObject is FileSystemKnownFolder && ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) && shellObject is ShellFile)
-
-                fileType = FileType.Archive;
-
-            else if (shellObject is ShellFile)
-
-            {
-
-                // var fileType = FileTypes.None;
-
-                // if (shellObject.GetType() == typeof(ShellFolder))
-
-                // fileType = FileTypes.Folder;
-
-                // else
-
-                if (path.EndsWith(".lnk"))
-
-                    fileType = FileType.Link;
-
-                // todo: add other 'in' archive supported formats
-
-                else if (ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)))
-
-                    fileType = FileType.Archive;
-
-                else
-
-                    fileType = FileType.File;
-
-            }
-
-            else
-
-                fileType = System.IO.Path.GetPathRoot(path) == path ? FileType.Drive : FileType.Folder;
-
-            return (fileType, GetSpecialFolderType(shellObject));
-
-        }
+        public static (FileType fileType, SpecialFolder specialFolder) GetFileType(string path, ShellObject shellObject) => (!shellObject.IsFileSystemObject
+                ? FileType.SpecialFolder
+                : shellObject is FileSystemKnownFolder && ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) && shellObject is ShellFile
+                ? FileType.Archive
+                : shellObject is ShellFile
+                ? path.EndsWith(".lnk")
+                    ? FileType.Link
+                    : ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) ? FileType.Archive : FileType.File
+                : System.IO.Path.GetPathRoot(path) == path ? FileType.Drive : FileType.Folder, GetSpecialFolderType(shellObject));
 
         /// <summary>
         /// Returns the <see cref="IO.SpecialFolder"/> value for a given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
@@ -234,22 +186,42 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
-        public ShellObjectInfo(ShellObject shellObject, string path) : base(path, GetFileType(path, shellObject).fileType) =>
-
-            Init(shellObject, nameof(FileType), GetFileType(path, shellObject).specialFolder);
+        public ShellObjectInfo(ShellObject shellObject, string path) : this(shellObject, path, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class.
+        /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class using custom factories for <see cref="ShellObjectInfo"/> and <see cref="ArchiveItemInfo"/>.
+        /// </summary>
+        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
+        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
+        /// <param name="shellObjectInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/> and <see cref="ArchiveLoader"/>'s use to create new instances of the <see cref="ShellObjectInfo"/> class.</param>
+        /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/> and <see cref="ArchiveLoader"/>'s use to create new instances of the <see cref="ArchiveItemInfo"/> class.</param>
+        public ShellObjectInfo(ShellObject shellObject, string path, IShellObjectInfoFactory shellObjectInfoFactory, IArchiveItemInfoFactory archiveItemInfoFactory) : base(path, GetFileType(path, shellObject).fileType) =>
+
+            Init(shellObject, nameof(FileType), GetFileType(path, shellObject).specialFolder, shellObjectInfoFactory, archiveItemInfoFactory);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/>.
         /// </summary>
         /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
-        public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder) : base(path, fileType) =>
+        public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder) : this(shellObject, path, fileType, specialFolder, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
 
-            Init(shellObject, nameof(fileType), specialFolder);// string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/> and <see cref="ArchiveItemInfo"/>.
+        /// </summary>
+        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
+        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
+        /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
+        /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
+        /// <param name="shellObjectInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/> and <see cref="ArchiveLoader"/>'s use to create new instances of the <see cref="ShellObjectInfo"/> class.</param>
+        /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/> and <see cref="ArchiveLoader"/>'s use to create new instances of the <see cref="ArchiveItemInfo"/> class.</param>
+        public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder, IShellObjectInfoFactory shellObjectInfoFactory, IArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType) =>
 
-        private void Init(ShellObject shellObject, string fileTypeParameterName, SpecialFolder specialFolder)
+            Init(shellObject, nameof(fileType), specialFolder, shellObjectInfoFactory, archiveItemInfoFactory);// string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
+
+        private void Init(ShellObject shellObject, string fileTypeParameterName, SpecialFolder specialFolder, IShellObjectInfoFactory shellObjectInfoFactory, IArchiveItemInfoFactory archiveItemInfoFactory)
 
         {
 
@@ -265,9 +237,9 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(Generic.FileTypeAndSpecialFolderNotCorrespond, fileTypeParameterName, nameof(specialFolder), FileType, specialFolder));
 
-            ShellObjectInfoFactory = new ShellObjectInfoFactory();
+            ShellObjectInfoFactory = shellObjectInfoFactory;
 
-            ArchiveItemInfoFactory = new ArchiveItemInfoFactory();
+            ArchiveItemInfoFactory = archiveItemInfoFactory;
 
             ShellObject = shellObject;
 
@@ -456,9 +428,33 @@ namespace WinCopies.IO
 
         public override string ToString() => string.IsNullOrEmpty(Path) ? ShellObject.GetDisplayName(DisplayNameType.Default) : System.IO.Path.GetFileName(Path);
 
-        public IShellObjectInfoFactory ShellObjectInfoFactory { get; set; }
+        public IShellObjectInfoFactory ShellObjectInfoFactory
+        {
+            get => _shellObjectInfoFactory; set
+            {
 
-        public IArchiveItemInfoFactory ArchiveItemInfoFactory { get; set; }
+                if (ItemsLoader.IsBusy)
+
+                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
+
+                _shellObjectInfoFactory = value;
+
+            }
+        }
+
+        public IArchiveItemInfoFactory ArchiveItemInfoFactory
+        {
+            get => _archiveItemInfoFactory; set
+            {
+
+                if (ItemsLoader.IsBusy)
+
+                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
+
+                _archiveItemInfoFactory = value;
+
+            }
+        }
 
         /// <summary>
         /// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.

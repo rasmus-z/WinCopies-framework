@@ -167,25 +167,56 @@ namespace WinCopies.IO
 
         public override string Name { get; }
 
-        // todo:
-
+        /// <summary>
+        /// Gets the small <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+        /// </summary>
         public override BitmapSource SmallBitmapSource => TryGetBitmapSource(new System.Drawing.Size(16, 16));
 
+        /// <summary>
+        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+        /// </summary>
         public override BitmapSource MediumBitmapSource => TryGetBitmapSource(new System.Drawing.Size(48, 48));
 
+        /// <summary>
+        /// Gets the large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+        /// </summary>
         public override BitmapSource LargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(128, 128));
 
+        /// <summary>
+        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+        /// </summary>
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(256, 256));
 
+        /// <summary>
+        /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> is browsable.
+        /// </summary>
         public override bool IsBrowsable => WMIItemType == WMIItemType.Namespace || WMIItemType == WMIItemType.Class;
 
         public WMIItemType WMIItemType { get; }
+
+        private IWMIItemInfoFactory _wmiItemInfoFactory;
+
+        public IWMIItemInfoFactory WMIItemInfoFactory
+        {
+            get => _wmiItemInfoFactory;
+
+            set
+            {
+
+                if (ItemsLoader.IsBusy)
+
+                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
+
+                _wmiItemInfoFactory = value;
+
+            }
+        }
 
         public override IBrowsableObjectInfo Clone() => throw new NotImplementedException();
 
         protected override IBrowsableObjectInfo GetParent() => throw new NotImplementedException();
 
-        private WMIItemsLoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMIItemsLoader(workerReportsProgress, workerSupportsCancellation) { Path = this, ObjectGetOptions = new ObjectGetOptions() { UseAmendedQualifiers = true }, EnumerationOptions = new EnumerationOptions() { EnumerateDeep = true, UseAmendedQualifiers = true } });
+        private WMIItemsLoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMIItemsLoader(workerReportsProgress, workerSupportsCancellation, WMIItemTypes.Namespace | WMIItemTypes.Class | WMIItemTypes.Instance) { Path = this, ObjectGetOptions = new ObjectGetOptions() { UseAmendedQualifiers = true }, EnumerationOptions = new EnumerationOptions() { EnumerateDeep = true, UseAmendedQualifiers = true } });
 
         public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItems();
 

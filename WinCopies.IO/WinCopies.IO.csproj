@@ -126,6 +126,7 @@
     <Compile Include="FolderLoader.cs" />
     <Compile Include="FolderLoaderFileSystemWatcher.cs" />
     <Compile Include="IBrowsableObjectInfo.cs" />
+    <Compile Include="IWMIItemInfoFactory.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registry.cs" />

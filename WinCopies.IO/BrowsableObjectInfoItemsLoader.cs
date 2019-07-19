@@ -12,7 +12,7 @@ using System.Globalization;
 namespace WinCopies.IO
 {
 
-    public interface IBrowsableObjectInfoItemsLoader : IDisposable
+    public interface IBrowsableObjectInfoItemsLoader : IBackgroundWorker, IDisposable
     {
 
         IBrowsableObjectInfo Path { get; }

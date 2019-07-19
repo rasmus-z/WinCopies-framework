@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using TsudaKageyu;
 
 using WinCopies.Collections;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
@@ -60,12 +61,12 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is disposing.
         /// </summary>
-        public bool IsDisposing { get; set; }
+        public bool IsDisposing { get; private set; }
 
         /// <summary>
         /// Gets a value that indicates if the items of this <see cref="BrowsableObjectInfo"/> are currently loaded.
         /// </summary>
-        public bool AreItemsLoaded { get; set; }
+        public bool AreItemsLoaded { get; internal set; }
 
         internal readonly ObservableCollection<IBrowsableObjectInfo> items = new ObservableCollection<IBrowsableObjectInfo>();
 
@@ -94,8 +95,11 @@ namespace WinCopies.IO
         private IBrowsableObjectInfoItemsLoader itemsLoader = null;
 
         /// <summary>
-        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
+        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>. See the Remarks section.
         /// </summary>
+        /// <remarks><para>When setting, automatically disposes the old <see cref="IBrowsableObjectInfoItemsLoader"/>.</para>
+        /// <para>When setting, if the new value is a <see cref="BrowsableObjectInfoItemsLoader"/>, its <see cref="BrowsableObjectInfoItemsLoader.Path"/> property is automatically set with this instance of <see cref="BrowsableObjectInfo"/>.</para></remarks>
+        /// <exception cref="InvalidOperationException">The old <see cref="IBrowsableObjectInfoItemsLoader"/> is running.</exception>
         public virtual IBrowsableObjectInfoItemsLoader ItemsLoader
         {
 
@@ -104,9 +108,9 @@ namespace WinCopies.IO
             set
             {
 
-                if (value == itemsLoader)
+                if (itemsLoader.IsBusy)
 
-                    return;
+                    throw new InvalidOperationException($"The old {nameof(IBrowsableObjectInfoItemsLoader)} is running.");
 
                 itemsLoader = value;
 
@@ -294,7 +298,7 @@ namespace WinCopies.IO
         /// Returns a string representation for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         /// <returns>The <see cref="LocalizedName"/> of this <see cref="BrowsableObjectInfo"/>.</returns>
-        public override string ToString() => Util.Util.IsNullEmptyOrWhiteSpace( LocalizedName) ? Path : LocalizedName;
+        public override string ToString() => Util.Util.IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
 
         /// <summary>
         /// When overridden in a derived class, returns an <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.

@@ -15,7 +15,7 @@ namespace WinCopies.IO
     public class WMIItemsLoader : BrowsableObjectInfoItemsLoader
     {
 
-        private readonly WMIItemTypes _wmiItemTypes = Util.Util.GetAllEnumFlags<WMIItemTypes>();
+        private readonly WMIItemTypes _wmiItemTypes;
 
 #pragma warning disable CS0649 // Set up using reflection.
         private readonly ConnectionOptions _connectionOptions;

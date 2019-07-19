@@ -42,6 +42,7 @@ namespace WinCopies.IO
 
     public class RegistryItemInfo : BrowsableObjectInfo
     {
+        private IRegistryItemInfoFactory _registryItemInfoFactory;
 
         public RegistryItemInfo() : this(new RegistryItemInfoFactory()) { }
 
@@ -154,7 +155,19 @@ namespace WinCopies.IO
 
         public override bool IsBrowsable => RegistryItemType == RegistryItemType.RegistryRoot || RegistryItemType == RegistryItemType.RegistryKey;
 
-        public IRegistryItemInfoFactory RegistryItemInfoFactory { get; set; }
+        public IRegistryItemInfoFactory RegistryItemInfoFactory
+        {
+            get => _registryItemInfoFactory; set
+            {
+
+                if (ItemsLoader.IsBusy)
+
+                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
+
+                _registryItemInfoFactory = value;
+
+            }
+        }
 
         public override IBrowsableObjectInfo Clone()
         {
@@ -198,11 +211,11 @@ namespace WinCopies.IO
 
                         return RegistryItemInfoFactory.GetBrowsableObjectInfo();
 
-                    StringBuilder stringBuilder = new StringBuilder();
+                    var stringBuilder = new StringBuilder();
 
                     for (int i = 0; i < path.Length - 1; i++)
 
-                        stringBuilder.Append(path);
+                        _ = stringBuilder.Append(path);
 
                     return RegistryItemInfoFactory.GetBrowsableObjectInfo(stringBuilder.ToString());
 
