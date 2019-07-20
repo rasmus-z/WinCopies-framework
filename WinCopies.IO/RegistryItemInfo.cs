@@ -40,7 +40,7 @@ namespace WinCopies.IO
 
     }
 
-    public class RegistryItemInfo : BrowsableObjectInfo
+    public class RegistryItemInfo : BrowsableObjectInfo, IRegistryItemInfo
     {
         private IRegistryItemInfoFactory _registryItemInfoFactory;
 
@@ -141,18 +141,39 @@ namespace WinCopies.IO
 
         public RegistryKey RegistryKey { get; }
 
+        /// <summary>
+        /// Gets the localized path of this <see cref="RegistryItemInfo"/>.
+        /// </summary>
         public override string LocalizedName => Name;
 
+        /// <summary>
+        /// Gets the name of this <see cref="RegistryItemInfo"/>.
+        /// </summary>
         public override string Name { get; }
 
+        /// <summary>
+        /// Gets the small <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo"/>.
+        /// </summary>
         public override BitmapSource SmallBitmapSource => TryGetBitmapSource(new System.Drawing.Size(16, 16));
 
+        /// <summary>
+        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo"/>.
+        /// </summary>
         public override BitmapSource MediumBitmapSource => TryGetBitmapSource(new System.Drawing.Size(48, 48));
 
+        /// <summary>
+        /// Gets the large <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo"/>.
+        /// </summary>
         public override BitmapSource LargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(128, 128));
 
+        /// <summary>
+        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo"/>.
+        /// </summary>
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(256, 256));
 
+        /// <summary>
+        /// Gets a value that indicates whether this <see cref="RegistryItemInfo"/> is browsable.
+        /// </summary>
         public override bool IsBrowsable => RegistryItemType == RegistryItemType.RegistryRoot || RegistryItemType == RegistryItemType.RegistryKey;
 
         public IRegistryItemInfoFactory RegistryItemInfoFactory

@@ -27,7 +27,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides info to interact with archive items.
     /// </summary>
-    public class ArchiveItemInfo : BrowsableObjectInfo, IArchiveItemInfoProvider
+    public class ArchiveItemInfo : BrowsableObjectInfo, IArchiveItemInfo
     {
         private IArchiveItemInfoFactory _archiveItemInfoFactory;
 

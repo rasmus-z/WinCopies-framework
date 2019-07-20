@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
 [assembly: AssemblyTitle("WinCopies.Data")]
-[assembly: AssemblyDescription("An assembly that provides some utilities to interact with data sources.")]
+[assembly: AssemblyDescription("Provides some utilities to interact with data sources.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("WinCopies framework")]
@@ -35,5 +35,5 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: NeutralResourcesLanguage("fr")]
+[assembly: NeutralResourcesLanguage("en")]
 

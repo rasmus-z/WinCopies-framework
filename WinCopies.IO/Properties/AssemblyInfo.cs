@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
 [assembly: AssemblyTitle("WinCopies.IO")]
-[assembly: AssemblyDescription("WinCopies framework Windows® shell interoperability assembly for basics i/o operations")]
+[assembly: AssemblyDescription("WinCopies framework Windows® shell interoperability assembly for basic i/o operations")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("WinCopies framework")]
@@ -35,5 +35,5 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: NeutralResourcesLanguage("fr")]
+[assembly: NeutralResourcesLanguage("en")]
 

@@ -13,7 +13,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides a base class for all I/O objects of the WinCopies framework.
     /// </summary>
-    public abstract class BrowsableObjectInfo : IBrowsableObjectInfo
+    public abstract class BrowsableObjectInfo : IBrowsableObjectInfo<BrowsableObjectInfoItemsLoader>
     {
 
         internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
@@ -92,7 +92,7 @@ namespace WinCopies.IO
         /// </summary>
         public FileType FileType { get; private set; } = FileType.None;
 
-        private IBrowsableObjectInfoItemsLoader itemsLoader = null;
+        private BrowsableObjectInfoItemsLoader itemsLoader = null;
 
         /// <summary>
         /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>. See the Remarks section.
@@ -100,7 +100,7 @@ namespace WinCopies.IO
         /// <remarks><para>When setting, automatically disposes the old <see cref="IBrowsableObjectInfoItemsLoader"/>.</para>
         /// <para>When setting, if the new value is a <see cref="BrowsableObjectInfoItemsLoader"/>, its <see cref="BrowsableObjectInfoItemsLoader.Path"/> property is automatically set with this instance of <see cref="BrowsableObjectInfo"/>.</para></remarks>
         /// <exception cref="InvalidOperationException">The old <see cref="IBrowsableObjectInfoItemsLoader"/> is running.</exception>
-        public virtual IBrowsableObjectInfoItemsLoader ItemsLoader
+        public virtual BrowsableObjectInfoItemsLoader ItemsLoader
         {
 
             get => itemsLoader;
@@ -146,7 +146,7 @@ namespace WinCopies.IO
         /// <summary>
         /// When overridden in a derived class, returns the parent of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        /// <returns>the parent of this <see cref="BrowsableObjectInfo"/>.</returns>
+        /// <returns>The parent of this <see cref="BrowsableObjectInfo"/>.</returns>
         protected abstract IBrowsableObjectInfo GetParent();
 
         // protected abstract IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileTypes fileType);
@@ -169,10 +169,10 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo"/> using the given <see cref="BrowsableObjectInfoItemsLoader"/>.
+        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
-        /// <param name="browsableObjectInfoItemsLoader">Custom loader to load the items of this <see cref="BrowsableObjectInfo"/>.</param>
-        public virtual void LoadItems(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
+        /// <param name="browsableObjectInfoItemsLoader">A custom items loader.</param>
+        public virtual void LoadItems(IBrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 
         {
 
@@ -184,7 +184,9 @@ namespace WinCopies.IO
 
                 throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
 
-            browsableObjectInfoItemsLoader.Path = this;
+            if (browsableObjectInfoItemsLoader is BrowsableObjectInfoItemsLoader _browsableObjectInfoItemsLoader)
+
+                _browsableObjectInfoItemsLoader.Path = this;
 
             browsableObjectInfoItemsLoader.LoadItems();
 
@@ -215,10 +217,10 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using the given <see cref="BrowsableObjectInfoItemsLoader"/>.
+        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
-        /// <param name="browsableObjectInfoItemsLoader">Custom loader to load the items of this <see cref="BrowsableObjectInfo"/>.</param>
-        public virtual void LoadItemsAsync(BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
+        /// <param name="browsableObjectInfoItemsLoader">A custom items loader.</param>
+        public virtual void LoadItemsAsync(IBrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
 
         {
 
@@ -232,7 +234,9 @@ namespace WinCopies.IO
 
             // ItemsLoader = browsableObjectInfoItemsLoader ?? throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
 
-            browsableObjectInfoItemsLoader.Path = this;
+            if (browsableObjectInfoItemsLoader is BrowsableObjectInfoItemsLoader _browsableObjectInfoItemsLoader)
+
+                _browsableObjectInfoItemsLoader.Path = this;
 
             browsableObjectInfoItemsLoader.LoadItemsAsync();
 
@@ -295,15 +299,15 @@ namespace WinCopies.IO
         public abstract void Rename(string newValue);
 
         /// <summary>
-        /// Returns a string representation for this <see cref="BrowsableObjectInfo"/>.
+        /// Gets a string representation of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         /// <returns>The <see cref="LocalizedName"/> of this <see cref="BrowsableObjectInfo"/>.</returns>
         public override string ToString() => Util.Util.IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
 
         /// <summary>
-        /// When overridden in a derived class, returns an <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        /// <returns>An <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
+        /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
         public abstract IBrowsableObjectInfo Clone();
 
         /// <summary>

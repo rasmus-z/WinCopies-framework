@@ -43,7 +43,19 @@ namespace WinCopies.IO
 
         public ManagementBaseObject ManagementObject { get; }
 
-        public WMIItemInfo() : this(new ManagementClass(@"\\.\ROOT:__NAMESPACE"), WMIItemType.Namespace) => IsRootNode = true;
+        protected virtual BrowsableObjectInfoItemsLoader ItemsLoaderOverride { get => base.ItemsLoader; set => base.ItemsLoader = value; }
+
+        public sealed override BrowsableObjectInfoItemsLoader ItemsLoader
+        {
+            get => ItemsLoaderOverride; set
+            {
+
+                _wmiItemInfoFactory._wmiItemsLoader = value;
+
+                ItemsLoaderOverride = value;
+
+            }
+        }
 
         private static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
 
@@ -79,7 +91,11 @@ namespace WinCopies.IO
 
         }
 
-        public WMIItemInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType) : base(GetPath(managementObject, wmiItemType), FileType.SpecialFolder)
+        public WMIItemInfo() : this(new ManagementClass(@"\\.\ROOT:__NAMESPACE"), WMIItemType.Namespace) => IsRootNode = true;
+
+        public WMIItemInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType) : this(managementObject, wmiItemType, new WMIItemInfoFactory()) { }
+
+        public WMIItemInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType, WMIItemInfoFactory wmiItemInfoFactory) : base(GetPath(managementObject, wmiItemType), FileType.SpecialFolder)
 
         {
 
@@ -96,6 +112,8 @@ namespace WinCopies.IO
             if (wmiItemType == WMIItemType.Namespace && Path.ToUpper().EndsWith("ROOT:__NAMESPACE"))
 
                 IsRootNode = true;
+
+            WMIItemInfoFactory = wmiItemInfoFactory;
 
         }
 
@@ -161,10 +179,19 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> represents a root node.
+        /// </summary>
         public bool IsRootNode { get; }
 
+        /// <summary>
+        /// Gets the localized path of this <see cref="WMIItemInfo"/>.
+        /// </summary>
         public override string LocalizedName => Name;
 
+        /// <summary>
+        /// Gets the name of this <see cref="WMIItemInfo"/>.
+        /// </summary>
         public override string Name { get; }
 
         /// <summary>
@@ -194,9 +221,9 @@ namespace WinCopies.IO
 
         public WMIItemType WMIItemType { get; }
 
-        private IWMIItemInfoFactory _wmiItemInfoFactory;
+        private WMIItemInfoFactory _wmiItemInfoFactory;
 
-        public IWMIItemInfoFactory WMIItemInfoFactory
+        public WMIItemInfoFactory WMIItemInfoFactory
         {
             get => _wmiItemInfoFactory;
 
@@ -209,14 +236,31 @@ namespace WinCopies.IO
 
                 _wmiItemInfoFactory = value;
 
+                _wmiItemInfoFactory._wmiItemsLoader = ItemsLoaderOverride;
+
             }
         }
 
-        public override IBrowsableObjectInfo Clone() => throw new NotImplementedException();
+        public override IBrowsableObjectInfo Clone() => WMIItemInfoFactory.GetBrowsableObjectInfo((ManagementBaseObject)ManagementObject.Clone(), WMIItemType);
 
-        protected override IBrowsableObjectInfo GetParent() => throw new NotImplementedException();
+        protected override IBrowsableObjectInfo GetParent()
+        {
 
-        private WMIItemsLoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMIItemsLoader(workerReportsProgress, workerSupportsCancellation, WMIItemTypes.Namespace | WMIItemTypes.Class | WMIItemTypes.Instance) { Path = this, ObjectGetOptions = new ObjectGetOptions() { UseAmendedQualifiers = true }, EnumerationOptions = new EnumerationOptions() { EnumerateDeep = true, UseAmendedQualifiers = true } });
+            if (IsRootNode) return null;
+
+            if (WMIItemType == WMIItemType.Namespace)
+
+            {
+
+                string path = Path.Substring(0, Path.LastIndexOf('\\')) + ":__NAMESPACE";
+
+                WMIItemInfoFactory.GetBrowsableObjectInfo(new ManagementObject(new ManagementScope(path, ), new ManagementPath(path), ))
+
+                    }
+
+        }
+
+        private WMIItemsLoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMIItemsLoader(workerReportsProgress, workerSupportsCancellation, WMIItemTypes.Namespace | WMIItemTypes.Class | WMIItemTypes.Instance) { Path = this });
 
         public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItems();
 

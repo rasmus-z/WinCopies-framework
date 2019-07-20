@@ -59,11 +59,6 @@ namespace WinCopies.IO
         /// </summary>
         IBrowsableObjectInfo Parent { get; }
 
-        ///// <summary>
-        ///// Gets or sets the items loader for this <see cref="IBrowsableObjectInfo"/>.
-        ///// </summary>
-        //IBrowsableObjectInfoItemsLoader ItemsLoader { get; set; }
-
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 
         /// <summary>
@@ -71,32 +66,60 @@ namespace WinCopies.IO
         /// </summary>
         void LoadItems();
 
+        /// <summary>
+        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> using custom worker behavior options.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation);
 
         /// <summary>
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
-        /// <param name="itemsLoader"></param>
-        void LoadItems(BrowsableObjectInfoItemsLoader itemsLoader);
+        /// <param name="itemsLoader">A custom items loader.</param>
+        void LoadItems(IBrowsableObjectInfoItemsLoader itemsLoader);
 
         /// <summary>
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously.
         /// </summary>
         void LoadItemsAsync();
 
+        /// <summary>
+        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using custom worker behavior options.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation);
 
         /// <summary>
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
-        /// <param name="itemsLoader"></param>
-        void LoadItemsAsync(BrowsableObjectInfoItemsLoader itemsLoader);
+        /// <param name="itemsLoader">A custom items loader.</param>
+        void LoadItemsAsync(IBrowsableObjectInfoItemsLoader itemsLoader);
 
+        /// <summary>
+        /// Renames or move to a relative path, or both, the current <see cref="IBrowsableObjectInfo"/> with the specified name.
+        /// </summary>
+        /// <param name="newValue">The new name or relative path for this <see cref="IBrowsableObjectInfo"/>.</param>
         void Rename(string newValue);
 
         // string ToString();
 
+        /// <summary>
+        /// Gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.</returns>
         IBrowsableObjectInfo Clone();
+
+    }
+
+    public interface IBrowsableObjectInfo<TItemsLoader> : IBrowsableObjectInfo where TItemsLoader : IBrowsableObjectInfoItemsLoader
+    {
+
+        /// <summary>
+        /// Gets or sets the items loader for this <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        TItemsLoader ItemsLoader { get; set; }
 
     }
 

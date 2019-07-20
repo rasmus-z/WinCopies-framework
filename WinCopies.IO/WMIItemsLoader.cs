@@ -9,6 +9,7 @@ using WinCopies.Util;
 
 namespace WinCopies.IO
 {
+
     /// <summary>
     /// A class for easier <see cref="ManagementBaseObject"/> items loading.
     /// </summary>
@@ -17,37 +18,22 @@ namespace WinCopies.IO
 
         private readonly WMIItemTypes _wmiItemTypes;
 
-#pragma warning disable CS0649 // Set up using reflection.
-        private readonly ConnectionOptions _connectionOptions;
+        private readonly WMIItemInfoFactoryOptions _wmiItemInfoFactoryOptions;
 
-        private readonly ObjectGetOptions _objectGetOptions;
+        public WMIItemInfoFactoryOptions WMIItemInfoFactoryOptions
+        {
 
-        private readonly EnumerationOptions _enumerationOptions;
-#pragma warning restore CS0649
+            get => _wmiItemInfoFactoryOptions;
+
+            set => this.SetBackgroundWorkerProperty(nameof(WMIItemInfoFactoryOptions), nameof(_wmiItemInfoFactoryOptions), value, typeof(WMIItemsLoader), true);
+
+        }
 
         /// <summary>
         /// Gets or sets the WMI item types to load.
         /// </summary>
         /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
         public WMIItemTypes WMIItemTypes { get => _wmiItemTypes; set => this.SetBackgroundWorkerProperty(nameof(WMIItemTypes), nameof(_wmiItemTypes), value, typeof(WMIItemsLoader), true); }
-
-        /// <summary>
-        /// Gets or sets options for the WMI connections.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
-        public ConnectionOptions ConnectionOptions { get => _connectionOptions; set => this.SetBackgroundWorkerProperty(nameof(ConnectionOptions), nameof(_connectionOptions), value, typeof(WMIItemsLoader), true); }
-
-        /// <summary>
-        /// Gets or sets options for getting management objects.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
-        public ObjectGetOptions ObjectGetOptions { get => _objectGetOptions; set => this.SetBackgroundWorkerProperty(nameof(ObjectGetOptions), nameof(_objectGetOptions), value, typeof(WMIItemsLoader), true); }
-
-        /// <summary>
-        /// Gets or sets options for management objects.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
-        public EnumerationOptions EnumerationOptions { get => _enumerationOptions; set => this.SetBackgroundWorkerProperty(nameof(EnumerationOptions), nameof(_enumerationOptions), value, typeof(WMIItemsLoader), true); }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
@@ -81,7 +67,7 @@ namespace WinCopies.IO
 
                 {
 
-                    ManagementClass managementClass = wmiItemInfo.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(wmiItemInfo.Path, ConnectionOptions), new ManagementPath(wmiItemInfo.Path), ObjectGetOptions);
+                    ManagementClass managementClass = wmiItemInfo.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(wmiItemInfo.Path, _wmiItemInfoFactoryOptions?.ConnectionOptions), new ManagementPath(wmiItemInfo.Path), _wmiItemInfoFactoryOptions?.ObjectGetOptions);
 
                     ManagementObjectCollection instances;
 
@@ -94,7 +80,7 @@ namespace WinCopies.IO
 
                         managementClass.Get();
 
-                        instances = EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(EnumerationOptions);
+                        instances = _wmiItemInfoFactoryOptions?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(_wmiItemInfoFactoryOptions?.EnumerationOptions);
 
                         foreach (ManagementBaseObject instance in instances)
 
@@ -118,12 +104,16 @@ namespace WinCopies.IO
                     }
 
                     // MessageBox.Show(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length));
-                    managementClass = new ManagementClass(new ManagementScope(wmiItemInfo.Path, ConnectionOptions), new ManagementPath(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length)), ObjectGetOptions);
+                    managementClass = new ManagementClass(new ManagementScope(wmiItemInfo.Path, _wmiItemInfoFactoryOptions?.ConnectionOptions), new ManagementPath(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length)), _wmiItemInfoFactoryOptions?.ObjectGetOptions);
 
-                    instances = EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(EnumerationOptions);
+                    instances = _wmiItemInfoFactoryOptions?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(_wmiItemInfoFactoryOptions?.EnumerationOptions);
 
+#if DEBUG
                     if (wmiItemInfo.Path.Contains("CIM"))
+
                         MessageBox.Show(instances.Count.ToString());
+#endif
+
                     foreach (ManagementBaseObject instance in instances)
 
                         _ = arrayBuilder.AddLast(instance);
@@ -149,11 +139,11 @@ namespace WinCopies.IO
 
                 {
 
-                    ManagementClass managementClass = wmiItemInfo.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(wmiItemInfo.Path, ConnectionOptions), new ManagementPath(wmiItemInfo.Path), ObjectGetOptions);
+                    ManagementClass managementClass = wmiItemInfo.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(wmiItemInfo.Path, _wmiItemInfoFactoryOptions?.ConnectionOptions), new ManagementPath(wmiItemInfo.Path), _wmiItemInfoFactoryOptions?.ObjectGetOptions);
 
                     ManagementObjectCollection instances;
 
-                    ArrayAndListBuilder<ManagementBaseObject> arrayBuilder = new ArrayAndListBuilder<ManagementBaseObject>();
+                    var arrayBuilder = new ArrayAndListBuilder<ManagementBaseObject>();
 
                     List<ManagementBaseObject> sortedInstances;
 
@@ -162,7 +152,7 @@ namespace WinCopies.IO
 
                         managementClass.Get();
 
-                        instances = EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(EnumerationOptions);
+                        instances = _wmiItemInfoFactoryOptions?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(_wmiItemInfoFactoryOptions?.EnumerationOptions);
 
                         foreach (ManagementBaseObject instance in instances)
 

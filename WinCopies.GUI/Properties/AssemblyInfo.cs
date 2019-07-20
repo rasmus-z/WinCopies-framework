@@ -8,7 +8,7 @@ using System.Windows;
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
 [assembly: AssemblyTitle("WinCopies.GUI")]
-[assembly: AssemblyDescription("Some visual basic components")]
+[assembly: AssemblyDescription("Some basic visual components")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("WinCopies framework")]
@@ -54,5 +54,5 @@ using System.Windows;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: Guid("ee11ac8a-f52b-4b09-9406-fdce3a0f6e6a")]
-[assembly: NeutralResourcesLanguage("fr")]
+[assembly: NeutralResourcesLanguage("en")]
 
