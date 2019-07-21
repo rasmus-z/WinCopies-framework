@@ -10,6 +10,7 @@ using System.Management;
 using System.Windows;
 using System.Windows.Interop;
 using System.Drawing;
+using System.Globalization;
 
 namespace WinCopies.IO
 {
@@ -230,7 +231,7 @@ namespace WinCopies.IO
             set
             {
 
-                if (ItemsLoader.IsBusy)
+                if (ItemsLoader?.IsBusy == true)
 
                     throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
 
@@ -248,15 +249,39 @@ namespace WinCopies.IO
 
             if (IsRootNode) return null;
 
-            if (WMIItemType == WMIItemType.Namespace)
+            string path;
+
+            switch (WMIItemType)
 
             {
 
-                string path = Path.Substring(0, Path.LastIndexOf('\\')) + ":__NAMESPACE";
+                case WMIItemType.Namespace:
 
-                WMIItemInfoFactory.GetBrowsableObjectInfo(new ManagementObject(new ManagementScope(path, ), new ManagementPath(path), ))
+                    path = Path.Substring(0, Path.LastIndexOf('\\')) + ":__NAMESPACE";
 
-                    }
+                    return path.EndsWith("root:__namespace", true, CultureInfo.InvariantCulture)
+                        ? WMIItemInfoFactory.GetBrowsableObjectInfo()
+                        : WMIItemInfoFactory.GetBrowsableObjectInfo(path, WMIItemType.Namespace);
+
+                case WMIItemType.Class:
+
+                    return Path.EndsWith("root:" + Name, true, CultureInfo.InvariantCulture)
+                        ? WMIItemInfoFactory.GetBrowsableObjectInfo()
+                        : WMIItemInfoFactory.GetBrowsableObjectInfo(Path.Substring(0, Path.IndexOf(':')) + ":__NAMESPACE", WMIItemType.Namespace);
+
+                case WMIItemType.Instance:
+
+                    path = Path.Substring(0, Path.IndexOf(':'));
+
+                    path = path.Substring(0, path.LastIndexOf('\\')) + ':' + path.Substring(path.LastIndexOf('\\') + 1);
+
+                    return WMIItemInfoFactory.GetBrowsableObjectInfo(path, WMIItemType.Class);
+
+                default: // We souldn't reach this point.
+
+                    return null;
+
+            }
 
         }
 

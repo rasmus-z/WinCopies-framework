@@ -58,9 +58,9 @@ namespace WinCopies.IO
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType) => new WMIItemInfo(managementObject, wmiItemType);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementScope managementScope, ManagementPath managementPath, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(managementScope, managementPath, OptionsOverride.ObjectGetOptions), wmiItemType);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementScope managementScope, ManagementPath managementPath, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(managementScope, managementPath, OptionsOverride?.ObjectGetOptions), wmiItemType);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(new ManagementScope(path, OptionsOverride.ConnectionOptions), new ManagementPath(path), OptionsOverride.ObjectGetOptions), wmiItemType);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(new ManagementScope(path, OptionsOverride?.ConnectionOptions), new ManagementPath(path), OptionsOverride?.ObjectGetOptions), wmiItemType);
 
     }
 

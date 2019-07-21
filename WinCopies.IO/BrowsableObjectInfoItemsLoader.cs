@@ -35,7 +35,7 @@ namespace WinCopies.IO
         private readonly BrowsableObjectInfo _path;
         private readonly IEnumerable<string> _filter;
 
-        public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(FolderLoader), true); }
+        public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoItemsLoader), true); }
 
         //public void changePath(IBrowsableObjectInfo newValue)
 
@@ -63,6 +63,8 @@ namespace WinCopies.IO
 
                 Path.Items.CollectionChanging += (object sender, NotifyCollectionChangedEventArgs e) =>
                 {
+
+                    if (e.NewItems != null)
 
                     foreach (var item in e.NewItems)
 
