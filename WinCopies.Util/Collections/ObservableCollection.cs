@@ -53,9 +53,9 @@ namespace WinCopies.Collections
     public class ObservableCollection<T> : System.Collections.ObjectModel.ObservableCollection<T>, INotifyCollectionChanging
     {
 
-        public event NotifyCollectionChangingEventHandler CollectionChanging;
+        public virtual event NotifyCollectionChangingEventHandler CollectionChanging;
 
-        public ObservableCollection()
+        public ObservableCollection() : base()
         {
 
         }
@@ -73,6 +73,8 @@ namespace WinCopies.Collections
         protected override void InsertItem(int index, T item)
         {
 
+            CheckReentrancy();
+
             OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Add, item, index));
 
             base.InsertItem(index, item);
@@ -82,6 +84,8 @@ namespace WinCopies.Collections
         protected override void MoveItem(int oldIndex, int newIndex)
 
         {
+
+            CheckReentrancy();
 
             OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Move, this[oldIndex], oldIndex, newIndex));
 
@@ -93,6 +97,8 @@ namespace WinCopies.Collections
 
         {
 
+            CheckReentrancy();
+
             OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Replace, this[index], item));
 
             base.SetItem(index, item);
@@ -102,6 +108,8 @@ namespace WinCopies.Collections
         protected override void RemoveItem(int index)
 
         {
+
+            CheckReentrancy();
 
             OnCollectionChanging(new NotifyCollectionChangedEventArgs(true, NotifyCollectionChangedAction.Remove, this[index], index));
 
@@ -113,7 +121,9 @@ namespace WinCopies.Collections
 
         {
 
-            OnCollectionChanging(new NotifyCollectionChangedEventArgs(new ReadOnlyCollection<T>(this. ToList())));
+            CheckReentrancy();
+
+            OnCollectionChanging(new NotifyCollectionChangedEventArgs(new ReadOnlyCollection<T>(this.ToList())));
 
             base.ClearItems();
 
@@ -122,10 +132,14 @@ namespace WinCopies.Collections
         protected virtual void OnCollectionChanging(NotifyCollectionChangedEventArgs e)
 
         {
-            
+
             if (!e.IsChangingEvent) throw new ArgumentException($"'{nameof(e)}' must have the IsChangingProperty set to true.");
 
-            CollectionChanging?.Invoke(this, e);
+            if (CollectionChanging != null)
+
+                using (BlockReentrancy())
+
+                    CollectionChanging(this, e);
 
         }
     }

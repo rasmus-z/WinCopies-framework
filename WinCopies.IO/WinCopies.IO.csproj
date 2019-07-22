@@ -117,19 +117,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArchiveItemInfo.cs" />
+    <Compile Include="ArchiveItemInfoFactory.cs" />
     <Compile Include="ArchiveLoader.cs" />
     <Compile Include="BrowsableObjectInfo.cs" />
     <Compile Include="BrowsableObjectInfoItemsLoader.cs" />
     <Compile Include="DesktopAppInfo.cs" />
+    <Compile Include="FileSystemObjectComparer.cs" />
     <Compile Include="FileSystemObjectItemsLoader.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="FolderLoader.cs" />
     <Compile Include="FolderLoaderFileSystemWatcher.cs" />
     <Compile Include="IArchiveItemInfo.cs" />
+    <Compile Include="IArchiveItemInfoProvider.cs" />
     <Compile Include="IBrowsableObjectInfo.cs" />
+    <Compile Include="IFileSystemObjectItemsLoader.cs" />
+    <Compile Include="IFolderLoader.cs" />
     <Compile Include="IRegistryItemInfo.cs" />
+    <Compile Include="IRegistryKeyItemsLoader.cs" />
     <Compile Include="IShellObjectInfo.cs" />
+    <Compile Include="IWMIItemInfo.cs" />
     <Compile Include="IWMIItemInfoFactory.cs" />
+    <Compile Include="IWMIItemsLoader.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registry.cs" />
@@ -139,6 +147,7 @@
     <Compile Include="RegistryItemInfoFactory.cs" />
     <Compile Include="RegistryKeyItemsLoader.cs" />
     <Compile Include="ShellObjectInfo.cs" />
+    <Compile Include="ShellObjectInfoFactory.cs" />
     <Compile Include="Size.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="WindowsStoreAppLauncherInterop.cs" />

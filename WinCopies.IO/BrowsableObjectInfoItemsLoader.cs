@@ -15,7 +15,11 @@ namespace WinCopies.IO
     public interface IBrowsableObjectInfoItemsLoader : IBackgroundWorker, IDisposable
     {
 
+        IEnumerable<string> Filter { get; set; }
+
         IBrowsableObjectInfo Path { get; }
+
+        bool CheckFilter(string path);
 
         void LoadItems();
 
@@ -32,7 +36,7 @@ namespace WinCopies.IO
 
         private readonly BackgroundWorker backgroundWorker = new BackgroundWorker();
         private readonly IComparer<IFileSystemObject> _fileSystemObjectComparer;
-        private readonly BrowsableObjectInfo _path;
+        private readonly IBrowsableObjectInfo _path;
         private readonly IEnumerable<string> _filter;
 
         public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoItemsLoader), true); }
@@ -43,7 +47,7 @@ namespace WinCopies.IO
 
 
 
-        //} 
+        //}
 
         /// <summary>
         /// Gets the path from which to load the items.
@@ -51,30 +55,46 @@ namespace WinCopies.IO
         public IBrowsableObjectInfo Path
         {
             get => _path; internal set
+
             {
+
+                var browsableObjectInfo = (BrowsableObjectInfo)value;
+
+                OnPathChanging(browsableObjectInfo);
 
                 // We try to set the property and we throw an exception if backgroundWorker is busy.
 
                 _ = this.SetBackgroundWorkerProperty(nameof(Path), nameof(_path), value, typeof(BrowsableObjectInfoItemsLoader), true);
 
-                // We reach this point only if the test above succeeded.
-
-                InitializePath();
-
-                Path.Items.CollectionChanging += (object sender, NotifyCollectionChangedEventArgs e) =>
-                {
-
-                    if (e.NewItems != null)
-
-                    foreach (var item in e.NewItems)
-
-                        if (item is BrowsableObjectInfo _browsableObjectInfo)
-
-                            _browsableObjectInfo.Parent = Path;
-
-                };
+                OnPathChanged(browsableObjectInfo);
 
             }
+        }
+
+        protected virtual void OnItemsChanging(NotifyCollectionChangedEventArgs e)
+        {
+
+            if (e.NewItems != null)
+
+                foreach (var item in e.NewItems)
+
+                    if (item is BrowsableObjectInfo _browsableObjectInfo)
+
+                        _browsableObjectInfo.Parent = (IBrowsableObjectInfo)Path;
+
+        }
+
+        private void ItemsChanging(object sender, NotifyCollectionChangedEventArgs e) => OnItemsChanging(e);
+
+        protected virtual void OnPathChanging(BrowsableObjectInfo path) { }
+
+        protected virtual void OnPathChanged(BrowsableObjectInfo path)
+        {
+
+            ((INotifyCollectionChanging)_path.Items).CollectionChanging -= ItemsChanging;
+
+            ((INotifyCollectionChanging)path.Items).CollectionChanging += ItemsChanging;
+
         }
 
         public IEnumerable<string> Filter { get => _filter; set => this.SetBackgroundWorkerProperty(nameof(Filter), nameof(_filter), value, typeof(BrowsableObjectInfoItemsLoader), true); }
@@ -183,7 +203,7 @@ namespace WinCopies.IO
 
         }
 
-        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => _path.AreItemsLoaded = true;
+        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => ((BrowsableObjectInfo)_path).AreItemsLoaded = true;
 
         public abstract bool CheckFilter(string path);
 
@@ -206,8 +226,6 @@ namespace WinCopies.IO
         /// </param>
         public void ReportProgress(int percentProgress, object userState) => backgroundWorker.ReportProgress(percentProgress, userState);
 
-        protected abstract void InitializePath();
-
         public static FileTypes FileTypeToFileTypeFlags(FileType fileType)
 
         {
@@ -220,7 +238,7 @@ namespace WinCopies.IO
 
             {
 
-                case FileType.None:
+                case FileType.Other:
 
                     return FileTypes.None;
 
@@ -340,28 +358,6 @@ namespace WinCopies.IO
         public void Resume() => backgroundWorker.Resume();
 
         protected virtual void OnAddingPath(IBrowsableObjectInfo path) => (Path as BrowsableObjectInfo)?.items.Add(path);
-    }
-
-
-
-    public class FileSystemObjectComparer : Comparer<IFileSystemObject>
-
-    {
-
-        public StringComparer StringComparer { get; set; }
-
-        public FileSystemObjectComparer() : this(StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
-
-        public FileSystemObjectComparer(StringComparer stringComparer) => StringComparer = stringComparer;
-
-        public override int Compare(IFileSystemObject x, IFileSystemObject y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
-                ? StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents())
-                : (x.FileType == FileType.Folder || x.FileType == FileType.Drive) && (y.FileType == FileType.File || y.FileType == FileType.Archive || y.FileType == FileType.Link)
-                ? -1
-                : (x.FileType == FileType.File || x.FileType == FileType.Archive || x.FileType == FileType.Link) && (y.FileType == FileType.Folder || y.FileType == FileType.Drive)
-                ? 1
-                : 0;
-
     }
 
 }

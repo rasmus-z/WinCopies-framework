@@ -12,18 +12,6 @@ using TsudaKageyu;
 namespace WinCopies.IO
 {
 
-    public interface IArchiveItemInfoProvider
-
-    {
-
-        // IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType);
-
-        IArchiveItemInfoFactory ArchiveItemInfoFactory { get; set; }
-
-        ShellObjectInfo ArchiveShellObject { get; }
-
-    }
-
     /// <summary>
     /// Provides info to interact with archive items.
     /// </summary>
@@ -154,8 +142,8 @@ namespace WinCopies.IO
                     Icon icon = null;
 
                     if (fileType != null)
-
-                        icon = Registry.GetIconVariationsFromFileType(fileType)?.TryGetIcon(size, 32, true, true);
+                        
+                        icon = Icon.ExtractAssociatedIcon(" Registry.GetIconVariationsFromFileType(fileType)?.TryGetIcon(size, 32, true, true);
 
                     return icon ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
@@ -319,26 +307,10 @@ namespace WinCopies.IO
 
                     throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
 
-                _archiveItemInfoFactory = value;
+                _archiveItemInfoFactory = value ?? throw new ArgumentNullException("value");
 
             }
         }
-    }
-
-    public interface IArchiveItemInfoFactory
-    {
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType);
-
-    }
-
-    public class ArchiveItemInfoFactory : IArchiveItemInfoFactory
-    {
-
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) =>
-
-            new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
-
     }
 
 }

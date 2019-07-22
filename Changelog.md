@@ -30,13 +30,19 @@ WinCopies.Util (2.0)
 		- EnumComparer
 		- ArrayAndListBuilder class to build arrays, lists and observable collections like the .Net's StringBuilder does.
 	- Methods:
-		- EqualityComparison delegate
-		- ToStringWithoutAccents string extension method
-		- Extension methods for LinkedLists
-		- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
-		- 'SetField' static method.
-		- The view model classes now have the OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
-		- Between methods for the other numeric types.
+		- Static methods:
+			- 'SetField' static method.
+			- 'Between' static methods for the other numeric types.
+			- 'ThrowIfNull' static method.
+			- 'GetOrThrowIfNotType' static method.
+		- Extension methods:
+			- ToStringWithoutAccents string extension method
+			- Extension methods for LinkedLists
+			- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
+		- Misc:
+			- EqualityComparison delegate
+			- The view model classes now have the OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
+			- The ReadOnlyObservableCollection has now the OnCollectionChanging protected virtual method.
 
 - Bug fixes:
 	- Bug fixed in the BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.
@@ -48,11 +54,14 @@ WinCopies.Util (2.0)
 	- The 'If' methods perform a real 'xor' comparison in binary mode and are now faster.
 	- The ApartmentState, WorkerReportsProgress and WorkerSupportsCancellation properties of the IBackgroundWorker interface are now settable.
 	- The IsNullConverter class now uses the 'is' operator instead of '=='.
+	- The ObservableCollection now calls base methods for avoinding reentrancy.
 
 - Removals:
 	- The redundant 'performIntegrityCheck' parameter in one of the 'SetProperty' methods has been removed.
 
-- Updated doc.
+- Misc:
+	- ReadOnlyObservableCollection's CollectionChanging event has now the protected access modifier.
+	- Updated doc.
 
 Project link
 ------------

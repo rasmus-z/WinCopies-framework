@@ -7,13 +7,14 @@ using TsudaKageyu;
 
 using WinCopies.Collections;
 using WinCopies.Util;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
     /// <summary>
     /// Provides a base class for all I/O objects of the WinCopies framework.
     /// </summary>
-    public abstract class BrowsableObjectInfo : IBrowsableObjectInfo<BrowsableObjectInfoItemsLoader>
+    public abstract class BrowsableObjectInfo
     {
 
         internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
@@ -21,7 +22,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the path of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        public string Path { get; }
+        public virtual string Path { get; }
 
         /// <summary>
         /// When overridden in a derived class, gets the localized path of this <see cref="BrowsableObjectInfo"/>.
@@ -66,21 +67,21 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates if the items of this <see cref="BrowsableObjectInfo"/> are currently loaded.
         /// </summary>
-        public bool AreItemsLoaded { get; internal set; }
+        public virtual bool AreItemsLoaded { get; internal set; }
 
         internal readonly ObservableCollection<IBrowsableObjectInfo> items = new ObservableCollection<IBrowsableObjectInfo>();
 
         /// <summary>
         /// Gets the items of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        public ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; } = null;
+        public virtual ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; } = null;
 
         private IBrowsableObjectInfo _parent = null;
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
         /// </summary>
-        public IBrowsableObjectInfo Parent
+        public virtual IBrowsableObjectInfo Parent
         {
             get => _parent ?? (_parent = GetParent());
 
@@ -90,37 +91,7 @@ namespace WinCopies.IO
         /// <summary>
         /// The file type of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        public FileType FileType { get; private set; } = FileType.None;
-
-        private BrowsableObjectInfoItemsLoader itemsLoader = null;
-
-        /// <summary>
-        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>. See the Remarks section.
-        /// </summary>
-        /// <remarks><para>When setting, automatically disposes the old <see cref="IBrowsableObjectInfoItemsLoader"/>.</para>
-        /// <para>When setting, if the new value is a <see cref="BrowsableObjectInfoItemsLoader"/>, its <see cref="BrowsableObjectInfoItemsLoader.Path"/> property is automatically set with this instance of <see cref="BrowsableObjectInfo"/>.</para></remarks>
-        /// <exception cref="InvalidOperationException">The old <see cref="IBrowsableObjectInfoItemsLoader"/> is running.</exception>
-        public virtual BrowsableObjectInfoItemsLoader ItemsLoader
-        {
-
-            get => itemsLoader;
-
-            set
-            {
-
-                if (itemsLoader.IsBusy)
-
-                    throw new InvalidOperationException($"The old {nameof(IBrowsableObjectInfoItemsLoader)} is running.");
-
-                itemsLoader = value;
-
-                if (value is BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
-
-                    browsableObjectInfoItemsLoader.Path = this;
-
-            }
-
-        }
+        public virtual FileType FileType { get; private set; } = FileType.Other;
 
         // private bool _considerAsPathRoot = false;
 
@@ -171,8 +142,8 @@ namespace WinCopies.IO
         /// <summary>
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
-        /// <param name="browsableObjectInfoItemsLoader">A custom items loader.</param>
-        public virtual void LoadItems(IBrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
+        /// <param name="itemsLoader">A custom items loader.</param>
+        public virtual void LoadItems(IBrowsableObjectInfoItemsLoader itemsLoader)
 
         {
 
@@ -180,15 +151,9 @@ namespace WinCopies.IO
 
                 throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, FileType.ToString(), ToString()));
 
-            if (browsableObjectInfoItemsLoader == null)
+            ItemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoItemsLoader>(itemsLoader, nameof(itemsLoader));
 
-                throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
-
-            if (browsableObjectInfoItemsLoader is BrowsableObjectInfoItemsLoader _browsableObjectInfoItemsLoader)
-
-                _browsableObjectInfoItemsLoader.Path = this;
-
-            browsableObjectInfoItemsLoader.LoadItems();
+            ItemsLoader.LoadItems();
 
         }
 
@@ -219,8 +184,8 @@ namespace WinCopies.IO
         /// <summary>
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
-        /// <param name="browsableObjectInfoItemsLoader">A custom items loader.</param>
-        public virtual void LoadItemsAsync(IBrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader)
+        /// <param name="itemsLoader">A custom items loader.</param>
+        public virtual void LoadItemsAsync(IBrowsableObjectInfoItemsLoader itemsLoader)
 
         {
 
@@ -228,17 +193,9 @@ namespace WinCopies.IO
 
                 throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, FileType.ToString(), ToString()));
 
-            if (browsableObjectInfoItemsLoader == null)
+            ItemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoItemsLoader>(itemsLoader, nameof(itemsLoader));
 
-                throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
-
-            // ItemsLoader = browsableObjectInfoItemsLoader ?? throw new ArgumentNullException(nameof(browsableObjectInfoItemsLoader));
-
-            if (browsableObjectInfoItemsLoader is BrowsableObjectInfoItemsLoader _browsableObjectInfoItemsLoader)
-
-                _browsableObjectInfoItemsLoader.Path = this;
-
-            browsableObjectInfoItemsLoader.LoadItemsAsync();
+            ItemsLoader.LoadItemsAsync();
 
         }
 
@@ -264,7 +221,7 @@ namespace WinCopies.IO
 
             IsDisposing = true;
 
-            if (ItemsLoader != null && ItemsLoader is BrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader && browsableObjectInfoItemsLoader.IsBusy)
+            if (ItemsLoader != null && ItemsLoader is IBrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader && browsableObjectInfoItemsLoader.IsBusy)
 
                 throw new InvalidOperationException("The items loader is busy.");
 
@@ -302,7 +259,7 @@ namespace WinCopies.IO
         /// Gets a string representation of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         /// <returns>The <see cref="LocalizedName"/> of this <see cref="BrowsableObjectInfo"/>.</returns>
-        public override string ToString() => Util.Util.IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
+        public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
 
         /// <summary>
         /// When overridden in a derived class, gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.
@@ -324,5 +281,29 @@ namespace WinCopies.IO
         /// </summary>
         /// <returns>The hash codes of the <see cref="FileType"/> and the <see cref="Path"/> property.</returns>
         public override int GetHashCode() => FileType.GetHashCode() ^ Path.ToLower().GetHashCode();
+
+        BrowsableObjectInfoItemsLoader _itemsLoader;
+
+        /// <summary>
+        /// Gets the items loader for this <see cref="BrowsableObjectInfo"/>. See the Remarks section.
+        /// </summary>
+        /// <remarks><para>When setting, automatically disposes the old <see cref="IBrowsableObjectInfoItemsLoader"/>.</para>
+        /// <para>When setting, if the new value is a <see cref="BrowsableObjectInfoItemsLoader"/>, its <see cref="BrowsableObjectInfoItemsLoader.Path"/> property is automatically set with this instance of <see cref="BrowsableObjectInfo"/>.</para></remarks>
+        /// <exception cref="InvalidOperationException">The old <see cref="IBrowsableObjectInfoItemsLoader"/> is running.</exception>
+        public IBrowsableObjectInfoItemsLoader ItemsLoader
+        {
+            get => _itemsLoader; set
+            {
+
+                BrowsableObjectInfoItemsLoader itemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoItemsLoader>(value, nameof(value));
+
+                _itemsLoader = itemsLoader;
+
+                itemsLoader.Path = (IBrowsableObjectInfo)this;
+
+            }
+
+        }
+
     }
 }

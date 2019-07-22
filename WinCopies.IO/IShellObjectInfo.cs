@@ -50,13 +50,9 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets or sets the factory this <see cref="IShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent casual file system items.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/></exception>
+        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy.</exception>
+        /// <exception cref="ArgumentNullException">The given value is null.</exception>
         IShellObjectInfoFactory ShellObjectInfoFactory { get; set; }
 
-        /// <summary>
-        /// Gets or sets the factory this <see cref="IShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/></exception>
-        IArchiveItemInfoFactory ArchiveItemInfoFactory { get; set; }
     }
 }

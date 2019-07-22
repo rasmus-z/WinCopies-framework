@@ -12,6 +12,8 @@ namespace WinCopies.IO
     public interface IBrowsableObjectInfo : IFileSystemObject, IDisposable
     {
 
+        IBrowsableObjectInfoItemsLoader ItemsLoader { get; }
+
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
@@ -110,16 +112,6 @@ namespace WinCopies.IO
         /// </summary>
         /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.</returns>
         IBrowsableObjectInfo Clone();
-
-    }
-
-    public interface IBrowsableObjectInfo<TItemsLoader> : IBrowsableObjectInfo where TItemsLoader : IBrowsableObjectInfoItemsLoader
-    {
-
-        /// <summary>
-        /// Gets or sets the items loader for this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        TItemsLoader ItemsLoader { get; set; }
 
     }
 

@@ -27,10 +27,10 @@ namespace WinCopies.IO
 
     }
 
-    public class RegistryKeyItemsLoader : BrowsableObjectInfoItemsLoader
+    public class RegistryKeyItemsLoader : BrowsableObjectInfoItemsLoader, IRegistryKeyItemsLoader
     {
 
-        private RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
+        private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
 
         public RegistryItemTypes RegistryItemTypes
         {
@@ -105,7 +105,7 @@ namespace WinCopies.IO
 
         }
 
-        protected override void InitializePath() => ThrowOnInvalidRegistryTypesOption();
+        protected override void OnPathChanging(BrowsableObjectInfo path) => ThrowOnInvalidRegistryTypesOption();
 
         private void ThrowOnInvalidRegistryTypesOption()
 
@@ -130,6 +130,8 @@ namespace WinCopies.IO
 
             {
 
+                var arrayAndListBuilder = new ArrayAndListBuilder<PathInfo>();
+
                 switch (registryItemInfo.RegistryItemType)
 
                 {
@@ -138,13 +140,21 @@ namespace WinCopies.IO
 
                         var _registryKeyFields = new List<FieldInfo>(typeof(Microsoft.Win32.Registry).GetFields());
 
-                        _registryKeyFields.Sort((FieldInfo x, FieldInfo y) => x.Name.CompareTo(y.Name));
+                        PathInfo pathInfo;
 
                         foreach (FieldInfo fieldInfo in _registryKeyFields)
 
                             if (CheckFilter(fieldInfo.Name))
 
-                                ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo((RegistryKey)fieldInfo.GetValue(null)));
+                            {
+
+                                pathInfo = new PathInfo();
+
+                                pathInfo.Path = pathInfo.Name = fieldInfo.Name;
+
+                                arrayAndListBuilder.AddLast(pathInfo);
+
+                            }
 
                         break;
 
@@ -196,8 +206,23 @@ namespace WinCopies.IO
 
                 }
 
+
+
+                ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo((RegistryKey)fieldInfo.GetValue(null)));
+
             }
 
+        }
+
+        public struct PathInfo : IFileSystemObject
+        {
+            public string Path { get; set; }
+
+            public string LocalizedName => Name;
+
+            public string Name { get; set; }
+
+            public FileType FileType => FileType.SpecialFolder;
         }
     }
 }

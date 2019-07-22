@@ -3061,7 +3061,8 @@ namespace WinCopies.Util
 
         }
 
-        [Obsolete("This method has been replaced by arrays-common methods.")]
+        // todo: To replace by arrays-common methods
+
         public static bool Contains(this string s, char value, out int index)
 
         {

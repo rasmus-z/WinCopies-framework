@@ -22,6 +22,8 @@ using WinCopies.Util;
 
 // using WinCopies.IO;
 
+using static WinCopies.Util.Util;
+
 #endregion
 
 
@@ -33,12 +35,12 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides a background process that can be used to load items of a folder.
     /// </summary>
-    public class FolderLoader : FileSystemObjectItemsLoader
+    public class FolderLoader : FileSystemObjectItemsLoader, IFolderLoader
     {
 
         // todo: to turn on ShellObjectWatcher for better compatibility
 
-#pragma warning disable CS0649 // Set up using reflection.
+#pragma warning disable CS0649 // Set up using reflection
         private readonly FolderLoaderFileSystemWatcher _folderLoaderFileSystemWatcher;
 #pragma warning restore CS0649
 
@@ -59,10 +61,18 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes) { }
+        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes)
+        {
 
-        protected override void InitializePath()
+            FileSystemWatcher.Created += FileSystemWatcher_Created;
 
+            FileSystemWatcher.Renamed += FileSystemWatcher_Renamed;
+
+            FileSystemWatcher.Deleted += FileSystemWatcher_Deleted;
+
+        }
+
+        protected override void OnPathChanging(BrowsableObjectInfo path)
         {
 
             if (Path == null)
@@ -73,13 +83,13 @@ namespace WinCopies.IO
 
             {
 
-                if (!(Path is ShellObjectInfo _path))
+                _ = GetOrThrowIfNotType<ShellObjectInfo>((IBrowsableObjectInfo)path, nameof(path));
 
-                    throw new ArgumentException("'Path' isn't a ShellObjectInfo. 'Path' is " + Path.ToString());
+                if (If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, path.FileType, FileType.File, FileType.Archive, FileType.Link, FileType.Other))
 
-                else if (_path.FileType != FileType.Folder && _path.FileType != FileType.Drive && _path.FileType != FileType.SpecialFolder)
+                    throw new ArgumentException("'Path' isn't a folder, a drive or a special folder. 'Path': " + path.ToString());
 
-                    throw new ArgumentException("'Path' isn't a folder, a drive or a special folder. 'Path': " + _path.ToString());
+                FileSystemWatcher.EnableRaisingEvents = false;
 
                 if ((((ShellObjectInfo)Path).FileType == FileType.Folder || ((ShellObjectInfo)Path).FileType == FileType.SpecialFolder) && ((ShellObjectInfo)Path).ShellObject.IsFileSystemObject && FileSystemWatcher == null)
 
@@ -98,12 +108,6 @@ namespace WinCopies.IO
 
                             FileSystemWatcher.EnableRaisingEvents = true;
 
-                            FileSystemWatcher.Created += FileSystemWatcher_Created;
-
-                            FileSystemWatcher.Renamed += FileSystemWatcher_Renamed;
-
-                            FileSystemWatcher.Deleted += FileSystemWatcher_Deleted;
-
                         }
 
                     }
@@ -111,6 +115,10 @@ namespace WinCopies.IO
                     catch { }
 
                 }
+
+                else
+
+                    FileSystemWatcher.Path = null;
 
             }
 
@@ -163,7 +171,9 @@ namespace WinCopies.IO
             catch { }
 #endif
 
-                ((BrowsableObjectInfo)Path).items.Sort(FileSystemObjectComparer);
+                if (FileSystemObjectComparer != null)
+
+                    ((BrowsableObjectInfo)Path).items.Sort(FileSystemObjectComparer);
             }
 
         }
@@ -261,7 +271,7 @@ namespace WinCopies.IO
 
 #endif
 
-                if (pathInfo.FileType == FileType.None || (pathInfo.FileType != FileType.SpecialFolder && FileTypes != Util.Util.GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
+                if (pathInfo.FileType == FileType.Other || (pathInfo.FileType != FileType.SpecialFolder && FileTypes != Util.Util.GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
 
                 // We only make a normalized path if we add the path to the paths to load.
 
@@ -460,17 +470,29 @@ namespace WinCopies.IO
 
             }
 
-
-
-            List<IFileSystemObject> _paths = paths.ToList();
-
-
-
-            _paths.Sort(FileSystemObjectComparer);
+            IEnumerable<PathInfo> pathInfos;
 
 
 
-            foreach (PathInfo path_ in _paths)
+            if (FileSystemObjectComparer == null)
+
+                pathInfos = (IEnumerable<PathInfo>)paths;
+
+            else
+
+            {
+
+                var _paths = paths.ToList();
+
+                _paths.Sort(FileSystemObjectComparer);
+
+                pathInfos = (IEnumerable<PathInfo>)_paths;
+
+            }
+
+
+
+            foreach (PathInfo path_ in pathInfos)
 
             {
 

@@ -34,18 +34,20 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the System.Exception class with serialized data.
         /// </summary>
-        /// <param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> that holds the serialized
+        /// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized
         /// object data about the exception being thrown.</param>
-        /// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext"/> that contains contextual information
+        /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information
         /// about the source or destination.</param>
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// The info parameter is <see langword="null"/>.
         /// </exception>
-        /// <exception cref="System.Runtime.Serialization.SerializationException">
-        /// The class name is <see langword="null"/> or <see cref="System.Exception.HResult"/> is zero (0).
+        /// <exception cref="SerializationException">
+        /// The class name is <see langword="null"/> or <see cref="Exception.HResult"/> is zero (0).
         /// </exception>
         [SecuritySafeCritical]
         protected RegistryException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+
+        public RegistryException(string message, string registryKeyPath) : this(message, null, registryKeyPath) { }    
 
         public RegistryException(string message, Exception innerException, string registryKeyPath) : base(message, innerException) => RegistryKeyPath = registryKeyPath;
     }

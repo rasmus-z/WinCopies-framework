@@ -185,7 +185,7 @@ namespace WinCopies.IO
 
                     throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
 
-                _registryItemInfoFactory = value;
+                _registryItemInfoFactory = value ?? throw new ArgumentNullException("value");
 
             }
         }

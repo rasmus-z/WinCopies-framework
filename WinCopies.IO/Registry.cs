@@ -16,454 +16,452 @@ namespace WinCopies.IO
 {
     // todo: check if registry keys are the authorized ones.
 
-    /// <summary>
-    /// Provides some static methods to interact with the Windows registry.
-    /// </summary>
     public static class Registry
     {
-        private const string DefaultIcon = "DefaultIcon";
-        private const string OpenCommandPath = "shell\\open\\command";
-        private const string DefaultIconDllPath = "%SystemRoot%\\System32\\SHELL32.dll";
-        private const string PerceivedType = "PerceivedType";
-        private const string SystemFileAssociations = "SystemFileAssociations";
-        private const string SoftwareClasses = "Software\\Classes";
-        private const string shellBackslash = "shell\\";
-        private const string UserChoice = "UserChoice";
-        private const string BackslashCommand = "\\command";
-        private const string ProgId = "ProgId";
-        private const string OpenWithProgids = "OpenWithProgids";
-        private const string OpenWithList = "OpenWithList";
-        private const string MRUList = "MRUList";
-        private const string SoftwareClassesApplications = "Software\\Classes\\Applications";
-        private const string ApplicationsBackslash = "Applications\\";
-        private const string SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts";
 
-        /// <summary>
-        /// Gets the Windows registry open-with file type for a given extension.
-        /// </summary>
-        /// <param name="extension">The file extension from which look for the associated file type.</param>
-        /// <returns>If found, the Windows registry open-with file type associated to the given extension, otherwise null.</returns>
-        public static string GetFileTypeFromExtension(string extension)
+        //private const string DefaultIcon = "DefaultIcon";
+        //private const string OpenCommandPath = "shell\\open\\command";
+        //private const string DefaultIconDllPath = "%SystemRoot%\\System32\\SHELL32.dll";
+        //private const string PerceivedType = "PerceivedType";
+        //private const string SystemFileAssociations = "SystemFileAssociations";
+        //private const string SoftwareClasses = "Software\\Classes";
+        //private const string shellBackslash = "shell\\";
+        //private const string UserChoice = "UserChoice";
+        //private const string BackslashCommand = "\\command";
+        //private const string ProgId = "ProgId";
+        //private const string OpenWithProgids = "OpenWithProgids";
+        //private const string OpenWithList = "OpenWithList";
+        //private const string MRUList = "MRUList";
+        //private const string SoftwareClassesApplications = "Software\\Classes\\Applications";
+        //private const string ApplicationsBackslash = "Applications\\";
+        //private const string SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts";
 
-        {
+        ///// <summary>
+        ///// Gets the Windows registry open-with file type for a given extension.
+        ///// </summary>
+        ///// <param name="extension">The file extension from which look for the associated file type.</param>
+        ///// <returns>If found, the Windows registry open-with file type associated to the given extension, otherwise null.</returns>
+        //public static string GetFileTypeFromExtension(string extension)
 
-            if (extension == null)
+        //{
 
-                throw new ArgumentNullException(nameof(extension));
+        //    if (extension == null)
 
-            if (string.IsNullOrEmpty(extension) || string.IsNullOrWhiteSpace(extension))
+        //        throw new ArgumentNullException(nameof(extension));
 
-                throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(extension)));
+        //    if (string.IsNullOrEmpty(extension) || string.IsNullOrWhiteSpace(extension))
 
-            RegistryKey value = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + '\\' + extension)
-                ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts + '\\' + extension);
+        //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(extension)));
 
-            if (value == null)
+        //    RegistryKey value = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + '\\' + extension)
+        //        ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts + '\\' + extension);
 
-            {
+        //    if (value == null)
 
-                value = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(extension)
-                ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + '\\' + extension);
+        //    {
 
-                return value?.GetValue("") as string;
+        //        value = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(extension)
+        //        ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + '\\' + extension);
 
-            }
+        //        return value?.GetValue("") as string;
 
-            else
+        //    }
 
-            {
+        //    else
 
-                return value.OpenSubKey(UserChoice).GetValue(ProgId) as string;
+        //    {
 
-            }
-        }
+        //        return value.OpenSubKey(UserChoice).GetValue(ProgId) as string;
 
-        /// <summary>
-        /// Gets the Windows registry command associated to a given extension.
-        /// </summary>
-        /// <param name="commandName">The command name.</param>
-        /// <param name="extension">The extension from which look for the associated command.</param>
-        /// <returns>The Windows registry command associated to the given extension.</returns>
-        public static string GetCommandFromExtension(string commandName, string extension)
+        //    }
+        //}
 
-        {
+        ///// <summary>
+        ///// Gets the Windows registry command associated to a given extension.
+        ///// </summary>
+        ///// <param name="commandName">The command name.</param>
+        ///// <param name="extension">The extension from which look for the associated command.</param>
+        ///// <returns>The Windows registry command associated to the given extension.</returns>
+        //public static string GetCommandFromExtension(string commandName, string extension)
 
-            // todo: public method to avoid argument test for each call of the GetCommandFromExtension and GetFileTypeFromExtension methods.
+        //{
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out string key, /*EqualityComparer<object>.Default, GetCommonPredicate<object>(),*/ null, GetKeyValuePair(nameof(commandName), (object)commandName), GetKeyValuePair(nameof(extension), (object)extension)))
+        //    // todo: public method to avoid argument test for each call of the GetCommandFromExtension and GetFileTypeFromExtension methods.
 
-                throw new ArgumentNullException(key);
+        //    if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out string key, /*EqualityComparer<object>.Default, GetCommonPredicate<object>(),*/ null, GetKeyValuePair(nameof(commandName), (object)commandName), GetKeyValuePair(nameof(extension), (object)extension)))
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, true, GetKeyValuePair(nameof(commandName), IsNullEmptyOrWhiteSpace(commandName)), GetKeyValuePair(nameof(extension), IsNullEmptyOrWhiteSpace(extension))))
+        //        throw new ArgumentNullException(key);
 
-                throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
+        //    if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, true, GetKeyValuePair(nameof(commandName), IsNullEmptyOrWhiteSpace(commandName)), GetKeyValuePair(nameof(extension), IsNullEmptyOrWhiteSpace(extension))))
 
-            string fileType = GetFileTypeFromExtension(extension);
+        //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
 
-            return fileType == null
-                ? (string)null
-                : GetFileTypeRegistryKey(fileType).OpenSubKey(shellBackslash + commandName + BackslashCommand)?.GetValue("") is string valueAsString ? valueAsString : null;
-        }
+        //    string fileType = GetFileTypeFromExtension(extension);
 
-        /// <summary>
-        /// Gets the Windows registry command associated to a given open-with file type.
-        /// </summary>
-        /// <param name="commandName">The command name.</param>
-        /// <param name="fileType">The Windows registry open-with file type from which look for the associated command.</param>
-        /// <returns>The Windows registry command associated to the given extension.</returns>
-        public static string GetCommandFromFileType(string commandName, string fileType)
+        //    return fileType == null
+        //        ? (string)null
+        //        : GetFileTypeRegistryKey(fileType).OpenSubKey(shellBackslash + commandName + BackslashCommand)?.GetValue("") is string valueAsString ? valueAsString : null;
+        //}
 
-        {
+        ///// <summary>
+        ///// Gets the Windows registry command associated to a given open-with file type.
+        ///// </summary>
+        ///// <param name="commandName">The command name.</param>
+        ///// <param name="fileType">The Windows registry open-with file type from which look for the associated command.</param>
+        ///// <returns>The Windows registry command associated to the given extension.</returns>
+        //public static string GetCommandFromFileType(string commandName, string fileType)
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out string key, null, GetKeyValuePair(nameof(commandName), commandName), GetKeyValuePair(nameof(commandName), fileType)))
+        //{
 
-                throw new ArgumentNullException(key);
+        //    if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out string key, null, GetKeyValuePair(nameof(commandName), commandName), GetKeyValuePair(nameof(commandName), fileType)))
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, true, GetKeyValuePair(nameof(commandName), IsNullEmptyOrWhiteSpace(commandName)), GetKeyValuePair(nameof(fileType), IsNullEmptyOrWhiteSpace(fileType))))
+        //        throw new ArgumentNullException(key);
 
-                throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
+        //    if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, true, GetKeyValuePair(nameof(commandName), IsNullEmptyOrWhiteSpace(commandName)), GetKeyValuePair(nameof(fileType), IsNullEmptyOrWhiteSpace(fileType))))
 
-            using (RegistryKey fileTypeRegistryKey = GetFileTypeRegistryKey(fileType)?.OpenSubKey(shellBackslash + commandName + BackslashCommand))
+        //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
 
-                return fileTypeRegistryKey?.GetValue("") as string;
+        //    using (RegistryKey fileTypeRegistryKey = GetFileTypeRegistryKey(fileType)?.OpenSubKey(shellBackslash + commandName + BackslashCommand))
 
-        }
+        //        return fileTypeRegistryKey?.GetValue("") as string;
 
-        /// <summary>
-        /// Gets the software path part from a Windows registry open-with command.
-        /// </summary>
-        /// <param name="command">The Windows registry open-with command to parse</param>
-        /// <returns>The software path part of the command.</returns>
-        public static string GetOpenWithSoftwarePathFromCommand(string command)
+        //}
 
-        {
+        ///// <summary>
+        ///// Gets the software path part from a Windows registry open-with command.
+        ///// </summary>
+        ///// <param name="command">The Windows registry open-with command to parse</param>
+        ///// <returns>The software path part of the command.</returns>
+        //public static string GetOpenWithSoftwarePathFromCommand(string command)
 
-            if (command == null)
+        //{
 
-                throw new ArgumentNullException(nameof(command));
+        //    if (command == null)
 
-            if (IsNullEmptyOrWhiteSpace(command))
+        //        throw new ArgumentNullException(nameof(command));
 
-                throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(command)));
+        //    if (IsNullEmptyOrWhiteSpace(command))
 
-            return command.Count(c => c == '"') > 1 && command.StartsWith("\"") ? command.Substring(1, command.Substring(1).IndexOf('"')) : command.Contains(' ') ? command.Substring(0, command.IndexOf(' ')) : command;
+        //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(command)));
 
-        }
+        //    return command.Count(c => c == '"') > 1 && command.StartsWith("\"") ? command.Substring(1, command.Substring(1).IndexOf('"')) : command.Contains(' ') ? command.Substring(0, command.IndexOf(' ')) : command;
 
-        public static string GetOpenWithSoftwareArgumentsFromCommand(string command)
+        //}
 
-        {
+        //public static string GetOpenWithSoftwareArgumentsFromCommand(string command)
 
-            if (command == null)
+        //{
 
-                throw new ArgumentNullException(nameof(command));
+        //    if (command == null)
 
-            if (IsNullEmptyOrWhiteSpace(command))
+        //        throw new ArgumentNullException(nameof(command));
 
-                throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(command)));
+        //    if (IsNullEmptyOrWhiteSpace(command))
 
-            if (command.Count(c => c == '"') > 2 && command.StartsWith("\""))
+        //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(command)));
 
-            {
+        //    if (command.Count(c => c == '"') > 2 && command.StartsWith("\""))
 
-                int value = command.Substring(1).IndexOf('"') + 1;
+        //    {
 
-                if (value < command.Length)
+        //        int value = command.Substring(1).IndexOf('"') + 1;
 
-                {
+        //        if (value < command.Length)
 
-                    string _command = command.Substring(value);
+        //        {
 
-                    return _command.StartsWith(" ") ? _command.Length > 1 ? _command.Substring(1) : "" : _command;
+        //            string _command = command.Substring(value);
 
-                }
+        //            return _command.StartsWith(" ") ? _command.Length > 1 ? _command.Substring(1) : "" : _command;
 
-                else
+        //        }
 
-                    return "";
+        //        else
 
-            }
+        //            return "";
 
-            else if (command.Contains(' '))
+        //    }
 
-            {
+        //    else if (command.Contains(' '))
 
-                int value = command.IndexOf(' ') + 1;
+        //    {
 
-                return value < command.Length ? command.Substring(value) : "";
+        //        int value = command.IndexOf(' ') + 1;
 
-            }
+        //        return value < command.Length ? command.Substring(value) : "";
 
-            else
+        //    }
 
-                return "";
+        //    else
 
-        }
+        //        return "";
 
-        public static ProcessStartInfo GetOpenWithSoftwareProcessStartInfoFromCommand(string command, string fileName)
+        //}
 
-        {
+        //public static ProcessStartInfo GetOpenWithSoftwareProcessStartInfoFromCommand(string command, string fileName)
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out string key, null, GetKeyValuePair(nameof(command), command), GetKeyValuePair(nameof(fileName), fileName)))
+        //{
 
-                throw new ArgumentNullException(key);
+        //    if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out string key, null, GetKeyValuePair(nameof(command), command), GetKeyValuePair(nameof(fileName), fileName)))
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, true, GetKeyValuePair(nameof(command), IsNullEmptyOrWhiteSpace(command)), GetKeyValuePair(nameof(fileName), IsNullEmptyOrWhiteSpace(fileName))))
+        //        throw new ArgumentNullException(key);
 
-                throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
+        //    if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out key, true, GetKeyValuePair(nameof(command), IsNullEmptyOrWhiteSpace(command)), GetKeyValuePair(nameof(fileName), IsNullEmptyOrWhiteSpace(fileName))))
 
-            string softwareFileName = command.Count(c => c == '"') > 2 && command.StartsWith("\"") ? command.Substring(1, command.Substring(1).IndexOf('"')) : command.Contains(' ') ? command.Substring(0, command.IndexOf(' ')) : command;
+        //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, key));
 
-            string commandLineArguments = command;
+        //    string softwareFileName = command.Count(c => c == '"') > 2 && command.StartsWith("\"") ? command.Substring(1, command.Substring(1).IndexOf('"')) : command.Contains(' ') ? command.Substring(0, command.IndexOf(' ')) : command;
 
-            if (commandLineArguments.StartsWith("\""))
+        //    string commandLineArguments = command;
 
-                commandLineArguments = commandLineArguments.Substring(1);
+        //    if (commandLineArguments.StartsWith("\""))
 
-            if (commandLineArguments.Length > softwareFileName.Length)
+        //        commandLineArguments = commandLineArguments.Substring(1);
 
-            {
+        //    if (commandLineArguments.Length > softwareFileName.Length)
 
-                if (commandLineArguments.Length > softwareFileName.Length)
+        //    {
 
-                {
+        //        if (commandLineArguments.Length > softwareFileName.Length)
 
-                    commandLineArguments = commandLineArguments.Substring(softwareFileName.Length);
+        //        {
 
-                    char[] charsToRemove = { '\"', ' ' };
+        //            commandLineArguments = commandLineArguments.Substring(softwareFileName.Length);
 
-                    foreach (char c in charsToRemove)
+        //            char[] charsToRemove = { '\"', ' ' };
 
-                        if (commandLineArguments.StartsWith(c))
+        //            foreach (char c in charsToRemove)
 
-                            commandLineArguments = commandLineArguments.Substring(1);
+        //                if (commandLineArguments.StartsWith(c))
 
-                    commandLineArguments = commandLineArguments.Replace("%1", fileName);
+        //                    commandLineArguments = commandLineArguments.Substring(1);
 
-                }
+        //            commandLineArguments = commandLineArguments.Replace("%1", fileName);
 
-                else
+        //        }
 
-                    commandLineArguments = "";
+        //        else
 
-            }
+        //            commandLineArguments = "";
 
-            else
+        //    }
 
-                commandLineArguments = "";
+        //    else
 
-            return new ProcessStartInfo(softwareFileName, commandLineArguments);
+        //        commandLineArguments = "";
 
-        }
+        //    return new ProcessStartInfo(softwareFileName, commandLineArguments);
 
-        // todo: add gesture for the 'HKEY_LOCAL_MACHINE\SOFTWARE\Clients' key (ex.: HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\FileAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\MimeAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\URLAssociations, ...).
+        //}
 
-        public static DesktopAppInfo[] GetDesktopAppInfosFromExtension(string extension)
+        //// todo: add gesture for the 'HKEY_LOCAL_MACHINE\SOFTWARE\Clients' key (ex.: HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\FileAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\MimeAssociations, HKEY_LOCAL_MACHINE\SOFTWARE\Clients\Media\Windows Media Player\Capabilities\URLAssociations, ...).
 
-        {
+        //public static DesktopAppInfo[] GetDesktopAppInfosFromExtension(string extension)
 
-            if (extension == null)
+        //{
 
-                throw new ArgumentNullException(nameof(extension));
+        //    if (extension == null)
 
-            if (string.IsNullOrEmpty(extension) || string.IsNullOrWhiteSpace(extension))
+        //        throw new ArgumentNullException(nameof(extension));
 
-                throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(extension)));
+        //    if (string.IsNullOrEmpty(extension) || string.IsNullOrWhiteSpace(extension))
 
-            RegistryKey[] subKeys = { Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses), Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts), Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses) };
+        //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(extension)));
 
-            RegistryKey _registryKey = null;
+        //    RegistryKey[] subKeys = { Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses), Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts), Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses) };
 
-            RegistryKey disposeAndGetNewRegistryKey(RegistryKey oldRegistryKey, RegistryKey newRegistryKey)
+        //    RegistryKey _registryKey = null;
 
-            {
+        //    RegistryKey disposeAndGetNewRegistryKey(RegistryKey oldRegistryKey, RegistryKey newRegistryKey)
 
-                oldRegistryKey?.Dispose();
+        //    {
 
-                return newRegistryKey;
+        //        oldRegistryKey?.Dispose();
 
-            }
+        //        return newRegistryKey;
 
-            var fileTypes = new ArrayAndListBuilder<DesktopAppInfo>();
+        //    }
 
-            void checkAndAddFileTypeIfSucceeded(string fileType, RegistryKey registryKey)
+        //    var fileTypes = new ArrayAndListBuilder<DesktopAppInfo>();
 
-            {
+        //    void checkAndAddFileTypeIfSucceeded(string fileType, RegistryKey registryKey)
 
-                if (GetFileTypeRegistryKey(fileType, registryKey)?.OpenSubKey(OpenCommandPath)?.GetValue("") is string)
+        //    {
 
-                {
+        //        if (GetFileTypeRegistryKey(fileType, registryKey)?.OpenSubKey(OpenCommandPath)?.GetValue("") is string)
 
-                    var desktopAppInfo = new DesktopAppInfo(fileType);
+        //        {
 
-                    foreach (DesktopAppInfo _desktopAppInfo in fileTypes)
+        //            var desktopAppInfo = new DesktopAppInfo(fileType);
 
-                        if (GetOpenWithSoftwarePathFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwarePathFromCommand(desktopAppInfo.Command) && GetOpenWithSoftwareArgumentsFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwareArgumentsFromCommand(desktopAppInfo.Command)) return;
+        //            foreach (DesktopAppInfo _desktopAppInfo in fileTypes)
 
-                    _ = fileTypes.AddLast(desktopAppInfo);
+        //                if (GetOpenWithSoftwarePathFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwarePathFromCommand(desktopAppInfo.Command) && GetOpenWithSoftwareArgumentsFromCommand(_desktopAppInfo.Command) == GetOpenWithSoftwareArgumentsFromCommand(desktopAppInfo.Command)) return;
 
-                }
+        //            _ = fileTypes.AddLast(desktopAppInfo);
 
-            }
+        //        }
 
-            void onOpenWithList(RegistryKey mainRegistryKey, RegistryKey registryKey, string extensionOrPerceivedType)
+        //    }
 
-            {
+        //    void onOpenWithList(RegistryKey mainRegistryKey, RegistryKey registryKey, string extensionOrPerceivedType)
 
-                if ((registryKey = disposeAndGetNewRegistryKey(registryKey, registryKey?.OpenSubKey(OpenWithList))) == null) return;
+        //    {
 
-                // object obj = registryKey.GetValueKind("MRUList");
+        //        if ((registryKey = disposeAndGetNewRegistryKey(registryKey, registryKey?.OpenSubKey(OpenWithList))) == null) return;
 
-                object valueAsObject = registryKey.GetValue(MRUList);
+        //        // object obj = registryKey.GetValueKind("MRUList");
 
-                string[] keyValueNames = registryKey.GetValueNames();
+        //        object valueAsObject = registryKey.GetValue(MRUList);
 
-                if (!(valueAsObject == null || registryKey.GetValueKind(MRUList) != RegistryValueKind.String || IsNullEmptyOrWhiteSpace((string)valueAsObject)))
+        //        string[] keyValueNames = registryKey.GetValueNames();
 
-                {
+        //        if (!(valueAsObject == null || registryKey.GetValueKind(MRUList) != RegistryValueKind.String || IsNullEmptyOrWhiteSpace((string)valueAsObject)))
 
-                    string _value = null;
+        //        {
 
-                    while (((string)valueAsObject).Length > 0)
+        //            string _value = null;
 
-                    {
+        //            while (((string)valueAsObject).Length > 0)
 
-                        _value = ((string)valueAsObject).Substring(0, 1);
+        //            {
 
-                        valueAsObject = ((string)valueAsObject).Substring(1);
+        //                _value = ((string)valueAsObject).Substring(0, 1);
 
-                        if (keyValueNames.Contains(_value) && registryKey.GetValue(_value) is string valueAsString)
+        //                valueAsObject = ((string)valueAsObject).Substring(1);
 
-                            checkAndAddFileTypeIfSucceeded(valueAsString, mainRegistryKey);
+        //                if (keyValueNames.Contains(_value) && registryKey.GetValue(_value) is string valueAsString)
 
-                    }
+        //                    checkAndAddFileTypeIfSucceeded(valueAsString, mainRegistryKey);
 
-                }
+        //            }
 
-                registryKey = disposeAndGetNewRegistryKey(registryKey, mainRegistryKey.OpenSubKey(extensionOrPerceivedType + '\\' + OpenWithList));
+        //        }
 
-                keyValueNames = registryKey?.GetSubKeyNames();
+        //        registryKey = disposeAndGetNewRegistryKey(registryKey, mainRegistryKey.OpenSubKey(extensionOrPerceivedType + '\\' + OpenWithList));
 
-                foreach (string ___value in keyValueNames)
+        //        keyValueNames = registryKey?.GetSubKeyNames();
 
-                    checkAndAddFileTypeIfSucceeded(___value, mainRegistryKey.Name.EndsWith('\\' + SystemFileAssociations) ? OpenRegistryKey(mainRegistryKey.Name.Substring(0, mainRegistryKey.Name.LastIndexOf('\\' + SystemFileAssociations))) : mainRegistryKey);
+        //        foreach (string ___value in keyValueNames)
 
-            }
+        //            checkAndAddFileTypeIfSucceeded(___value, mainRegistryKey.Name.EndsWith('\\' + SystemFileAssociations) ? OpenRegistryKey(mainRegistryKey.Name.Substring(0, mainRegistryKey.Name.LastIndexOf('\\' + SystemFileAssociations))) : mainRegistryKey);
 
-            foreach (RegistryKey registryKey in subKeys)
+        //    }
 
-            {
+        //    foreach (RegistryKey registryKey in subKeys)
 
-                _registryKey = disposeAndGetNewRegistryKey(_registryKey, registryKey.OpenSubKey(extension));
+        //    {
 
-                if (_registryKey == null) continue;
+        //        _registryKey = disposeAndGetNewRegistryKey(_registryKey, registryKey.OpenSubKey(extension));
 
-                #region Progids
+        //        if (_registryKey == null) continue;
 
-                _registryKey = disposeAndGetNewRegistryKey(_registryKey, _registryKey.OpenSubKey(OpenWithProgids));
+        //        #region Progids
 
-                if (_registryKey != null)
+        //        _registryKey = disposeAndGetNewRegistryKey(_registryKey, _registryKey.OpenSubKey(OpenWithProgids));
 
-                {
+        //        if (_registryKey != null)
 
-                    foreach (string value in _registryKey.GetValueNames())
+        //        {
 
-                    {
+        //            foreach (string value in _registryKey.GetValueNames())
 
-                        if (value == "") continue;
+        //            {
 
-                        checkAndAddFileTypeIfSucceeded(value, registryKey);
+        //                if (value == "") continue;
 
-                    }
+        //                checkAndAddFileTypeIfSucceeded(value, registryKey);
 
-                }
+        //            }
 
-                #endregion
+        //        }
 
-                #region OpenWith
+        //        #endregion
 
-                _registryKey = disposeAndGetNewRegistryKey(_registryKey, registryKey.OpenSubKey(extension));
+        //        #region OpenWith
 
-                onOpenWithList(registryKey, _registryKey, extension);
+        //        _registryKey = disposeAndGetNewRegistryKey(_registryKey, registryKey.OpenSubKey(extension));
 
-                #endregion
+        //        onOpenWithList(registryKey, _registryKey, extension);
 
-                #region PerceivedType
+        //        #endregion
 
-                _registryKey = registryKey.OpenSubKey(extension);
+        //        #region PerceivedType
 
-                object valueAsObject = _registryKey.GetValue(PerceivedType);
+        //        _registryKey = registryKey.OpenSubKey(extension);
 
-                if (valueAsObject == null || _registryKey.GetValueKind(PerceivedType) != RegistryValueKind.String || (string)valueAsObject == "") continue;
+        //        object valueAsObject = _registryKey.GetValue(PerceivedType);
 
-                // checkAndAddFileTypeIfSucceeded((string)valueAsObject, registryKey, true);
+        //        if (valueAsObject == null || _registryKey.GetValueKind(PerceivedType) != RegistryValueKind.String || (string)valueAsObject == "") continue;
 
-                onOpenWithList(_registryKey.OpenSubKey(SystemFileAssociations) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations), _registryKey.OpenSubKey(SystemFileAssociations + '\\' + (string)valueAsObject) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations + '\\' + (string)valueAsObject), (string)valueAsObject);
+        //        // checkAndAddFileTypeIfSucceeded((string)valueAsObject, registryKey, true);
 
-                #endregion
+        //        onOpenWithList(_registryKey.OpenSubKey(SystemFileAssociations) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations), _registryKey.OpenSubKey(SystemFileAssociations + '\\' + (string)valueAsObject) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations + '\\' + (string)valueAsObject), (string)valueAsObject);
 
-                registryKey.Dispose();
+        //        #endregion
 
-            }
+        //        registryKey.Dispose();
 
-            return fileTypes.ToArray();
+        //    }
 
-        }
+        //    return fileTypes.ToArray();
 
-        public static RegistryKey GetFileTypeRegistryKey(string fileType)
+        //}
 
-        {
+        //public static RegistryKey GetFileTypeRegistryKey(string fileType)
 
-            if (fileType == null)
+        //{
 
-                throw new ArgumentNullException(nameof(fileType));
+        //    if (fileType == null)
 
-            if (IsNullEmptyOrWhiteSpace(fileType))
+        //        throw new ArgumentNullException(nameof(fileType));
 
-                throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(fileType)));
+        //    if (IsNullEmptyOrWhiteSpace(fileType))
 
-            return Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + '\\' + fileType) ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClassesApplications + '\\' + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ApplicationsBackslash + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + '\\' + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClassesApplications + '\\' + fileType) ?? null;
+        //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(fileType)));
 
-        }
+        //    return Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + '\\' + fileType) ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClassesApplications + '\\' + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ApplicationsBackslash + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + '\\' + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClassesApplications + '\\' + fileType) ?? null;
 
-        public static RegistryKey GetFileTypeRegistryKey(string fileType, RegistryKey registryKey)
+        //}
 
-        {
+        //public static RegistryKey GetFileTypeRegistryKey(string fileType, RegistryKey registryKey)
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, out string key, null, GetKeyValuePair(nameof(fileType), (object)fileType), GetKeyValuePair(nameof(registryKey), (object)registryKey)))
+        //{
 
-                throw new ArgumentNullException(key);
+        //    if (If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, out string key, null, GetKeyValuePair(nameof(fileType), (object)fileType), GetKeyValuePair(nameof(registryKey), (object)registryKey)))
 
-            if (IsNullEmptyOrWhiteSpace(fileType))
+        //        throw new ArgumentNullException(key);
 
-                throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(fileType)));
+        //    if (IsNullEmptyOrWhiteSpace(fileType))
 
-            string fileExtsPath = Microsoft.Win32.Registry.CurrentUser.Name + '\\' + SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts;
+        //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(fileType)));
 
-            string classesRootName = nameof(Microsoft.Win32.Registry.ClassesRoot.Name);
+        //    string fileExtsPath = Microsoft.Win32.Registry.CurrentUser.Name + '\\' + SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts;
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, registryKey.Name, Microsoft.Win32.Registry.CurrentUser.Name + SoftwareClasses, fileExtsPath, classesRootName, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"))
+        //    string classesRootName = nameof(Microsoft.Win32.Registry.ClassesRoot.Name);
 
-            {
+        //    if (If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, registryKey.Name, Microsoft.Win32.Registry.CurrentUser.Name + SoftwareClasses, fileExtsPath, classesRootName, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"))
 
-                if (registryKey.Name == fileExtsPath)
+        //    {
 
-                    registryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses);
+        //        if (registryKey.Name == fileExtsPath)
 
-                RegistryKey _registryKey = registryKey.Name.StartsWith(classesRootName)
-                    ? registryKey.OpenSubKey(fileType) ?? registryKey.OpenSubKey(ApplicationsBackslash + fileType)
-                    : registryKey.OpenSubKey(fileType) ?? registryKey.OpenSubKey(ApplicationsBackslash + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ApplicationsBackslash + fileType);
+        //            registryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses);
 
-                registryKey.Dispose();
+        //        RegistryKey _registryKey = registryKey.Name.StartsWith(classesRootName)
+        //            ? registryKey.OpenSubKey(fileType) ?? registryKey.OpenSubKey(ApplicationsBackslash + fileType)
+        //            : registryKey.OpenSubKey(fileType) ?? registryKey.OpenSubKey(ApplicationsBackslash + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ApplicationsBackslash + fileType);
 
-                return _registryKey;
-            }
+        //        registryKey.Dispose();
 
-            else throw new ArgumentException(string.Format(Generic.NotValidRegistryKey, registryKey));
+        //        return _registryKey;
+        //    }
 
+        //    else throw new ArgumentException(string.Format(Generic.NotValidRegistryKey, registryKey));
 
 
-        }
+
+        //}
 
         public static RegistryKey OpenRegistryKey(string path)
 
@@ -501,182 +499,182 @@ namespace WinCopies.IO
 
                 return path.Length > 0 ? registryKey.OpenSubKey(path) : registryKey;
 
-            else throw new IOException(string.Format(Generic.RegistryKeyNotExists, path));
+            else throw new RegistryException(string.Format(Generic.RegistryKeyNotExists, path), path);
 
         }
 
-        public static Icon[] GetIconVariationsFromFileType(string fileType) => GetIconVariationsFromFileTypeRegistryKey(GetFileTypeRegistryKey(fileType));
+        //public static Icon[] GetIconVariationsFromFileType(string fileType) => GetIconVariationsFromFileTypeRegistryKey(GetFileTypeRegistryKey(fileType));
 
-        public static Icon[] GetIconVariationsFromFileType(string fileType, RegistryKey registryKey) => GetIconVariationsFromFileTypeRegistryKey(GetFileTypeRegistryKey(fileType, registryKey));
+        //public static Icon[] GetIconVariationsFromFileType(string fileType, RegistryKey registryKey) => GetIconVariationsFromFileTypeRegistryKey(GetFileTypeRegistryKey(fileType, registryKey));
 
-        public static Icon[] GetIconVariationsFromFileTypeRegistryKey(RegistryKey registryKey)
+        //public static Icon[] GetIconVariationsFromFileTypeRegistryKey(RegistryKey registryKey)
 
-        {
-            RegistryKey _registryKey;
+        //{
+        //    RegistryKey _registryKey;
 
-            string iconName;
+        //    string iconName;
 
-            int? iconIndex;
+        //    int? iconIndex;
 
-            if ((_registryKey = registryKey.OpenSubKey(DefaultIcon)) == null || !(_registryKey.GetValue("") is string defaultIconPath))
+        //    if ((_registryKey = registryKey.OpenSubKey(DefaultIcon)) == null || !(_registryKey.GetValue("") is string defaultIconPath))
 
-            {
+        //    {
 
-                defaultIconPath = (_registryKey = registryKey.OpenSubKey(OpenCommandPath)) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null
-                    ? DefaultIconDllPath
-                    : GetOpenWithSoftwarePathFromCommand(defaultIconPath);
+        //        defaultIconPath = (_registryKey = registryKey.OpenSubKey(OpenCommandPath)) == null || (defaultIconPath = _registryKey.GetValue("") as string) == null
+        //            ? DefaultIconDllPath
+        //            : GetOpenWithSoftwarePathFromCommand(defaultIconPath);
 
-                iconName = null;
+        //        iconName = null;
 
-                iconIndex = null;
+        //        iconIndex = null;
 
-            }
+        //    }
 
-            else
+        //    else
 
-            {
+        //    {
 
-                string[] subPaths;
+        //        string[] subPaths;
 
-                if (defaultIconPath.Contains(','))
+        //        if (defaultIconPath.Contains(','))
 
-                {
+        //        {
 
-                    subPaths = defaultIconPath.Split(',');
+        //            subPaths = defaultIconPath.Split(',');
 
-                    string iconId = subPaths[subPaths.Length - 1];
+        //            string iconId = subPaths[subPaths.Length - 1];
 
-                    if (iconId.StartsWith("-"))
+        //            if (iconId.StartsWith("-"))
 
-                    {
+        //            {
 
-                        iconName = iconId.Substring(1);
+        //                iconName = iconId.Substring(1);
 
-                        iconIndex = null;
+        //                iconIndex = null;
 
-                    }
+        //            }
 
-                    else
+        //            else
 
-                    {
+        //            {
 
-                        if (int.TryParse(iconId, out int _iconIndex))
+        //                if (int.TryParse(iconId, out int _iconIndex))
 
-                        {
+        //                {
 
-                            iconIndex = _iconIndex;
+        //                    iconIndex = _iconIndex;
 
-                            iconName = null;
+        //                    iconName = null;
 
-                        }
+        //                }
 
-                        else
+        //                else
 
-                        {
+        //                {
 
-                            iconName = iconId;
+        //                    iconName = iconId;
 
-                            iconIndex = null;
+        //                    iconIndex = null;
 
-                        }
+        //                }
 
-                    }
+        //            }
 
-                    var stringBuilder = new StringBuilder();
+        //            var stringBuilder = new StringBuilder();
 
-                    for (int i = 0; i < subPaths.Length - 1; i++)
+        //            for (int i = 0; i < subPaths.Length - 1; i++)
 
-                        _ = stringBuilder.Append(subPaths[i]);
+        //                _ = stringBuilder.Append(subPaths[i]);
 
-                    defaultIconPath = stringBuilder.ToString();
+        //            defaultIconPath = stringBuilder.ToString();
 
-                    if (defaultIconPath == "")
+        //            if (defaultIconPath == "")
 
-                        throw new RegistryException("Invalid DefaultIcon registry value.", null, registryKey.Name);
+        //                throw new RegistryException("Invalid DefaultIcon registry value.", null, registryKey.Name);
 
-                }
+        //        }
 
-                else
+        //        else
 
-                {
+        //        {
 
-                    iconName = null;
+        //            iconName = null;
 
-                    iconIndex = null;
+        //            iconIndex = null;
 
-                }
+        //        }
 
-            }
+        //    }
 
-            try
+        //    try
 
-            {
+        //    {
 
-                defaultIconPath = Path.GetRealPathFromEnvironmentVariables(defaultIconPath);
+        //        defaultIconPath = Path.GetRealPathFromEnvironmentVariables(defaultIconPath);
 
-            }
+        //    }
 
-            catch (Exception)
+        //    catch (Exception)
 
-            {
+        //    {
 
-                return null;
+        //        return null;
 
-            }
+        //    }
 
-            //try
-            //{
+        //    //try
+        //    //{
 
-            //    var obj = WinCopies.Win32Interop.Icon.ExtractIconFromExe(defaultIconPath, iconIndex.Value, true)?.Split();
+        //    //    var obj = WinCopies.Win32Interop.Icon.ExtractIconFromExe(defaultIconPath, iconIndex.Value, true)?.Split();
 
-            //    Debug.WriteLine("obj.Length: " + obj.Length);
+        //    //    Debug.WriteLine("obj.Length: " + obj.Length);
 
-            //}
-            //catch (Exception) { }
+        //    //}
+        //    //catch (Exception) { }
 
-            var m = new System.Drawing.IconLib.MultiIcon
-            {
-                SelectedIndex = -1
-            };
+        //    var m = new System.Drawing.IconLib.MultiIcon
+        //    {
+        //        SelectedIndex = -1
+        //    };
 
-            m.Load(defaultIconPath);
+        //    m.Load(defaultIconPath);
 
-            System.Drawing.IconLib.SingleIcon obj = null;
+        //    System.Drawing.IconLib.SingleIcon obj = null;
 
-            if (!iconIndex.HasValue && iconName == null)
+        //    if (!iconIndex.HasValue && iconName == null)
 
-                iconIndex = 0;
+        //        iconIndex = 0;
 
-            if (iconIndex.HasValue)
+        //    if (iconIndex.HasValue)
 
-                obj = m.ToList()[iconIndex.Value];
+        //        obj = m.ToList()[iconIndex.Value];
 
-            else /*if (iconName != null)*/
+        //    else /*if (iconName != null)*/
 
-            {
+        //    {
 
-                foreach (System.Drawing.IconLib.SingleIcon _obj in m)
+        //        foreach (System.Drawing.IconLib.SingleIcon _obj in m)
 
-                    if (_obj.Name == iconName)
+        //            if (_obj.Name == iconName)
 
-                    {
+        //            {
 
-                        obj = _obj;
+        //                obj = _obj;
 
-                        break;
+        //                break;
 
-                    }
+        //            }
 
-                if (obj == null)
+        //        if (obj == null)
 
-                    obj = m.ToList()[0];
+        //            obj = m.ToList()[0];
 
-            }
+        //    }
 
-            return obj.Icon.Split(); //return defaultIconPath.EndsWith(".ico")
-            //    ? new Icon(defaultIconPath).Split() : !iconIndex.HasValue ? Icon.ExtractAssociatedIcon(defaultIconPath).Split()
-            //    : WinCopies.Win32Interop.Icon.ExtractIconFromExe(defaultIconPath, iconIndex.Value, true)?.Split();
-        }
+        //    return obj.Icon.Split(); //return defaultIconPath.EndsWith(".ico")
+        //    //    ? new Icon(defaultIconPath).Split() : !iconIndex.HasValue ? Icon.ExtractAssociatedIcon(defaultIconPath).Split()
+        //    //    : WinCopies.Win32Interop.Icon.ExtractIconFromExe(defaultIconPath, iconIndex.Value, true)?.Split();
+        //}
 
     }
 

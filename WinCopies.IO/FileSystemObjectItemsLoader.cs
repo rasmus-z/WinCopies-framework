@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using WinCopies.Util;
 
 namespace WinCopies.IO
 {
-    public abstract class FileSystemObjectItemsLoader : BrowsableObjectInfoItemsLoader
+    public abstract class FileSystemObjectItemsLoader : BrowsableObjectInfoItemsLoader, IFileSystemObjectItemsLoader
     {
 
         private readonly FileTypes _fileTypes = Util.Util.GetAllEnumFlags<FileTypes>();

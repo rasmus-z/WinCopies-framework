@@ -39,24 +39,10 @@ namespace WinCopies.IO
 
     }
 
-    public class WMIItemInfo : BrowsableObjectInfo
+    public class WMIItemInfo : BrowsableObjectInfo, IWMIItemInfo
     {
 
         public ManagementBaseObject ManagementObject { get; }
-
-        protected virtual BrowsableObjectInfoItemsLoader ItemsLoaderOverride { get => base.ItemsLoader; set => base.ItemsLoader = value; }
-
-        public sealed override BrowsableObjectInfoItemsLoader ItemsLoader
-        {
-            get => ItemsLoaderOverride; set
-            {
-
-                _wmiItemInfoFactory._wmiItemsLoader = value;
-
-                ItemsLoaderOverride = value;
-
-            }
-        }
 
         private static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
 
@@ -235,9 +221,9 @@ namespace WinCopies.IO
 
                     throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
 
-                _wmiItemInfoFactory = value;
+                _wmiItemInfoFactory = value ?? throw new ArgumentNullException("value");
 
-                _wmiItemInfoFactory._wmiItemsLoader = ItemsLoaderOverride;
+                _wmiItemInfoFactory._wmiItemsLoader = ItemsLoader;
 
             }
         }

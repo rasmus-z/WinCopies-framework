@@ -10,7 +10,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Undefined file type.
         /// </summary>
-        None,
+        Other,
 
         /// <summary>
         /// The item is a folder.
@@ -40,12 +40,7 @@ namespace WinCopies.IO
         /// <summary>
         /// The item is a special folder (system folder or virtual folder).
         /// </summary>
-        SpecialFolder,
-
-        /// <summary>
-        /// The item is from an other file type.
-        /// </summary>
-        Other
+        SpecialFolder
     }
 
     /// <summary>

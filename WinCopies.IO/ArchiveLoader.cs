@@ -19,6 +19,8 @@ using WinCopies.Util;
 
 // using WinCopies.IO;
 
+using static WinCopies.Util.Util;
+
 #endregion
 
 #endregion
@@ -106,7 +108,7 @@ namespace WinCopies.IO
         /// <param name="fileTypes">The file types to load.</param>
         public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes) { }
 
-        protected override void InitializePath()
+        protected override void OnPathChanging(BrowsableObjectInfo path)
 
         {
 
@@ -120,17 +122,10 @@ namespace WinCopies.IO
 
             // }
 
-            IBrowsableObjectInfo _path = Path as ShellObjectInfo;
+            _ = GetOrThrowIfNotType<IArchiveItemInfoProvider>((IBrowsableObjectInfo)path, nameof(path));
 
-            if (_path == null)
-
-                _path = Path as ArchiveItemInfo;
-
-            if (_path == null)
-
-                throw new ArgumentException("'Path' is null or isn't a ShellObjectInfo or an ArchiveItemInfo.");
-
-            else if (_path.FileType != FileType.Folder && _path.FileType != IO.FileType.Archive)
+            /*else*/
+            if (Path.FileType != FileType.Archive)
 
                 throw new ArgumentException("'Path' is not an Archive or a Folder.");
 
@@ -229,7 +224,7 @@ namespace WinCopies.IO
 
                     {
 
-                        if (pathInfo.FileType == FileType.None || (FileTypes != Util.Util.GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
+                        if (pathInfo.FileType == FileType.Other || (FileTypes != Util.Util.GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
 
                         // We only make a normalized path if we add the path to the paths to load.
 
@@ -392,9 +387,23 @@ namespace WinCopies.IO
 
             // }
 
-            var sortedPaths = paths.ToList();
+            IEnumerable<PathInfo> pathInfos;
 
-            sortedPaths.Sort(FileSystemObjectComparer);
+            if (FileSystemObjectComparer == null)
+
+                pathInfos = (IEnumerable<PathInfo>)paths;
+
+            else
+
+            {
+
+                var sortedPaths = paths.ToList();
+
+                sortedPaths.Sort(FileSystemObjectComparer);
+
+                pathInfos = (IEnumerable<PathInfo>)paths;
+
+            }
 
             // for (int i = 0; i < files.Count; i++)
 
@@ -444,7 +453,7 @@ namespace WinCopies.IO
 
             // this._Paths = new ObservableCollection<IBrowsableObjectInfo>();
 
-            foreach (PathInfo path_ in sortedPaths)
+            foreach (PathInfo path_ in pathInfos)
 
                 reportProgressAndAddNewPathToObservableCollection(path_);
 

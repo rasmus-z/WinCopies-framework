@@ -442,10 +442,13 @@ namespace WinCopies.IO
         /// <returns>The <see cref="LocalizedName"/> of this <see cref="ShellObjectInfo"/>.</returns>
         public override string ToString() => string.IsNullOrEmpty(Path) ? ShellObject.GetDisplayName(DisplayNameType.Default) : System.IO.Path.GetFileName(Path);
 
+        // todo: to virtual methods
+
         /// <summary>
         /// Gets or sets the factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent casual file system items.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/></exception>
+        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy.</exception>
+        /// <exception cref="ArgumentNullException">The given value is null.</exception>
         public IShellObjectInfoFactory ShellObjectInfoFactory
         {
             get => _shellObjectInfoFactory; set
@@ -455,7 +458,7 @@ namespace WinCopies.IO
 
                     throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
 
-                _shellObjectInfoFactory = value;
+                _shellObjectInfoFactory = value ?? throw new ArgumentNullException("value");
 
             }
         }
@@ -463,7 +466,8 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets or sets the factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/></exception>
+        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy.</exception>
+        /// <exception cref="ArgumentNullException">The given value is null.</exception>
         public IArchiveItemInfoFactory ArchiveItemInfoFactory
         {
             get => _archiveItemInfoFactory; set
@@ -473,7 +477,7 @@ namespace WinCopies.IO
 
                     throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
 
-                _archiveItemInfoFactory = value;
+                _archiveItemInfoFactory = value ?? throw new ArgumentNullException("value");
 
             }
         }
@@ -522,54 +526,6 @@ namespace WinCopies.IO
         /// </summary>
         /// <returns>An <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
         public override IBrowsableObjectInfo Clone() => ShellObjectInfoFactory.GetBrowsableObjectInfo(ShellObject.FromParsingName(ShellObject.ParsingName), Path, FileType, SpecialFolder);
-
-    }
-
-    /// <summary>
-    /// A factory to create new <see cref="IBrowsableObjectInfo"/>'s.
-    /// </summary>
-    public interface IShellObjectInfoFactory
-    {
-
-        /// <summary>
-        /// Gets a new <see cref="IBrowsableObjectInfo"/> that represents the given <see cref="ShellObject"/> and path.
-        /// </summary>
-        /// <param name="shellObject">The <see cref="ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
-        IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path);
-
-        /// <summary>
-        /// Gets a new <see cref="IBrowsableObjectInfo"/> that represents the given <see cref="ShellObject"/>, path, <see cref="FileType"/> and <see cref="SpecialFolder"/>.
-        /// </summary>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
-        /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
-        /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
-        IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder);
-
-    }
-
-    /// <summary>
-    /// A factory to create new <see cref="ShellObjectInfo"/>'s.
-    /// </summary>
-    public class ShellObjectInfoFactory : IShellObjectInfoFactory
-    {
-
-        /// <summary>
-        /// Gets a new <see cref="ShellObjectInfo"/> that represents the given <see cref="ShellObject"/> and path.
-        /// </summary>
-        /// <param name="shellObject">The <see cref="ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path) => new ShellObjectInfo(shellObject, path);
-
-        /// <summary>
-        /// Gets a new <see cref="ShellObjectInfo"/> that represents the given <see cref="ShellObject"/>, path, <see cref="FileType"/> and <see cref="SpecialFolder"/>.
-        /// </summary>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
-        /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
-        /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder) => new ShellObjectInfo(shellObject, path, fileType, specialFolder);
 
     }
 

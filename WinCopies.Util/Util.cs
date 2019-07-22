@@ -1624,6 +1624,32 @@ namespace WinCopies.Util
         /// <returns>The numeric value corresponding to this enum, in the given enum type underlying type.</returns>
         public static object GetNumValue(Type enumType, string fieldName) => enumType.IsEnum ? Convert.ChangeType(enumType.GetField(fieldName).GetValue(null), Enum.GetUnderlyingType(enumType)) : throw new ArgumentException("'enumType' is not an enum type.");
 
+        public static void ThrowIfNull(object obj, string argumentName)
+        {
+
+            if (obj is null)
+
+                throw new ArgumentNullException(argumentName);
+
+        }
+
+        public static T GetOrThrowIfNotType<T>(object obj, string argumentName)
+
+        {
+
+            if (obj is T _obj)
+
+                return _obj;
+
+            else if (obj is null)
+
+                throw new ArgumentNullException(argumentName);
+
+            else
+
+                throw new ArgumentException($"{argumentName} must be {typeof(T).Name}. {argumentName} is {obj.GetType().ToString()}", argumentName);
+
+        }
     }
 
     public class EnumComparer : IComparer<Enum>
@@ -1656,15 +1682,15 @@ namespace WinCopies.Util
 
                 else
 
-                // We shouldn't reach this point.
+                    // We shouldn't reach this point.
 
-                return 0;
+                    return 0;
 
             }
 
             else
 
-            throw new ArgumentException("'y' is not from a numeric type.");
+                throw new ArgumentException("'y' is not from a numeric type.");
 
         }
 
@@ -1675,35 +1701,35 @@ namespace WinCopies.Util
 
             {
 
-                object o = y. GetNumValue();
+                object o = y.GetNumValue();
 
-                if (o is sbyte sb) return - sb.CompareTo(x);
+                if (o is sbyte sb) return -sb.CompareTo(x);
 
-                else if (o is byte b) return - b.CompareTo(x);
+                else if (o is byte b) return -b.CompareTo(x);
 
-                else if (o is short s) return - s.CompareTo(x);
+                else if (o is short s) return -s.CompareTo(x);
 
-                else if (o is ushort us) return - us.CompareTo(x);
+                else if (o is ushort us) return -us.CompareTo(x);
 
-                else if (o is int i) return - i.CompareTo(x);
+                else if (o is int i) return -i.CompareTo(x);
 
-                else if (o is uint ui) return - ui.CompareTo(x);
+                else if (o is uint ui) return -ui.CompareTo(x);
 
-                else if (o is long l) return - l.CompareTo(x);
+                else if (o is long l) return -l.CompareTo(x);
 
-                else if (o is ulong ul) return - ul.CompareTo(x);
+                else if (o is ulong ul) return -ul.CompareTo(x);
 
                 else
 
-                // We shouldn't reach this point.
+                    // We shouldn't reach this point.
 
-                return 0;
+                    return 0;
 
             }
 
             else
 
-            throw new ArgumentException("'x' is not from a numeric type.");
+                throw new ArgumentException("'x' is not from a numeric type.");
 
         }
 
