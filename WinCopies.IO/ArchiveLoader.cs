@@ -125,7 +125,7 @@ namespace WinCopies.IO
             _ = GetOrThrowIfNotType<IArchiveItemInfoProvider>((IBrowsableObjectInfo)path, nameof(path));
 
             /*else*/
-            if (Path.FileType != FileType.Archive)
+            if (path.FileType != FileType.Archive)
 
                 throw new ArgumentException("'Path' is not an Archive or a Folder.");
 
@@ -159,7 +159,7 @@ namespace WinCopies.IO
 
             if (FileTypes == FileTypes.None) return;
 
-            else if (FileTypes.HasFlag(Util.Util.GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
+            else if (FileTypes.HasFlag(GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
 
                 throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
 

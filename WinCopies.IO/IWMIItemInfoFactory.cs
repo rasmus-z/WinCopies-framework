@@ -10,6 +10,8 @@ namespace WinCopies.IO
     public interface IWMIItemInfoFactory
     {
 
+        IWMIItemInfoFactoryOptions Options { get; }
+
         IBrowsableObjectInfo GetBrowsableObjectInfo();
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType);
@@ -20,14 +22,7 @@ namespace WinCopies.IO
 
     }
 
-    public interface IWMIItemInfoFactory<TOptions> : IWMIItemInfoFactory where TOptions : IWMIItemInfoFactoryOptions
-    {
-
-        TOptions Options { get; set; }
-
-    }
-
-    public class WMIItemInfoFactory : IWMIItemInfoFactory<WMIItemInfoFactoryOptions>
+    public class WMIItemInfoFactory : IWMIItemInfoFactory
     {
 
         internal IBrowsableObjectInfoItemsLoader _wmiItemsLoader;
@@ -43,12 +38,15 @@ namespace WinCopies.IO
 
                 if (_wmiItemsLoader?.IsBusy == true)
 
-                    throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo<IBrowsableObjectInfoItemsLoader>.ItemsLoader)} is busy.");
+                    throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
 
                 OptionsOverride = value;
 
             }
+
         }
+
+        IWMIItemInfoFactoryOptions IWMIItemInfoFactory.Options => Options;
 
         public WMIItemInfoFactory() { }
 
@@ -101,7 +99,7 @@ _connectionOptions = value;
         {
             get => ConnectionOptionsOverride; set
             {
-                if (_wmiItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo<IBrowsableObjectInfoItemsLoader>.ItemsLoader)} is busy.");
+                if (_wmiItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
 
                 ConnectionOptionsOverride = value;
             }
@@ -125,7 +123,7 @@ _connectionOptions = value;
 
             get => ObjectGetOptionsOverride; set
             {
-                if (_wmiItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo<IBrowsableObjectInfoItemsLoader>.ItemsLoader)} is busy.");
+                if (_wmiItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
 
                 ObjectGetOptionsOverride = value;
             }
@@ -148,7 +146,7 @@ _connectionOptions = value;
         {
             get => EnumerationOptionsOverride; set
             {
-                if (_wmiItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo<IBrowsableObjectInfoItemsLoader>.ItemsLoader)} is busy.");
+                if (_wmiItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
 
                 EnumerationOptionsOverride = value;
             }

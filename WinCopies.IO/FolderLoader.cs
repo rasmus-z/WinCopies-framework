@@ -233,7 +233,7 @@ namespace WinCopies.IO
 
             if (FileTypes == FileTypes.None) return;
 
-            else if (FileTypes.HasFlag(Util.Util.GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
+            else if (FileTypes.HasFlag(GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
 
                 throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
 
@@ -303,7 +303,9 @@ namespace WinCopies.IO
 
                     string path = null /*= Path.Name*/;
 
-                    IBrowsableObjectInfo browsableObjectInfo = Path;
+                    var browsableObjectInfo = (IBrowsableObjectInfo)Path;
+
+                    IBrowsableObjectInfo newPath;
 
                     path = browsableObjectInfo.Name;
 
@@ -315,7 +317,9 @@ namespace WinCopies.IO
 
                         path = browsableObjectInfo.Name + "\\" + path;
 
-                        browsableObjectInfo = browsableObjectInfo.Parent;
+                        newPath = browsableObjectInfo.Parent;
+
+                        browsableObjectInfo.Dispose();
 
                     }
 

@@ -41,18 +41,22 @@ namespace WinCopies.IO
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
         public WMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, WMIItemTypes wmiItemTypes) : base(workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
 
-        public override bool CheckFilter(string path) => throw new NotImplementedException();
+        protected override void OnPathChanging(BrowsableObjectInfo path) => WinCopies.Util.Util.ThrowIfNotType<IWMIItemInfo>(path, nameof(path));
 
-        protected override void InitializePath() { }
+        public override bool CheckFilter(string path) => throw new NotImplementedException();
 
         protected override void OnDoWork()
         {
 
-            if (Path.WMIItemType == WMIItemType.Namespace)
+            // We've already checked if Path is actually an IWMIItemInfo in the OnPathChanging method.
+
+            var path = ((WMIItemInfo)Path);
+
+            if ( path .WMIItemType == WMIItemType.Namespace)
 
             {
 
-                ManagementClass managementClass = Path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, Path.WMIItemInfoFactory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.WMIItemInfoFactory?.Options?.ObjectGetOptions);
+                ManagementClass managementClass = path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, path.WMIItemInfoFactory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), path.WMIItemInfoFactory?.Options?.ObjectGetOptions);
 
                 ManagementObjectCollection instances;
 
@@ -65,7 +69,7 @@ namespace WinCopies.IO
 
                     managementClass.Get();
 
-                    instances = Path.WMIItemInfoFactory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(Path.WMIItemInfoFactory?.Options?.EnumerationOptions);
+                    instances = path.WMIItemInfoFactory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(path.WMIItemInfoFactory?.Options?.EnumerationOptions);
 
                     foreach (ManagementBaseObject instance in instances)
 
@@ -89,9 +93,9 @@ namespace WinCopies.IO
                 }
 
                 // MessageBox.Show(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length));
-                managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.WMIItemInfoFactory?.Options?.ConnectionOptions), new ManagementPath(Path.Path.Substring(0, Path.Path.Length - ":__NAMESPACE".Length)), Path.WMIItemInfoFactory?.Options?.ObjectGetOptions);
+                managementClass = new ManagementClass(new ManagementScope(Path.Path, path.WMIItemInfoFactory?.Options?.ConnectionOptions), new ManagementPath(Path.Path.Substring(0, Path.Path.Length - ":__NAMESPACE".Length)), path.WMIItemInfoFactory?.Options?.ObjectGetOptions);
 
-                instances = Path.WMIItemInfoFactory?.Options?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(Path.WMIItemInfoFactory?.Options?.EnumerationOptions);
+                instances = path.WMIItemInfoFactory?.Options?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(path.WMIItemInfoFactory?.Options?.EnumerationOptions);
 
 #if DEBUG
                 if (Path.Path.Contains("CIM"))
@@ -120,11 +124,11 @@ namespace WinCopies.IO
 
             }
 
-            else if (Path.WMIItemType == WMIItemType.Class)
+            else if (path.WMIItemType == WMIItemType.Class)
 
             {
 
-                ManagementClass managementClass = Path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, Path.WMIItemInfoFactory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.WMIItemInfoFactory?.Options?.ObjectGetOptions);
+                ManagementClass managementClass = path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, path.WMIItemInfoFactory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), path.WMIItemInfoFactory?.Options?.ObjectGetOptions);
 
                 ManagementObjectCollection instances;
 
@@ -137,7 +141,7 @@ namespace WinCopies.IO
 
                     managementClass.Get();
 
-                    instances = Path.WMIItemInfoFactory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(Path.WMIItemInfoFactory?.Options?.EnumerationOptions);
+                    instances = path.WMIItemInfoFactory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(path.WMIItemInfoFactory?.Options?.EnumerationOptions);
 
                     foreach (ManagementBaseObject instance in instances)
 

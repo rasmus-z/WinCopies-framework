@@ -14,7 +14,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides a base class for all I/O objects of the WinCopies framework.
     /// </summary>
-    public abstract class BrowsableObjectInfo
+    public abstract class BrowsableObjectInfo : IBrowsableObjectInfo
     {
 
         internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
@@ -211,39 +211,39 @@ namespace WinCopies.IO
         // /// </summary>
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
-        public virtual void Dispose() => Dispose(true);
+        /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
+        public virtual void Dispose() => Dispose(false, true);
 
-        private void Dispose(bool disposeParentBrowsableObjectInfo)
+        /// <summary>
+        /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
+        /// </summary>
+        /// <param name="disposeItemsLoader">Whether to dispose the <see cref="ItemsLoader"/>s of the current path and its parent and items. If this parameter is set to <see langword="true"/>, the <see cref="ItemsLoader"/>s will also be disposed recursively.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
+        public virtual void Dispose(bool disposeItemsLoader) => Dispose(disposeItemsLoader, true);
+
+        private void Dispose(bool disposeItemsLoader, bool disposeParentBrowsableObjectInfo)
 
         {
 
             IsDisposing = true;
 
-            if (ItemsLoader != null && ItemsLoader is IBrowsableObjectInfoItemsLoader browsableObjectInfoItemsLoader && browsableObjectInfoItemsLoader.IsBusy)
+            if (ItemsLoader?.IsBusy == true)
 
-                throw new InvalidOperationException("The items loader is busy.");
+                ItemsLoader.Cancel();
 
-            else if (ItemsLoader != null)
+            if (disposeItemsLoader && ItemsLoader != null)
 
-                ItemsLoader.Dispose();
-
-            foreach (BrowsableObjectInfo browsableObjectInfo in Items.OfType<BrowsableObjectInfo>())
-
-            {
-
-                browsableObjectInfo.Dispose(false);
-
-                if (browsableObjectInfo.ItemsLoader != null)
-
-                    browsableObjectInfo.ItemsLoader.Dispose();
-
-            }
+                ItemsLoader.Dispose(false);
 
             if (disposeParentBrowsableObjectInfo && Parent != null)
 
-                Parent.Dispose();
+                Parent.Dispose(disposeItemsLoader);
+
+            foreach (IBrowsableObjectInfo browsableObjectInfo in Items)
+
+                browsableObjectInfo.Dispose(disposeItemsLoader);
 
             IsDisposing = false;
 
@@ -284,22 +284,26 @@ namespace WinCopies.IO
 
         BrowsableObjectInfoItemsLoader _itemsLoader;
 
+        IBrowsableObjectInfoItemsLoader IBrowsableObjectInfo.ItemsLoader => ItemsLoader;
+
         /// <summary>
         /// Gets the items loader for this <see cref="BrowsableObjectInfo"/>. See the Remarks section.
         /// </summary>
-        /// <remarks><para>When setting, automatically disposes the old <see cref="IBrowsableObjectInfoItemsLoader"/>.</para>
+        /// <remarks><para>When setting, automatically disposes the old <see cref="BrowsableObjectInfoItemsLoader"/>.</para>
         /// <para>When setting, if the new value is a <see cref="BrowsableObjectInfoItemsLoader"/>, its <see cref="BrowsableObjectInfoItemsLoader.Path"/> property is automatically set with this instance of <see cref="BrowsableObjectInfo"/>.</para></remarks>
-        /// <exception cref="InvalidOperationException">The old <see cref="IBrowsableObjectInfoItemsLoader"/> is running.</exception>
-        public IBrowsableObjectInfoItemsLoader ItemsLoader
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoItemsLoader"/> is running.</exception>
+        public virtual BrowsableObjectInfoItemsLoader ItemsLoader
         {
             get => _itemsLoader; set
             {
 
-                BrowsableObjectInfoItemsLoader itemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoItemsLoader>(value, nameof(value));
+                if (ItemsLoader?.IsBusy == true)
 
-                _itemsLoader = itemsLoader;
+                    throw new InvalidOperationException("The items loader is busy.");
 
-                itemsLoader.Path = (IBrowsableObjectInfo)this;
+                value.Path = this;
+
+                _itemsLoader = value;
 
             }
 

@@ -422,18 +422,25 @@ namespace WinCopies.Util
         public bool IsDisposed { get; private set; }
 
         /// <summary>
+        /// Releases resources used by the <see cref="BackgroundWorker"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
+        public new void Dispose() => base. Dispose();
+
+        /// <summary>
         /// Releases the unmanaged resources used by the <see cref="BackgroundWorker"/> and optionally releases the managed resources.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
         protected override void Dispose(bool disposing)
 
         {
 
             if (IsBusy)
 
-            //    throw new InvalidOperationException(BackgroundWorkerIsBusy);
+                //    throw new InvalidOperationException(BackgroundWorkerIsBusy);
 
-            Cancel(true);
+                Cancel(true);
 
             base.Dispose(disposing);
 

@@ -125,33 +125,13 @@ namespace WinCopies.IO
         private Icon TryGetIcon(System.Drawing.Size size)
         {
 
-            if (System.IO.Path.HasExtension(Path))
+            // if (System.IO.Path.HasExtension(Path))
 
-                // todo: dll's ?
+                return Microsoft.WindowsAPICodePack.Shell.FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Shell.FileAttributes.Normal, Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.Icon | Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
-                if (Path.EndsWith(".exe"))
+            // else
 
-                    return TryGetIcon(11, "imageres.dll", size);
-
-                else
-
-                {
-
-                    string fileType = Registry.GetFileTypeFromExtension(System.IO.Path.GetExtension(Path));
-
-                    Icon icon = null;
-
-                    if (fileType != null)
-                        
-                        icon = Icon.ExtractAssociatedIcon(" Registry.GetIconVariationsFromFileType(fileType)?.TryGetIcon(size, 32, true, true);
-
-                    return icon ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
-
-                }
-
-            else
-
-                return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+                // return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
         }
 

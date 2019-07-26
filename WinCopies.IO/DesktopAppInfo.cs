@@ -35,64 +35,64 @@ namespace WinCopies.IO
 
     //}
 
-    public class DesktopAppInfo // : AppInfo
-    {
+    //public class DesktopAppInfo // : AppInfo
+    //{
 
-        private ShellObject _shellObject;
+    //    private ShellObject _shellObject;
 
-        /// <summary>
-        /// Gets the display name of this <see cref="DesktopAppInfo"/>.
-        /// </summary>
-        public string DisplayName => (_shellObject ?? (_shellObject = ShellObject.FromParsingName(Path))).Properties.System.FileDescription.Value;
+    //    /// <summary>
+    //    /// Gets the display name of this <see cref="DesktopAppInfo"/>.
+    //    /// </summary>
+    //    public string DisplayName => (_shellObject ?? (_shellObject = ShellObject.FromParsingName(Path))).Properties.System.FileDescription.Value;
 
-        private string _path;
+    //    private string _path;
 
-        /// <summary>
-        /// Gets the path of this <see cref="DesktopAppInfo"/>.
-        /// </summary>
-        public string Path => _path ?? (_path = GetOpenWithSoftwarePathFromCommand(Command));
+    //    /// <summary>
+    //    /// Gets the path of this <see cref="DesktopAppInfo"/>.
+    //    /// </summary>
+    //    public string Path => _path ?? (_path = GetOpenWithSoftwarePathFromCommand(Command));
 
-        /// <summary>
-        /// Gets the full command (software path and command line args) of this <see cref="DesktopAppInfo"/>.
-        /// </summary>
-        public string Command { get; } = null;
+    //    /// <summary>
+    //    /// Gets the full command (software path and command line args) of this <see cref="DesktopAppInfo"/>.
+    //    /// </summary>
+    //    public string Command { get; } = null;
 
-        /// <summary>
-        /// Gets the Windows Registry file type of this <see cref="DesktopAppInfo"/>.
-        /// </summary>
-        public string FileType { get; } = null;
+    //    /// <summary>
+    //    /// Gets the Windows Registry file type of this <see cref="DesktopAppInfo"/>.
+    //    /// </summary>
+    //    public string FileType { get; } = null;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DesktopAppInfo"/> class for a given Windows Registry file type.
-        /// </summary>
-        /// <param name="fileType">The Windows Registry file type of the new instance of the <see cref="DesktopAppInfo"/>.</param>
-        public DesktopAppInfo(string fileType)
+    //    /// <summary>
+    //    /// Initializes a new instance of the <see cref="DesktopAppInfo"/> class for a given Windows Registry file type.
+    //    /// </summary>
+    //    /// <param name="fileType">The Windows Registry file type of the new instance of the <see cref="DesktopAppInfo"/>.</param>
+    //    public DesktopAppInfo(string fileType)
 
-        {
+    //    {
 
-            FileType = fileType;
+    //        FileType = fileType;
 
-            Command = GetCommandFromFileType("open", FileType);
+    //        Command = GetCommandFromFileType("open", FileType);
 
-        }
+    //    }
 
-        public void Open(ShellObject shellObject) => Open(shellObject.ParsingName, "open");
+    //    public void Open(ShellObject shellObject) => Open(shellObject.ParsingName, "open");
 
-        public bool Open(ShellObject shellObject, string commandName) => Open(shellObject.ParsingName, commandName);
+    //    public bool Open(ShellObject shellObject, string commandName) => Open(shellObject.ParsingName, commandName);
 
-        public void Open(string fileName) => Open(fileName, "open");
+    //    public void Open(string fileName) => Open(fileName, "open");
 
-        public bool Open(string fileName, string commandName)
+    //    public bool Open(string fileName, string commandName)
 
-        {
+    //    {
 
-            _ = Process.Start(GetOpenWithSoftwareProcessStartInfoFromCommand(GetCommandFromFileType(commandName, FileType), fileName));
+    //        _ = Process.Start(GetOpenWithSoftwareProcessStartInfoFromCommand(GetCommandFromFileType(commandName, FileType), fileName));
 
-            return true;
+    //        return true;
 
-        }
+    //    }
 
-    }
+    //}
 
     //public class WindowsStoreAppInfo : AppInfo
 

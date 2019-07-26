@@ -1633,6 +1633,18 @@ namespace WinCopies.Util
 
         }
 
+        private static void ThrowIfNotTypeInternal<T>(object obj, string argumentName) => throw (obj is null ? new ArgumentNullException(argumentName) : new ArgumentException($"{argumentName} must be {typeof(T).ToString()}. {argumentName} is {obj.GetType().ToString()}", argumentName));
+
+        public static void ThrowIfNotType<T>(object obj, string argumentName)
+
+        {
+
+            if (!(obj is T))
+
+                ThrowIfNotTypeInternal<T>(obj, argumentName);
+
+        }
+
         public static T GetOrThrowIfNotType<T>(object obj, string argumentName)
 
         {
@@ -1641,13 +1653,17 @@ namespace WinCopies.Util
 
                 return _obj;
 
-            else if (obj is null)
-
-                throw new ArgumentNullException(argumentName);
-
             else
 
-                throw new ArgumentException($"{argumentName} must be {typeof(T).Name}. {argumentName} is {obj.GetType().ToString()}", argumentName);
+            {
+
+                ThrowIfNotTypeInternal<T>(obj, argumentName);
+
+                // We shouldn't reach this point.
+
+                return default;
+
+            }
 
         }
     }
