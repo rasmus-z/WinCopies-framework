@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using static WinCopies.Util.Util;
-using WinCopies.Util;
 using System.Management;
 using System.Windows;
 using System.Windows.Interop;

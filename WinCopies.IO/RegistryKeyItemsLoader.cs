@@ -138,23 +138,29 @@ namespace WinCopies.IO
 
                     case RegistryItemType.RegistryRoot:
 
-                        var _registryKeyFields = new List<FieldInfo>(typeof(Microsoft.Win32.Registry).GetFields());
+                        if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryKey))
 
-                        PathInfo pathInfo;
+                        {
 
-                        foreach (FieldInfo fieldInfo in _registryKeyFields)
+                            FieldInfo[] _registryKeyFields = typeof(Microsoft.Win32.Registry).GetFields();
 
-                            if (CheckFilter(fieldInfo.Name))
+                            PathInfo pathInfo;
 
-                            {
+                            foreach (FieldInfo fieldInfo in _registryKeyFields)
 
-                                pathInfo = new PathInfo();
+                                if (CheckFilter(fieldInfo.Name))
 
-                                pathInfo.Path = pathInfo.Name = fieldInfo.Name;
+                                {
 
-                                arrayAndListBuilder.AddLast(pathInfo);
+                                    pathInfo = new PathInfo();
 
-                            }
+                                    pathInfo.Path = pathInfo.Name = fieldInfo.Name;
+
+                                    arrayAndListBuilder.AddLast(pathInfo);
+
+                                }
+
+                        }
 
                         break;
 

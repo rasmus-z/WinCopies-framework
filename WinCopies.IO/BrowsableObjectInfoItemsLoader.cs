@@ -1,13 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 
+using WinCopies.Collections;
 using WinCopies.Util;
 
 using BackgroundWorker = WinCopies.Util.BackgroundWorker;
-using System.Collections.Generic;
-using System.Threading;
-using WinCopies.Collections;
-using System.Globalization;
 
 namespace WinCopies.IO
 {

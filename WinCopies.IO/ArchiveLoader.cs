@@ -1,29 +1,11 @@
-﻿#region "Imports"
-
-
-
-#region ".NET"
-
-using SevenZip;
+﻿using SevenZip;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using WinCopies.Util;
-
-#endregion
-
-#region "WinCopies"
-
-// using WinCopies.IO;
-
 using static WinCopies.Util.Util;
-
-#endregion
-
-#endregion
 
 namespace WinCopies.IO
 {

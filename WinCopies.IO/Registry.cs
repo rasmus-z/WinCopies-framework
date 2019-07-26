@@ -1,16 +1,9 @@
 ﻿using Microsoft.Win32;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Reflection;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
-using static WinCopies.Util.Generic;
-using System.Drawing;
-using TsudaKageyu;
-using System.Text;
-using System.Runtime.InteropServices;
 
 namespace WinCopies.IO
 {
@@ -467,6 +460,8 @@ namespace WinCopies.IO
 
         {
 
+            ThrowIfNullEmptyOrWhiteSpace(path, nameof(path));
+
             string registryKeyName;
 
             if (path.Contains('\\', out int result))
@@ -489,13 +484,23 @@ namespace WinCopies.IO
 
             }
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out RegistryKey registryKey, registryKeyName, GetKeyValuePair(Microsoft.Win32.Registry.ClassesRoot, Microsoft.Win32.Registry.ClassesRoot.Name),
-                GetKeyValuePair(Microsoft.Win32.Registry.CurrentConfig, Microsoft.Win32.Registry.CurrentConfig.Name),
-                GetKeyValuePair(Microsoft.Win32.Registry.CurrentUser, Microsoft.Win32.Registry.CurrentUser.Name),
-                GetKeyValuePair(Microsoft.Win32.Registry.DynData, Microsoft.Win32.Registry.DynData.Name),
-                GetKeyValuePair(Microsoft.Win32.Registry.LocalMachine, Microsoft.Win32.Registry.LocalMachine.Name),
-                GetKeyValuePair(Microsoft.Win32.Registry.PerformanceData, Microsoft.Win32.Registry.PerformanceData.Name),
-                GetKeyValuePair(Microsoft.Win32.Registry.Users, Microsoft.Win32.Registry.Users.Name)))
+            FieldInfo[] fields = typeof(Microsoft.Win32.Registry).GetFields();
+
+            var registryKeys = new KeyValuePair<RegistryKey, string>[fields.Length];
+
+            RegistryKey item;
+
+            for (int i = 0; i < fields.Length; i++)
+
+            {
+
+                item = (RegistryKey)fields[i].GetValue(null);
+
+                registryKeys[i] = new KeyValuePair<RegistryKey, string>(item, item.Name);
+
+            }
+
+            if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out RegistryKey registryKey, registryKeyName, registryKeys))
 
                 return path.Length > 0 ? registryKey.OpenSubKey(path) : registryKey;
 

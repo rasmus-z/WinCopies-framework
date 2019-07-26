@@ -1,33 +1,12 @@
-﻿#region "Imports"
-
-
-
-#region ".NET"
-
-using Microsoft.WindowsAPICodePack.Shell;
+﻿using Microsoft.WindowsAPICodePack.Shell;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Windows;
 using WinCopies.Util;
 
-#endregion
-
-#region "WinCopies"
-
-// using WinCopies.IO;
-
 using static WinCopies.Util.Util;
-
-#endregion
-
-
-#endregion
 
 namespace WinCopies.IO
 {

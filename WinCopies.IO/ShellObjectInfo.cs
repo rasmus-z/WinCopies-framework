@@ -1,13 +1,10 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 
-using SevenZip;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using static WinCopies.Util.Util;
 using FileInfo = System.IO.FileInfo;

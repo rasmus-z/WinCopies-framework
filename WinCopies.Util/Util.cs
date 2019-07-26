@@ -1465,6 +1465,26 @@ namespace WinCopies.Util
 
         public static bool IsNullEmptyOrWhiteSpace(string value) => string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
 
+        public static void ThrowIfNullEmptyOrWhiteSpace(string value)
+
+        {
+
+            if (IsNullEmptyOrWhiteSpace(value))
+
+                throw new InvalidOperationException($"The given value is null, empty or white space. The given value is: '{value ?? ""}'");
+
+        }
+
+        public static void ThrowIfNullEmptyOrWhiteSpace(string value, string argumentName)
+
+        {
+
+            if (IsNullEmptyOrWhiteSpace(value))
+
+                throw new ArgumentException($"The given value is null, empty or white space. The given value is: '{value ?? ""}'", argumentName);
+
+        }
+
         /// <summary>
         /// Concatenates multiple arrays from a same item type. Arrays must have only one dimension.
         /// </summary>

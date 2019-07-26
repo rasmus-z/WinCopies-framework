@@ -1,11 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 
-using System;
-using System.Diagnostics;
-using System.Globalization;
-
-using Shell = Microsoft.WindowsAPICodePack.Shell;
-
 namespace WinCopies.IO
 {
     /// <summary>
