@@ -47,7 +47,7 @@ namespace WinCopies.IO
 
             // We've already checked if Path is actually an IWMIItemInfo in the OnPathChanging method.
 
-            var path = ((WMIItemInfo)Path);
+            var path = (WMIItemInfo)Path;
 
             if ( path .WMIItemType == WMIItemType.Namespace)
 

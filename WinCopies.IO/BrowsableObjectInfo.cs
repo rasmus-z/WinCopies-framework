@@ -281,9 +281,9 @@ namespace WinCopies.IO
         /// <returns>The hash codes of the <see cref="FileType"/> and the <see cref="Path"/> property.</returns>
         public override int GetHashCode() => FileType.GetHashCode() ^ Path.ToLower().GetHashCode();
 
-        BrowsableObjectInfoItemsLoader _itemsLoader;
-
         IBrowsableObjectInfoItemsLoader IBrowsableObjectInfo.ItemsLoader => ItemsLoader;
+
+        protected virtual BrowsableObjectInfoItemsLoader ItemsLoaderOverride { get; set; }
 
         /// <summary>
         /// Gets the items loader for this <see cref="BrowsableObjectInfo"/>. See the Remarks section.
@@ -291,9 +291,9 @@ namespace WinCopies.IO
         /// <remarks><para>When setting, automatically disposes the old <see cref="BrowsableObjectInfoItemsLoader"/>.</para>
         /// <para>When setting, if the new value is a <see cref="BrowsableObjectInfoItemsLoader"/>, its <see cref="BrowsableObjectInfoItemsLoader.Path"/> property is automatically set with this instance of <see cref="BrowsableObjectInfo"/>.</para></remarks>
         /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoItemsLoader"/> is running.</exception>
-        public virtual BrowsableObjectInfoItemsLoader ItemsLoader
+        public BrowsableObjectInfoItemsLoader ItemsLoader
         {
-            get => _itemsLoader; set
+            get => ItemsLoaderOverride; set
             {
 
                 if (ItemsLoader?.IsBusy == true)
@@ -302,7 +302,7 @@ namespace WinCopies.IO
 
                 value.Path = this;
 
-                _itemsLoader = value;
+                ItemsLoaderOverride = value;
 
             }
 

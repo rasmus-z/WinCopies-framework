@@ -6,6 +6,8 @@ namespace WinCopies.IO
     public interface IWMIItemInfoFactory
     {
 
+        bool UseCurrentFactoryRecursively { get; set; }
+
         IWMIItemInfoFactoryOptions Options { get; }
 
         IBrowsableObjectInfo GetBrowsableObjectInfo();
@@ -21,18 +23,16 @@ namespace WinCopies.IO
     public class WMIItemInfoFactory : IWMIItemInfoFactory
     {
 
-        internal IBrowsableObjectInfoItemsLoader _wmiItemsLoader;
+        internal IBrowsableObjectInfoItemsLoader itemsLoader;
 
         private WMIItemInfoFactoryOptions _options;
-
-        protected virtual WMIItemInfoFactoryOptions OptionsOverride { get => _options; set => _options = value; }
 
         public WMIItemInfoFactoryOptions Options
         {
             get => OptionsOverride; set
             {
 
-                if (_wmiItemsLoader?.IsBusy == true)
+                if (itemsLoader?.IsBusy == true)
 
                     throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
 

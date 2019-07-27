@@ -204,11 +204,22 @@ namespace WinCopies.IO
 
         public WMIItemType WMIItemType { get; }
 
-        private WMIItemInfoFactory _wmiItemInfoFactory;
+        protected sealed override BrowsableObjectInfoItemsLoader ItemsLoaderOverride
+        {
+            get => base.ItemsLoaderOverride; set
+            {
+
+                base.ItemsLoaderOverride = value;
+
+                WMIItemInfoFactoryOverride.itemsLoader = value;
+
+            }
+
+        }
 
         public WMIItemInfoFactory WMIItemInfoFactory
         {
-            get => _wmiItemInfoFactory;
+            get => WMIItemInfoFactoryOverride;
 
             set
             {
@@ -217,9 +228,9 @@ namespace WinCopies.IO
 
                     throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
 
-                _wmiItemInfoFactory = value ?? throw new ArgumentNullException("value");
+                WMIItemInfoFactoryOverride = value ?? throw new ArgumentNullException("value");
 
-                _wmiItemInfoFactory._wmiItemsLoader = ItemsLoader;
+                WMIItemInfoFactoryOverride.itemsLoader = ItemsLoader;
 
             }
         }

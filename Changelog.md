@@ -9,7 +9,7 @@ CHANGELOG
 Updates
 -------
 
-1.4
+2.0
 ---
 
 WinCopies.Data (1.0)
@@ -40,9 +40,11 @@ WinCopies.Util (2.0)
 			- Extension methods for LinkedLists
 			- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
 		- Misc:
-			- EqualityComparison delegate
-			- The view model classes now have the OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
-			- The ReadOnlyObservableCollection has now the OnCollectionChanging protected virtual method.
+			- EqualityComparison, FieldValidateValueCallback*, FieldValueChangedCallback*, PropertyValidateCallback* and PropertyValueChangedCallback* delegates
+			- The view model classes now have an OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
+			- The ReadOnlyObservableCollection has now an OnCollectionChanging protected virtual method.
+	- Parameters:
+		- The WinCopies.Util.Extensions.SetProperty/Field now have multiple new optional parameters to extend the capabilities of these methods.
 
 - Bug fixes:
 	- Bug fixed in the BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.
@@ -57,11 +59,13 @@ WinCopies.Util (2.0)
 	- The ObservableCollection now calls base methods for avoinding reentrancy.
 
 - Removals:
-	- The redundant 'performIntegrityCheck' parameter in one of the 'SetProperty' methods has been removed.
+	- The 'performIntegrityCheck' parameter in 'SetProperty' methods has been replaced by the 'throwIfReadOnly' parameter.
 
 - Misc:
 	- ReadOnlyObservableCollection's CollectionChanging event has now the protected access modifier.
 	- Updated doc.
+
+* See WinCopies.Util.Extensions.SetProperty/Field
 
 Project link
 ------------

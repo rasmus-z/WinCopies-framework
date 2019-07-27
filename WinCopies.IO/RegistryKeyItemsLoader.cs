@@ -130,7 +130,21 @@ namespace WinCopies.IO
 
             {
 
-                var arrayAndListBuilder = new ArrayAndListBuilder<PathInfo>();
+                var paths = new ArrayAndListBuilder<IFileSystemObject>();
+
+                PathInfo pathInfo;
+
+                void checkAndAppend(string pathWithoutName, string name, RegistryItemType registryItemType)
+
+                {
+
+                    string path = pathWithoutName + '\\' + name;
+
+                    if (CheckFilter(path))
+
+                        _ = paths.AddLast(pathInfo = new PathInfo() { Path = path, Name = name, RegistryItemType = registryItemType });
+
+                }
 
                 switch (registryItemInfo.RegistryItemType)
 
@@ -144,21 +158,17 @@ namespace WinCopies.IO
 
                             FieldInfo[] _registryKeyFields = typeof(Microsoft.Win32.Registry).GetFields();
 
-                            PathInfo pathInfo;
+                            string name;
 
                             foreach (FieldInfo fieldInfo in _registryKeyFields)
 
-                                if (CheckFilter(fieldInfo.Name))
+                            {
 
-                                {
+                                name = ((RegistryKey)fieldInfo.GetValue(null)).Name;
 
-                                    pathInfo = new PathInfo();
+                                checkAndAppend(name, name, RegistryItemType.RegistryKey);
 
-                                    pathInfo.Path = pathInfo.Name = fieldInfo.Name;
-
-                                    arrayAndListBuilder.AddLast(pathInfo);
-
-                                }
+                            }
 
                         }
 
@@ -166,7 +176,7 @@ namespace WinCopies.IO
 
                     case RegistryItemType.RegistryKey:
 
-                        List<string> items;
+                        string[] items;
 
                         if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryKey))
 
@@ -174,15 +184,11 @@ namespace WinCopies.IO
 
                             {
 
-                                items = new List<string>(registryItemInfo.RegistryKey.GetSubKeyNames());
-
-                                items.Sort();
+                                items = registryItemInfo.RegistryKey.GetSubKeyNames();
 
                                 foreach (string item in items)
 
-                                    if (CheckFilter(item))
-
-                                        ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo(registryItemInfo.Path + '\\' + item));
+                                    checkAndAppend(item.Substring(0, item.LastIndexOf('\\')), item.Substring(item.LastIndexOf('\\') + 1), RegistryItemType.RegistryKey);
 
                             }
 
@@ -194,15 +200,11 @@ namespace WinCopies.IO
 
                             {
 
-                                items = new List<string>(registryItemInfo.RegistryKey.GetValueNames());
-
-                                items.Sort();
+                                items = registryItemInfo.RegistryKey.GetValueNames();
 
                                 foreach (string item in items)
 
-                                    if (CheckFilter(item))
-
-                                        ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo(registryItemInfo.RegistryKey, item));
+                                    checkAndAppend(registryItemInfo.RegistryKey.Name, item, RegistryItemType.RegistryValue);
 
                             }
 
@@ -214,7 +216,35 @@ namespace WinCopies.IO
 
 
 
-                ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo((RegistryKey)fieldInfo.GetValue(null)));
+                IEnumerable<PathInfo> pathInfos;
+
+
+
+                if (FileSystemObjectComparer == null)
+
+                    pathInfos = (IEnumerable<PathInfo>)paths;
+
+                else
+
+                {
+
+                    var _paths = paths.ToList();
+
+                    _paths.Sort(FileSystemObjectComparer);
+
+                    pathInfos = (IEnumerable<PathInfo>)_paths;
+
+                }
+
+
+
+                foreach (PathInfo _path in paths)
+
+                    ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo());
+
+                ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo(registryItemInfo.Path + '\\' + item));
+
+                ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo(registryItemInfo.RegistryKey, item));
 
             }
 
@@ -229,6 +259,8 @@ namespace WinCopies.IO
             public string Name { get; set; }
 
             public FileType FileType => FileType.SpecialFolder;
+
+            public RegistryItemType RegistryItemType { get; set; }
         }
     }
 }

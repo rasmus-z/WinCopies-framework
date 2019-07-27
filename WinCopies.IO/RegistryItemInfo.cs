@@ -103,6 +103,10 @@ namespace WinCopies.IO
             RegistryKey = registryKey;
         }
 
+        public RegistryItemInfo(string registryKeyPath, string valueName) : this(Registry.OpenRegistryKey(registryKeyPath), valueName) { }
+
+        public RegistryItemInfo(string registryKeyPath, string valueName, IRegistryItemInfoFactory factory) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, factory) { }
+
         private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
 
         {
