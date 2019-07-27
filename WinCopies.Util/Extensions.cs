@@ -2199,7 +2199,7 @@ namespace WinCopies.Util
 
         }
 
-        private static (bool fieldChanged, object oldValue) SetField(this object obj, FieldInfo field, object previousValue, object newValue, string paramName, bool setOnlyIfNotNull, bool throwIfNull, FieldValidateValueCallback validateValueCallback, bool throwIfValidationFails, FieldValueChangedCallback valueChangedCallback)
+        private static (bool fieldChanged, object oldValue) SetField(this object obj, FieldInfo field, object previousValue, object newValue, string paramName, bool setOnlyIfNotNull, bool throwIfNull, bool disposeOldValue, FieldValidateValueCallback validateValueCallback, bool throwIfValidationFails, FieldValueChangedCallback valueChangedCallback)
 
         {
 
@@ -2220,6 +2220,10 @@ namespace WinCopies.Util
                 if ((newValue == null && previousValue != null) || (newValue != null && !newValue.Equals(previousValue)))
 
                 {
+
+                    if (disposeOldValue)
+
+                    ((IDisposable)previousValue).Dispose();
 
                     field.SetValue(obj, newValue);
 
@@ -2250,7 +2254,17 @@ namespace WinCopies.Util
 
             FieldInfo field = GetField(fieldName, declaringType, bindingFlags);
 
-            return obj.SetField(field, field.GetValue(obj), newValue, paramName, setOnlyIfNotNull, throwIfNull, validateValueCallback, throwIfValidationFails, valueChangedCallback);
+            return obj.SetField(field, field.GetValue(obj), newValue, paramName, setOnlyIfNotNull, throwIfNull, false, validateValueCallback, throwIfValidationFails, valueChangedCallback);
+
+        }
+
+        public static (bool fieldChanged, IDisposable oldValue) DisposeAndSetField(this object obj, string fieldName, IDisposable newValue, Type declaringType, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet, string paramName = null, bool setOnlyIfNotNull = false, bool throwIfNull = false, FieldValidateValueCallback validateValueCallback = null, bool throwIfValidationFails = false, FieldValueChangedCallback valueChangedCallback = null)
+
+        {
+
+            FieldInfo field = GetField(fieldName, declaringType, bindingFlags);
+
+            return ((bool, IDisposable)) obj.SetField(field, field.GetValue(obj), newValue, paramName, setOnlyIfNotNull, throwIfNull, true, validateValueCallback, throwIfValidationFails, valueChangedCallback);
 
         }
 
@@ -2324,7 +2338,7 @@ namespace WinCopies.Util
 
             return !property.CanWrite || property.SetMethod == null
                 ? throwIfReadOnly ? throw new InvalidOperationException(string.Format("This property is read-only. Property name: {0}, declaring type: {1}.", propertyName, declaringType)) : (false, previousValue)
-                : obj.SetField(field, previousValue, newValue, paramName, setOnlyIfNotNull, throwIfNull, validateValueCallback, throwIfValidationFails, valueChangedCallback);
+                : obj.SetField(field, previousValue, newValue, paramName, setOnlyIfNotNull, throwIfNull, false, validateValueCallback, throwIfValidationFails, valueChangedCallback);
         }
 
         /// <summary>
@@ -2399,6 +2413,153 @@ namespace WinCopies.Util
 
         }
 
+
+        /// <summary>
+        /// Disposes an old value of a property then sets a new value to the given property if the new value is different.
+        /// </summary>
+        /// <param name="obj">The object in which to set the property.</param>
+        /// <param name="propertyName">The name of the given property.</param>
+        /// <param name="fieldName">The field related to the property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the given property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <param name="paramName">The parameter from which the value was passed to this method.</param>
+        /// <param name="setOnlyIfNotNull">Whether to set only if the given value is not null.</param>
+        /// <param name="throwIfNull">Whether to throw if the given value is null.</param>
+        /// <param name="validateValueCallback">The callback used to validate the given value. You can leave this parameter to null if you don't want to perform validation.</param>
+        /// <param name="throwIfValidationFails">Whether to throw if the validation of <paramref name="validateValueCallback"/> fails.</param>
+        /// <param name="valueChangedCallback">The callback used to perform actions after the property is set. You can leave this parameter to null if you don't want to perform actions after the property is set.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the given property (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <exception cref="InvalidOperationException">The declaring types of the given property and field name doesn't correspond. OR The given property is read-only and <paramref name="throwIfReadOnly"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="ArgumentNullException">The new value is null and <paramref name="throwIfNull"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="Exception"><paramref name="validateValueCallback"/> failed and <paramref name="throwIfValidationFails"/> is set to <see langword="true"/>. This exception is the exception that was returned by <paramref name="validateValueCallback"/> if it was not null or an <see cref="ArgumentException"/> otherwise.</exception>
+        public static (bool propertyChanged, IDisposable oldValue) DisposeAndSetProperty(this object obj, string propertyName, string fieldName, IDisposable newValue, Type declaringType, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet, string paramName = null, bool setOnlyIfNotNull = false, bool throwIfNull = false, FieldValidateValueCallback validateValueCallback = null, bool throwIfValidationFails = false, FieldValueChangedCallback valueChangedCallback = null)
+
+        {
+
+            //BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
+            //             BindingFlags.Static | BindingFlags.Instance |
+            //             BindingFlags.DeclaredOnly;
+            //this.GetType().GetField(fieldName, flags).SetValue(this, newValue);
+
+            //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, previousValue, newValue)); 
+
+            // if (declaringType == null) 
+
+            // {
+
+            //while (objectType != declaringType && objectType != typeof(object))
+
+            //    objectType = objectType.BaseType;
+
+            //if (objectType != declaringType)
+
+            //    throw new ArgumentException(string.Format((string)ResourcesHelper.GetResource("DeclaringTypeIsNotInObjectInheritanceHierarchyException"), declaringType, objectType));
+
+            // }
+
+            //#if DEBUG
+
+            //            var fields = objectType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+            //            foreach (var _field in fields)
+
+            //                Debug.WriteLine("Object type: " + objectType + " " + _field.Name);
+
+            //#endif
+
+            // var objectType = obj.GetType();
+
+            FieldInfo field = GetField(fieldName, declaringType, bindingFlags);
+
+            IDisposable previousValue = (IDisposable) field.GetValue(obj);
+
+            if (!CheckPropertySetIntegrity(declaringType, propertyName, out string methodName, 3, bindingFlags))
+
+                throw new InvalidOperationException(string.Format(DeclaringTypesNotCorrespond, propertyName, methodName));
+
+            PropertyInfo property = GetProperty(propertyName, declaringType, bindingFlags);
+
+            return !property.CanWrite || property.SetMethod == null
+                ? throwIfReadOnly ? throw new InvalidOperationException(string.Format("This property is read-only. Property name: {0}, declaring type: {1}.", propertyName, declaringType)) : (false, previousValue)
+                : ((bool, IDisposable))    obj.SetField(field, previousValue, newValue, paramName, setOnlyIfNotNull, throwIfNull, true, validateValueCallback, throwIfValidationFails, valueChangedCallback);
+        }
+
+        /// <summary>
+        /// Disposes an old value of a property then sets a new value to the given property if the new value is different.
+        /// </summary>
+        /// <param name="obj">The object in which to set the property.</param>
+        /// <param name="propertyName">The name of the given property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the given property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <param name="paramName">The parameter from which the value was passed to this method.</param>
+        /// <param name="setOnlyIfNotNull">Whether to set only if the given value is not null.</param>
+        /// <param name="throwIfNull">Whether to throw if the given value is null.</param>
+        /// <param name="validateValueCallback">The callback used to validate the given value. You can leave this parameter to null if you don't want to perform validation.</param>
+        /// <param name="throwIfValidationFails">Whether to throw if the validation of <paramref name="validateValueCallback"/> fails.</param>
+        /// <param name="valueChangedCallback">The callback used to perform actions after the property is set. You can leave this parameter to null if you don't want to perform actions after the property is set.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the given property (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <exception cref="InvalidOperationException">The given property is read-only and <paramref name="throwIfReadOnly"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="ArgumentNullException">The new value is null and <paramref name="throwIfNull"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="Exception"><paramref name="validateValueCallback"/> failed and <paramref name="throwIfValidationFails"/> is set to <see langword="true"/>. This exception is the exception that was returned by <paramref name="validateValueCallback"/> if it was not null or an <see cref="ArgumentException"/> otherwise.</exception>
+        public static (bool propertyChanged, IDisposable oldValue) DisposeAndSetProperty(this object obj, string propertyName, IDisposable    newValue, Type declaringType, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet, string paramName = null, bool setOnlyIfNotNull = false, bool throwIfNull = false, PropertyValidateValueCallback validateValueCallback = null, bool throwIfValidationFails = false, PropertyValueChangedCallback valueChangedCallback = null)
+
+        {
+
+            PropertyInfo property = GetProperty(propertyName, declaringType, bindingFlags);
+
+            IDisposable previousValue = (IDisposable) property.GetValue(obj);
+
+            if (!property.CanWrite || property.SetMethod == null)
+
+                return throwIfReadOnly ? throw new InvalidOperationException(string.Format("This property is read-only. Property name: {0}, declaring type: {1}.", propertyName, declaringType)) : (false, previousValue);
+
+            if (newValue is null)
+
+                if (throwIfNull)
+
+                    throw new ArgumentNullException(nameof(paramName));
+
+                else if (setOnlyIfNotNull)
+
+                    return (false, previousValue);
+
+            (bool validationResult, Exception validationException) = validateValueCallback?.Invoke(obj, newValue, property, paramName) ?? (true, null);
+
+            if (validationResult)
+
+                if ((newValue == null && previousValue != null) || (newValue != null && !newValue.Equals(previousValue)))
+
+                {
+
+                    previousValue.Dispose();
+
+                    property.SetValue(obj, newValue);
+
+                    valueChangedCallback?.Invoke(obj, newValue, property, paramName);
+
+                    return (true, previousValue);
+
+                    //BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
+                    //             BindingFlags.Static | BindingFlags.Instance |
+                    //             BindingFlags.DeclaredOnly;
+                    //this.GetType().GetField(fieldName, flags).SetValue(this, newValue);
+
+                }
+
+                else
+
+                    return (false, previousValue);
+
+            else
+
+                return throwIfValidationFails ? throw (validationException ?? new ArgumentException("Validation error.", paramName)) : (false, previousValue);
+
+        }
+
         /// <summary>
         /// Sets a value to a property if the new value is different.
         /// </summary>
@@ -2445,7 +2606,7 @@ namespace WinCopies.Util
         /// <exception cref="ArgumentNullException">The new value is null and <paramref name="throwIfNull"/> is set to <see langword="true"/>.</exception>
         /// <exception cref="Exception"><paramref name="validateValueCallback"/> failed and <paramref name="throwIfValidationFails"/> is set to <see langword="true"/>. This exception is the exception that was returned by <paramref name="validateValueCallback"/> if it was not null or an <see cref="ArgumentException"/> otherwise.</exception>
         public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet, string paramName = null, bool setOnlyIfNotNull = false, bool throwIfNull = false, PropertyValidateValueCallback validateValueCallback = null, bool throwIfValidationFails = false, PropertyValueChangedCallback valueChangedCallback = null) => obj.IsBusy
-                ? throwIfBusy ? (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj)) : throw new InvalidOperationException(BackgroundWorkerIsBusy)
+                ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy): (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj))
                 : obj.SetProperty(propertyName, newValue, declaringType, throwIfReadOnly, bindingFlags, paramName, setOnlyIfNotNull, throwIfNull, validateValueCallback, throwIfValidationFails, valueChangedCallback);
 
         /// <summary>
@@ -2496,6 +2657,104 @@ namespace WinCopies.Util
         public static (bool propertyChanged, object oldValue) SetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, object newValue, Type declaringType, bool throwIfBusy, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet, string paramName = null, bool setOnlyIfNotNull = false, bool throwIfNull = false, PropertyValidateValueCallback validateValueCallback = null, bool throwIfValidationFails = false, PropertyValueChangedCallback valueChangedCallback = null) => obj.IsBusy
                 ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj))
                 : obj.SetProperty(propertyName, newValue, declaringType, throwIfReadOnly, bindingFlags, paramName, setOnlyIfNotNull, throwIfNull, validateValueCallback, throwIfValidationFails, valueChangedCallback);
+
+        /// <summary>
+        /// Disposes an old value of a property then sets a new value to the given property if the new value is different.
+        /// </summary>
+        /// <param name="obj">The object in which to set the property.</param>
+        /// <param name="propertyName">The name of the given property.</param>
+        /// <param name="fieldName">The field related to the property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfBusy">Whether to throw if <paramref name="obj"/> is busy.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the given property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <param name="paramName">The parameter from which the value was passed to this method.</param>
+        /// <param name="setOnlyIfNotNull">Whether to set only if the given value is not null.</param>
+        /// <param name="throwIfNull">Whether to throw if the given value is null.</param>
+        /// <param name="validateValueCallback">The callback used to validate the given value. You can leave this parameter to null if you don't want to perform validation.</param>
+        /// <param name="throwIfValidationFails">Whether to throw if the validation of <paramref name="validateValueCallback"/> fails.</param>
+        /// <param name="valueChangedCallback">The callback used to perform actions after the property is set. You can leave this parameter to null if you don't want to perform actions after the property is set.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the given property (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <exception cref="InvalidOperationException">The declaring types of the given property and field name doesn't correspond. OR The given property is read-only and <paramref name="throwIfReadOnly"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="ArgumentNullException">The new value is null and <paramref name="throwIfNull"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="Exception"><paramref name="validateValueCallback"/> failed and <paramref name="throwIfValidationFails"/> is set to <see langword="true"/>. This exception is the exception that was returned by <paramref name="validateValueCallback"/> if it was not null or an <see cref="ArgumentException"/> otherwise.</exception>
+        public static (bool propertyChanged, IDisposable oldValue) DisposeAndSetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, string fieldName, IDisposable newValue, Type declaringType, bool throwIfBusy, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet, string paramName = null, bool setOnlyIfNotNull = false, bool throwIfNull = false, FieldValidateValueCallback validateValueCallback = null, bool throwIfValidationFails = false, FieldValueChangedCallback valueChangedCallback = null) => obj.IsBusy
+                ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, (IDisposable) GetField(fieldName, declaringType, bindingFlags).GetValue(obj))
+                : obj.DisposeAndSetProperty(propertyName, fieldName, newValue, declaringType, throwIfReadOnly, bindingFlags, paramName, setOnlyIfNotNull, throwIfNull, validateValueCallback, throwIfValidationFails, valueChangedCallback);
+
+        /// <summary>
+        /// Disposes an old value of a property then sets a new value to the given property if the new value is different.
+        /// </summary>
+        /// <param name="obj">The object in which to set the property.</param>
+        /// <param name="propertyName">The name of the given property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfBusy">Whether to throw if <paramref name="obj"/> is busy.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the given property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <param name="paramName">The parameter from which the value was passed to this method.</param>
+        /// <param name="setOnlyIfNotNull">Whether to set only if the given value is not null.</param>
+        /// <param name="throwIfNull">Whether to throw if the given value is null.</param>
+        /// <param name="validateValueCallback">The callback used to validate the given value. You can leave this parameter to null if you don't want to perform validation.</param>
+        /// <param name="throwIfValidationFails">Whether to throw if the validation of <paramref name="validateValueCallback"/> fails.</param>
+        /// <param name="valueChangedCallback">The callback used to perform actions after the property is set. You can leave this parameter to null if you don't want to perform actions after the property is set.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the given property (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <exception cref="InvalidOperationException">The given property is read-only and <paramref name="throwIfReadOnly"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="ArgumentNullException">The new value is null and <paramref name="throwIfNull"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="Exception"><paramref name="validateValueCallback"/> failed and <paramref name="throwIfValidationFails"/> is set to <see langword="true"/>. This exception is the exception that was returned by <paramref name="validateValueCallback"/> if it was not null or an <see cref="ArgumentException"/> otherwise.</exception>
+        public static (bool propertyChanged, IDisposable oldValue) DisposeAndSetBackgroundWorkerProperty(this System.ComponentModel.BackgroundWorker obj, string propertyName, IDisposable newValue, Type declaringType, bool throwIfBusy, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet, string paramName = null, bool setOnlyIfNotNull = false, bool throwIfNull = false, PropertyValidateValueCallback validateValueCallback = null, bool throwIfValidationFails = false, PropertyValueChangedCallback valueChangedCallback = null) => obj.IsBusy
+                ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, (IDisposable) GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj))
+                : obj.DisposeAndSetProperty(propertyName, newValue, declaringType, throwIfReadOnly, bindingFlags, paramName, setOnlyIfNotNull, throwIfNull, validateValueCallback, throwIfValidationFails, valueChangedCallback);
+
+        /// <summary>
+        /// Disposes an old value of a property then sets a new value to the given property if the new value is different.
+        /// </summary>
+        /// <param name="obj">The object in which to set the property.</param>
+        /// <param name="propertyName">The name of the given property.</param>
+        /// <param name="fieldName">The field related to the property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfBusy">Whether to throw if <paramref name="obj"/> is busy.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the given property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <param name="paramName">The parameter from which the value was passed to this method.</param>
+        /// <param name="setOnlyIfNotNull">Whether to set only if the given value is not null.</param>
+        /// <param name="throwIfNull">Whether to throw if the given value is null.</param>
+        /// <param name="validateValueCallback">The callback used to validate the given value. You can leave this parameter to null if you don't want to perform validation.</param>
+        /// <param name="throwIfValidationFails">Whether to throw if the validation of <paramref name="validateValueCallback"/> fails.</param>
+        /// <param name="valueChangedCallback">The callback used to perform actions after the property is set. You can leave this parameter to null if you don't want to perform actions after the property is set.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the given property (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <exception cref="InvalidOperationException">The declaring types of the given property and field name doesn't correspond.</exception>
+        /// <exception cref="ArgumentNullException">The new value is null and <paramref name="throwIfNull"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="Exception"><paramref name="validateValueCallback"/> failed and <paramref name="throwIfValidationFails"/> is set to <see langword="true"/>. This exception is the exception that was returned by <paramref name="validateValueCallback"/> if it was not null or an <see cref="ArgumentException"/> otherwise.</exception>
+        public static (bool propertyChanged, IDisposable oldValue) DisposeAndSetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, string fieldName, IDisposable newValue, Type declaringType, bool throwIfBusy, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet, string paramName = null, bool setOnlyIfNotNull = false, bool throwIfNull = false, FieldValidateValueCallback validateValueCallback = null, bool throwIfValidationFails = false, FieldValueChangedCallback valueChangedCallback = null) => obj.IsBusy
+                ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, (IDisposable) GetField(fieldName, declaringType, bindingFlags).GetValue(obj))
+                : obj.DisposeAndSetProperty(propertyName, fieldName, newValue, declaringType, throwIfReadOnly, bindingFlags, paramName, setOnlyIfNotNull, throwIfNull, validateValueCallback, throwIfValidationFails, valueChangedCallback);
+
+        /// <summary>
+        /// Disposes an old value of a property then sets a new value to the given property if the new value is different.
+        /// </summary>
+        /// <param name="obj">The object in which to set the property.</param>
+        /// <param name="propertyName">The name of the given property.</param>
+        /// <param name="newValue">The value to set.</param>
+        /// <param name="declaringType">The actual declaring type of the property.</param>
+        /// <param name="throwIfBusy">Whether to throw if <paramref name="obj"/> is busy.</param>
+        /// <param name="throwIfReadOnly">Whether to throw if the given property is read-only.</param>
+        /// <param name="bindingFlags">The <see cref="BindingFlags"/> used to get the property.</param>
+        /// <param name="paramName">The parameter from which the value was passed to this method.</param>
+        /// <param name="setOnlyIfNotNull">Whether to set only if the given value is not null.</param>
+        /// <param name="throwIfNull">Whether to throw if the given value is null.</param>
+        /// <param name="validateValueCallback">The callback used to validate the given value. You can leave this parameter to null if you don't want to perform validation.</param>
+        /// <param name="throwIfValidationFails">Whether to throw if the validation of <paramref name="validateValueCallback"/> fails.</param>
+        /// <param name="valueChangedCallback">The callback used to perform actions after the property is set. You can leave this parameter to null if you don't want to perform actions after the property is set.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the setting succeeded and the old value of the given property (or <see langword="null"/> if the property does not contain any value nor reference).</returns>
+        /// <exception cref="InvalidOperationException">The given property is read-only and <paramref name="throwIfReadOnly"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="ArgumentNullException">The new value is null and <paramref name="throwIfNull"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="Exception"><paramref name="validateValueCallback"/> failed and <paramref name="throwIfValidationFails"/> is set to <see langword="true"/>. This exception is the exception that was returned by <paramref name="validateValueCallback"/> if it was not null or an <see cref="ArgumentException"/> otherwise.</exception>
+        public static (bool propertyChanged, IDisposable oldValue) DisposeAndSetBackgroundWorkerProperty(this IBackgroundWorker obj, string propertyName, IDisposable newValue, Type declaringType, bool throwIfBusy, bool throwIfReadOnly = true, BindingFlags bindingFlags = Util.DefaultBindingFlagsForPropertySet, string paramName = null, bool setOnlyIfNotNull = false, bool throwIfNull = false, PropertyValidateValueCallback validateValueCallback = null, bool throwIfValidationFails = false, PropertyValueChangedCallback valueChangedCallback = null) => obj.IsBusy
+                ? throwIfBusy ? throw new InvalidOperationException(BackgroundWorkerIsBusy) : (false, (IDisposable) GetProperty(propertyName, declaringType, bindingFlags).GetValue(obj))
+                : obj.DisposeAndSetProperty(propertyName, newValue, declaringType, throwIfReadOnly, bindingFlags, paramName, setOnlyIfNotNull, throwIfNull, validateValueCallback, throwIfValidationFails, valueChangedCallback);
 
         /// <summary>
         /// Gets the numeric value for an enum.
