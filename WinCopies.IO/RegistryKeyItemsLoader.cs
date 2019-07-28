@@ -238,9 +238,27 @@ namespace WinCopies.IO
 
 
 
-                foreach (PathInfo _path in pathInfos)
+                using (IEnumerator<PathInfo> pathsEnum = pathInfos.GetEnumerator())
 
-                    ReportProgress(0, _path.IsValue ? registryItemInfo.Factory.GetBrowsableObjectInfo(_path.Path) : registryItemInfo.Factory.GetBrowsableObjectInfo(_path.Path.Substring(0, _path.Path.Length - _path.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), _path.Name));
+
+
+                    while (pathsEnum.MoveNext())
+
+                        try
+
+                        {
+
+                            do
+
+                                ReportProgress(0, pathsEnum.Current.IsValue ? registryItemInfo.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path) : registryItemInfo.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path.Substring(0, pathsEnum.Current.Path.Length - pathsEnum.Current.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), pathsEnum.Current.Name));
+
+                            while (pathsEnum.MoveNext());
+
+                        }
+
+                        catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
+
+
 
             }
 
