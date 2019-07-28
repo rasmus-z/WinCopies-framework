@@ -11,34 +11,6 @@ using BackgroundWorker = WinCopies.Util.BackgroundWorker;
 namespace WinCopies.IO
 {
 
-    public interface IBrowsableObjectInfoItemsLoader : IBackgroundWorker, IDisposable
-    {
-
-        IEnumerable<string> Filter { get; set; }
-
-        IBrowsableObjectInfo Path { get; }
-
-        bool CheckFilter(string path);
-
-        void LoadItems();
-
-        void LoadItemsAsync();
-
-        /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfoItemsLoader"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoItemsLoader"/> is busy and does not support cancellation.</exception>
-        new void Dispose();
-
-        /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfoItemsLoader"/> and optionally disposes the related <see cref="Path"/>.
-        /// </summary>
-        /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
-        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoItemsLoader"/> is busy and does not support cancellation.</exception>
-        void Dispose(bool disposePath);
-
-    }
-
     /// <summary>
     /// The base class for the <see cref="IBrowsableObjectInfo"/> items loaders.
     /// </summary>
@@ -47,9 +19,11 @@ namespace WinCopies.IO
     {
 
         private readonly BackgroundWorker backgroundWorker = new BackgroundWorker();
+#pragma warning disable CS0649 // Set up using reflection
         private readonly IComparer<IFileSystemObject> _fileSystemObjectComparer;
-        private BrowsableObjectInfo _path;
         private readonly IEnumerable<string> _filter;
+#pragma warning restore CS0649
+        private BrowsableObjectInfo _path;
 
         public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoItemsLoader), true); }
 
@@ -68,34 +42,31 @@ namespace WinCopies.IO
         /// </summary>
         public BrowsableObjectInfo Path
         {
-            get => PathOverride; internal set
+            get => _path; internal set
 
             {
 
                 OnPathChanging(value);
 
-                PathOverride = value;
+                _path = value;
 
                 OnPathChanged(value);
 
             }
         }
 
-        protected virtual BrowsableObjectInfo PathOverride
-        {
-            get => _path; set => _path = value;
-        }
+        //protected virtual BrowsableObjectInfo PathOverride { get => _path; set => _path = value; }
 
         protected virtual void OnItemsChanging(NotifyCollectionChangedEventArgs e)
         {
 
             if (e.NewItems != null)
 
-                foreach (var item in e.NewItems)
+                foreach (object item in e.NewItems)
 
                     if (item is BrowsableObjectInfo _browsableObjectInfo)
 
-                        _browsableObjectInfo.Parent = (IBrowsableObjectInfo)Path;
+                        _browsableObjectInfo.Parent = Path;
 
         }
 
@@ -222,7 +193,7 @@ namespace WinCopies.IO
 
         }
 
-        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => ((BrowsableObjectInfo)_path).AreItemsLoaded = true;
+        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => _path.AreItemsLoaded = true;
 
         public abstract bool CheckFilter(string path);
 
@@ -291,13 +262,11 @@ namespace WinCopies.IO
 
         }
 
-        protected abstract void OnDoWork();
-
         /// <summary>
         /// When overridden in a derived class, provides a handler for the <see cref="DoWork"/> event.
         /// </summary>
         /// <param name="e">Event args for the current event</param>
-        protected virtual void OnDoWork(DoWorkEventArgs e) => OnDoWork();
+        protected abstract void OnDoWork(DoWorkEventArgs e);
 
         protected virtual void OnProgressChanged(ProgressChangedEventArgs e) => OnAddingPath(e.UserState as IBrowsableObjectInfo);
 
@@ -307,11 +276,11 @@ namespace WinCopies.IO
         // /// <param name="path">The path from which load items.</param>
         // public BrowsableObjectInfoItemsLoader(IBrowsableObjectInfo path) { path.ItemsLoader = this; }
 
-        private void InitLoad()
+        protected void Reset()
 
         {
 
-            if (_path == null) throw new NullReferenceException("'Path' is null.");
+            if (_path is null) return;
 
             if (!_path.IsBrowsable)
 
@@ -328,24 +297,24 @@ namespace WinCopies.IO
         /// <summary>
         /// Loads the items of the <see cref="Path"/> object.
         /// </summary>
-        public void LoadItems()
+        public virtual void LoadItems()
 
         {
 
-            InitLoad();
+            Reset();
 
-            OnDoWork();
+            OnDoWork(new DoWorkEventArgs(null));
 
         }
 
         /// <summary>
         /// Loads the items of the <see cref="Path"/> object asynchronously.
         /// </summary>
-        public void LoadItemsAsync()
+        public virtual void LoadItemsAsync()
 
         {
 
-            InitLoad();
+            Reset();
 
             backgroundWorker.RunWorkerAsync();
 
@@ -394,7 +363,7 @@ namespace WinCopies.IO
         /// </summary>
         public void Resume() => backgroundWorker.Resume();
 
-        protected virtual void OnAddingPath(IBrowsableObjectInfo path) => (Path as BrowsableObjectInfo)?.items.Add(path);
+        protected virtual void OnAddingPath(IBrowsableObjectInfo path) => Path.items.Add(path);
     }
 
 }

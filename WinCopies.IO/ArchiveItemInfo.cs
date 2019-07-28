@@ -12,6 +12,13 @@ using TsudaKageyu;
 namespace WinCopies.IO
 {
 
+    public interface IArchiveItemInfo : IBrowsableObjectInfo, IArchiveItemInfoProvider
+    {
+
+        ArchiveFileInfo? ArchiveFileInfo { get; }
+
+    }
+
     /// <summary>
     /// Provides info to interact with archive items.
     /// </summary>
@@ -119,20 +126,15 @@ namespace WinCopies.IO
 
         #endregion
 
-        public ShellObjectInfo ArchiveShellObject { get; } = null;
+        IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObject;
 
-        private Icon TryGetIcon(System.Drawing.Size size)
-        {
+        public IShellObjectInfo ArchiveShellObject { get; } = null;
+
+        private Icon TryGetIcon(System.Drawing.Size size) =>
 
             // if (System.IO.Path.HasExtension(Path))
 
-            return Microsoft.WindowsAPICodePack.Shell.FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Shell.FileAttributes.Normal, Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.Icon | Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
-
-            // else
-
-            // return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
-
-        }
+            Microsoft.WindowsAPICodePack.Shell.FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Shell.FileAttributes.Normal, Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.Icon | Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
         private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
 
@@ -187,21 +189,21 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class.
         /// </summary>
-        /// <param name="archiveShellObject">The <see cref="ShellObjectInfo"/> that correspond to the root path of the archive</param>
+        /// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
         /// <param name="archiveFileInfo">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represent a folder that exists implicitly in the archive.</param>
         /// <param name="path">The full path to this archive item</param>
         /// <param name="fileType">The file type of this archive item</param>
-        public ArchiveItemInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) : this(archiveShellObject, archiveFileInfo, path, fileType, new ArchiveItemInfoFactory()) { }
+        public ArchiveItemInfo(IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) : this(archiveShellObject, archiveFileInfo, path, fileType, new ArchiveItemInfoFactory()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using custom factories for <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        /// <param name="archiveShellObject">The <see cref="ShellObjectInfo"/> that correspond to the root path of the archive</param>
+        /// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
         /// <param name="archiveFileInfo">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represent a folder that exists implicitly in the archive.</param>
         /// <param name="path">The full path to this archive item</param>
         /// <param name="fileType">The file type of this archive item</param>
-        /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/> and <see cref="ArchiveLoader"/>'s use to create new instances of the <see cref="ArchiveItemInfo"/> class.</param>
-        public ArchiveItemInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType)
+        /// <param name="archiveItemInfoFactory">The factory this <see cref="ArchiveItemInfo"/> and associated <see cref="FolderLoader"/> and <see cref="ArchiveLoader"/>'s use to create new instances of the <see cref="ArchiveItemInfo"/> class.</param>
+        public ArchiveItemInfo(IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType)
 
         {
 

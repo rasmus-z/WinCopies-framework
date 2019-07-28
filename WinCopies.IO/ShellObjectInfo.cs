@@ -24,7 +24,7 @@ namespace WinCopies.IO
         /// </summary>
         public ShellObject ShellObject { get; private set; } = null;
 
-        ShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => this;
+        IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => this;
 
         /// <summary>
         /// Gets the localized name of this <see cref="ShellObjectInfo"/> depending the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details.

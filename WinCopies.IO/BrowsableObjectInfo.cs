@@ -10,8 +10,9 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
+
     /// <summary>
-    /// Provides a base class for all I/O objects of the WinCopies framework.
+    /// Provides info to interact with any browsable items.
     /// </summary>
     public abstract class BrowsableObjectInfo : IBrowsableObjectInfo
     {
@@ -342,13 +343,20 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Checks if a <see cref="BrowsableObjectInfoFactory"/> can be added to this <see cref="BrowsableObjectInfo"/> and throw an exception if the validation failed.
+        /// </summary>
+        /// <param name="newFactory">The new factory to use in this <see cref="BrowsableObjectInfo"/> and in its associated <see cref="ItemsLoader"/>.</param>
+        /// <param name="paramName">The parameter name to include in error messages.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy. OR The given factory has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="newFactory"/> is null.</exception>
         protected virtual void ThrowOnInvalidFactoryUpdateOperation(BrowsableObjectInfoFactory newFactory, string paramName)
 
         {
 
             if (_itemsLoader?.IsBusy == true)
 
-                throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
+                throw new InvalidOperationException($"The {nameof(ItemsLoader)} is busy.");
 
             if (newFactory is null)
 
@@ -359,44 +367,6 @@ namespace WinCopies.IO
                 throw new InvalidOperationException("The given factory has already been added to a BrowsableObjectInfo.");
 
         }
-
-    }
-
-    public interface IBrowsableObjectInfoFactory
-
-    {
-
-        IBrowsableObjectInfo Path { get; }
-
-        bool UseCurrentFactoryRecursively { get; set; }
-
-    }
-
-    public class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
-
-    {
-
-        public IBrowsableObjectInfo Path { get; internal set; }
-
-        private bool _useCurrentFactoryRecursively;
-
-        public bool UseCurrentFactoryRecursively
-        {
-            get => _useCurrentFactoryRecursively; set
-
-            {
-
-                if (Path.ItemsLoader?.IsBusy == true)
-
-                    throw new InvalidOperationException("The Path's ItemsLoader of the current factory is busy.");
-
-            }
-
-        }
-
-        public BrowsableObjectInfoFactory() : this(true) { }
-
-        public BrowsableObjectInfoFactory(bool useRecursively) => _useCurrentFactoryRecursively = useRecursively;
 
     }
 

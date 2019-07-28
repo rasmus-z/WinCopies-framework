@@ -119,7 +119,7 @@ namespace WinCopies.IO
 
         }
 
-        protected override void OnDoWork()
+        protected override void OnDoWork(DoWorkEventArgs e)
         {
 
             if (RegistryItemTypes == RegistryItemTypes.None)

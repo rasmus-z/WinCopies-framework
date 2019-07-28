@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Management;
 using System.Windows;
 using WinCopies.Util;
@@ -42,7 +43,7 @@ namespace WinCopies.IO
 
         public override bool CheckFilter(string path) => throw new NotImplementedException();
 
-        protected override void OnDoWork()
+        protected override void OnDoWork(DoWorkEventArgs e)
         {
 
             // We've already checked if Path is actually an IWMIItemInfo in the OnPathChanging method.
@@ -83,7 +84,7 @@ namespace WinCopies.IO
                         ReportProgress(0, new WMIItemInfo(item, WMIItemType.Namespace));
 
                 }
-                catch (Exception ex)
+                catch (Exception)
 
                 {
                     // MessageBox.Show(ex.Message);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -10,6 +11,13 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
+
+    public interface IFolderLoader : IFileSystemObjectItemsLoader
+    {
+
+        FolderLoaderFileSystemWatcher FileSystemWatcher { get; }
+
+    }
 
     /// <summary>
     /// Provides a background process that can be used to load items of a folder.
@@ -182,17 +190,17 @@ namespace WinCopies.IO
 
             if (!Application.Current.Dispatcher.CheckAccess())
 
-                Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectDeleted(path));
+                _ = Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectDeleted(path));
 
             else
 
-                for (int i = 0; i < ((BrowsableObjectInfo)Path).items.Count; i++)
+                for (int i = 0; i < Path.items.Count; i++)
 
-                    if (((BrowsableObjectInfo)Path).items[i].Path == path)
+                    if (Path.items[i].Path == path)
 
                     {
 
-                        ((BrowsableObjectInfo)Path).items.RemoveAt(i);
+                        Path.items.RemoveAt(i);
 
                         return;
 
@@ -206,7 +214,7 @@ namespace WinCopies.IO
 
         private void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e) => OnShellObjectDeleted(e.FullPath);
 
-        protected override void OnDoWork()
+        protected override void OnDoWork(DoWorkEventArgs e)
 
         {
 

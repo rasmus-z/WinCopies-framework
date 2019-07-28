@@ -29,7 +29,7 @@ namespace WinCopies.IO
 
             BrowsableObjectInfo browsableObjectInfo;
 
-            ShellObject shellObject = ShellObject.FromParsingName(paths[0]);
+            var shellObject = ShellObject.FromParsingName(paths[0]);
 
             browsableObjectInfo = Directory.Exists(paths[0])
                 ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile)
@@ -603,7 +603,7 @@ namespace WinCopies.IO
 
             string[] subPaths = path.Split('\\');
 
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
             int count = 0;
 
@@ -641,7 +641,7 @@ namespace WinCopies.IO
 
         {
 
-            List<KeyValuePair<string, string>> paths = new List<KeyValuePair<string, string>>();
+            var paths = new List<KeyValuePair<string, string>>();
 
             foreach (string environmentPathVariable in EnvironmentPathVariables)
 

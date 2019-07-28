@@ -10,5 +10,5 @@ namespace WinCopies.IO
         /// </summary>
         /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMIItemsLoader"/> is busy.</exception>
         WMIItemTypes WMIItemTypes { get; set; }
-}
+    }
 }

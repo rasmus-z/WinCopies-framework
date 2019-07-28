@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using WinCopies.Util;
@@ -135,7 +136,7 @@ namespace WinCopies.IO
 
         }
 
-        protected override void OnDoWork()
+        protected override void OnDoWork(DoWorkEventArgs e)
 
         {
 

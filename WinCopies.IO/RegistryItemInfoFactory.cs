@@ -3,20 +3,6 @@ using System;
 
 namespace WinCopies.IO
 {
-    public interface IRegistryItemInfoFactory : IBrowsableObjectInfoFactory
-    {
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo();
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey);
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath);
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, string valueName);
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName);
-
-    }
 
     public class RegistryItemInfoFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory
     {
@@ -32,4 +18,5 @@ namespace WinCopies.IO
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName) => UseCurrentFactoryRecursively ? new RegistryItemInfo(registryKeyPath, valueName, this) : new RegistryItemInfo(registryKeyPath, valueName);
 
     }
+
 }

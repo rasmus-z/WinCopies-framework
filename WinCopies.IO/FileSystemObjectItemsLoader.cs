@@ -3,6 +3,14 @@ using WinCopies.Util;
 
 namespace WinCopies.IO
 {
+
+    public interface IFileSystemObjectItemsLoader : IBrowsableObjectInfoItemsLoader
+    {
+
+        FileTypes FileTypes { get; set; }
+
+    }
+
     public abstract class FileSystemObjectItemsLoader : BrowsableObjectInfoItemsLoader, IFileSystemObjectItemsLoader
     {
 
