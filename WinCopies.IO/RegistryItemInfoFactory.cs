@@ -3,10 +3,8 @@ using System;
 
 namespace WinCopies.IO
 {
-    public interface IRegistryItemInfoFactory
+    public interface IRegistryItemInfoFactory : IBrowsableObjectInfoFactory
     {
-
-        bool UseCurrentFactoryRecursively { get; set; }
 
         IBrowsableObjectInfo GetBrowsableObjectInfo();
 
@@ -20,28 +18,8 @@ namespace WinCopies.IO
 
     }
 
-    public class RegistryItemInfoFactory : IRegistryItemInfoFactory
+    public class RegistryItemInfoFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory
     {
-
-        internal IBrowsableObjectInfoItemsLoader itemsLoader;
-
-        protected virtual bool UseCurrentFactoryRecursivelyOverride { get; set; }
-
-        public bool UseCurrentFactoryRecursively
-        {
-            get => UseCurrentFactoryRecursivelyOverride; set
-
-            {
-
-                if (itemsLoader?.IsBusy == true)
-
-                    throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
-
-                UseCurrentFactoryRecursivelyOverride = value;
-
-            }
-
-        }
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => UseCurrentFactoryRecursively ? new RegistryItemInfo(this) : new RegistryItemInfo();
 

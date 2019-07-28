@@ -6,9 +6,7 @@
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType);
 
-        IArchiveItemInfoFactory ArchiveItemInfoFactory { get; set; }
-
-        // todo: throws if not a shellobjectinfo archive
+        IArchiveItemInfoFactory Factory { get; }    
 
         ShellObjectInfo ArchiveShellObject { get; }
 

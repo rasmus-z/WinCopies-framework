@@ -3,10 +3,8 @@ using System.Management;
 
 namespace WinCopies.IO
 {
-    public interface IWMIItemInfoFactory
+    public interface IWMIItemInfoFactory : IBrowsableObjectInfoFactory
     {
-
-        bool UseCurrentFactoryRecursively { get; set; }
 
         IWMIItemInfoFactoryOptions Options { get; }
 
@@ -20,41 +18,39 @@ namespace WinCopies.IO
 
     }
 
-    public class WMIItemInfoFactory : IWMIItemInfoFactory
+    public class WMIItemInfoFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
     {
-
-        internal IBrowsableObjectInfoItemsLoader itemsLoader;
 
         private WMIItemInfoFactoryOptions _options;
 
         public WMIItemInfoFactoryOptions Options
         {
-            get => OptionsOverride; set
+            get => _options; set
             {
 
-                if (itemsLoader?.IsBusy == true)
+                if (Path?.ItemsLoader?.IsBusy == true)
 
                     throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
 
-                OptionsOverride = value;
+                _options = value;
 
             }
 
         }
 
-        IWMIItemInfoFactoryOptions IWMIItemInfoFactory.Options => Options;
+        IWMIItemInfoFactoryOptions IWMIItemInfoFactory.Options => _options;
 
         public WMIItemInfoFactory() { }
 
-        public WMIItemInfoFactory(WMIItemInfoFactoryOptions options) => OptionsOverride = options;
+        public WMIItemInfoFactory(WMIItemInfoFactoryOptions options) => _options = options;
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => new WMIItemInfo();
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType) => new WMIItemInfo(managementObject, wmiItemType);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementScope managementScope, ManagementPath managementPath, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(managementScope, managementPath, OptionsOverride?.ObjectGetOptions), wmiItemType);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementScope managementScope, ManagementPath managementPath, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(managementScope, managementPath, _options?.ObjectGetOptions), wmiItemType);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(new ManagementScope(path, OptionsOverride?.ConnectionOptions), new ManagementPath(path), OptionsOverride?.ObjectGetOptions), wmiItemType);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(new ManagementScope(path, _options?.ConnectionOptions), new ManagementPath(path), _options?.ObjectGetOptions), wmiItemType);
 
     }
 

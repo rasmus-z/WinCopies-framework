@@ -142,7 +142,7 @@
     <Compile Include="IRegistryKeyItemsLoader.cs" />
     <Compile Include="IShellObjectInfo.cs" />
     <Compile Include="IWMIItemInfo.cs" />
-    <Compile Include="IWMIItemInfoFactory.cs" />
+    <Compile Include="WMIItemInfoFactory.cs" />
     <Compile Include="IWMIItemsLoader.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

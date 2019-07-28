@@ -2,14 +2,14 @@
 
 namespace WinCopies.IO
 {
-    public interface IArchiveItemInfoFactory
+    public interface IArchiveItemInfoFactory : IBrowsableObjectInfoFactory
     {
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType);
 
     }
 
-    public class ArchiveItemInfoFactory : IArchiveItemInfoFactory
+    public class ArchiveItemInfoFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory
     {
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) =>

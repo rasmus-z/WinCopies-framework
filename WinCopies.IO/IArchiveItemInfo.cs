@@ -7,6 +7,5 @@ namespace WinCopies.IO
 
         ArchiveFileInfo? ArchiveFileInfo { get; }
 
-        IArchiveItemInfoFactory ArchiveItemInfoFactory { get; set; }
     }
 }

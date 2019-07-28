@@ -96,7 +96,7 @@ namespace WinCopies.IO
 
                 IsRootNode = true;
 
-            WMIItemInfoFactory = wmiItemInfoFactory;
+            Factory = wmiItemInfoFactory;
 
         }
 
@@ -204,38 +204,9 @@ namespace WinCopies.IO
 
         public WMIItemType WMIItemType { get; }
 
-        protected sealed override BrowsableObjectInfoItemsLoader ItemsLoaderOverride
-        {
-            get => base.ItemsLoaderOverride; set
-            {
+        public new WMIItemInfoFactory Factory        {            get => (WMIItemInfoFactory)base.Factory;            set => base.Factory = value;        }
 
-                base.ItemsLoaderOverride = value;
-
-                WMIItemInfoFactoryOverride.itemsLoader = value;
-
-            }
-
-        }
-
-        public WMIItemInfoFactory WMIItemInfoFactory
-        {
-            get => WMIItemInfoFactoryOverride;
-
-            set
-            {
-
-                if (ItemsLoader?.IsBusy == true)
-
-                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
-
-                WMIItemInfoFactoryOverride = value ?? throw new ArgumentNullException("value");
-
-                WMIItemInfoFactoryOverride.itemsLoader = ItemsLoader;
-
-            }
-        }
-
-        public override IBrowsableObjectInfo Clone() => WMIItemInfoFactory.GetBrowsableObjectInfo((ManagementBaseObject)ManagementObject.Clone(), WMIItemType);
+        public override IBrowsableObjectInfo Clone() => Factory.GetBrowsableObjectInfo((ManagementBaseObject)ManagementObject.Clone(), WMIItemType);
 
         protected override IBrowsableObjectInfo GetParent()
         {
@@ -253,14 +224,14 @@ namespace WinCopies.IO
                     path = Path.Substring(0, Path.LastIndexOf('\\')) + ":__NAMESPACE";
 
                     return path.EndsWith("root:__namespace", true, CultureInfo.InvariantCulture)
-                        ? WMIItemInfoFactory.GetBrowsableObjectInfo()
-                        : WMIItemInfoFactory.GetBrowsableObjectInfo(path, WMIItemType.Namespace);
+                        ? Factory.GetBrowsableObjectInfo()
+                        : Factory.GetBrowsableObjectInfo(path, WMIItemType.Namespace);
 
                 case WMIItemType.Class:
 
                     return Path.EndsWith("root:" + Name, true, CultureInfo.InvariantCulture)
-                        ? WMIItemInfoFactory.GetBrowsableObjectInfo()
-                        : WMIItemInfoFactory.GetBrowsableObjectInfo(Path.Substring(0, Path.IndexOf(':')) + ":__NAMESPACE", WMIItemType.Namespace);
+                        ? Factory.GetBrowsableObjectInfo()
+                        : Factory.GetBrowsableObjectInfo(Path.Substring(0, Path.IndexOf(':')) + ":__NAMESPACE", WMIItemType.Namespace);
 
                 case WMIItemType.Instance:
 
@@ -268,7 +239,7 @@ namespace WinCopies.IO
 
                     path = path.Substring(0, path.LastIndexOf('\\')) + ':' + path.Substring(path.LastIndexOf('\\') + 1);
 
-                    return WMIItemInfoFactory.GetBrowsableObjectInfo(path, WMIItemType.Class);
+                    return Factory.GetBrowsableObjectInfo(path, WMIItemType.Class);
 
                 default: // We souldn't reach this point.
 

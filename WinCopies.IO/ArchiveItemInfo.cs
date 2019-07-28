@@ -17,7 +17,6 @@ namespace WinCopies.IO
     /// </summary>
     public class ArchiveItemInfo : BrowsableObjectInfo, IArchiveItemInfo
     {
-        private IArchiveItemInfoFactory _archiveItemInfoFactory;
 
         #region Overrides
 
@@ -60,7 +59,7 @@ namespace WinCopies.IO
         /// When overridden in a derived class, returns the parent of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
         /// <returns>the parent of this <see cref="ArchiveItemInfo"/>.</returns>
-        protected override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? ArchiveItemInfoFactory.GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
+        protected override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? Factory.GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 
@@ -116,7 +115,7 @@ namespace WinCopies.IO
         /// Returns an <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.
         /// </summary>
         /// <returns>An <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.</returns>
-        public override IBrowsableObjectInfo Clone() => ArchiveItemInfoFactory.GetBrowsableObjectInfo(new ShellObjectInfo(ArchiveShellObject.ShellObject, ArchiveShellObject.Path, ArchiveShellObject.FileType, ArchiveShellObject.SpecialFolder), ArchiveFileInfo, Path, FileType);
+        public override IBrowsableObjectInfo Clone() => Factory.GetBrowsableObjectInfo(new ShellObjectInfo(ArchiveShellObject.ShellObject, ArchiveShellObject.Path, ArchiveShellObject.FileType, ArchiveShellObject.SpecialFolder), ArchiveFileInfo, Path, FileType);
 
         #endregion
 
@@ -127,11 +126,11 @@ namespace WinCopies.IO
 
             // if (System.IO.Path.HasExtension(Path))
 
-                return Microsoft.WindowsAPICodePack.Shell.FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Shell.FileAttributes.Normal, Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.Icon | Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+            return Microsoft.WindowsAPICodePack.Shell.FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Shell.FileAttributes.Normal, Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.Icon | Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
             // else
 
-                // return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+            // return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
 
         }
 
@@ -202,7 +201,7 @@ namespace WinCopies.IO
         /// <param name="path">The full path to this archive item</param>
         /// <param name="fileType">The file type of this archive item</param>
         /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/> and <see cref="ArchiveLoader"/>'s use to create new instances of the <see cref="ArchiveItemInfo"/> class.</param>
-        public ArchiveItemInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType, IArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType)
+        public ArchiveItemInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType)
 
         {
 
@@ -232,7 +231,7 @@ namespace WinCopies.IO
 
                 ArchiveFileInfo = archiveFileInfo.Value;
 
-            ArchiveItemInfoFactory = archiveItemInfoFactory;
+            Factory = archiveItemInfoFactory;
 
 #if DEBUG
 
@@ -278,19 +277,10 @@ namespace WinCopies.IO
 
         }
 
-        public IArchiveItemInfoFactory ArchiveItemInfoFactory
-        {
-            get => _archiveItemInfoFactory; set
-            {
+        IArchiveItemInfoFactory IArchiveItemInfoProvider.Factory => Factory;
 
-                if (ItemsLoader.IsBusy)
+        public new ArchiveItemInfoFactory Factory { get => (ArchiveItemInfoFactory)base.Factory; set => base.Factory = value; }
 
-                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
-
-                _archiveItemInfoFactory = value ?? throw new ArgumentNullException("value");
-
-            }
-        }
     }
 
 }

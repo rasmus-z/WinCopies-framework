@@ -38,24 +38,26 @@ namespace WinCopies.IO
 
     public class RegistryItemInfo : BrowsableObjectInfo, IRegistryItemInfo
     {
-        private IRegistryItemInfoFactory _registryItemInfoFactory;
 
         public RegistryItemInfo() : this(new RegistryItemInfoFactory()) { }
 
-        public RegistryItemInfo(IRegistryItemInfoFactory factory) : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder)
+        public RegistryItemInfo(RegistryItemInfoFactory factory) : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder)
         {
-            RegistryItemInfoFactory = factory;
+
+            Factory = factory;
 
             Name = Path;
 
             RegistryItemType = RegistryItemType.RegistryRoot;
+
         }
 
         public RegistryItemInfo(RegistryKey registryKey) : this(registryKey, new RegistryItemInfoFactory()) { }
 
-        public RegistryItemInfo(RegistryKey registryKey, IRegistryItemInfoFactory factory) : base(registryKey.Name, FileType.SpecialFolder)
+        public RegistryItemInfo(RegistryKey registryKey, RegistryItemInfoFactory factory) : base(registryKey.Name, FileType.SpecialFolder)
         {
-            RegistryItemInfoFactory = factory;
+
+            Factory = factory;
 
             string[] name = registryKey.Name.Split('\\');
 
@@ -64,13 +66,15 @@ namespace WinCopies.IO
             RegistryItemType = RegistryItemType.RegistryKey;
 
             RegistryKey = registryKey;
+
         }
 
         public RegistryItemInfo(string path) : this(path, new RegistryItemInfoFactory()) { }
 
-        public RegistryItemInfo(string path, IRegistryItemInfoFactory factory) : base(path, FileType.SpecialFolder)
+        public RegistryItemInfo(string path, RegistryItemInfoFactory factory) : base(path, FileType.SpecialFolder)
         {
-            RegistryItemInfoFactory = factory;
+
+            Factory = factory;
 
             string[] name = path.Split('\\');
 
@@ -87,25 +91,28 @@ namespace WinCopies.IO
             }
 
             catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
+
         }
 
         public RegistryItemInfo(RegistryKey registryKey, string valueName) : this(registryKey, valueName, new RegistryItemInfoFactory()) { }
 
-        public RegistryItemInfo(RegistryKey registryKey, string valueName, IRegistryItemInfoFactory factory) : base(registryKey.Name, FileType.Other)
+        public RegistryItemInfo(RegistryKey registryKey, string valueName, RegistryItemInfoFactory factory) : base(registryKey.Name, FileType.Other)
 
         {
-            RegistryItemInfoFactory = factory;
+
+            Factory = factory;
 
             Name = valueName;
 
             RegistryItemType = RegistryItemType.RegistryValue;
 
             RegistryKey = registryKey;
+
         }
 
-        public RegistryItemInfo(string registryKeyPath, string valueName) : this(Registry.OpenRegistryKey(registryKeyPath), valueName) { }
+        public RegistryItemInfo(string registryKeyPath, string valueName) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, new RegistryItemInfoFactory()) { }
 
-        public RegistryItemInfo(string registryKeyPath, string valueName, IRegistryItemInfoFactory factory) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, factory) { }
+        public RegistryItemInfo(string registryKeyPath, string valueName, RegistryItemInfoFactory factory) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, factory) { }
 
         private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
 
@@ -176,19 +183,7 @@ namespace WinCopies.IO
         /// </summary>
         public override bool IsBrowsable => RegistryItemType == RegistryItemType.RegistryRoot || RegistryItemType == RegistryItemType.RegistryKey;
 
-        public IRegistryItemInfoFactory RegistryItemInfoFactory
-        {
-            get => _registryItemInfoFactory; set
-            {
-
-                if (ItemsLoader.IsBusy)
-
-                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
-
-                _registryItemInfoFactory = value ?? throw new ArgumentNullException("value");
-
-            }
-        }
+        public new RegistryItemInfoFactory Factory        {            get => (RegistryItemInfoFactory)base.Factory; set => base.Factory = value;        }
 
         public override IBrowsableObjectInfo Clone()
         {
@@ -199,15 +194,15 @@ namespace WinCopies.IO
 
                 case RegistryItemType.RegistryRoot:
 
-                    return RegistryItemInfoFactory.GetBrowsableObjectInfo();
+                    return Factory.GetBrowsableObjectInfo();
 
                 case RegistryItemType.RegistryKey:
 
-                    return RegistryItemInfoFactory.GetBrowsableObjectInfo(RegistryKey);
+                    return Factory.GetBrowsableObjectInfo(RegistryKey);
 
                 case RegistryItemType.RegistryValue:
 
-                    return RegistryItemInfoFactory.GetBrowsableObjectInfo(RegistryKey, Name);
+                    return Factory.GetBrowsableObjectInfo(RegistryKey, Name);
 
                 default:
 
@@ -230,7 +225,7 @@ namespace WinCopies.IO
 
                     if (path.Length == 1)
 
-                        return RegistryItemInfoFactory.GetBrowsableObjectInfo();
+                        return Factory.GetBrowsableObjectInfo();
 
                     var stringBuilder = new StringBuilder();
 
@@ -238,11 +233,11 @@ namespace WinCopies.IO
 
                         _ = stringBuilder.Append(path);
 
-                    return RegistryItemInfoFactory.GetBrowsableObjectInfo(stringBuilder.ToString());
+                    return Factory.GetBrowsableObjectInfo(stringBuilder.ToString());
 
                 case RegistryItemType.RegistryValue:
 
-                    return RegistryItemInfoFactory.GetBrowsableObjectInfo(RegistryKey);
+                    return Factory.GetBrowsableObjectInfo(RegistryKey);
 
                 default:
 

@@ -141,7 +141,7 @@ namespace WinCopies.IO
                 try
                 {
 
-                    ((BrowsableObjectInfo)Path).items.Add(((ShellObjectInfo)Path).ShellObjectInfoFactory.GetBrowsableObjectInfo(ShellObject.FromParsingName(path), path));
+                    Path.items.Add(((ShellObjectInfo)Path).Factory.GetBrowsableObjectInfo(ShellObject.FromParsingName(path), path));
 
                 }
 #if DEBUG
@@ -152,7 +152,7 @@ namespace WinCopies.IO
 
                 if (FileSystemObjectComparer != null)
 
-                    ((BrowsableObjectInfo)Path).items.Sort(FileSystemObjectComparer);
+                    Path.items.Sort(FileSystemObjectComparer);
             }
 
         }
@@ -490,7 +490,7 @@ namespace WinCopies.IO
 
                 // new_Path.LoadThumbnail();
 
-                ReportProgress(0, ((ShellObjectInfo)Path).ShellObjectInfoFactory.GetBrowsableObjectInfo(path_.ShellObject, path_.Path, path_.FileType, ShellObjectInfo.GetFileType(path_.Path, path_.ShellObject).specialFolder));
+                ReportProgress(0, ((ShellObjectInfo)Path).Factory.GetBrowsableObjectInfo(path_.ShellObject, path_.Path, path_.FileType, ShellObjectInfo.GetFileType(path_.Path, path_.ShellObject).specialFolder));
 
             }
 

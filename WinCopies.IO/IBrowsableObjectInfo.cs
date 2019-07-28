@@ -12,6 +12,8 @@ namespace WinCopies.IO
     public interface IBrowsableObjectInfo : IFileSystemObject, IDisposable
     {
 
+        IBrowsableObjectInfoFactory Factory { get; }
+
         IBrowsableObjectInfoItemsLoader ItemsLoader { get; }
 
         /// <summary>

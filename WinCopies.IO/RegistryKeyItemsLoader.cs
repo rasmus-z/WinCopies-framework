@@ -134,7 +134,7 @@ namespace WinCopies.IO
 
                 PathInfo pathInfo;
 
-                void checkAndAppend(string pathWithoutName, string name, RegistryItemType registryItemType)
+                void checkAndAppend(string pathWithoutName, string name, bool isValue)
 
                 {
 
@@ -142,7 +142,7 @@ namespace WinCopies.IO
 
                     if (CheckFilter(path))
 
-                        _ = paths.AddLast(pathInfo = new PathInfo() { Path = path, Name = name, RegistryItemType = registryItemType });
+                        _ = paths.AddLast(pathInfo = new PathInfo() { Path = path, Name = name, IsValue = isValue });
 
                 }
 
@@ -166,7 +166,7 @@ namespace WinCopies.IO
 
                                 name = ((RegistryKey)fieldInfo.GetValue(null)).Name;
 
-                                checkAndAppend(name, name, RegistryItemType.RegistryKey);
+                                checkAndAppend(name, name, false);
 
                             }
 
@@ -188,7 +188,7 @@ namespace WinCopies.IO
 
                                 foreach (string item in items)
 
-                                    checkAndAppend(item.Substring(0, item.LastIndexOf('\\')), item.Substring(item.LastIndexOf('\\') + 1), RegistryItemType.RegistryKey);
+                                    checkAndAppend(item.Substring(0, item.LastIndexOf('\\')), item.Substring(item.LastIndexOf('\\') + 1), false);
 
                             }
 
@@ -204,7 +204,7 @@ namespace WinCopies.IO
 
                                 foreach (string item in items)
 
-                                    checkAndAppend(registryItemInfo.RegistryKey.Name, item, RegistryItemType.RegistryValue);
+                                    checkAndAppend(registryItemInfo.RegistryKey.Name, item, true);
 
                             }
 
@@ -238,13 +238,9 @@ namespace WinCopies.IO
 
 
 
-                foreach (PathInfo _path in paths)
+                foreach (PathInfo _path in pathInfos)
 
-                    ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo());
-
-                ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo(registryItemInfo.Path + '\\' + item));
-
-                ReportProgress(0, registryItemInfo.RegistryItemInfoFactory.GetBrowsableObjectInfo(registryItemInfo.RegistryKey, item));
+                    ReportProgress(0, _path.IsValue ? registryItemInfo.Factory.GetBrowsableObjectInfo(_path.Path) : registryItemInfo.Factory.GetBrowsableObjectInfo(_path.Path.Substring(0, _path.Path.Length - _path.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), _path.Name));
 
             }
 
@@ -260,7 +256,7 @@ namespace WinCopies.IO
 
             public FileType FileType => FileType.SpecialFolder;
 
-            public RegistryItemType RegistryItemType { get; set; }
+            public bool IsValue { get; set; }
         }
     }
 }

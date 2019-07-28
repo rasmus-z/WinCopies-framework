@@ -16,8 +16,8 @@ namespace WinCopies.IO
     /// </summary>
     public class ShellObjectInfo : BrowsableObjectInfo, IShellObjectInfo
     {
-        private IShellObjectInfoFactory _shellObjectInfoFactory;
-        private IArchiveItemInfoFactory _archiveItemInfoFactory;
+
+        private ArchiveItemInfoFactory _archiveItemInfoFactory;
 
         /// <summary>
         /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.
@@ -199,7 +199,7 @@ namespace WinCopies.IO
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="shellObjectInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent casual file system items.</param>
         /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
-        public ShellObjectInfo(ShellObject shellObject, string path, IShellObjectInfoFactory shellObjectInfoFactory, IArchiveItemInfoFactory archiveItemInfoFactory) : base(path, GetFileType(path, shellObject).fileType) =>
+        public ShellObjectInfo(ShellObject shellObject, string path, ShellObjectInfoFactory shellObjectInfoFactory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, GetFileType(path, shellObject).fileType) =>
 
             Init(shellObject, nameof(FileType), GetFileType(path, shellObject).specialFolder, shellObjectInfoFactory, archiveItemInfoFactory);
 
@@ -221,11 +221,11 @@ namespace WinCopies.IO
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
         /// <param name="shellObjectInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent casual file system items.</param>
         /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
-        public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder, IShellObjectInfoFactory shellObjectInfoFactory, IArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType) =>
+        public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder, ShellObjectInfoFactory shellObjectInfoFactory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType) =>
 
             Init(shellObject, nameof(fileType), specialFolder, shellObjectInfoFactory, archiveItemInfoFactory);// string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
 
-        private void Init(ShellObject shellObject, string fileTypeParameterName, SpecialFolder specialFolder, IShellObjectInfoFactory shellObjectInfoFactory, IArchiveItemInfoFactory archiveItemInfoFactory)
+        private void Init(ShellObject shellObject, string fileTypeParameterName, SpecialFolder specialFolder, ShellObjectInfoFactory shellObjectInfoFactory, ArchiveItemInfoFactory archiveItemInfoFactory)
 
         {
 
@@ -241,7 +241,7 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(Generic.FileTypeAndSpecialFolderNotCorrespond, fileTypeParameterName, nameof(specialFolder), FileType, specialFolder));
 
-            ShellObjectInfoFactory = shellObjectInfoFactory;
+            Factory = shellObjectInfoFactory;
 
             ArchiveItemInfoFactory = archiveItemInfoFactory;
 
@@ -296,7 +296,7 @@ namespace WinCopies.IO
 
                     string _parent = parentDirectoryInfo.FullName;
 
-                    return ShellObjectInfoFactory.GetBrowsableObjectInfo(ShellObject.FromParsingName(_parent), _parent);
+                    return Factory.GetBrowsableObjectInfo(ShellObject.FromParsingName(_parent), _parent);
 
                 }
 
@@ -305,9 +305,9 @@ namespace WinCopies.IO
             }
 
             else return FileType == FileType.Drive
-                ? ShellObjectInfoFactory.GetBrowsableObjectInfo(ShellObject.Parent, KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolder.Computer)
+                ? Factory.GetBrowsableObjectInfo(ShellObject.Parent, KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolder.Computer)
                 : FileType == FileType.SpecialFolder && SpecialFolder != SpecialFolder.Computer
-                ? ShellObjectInfoFactory.GetBrowsableObjectInfo(ShellObject.Parent, KnownFolderHelper.FromParsingName(ShellObject.Parent.ParsingName).Path)
+                ? Factory.GetBrowsableObjectInfo(ShellObject.Parent, KnownFolderHelper.FromParsingName(ShellObject.Parent.ParsingName).Path)
                 : null;
 
         }
@@ -447,35 +447,27 @@ namespace WinCopies.IO
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy.</exception>
         /// <exception cref="ArgumentNullException">The given value is null.</exception>
-        public IShellObjectInfoFactory ShellObjectInfoFactory
-        {
-            get => _shellObjectInfoFactory; set
-            {
+        public new ShellObjectInfoFactory Factory { get => (ShellObjectInfoFactory)base.Factory; set => base.Factory = value; }
 
-                if (ItemsLoader.IsBusy)
-
-                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
-
-                _shellObjectInfoFactory = value ?? throw new ArgumentNullException("value");
-
-            }
-        }
+        IArchiveItemInfoFactory IArchiveItemInfoProvider.Factory => _archiveItemInfoFactory;
 
         /// <summary>
         /// Gets or sets the factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy.</exception>
         /// <exception cref="ArgumentNullException">The given value is null.</exception>
-        public IArchiveItemInfoFactory ArchiveItemInfoFactory
+        public ArchiveItemInfoFactory ArchiveItemInfoFactory
         {
             get => _archiveItemInfoFactory; set
             {
 
-                if (ItemsLoader.IsBusy)
+                ThrowOnInvalidFactoryUpdateOperation(value, nameof(value));
 
-                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is running.");
+                _archiveItemInfoFactory.Path = null;
 
-                _archiveItemInfoFactory = value ?? throw new ArgumentNullException("value");
+                value.Path = this;
+
+                _archiveItemInfoFactory = value;
 
             }
         }
@@ -523,7 +515,7 @@ namespace WinCopies.IO
         /// Gets a new <see cref="ShellObjectInfo"/> that represents the same item that the current <see cref="ShellObjectInfo"/>.
         /// </summary>
         /// <returns>An <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
-        public override IBrowsableObjectInfo Clone() => ShellObjectInfoFactory.GetBrowsableObjectInfo(ShellObject.FromParsingName(ShellObject.ParsingName), Path, FileType, SpecialFolder);
+        public override IBrowsableObjectInfo Clone() => Factory.GetBrowsableObjectInfo(ShellObject.FromParsingName(ShellObject.ParsingName), Path, FileType, SpecialFolder);
 
     }
 

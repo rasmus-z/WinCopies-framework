@@ -13,7 +13,5 @@ namespace WinCopies.IO
         bool IsRootNode { get; }
 
         WMIItemType WMIItemType { get; }
-
-        WMIItemInfoFactory WMIItemInfoFactory { get; set; }
     }
 }

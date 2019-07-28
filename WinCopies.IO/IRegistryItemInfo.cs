@@ -9,7 +9,5 @@ namespace WinCopies.IO
 
         RegistryKey RegistryKey { get; }
 
-        IRegistryItemInfoFactory RegistryItemInfoFactory { get; set; }
-
     }
 }
