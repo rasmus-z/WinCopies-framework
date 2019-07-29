@@ -21,14 +21,14 @@ namespace WinCopies.IO
     public class WMIItemInfoFactoryOptions : IWMIItemInfoFactoryOptions
     {
 
-        internal IBrowsableObjectInfoItemsLoader _wmiItemsLoader;
+        internal IBrowsableObjectInfoLoader _wmiItemsLoader;
 
         private ConnectionOptions _connectionOptions;
 
         /// <summary>
         /// Gets or sets options for the WMI connections.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoItemsLoader"/> is busy.</exception>
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader"/> is busy.</exception>
         protected virtual ConnectionOptions ConnectionOptionsOverride
         {
             get => _connectionOptions; set =>
@@ -39,7 +39,7 @@ _connectionOptions = value;
         /// <summary>
         /// Gets or sets options for the WMI connections.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoItemsLoader"/> is busy.</exception>
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader"/> is busy.</exception>
         public ConnectionOptions ConnectionOptions
         {
             get => ConnectionOptionsOverride; set
@@ -55,13 +55,13 @@ _connectionOptions = value;
         /// <summary>
         /// Gets or sets options for getting management objects.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoItemsLoader"/> is busy.</exception>
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader"/> is busy.</exception>
         protected virtual ObjectGetOptions ObjectGetOptionsOverride { get => _objectGetOptions; set => _objectGetOptions = value; }
 
         /// <summary>
         /// Gets or sets options for getting management objects.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoItemsLoader"/> is busy.</exception>
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader"/> is busy.</exception>
         public ObjectGetOptions ObjectGetOptions
 
         {
@@ -80,13 +80,13 @@ _connectionOptions = value;
         /// <summary>
         /// Gets or sets options for management objects.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoItemsLoader"/> is busy.</exception>
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader"/> is busy.</exception>
         protected virtual EnumerationOptions EnumerationOptionsOverride { get => _enumerationOptions; set => _enumerationOptions = value; }
 
         /// <summary>
         /// Gets or sets options for management objects.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoItemsLoader"/> is busy.</exception>
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader"/> is busy.</exception>
         public virtual EnumerationOptions EnumerationOptions
         {
             get => EnumerationOptionsOverride; set

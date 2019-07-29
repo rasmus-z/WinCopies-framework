@@ -11,7 +11,7 @@ namespace WinCopies.IO
     /// <summary>
     /// A class for easier <see cref="ManagementBaseObject"/> items loading.
     /// </summary>
-    public class WMIItemsLoader : BrowsableObjectInfoItemsLoader, IWMIItemsLoader
+    public class WMIItemsLoader : BrowsableObjectInfoLoader, IWMIItemsLoader
     {
 
         private readonly WMIItemTypes _wmiItemTypes;
@@ -23,7 +23,7 @@ namespace WinCopies.IO
         public WMIItemTypes WMIItemTypes { get => _wmiItemTypes; set => this.SetBackgroundWorkerProperty(nameof(WMIItemTypes), nameof(_wmiItemTypes), value, typeof(WMIItemsLoader), true); }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader"/> class.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
@@ -31,7 +31,7 @@ namespace WinCopies.IO
         public WMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, WMIItemTypes wmiItemTypes) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), wmiItemTypes) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class using a custom comparer.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader"/> class using a custom comparer.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
@@ -166,4 +166,5 @@ namespace WinCopies.IO
 
         }
     }
+
 }

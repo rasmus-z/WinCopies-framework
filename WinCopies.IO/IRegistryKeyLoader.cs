@@ -1,6 +1,6 @@
 ﻿namespace WinCopies.IO
 {
-    public interface IRegistryKeyItemsLoader : IBrowsableObjectInfoItemsLoader
+    public interface IRegistryKeyLoader : IBrowsableObjectInfoLoader
     {
 
         RegistryItemTypes RegistryItemTypes { get; set; }

@@ -9,6 +9,8 @@ using System.Windows.Media.Imaging;
 
 using TsudaKageyu;
 
+using static WinCopies.Util.Util;
+
 namespace WinCopies.IO
 {
 
@@ -20,12 +22,10 @@ namespace WinCopies.IO
     }
 
     /// <summary>
-    /// Provides info to interact with archive items.
+    /// Represents an archive that can be used with interoperability with the other <see cref="IBrowsableObjectInfo"/> objects.
     /// </summary>
     public class ArchiveItemInfo : BrowsableObjectInfo, IArchiveItemInfo
     {
-
-        #region Overrides
 
         /// <summary>
         /// Gets the localized path of this <see cref="ArchiveItemInfo"/>.
@@ -60,131 +60,28 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
         /// </summary>
-        public override bool IsBrowsable => FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.Archive;
+        public override bool IsBrowsable => If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, FileType, FileType.Folder, FileType.Drive, FileType.Archive);
+
+        IArchiveItemInfoFactory IArchiveItemInfoProvider.Factory => Factory;
 
         /// <summary>
-        /// When overridden in a derived class, returns the parent of this <see cref="ArchiveItemInfo"/>.
+        /// Gets or sets the factory for this <see cref="ArchiveItemInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="ArchiveItemInfo"/> and its associated <see cref="ItemsLoader"/>.
         /// </summary>
-        /// <returns>the parent of this <see cref="ArchiveItemInfo"/>.</returns>
-        protected override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? Factory.GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
-
-        // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
+        /// <exception cref="InvalidOperationException">The old <see cref="ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="ArgumentNullException">value is null.</exception>
+        public new ArchiveItemInfoFactory Factory { get => (ArchiveItemInfoFactory)base.Factory; set => base.Factory = value; }
 
         /// <summary>
-        /// Loads the items of this <see cref="ArchiveItemInfo"/> using custom worker behavior options.
+        /// Gets or sets the items loader for this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, Util.Util.GetAllEnumFlags<FileTypes>()));
-
-        /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
-        /// </summary>
-        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, Util.Util.GetAllEnumFlags<FileTypes>()));
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public override void Dispose()
-        {
-
-            base.Dispose();
-
-            ArchiveShellObject.Dispose();
-
-        }
-
-        /// <summary>
-        /// Currently not implemented.
-        /// </summary>
-        /// <param name="newValue"></param>
-        public override void Rename(string newValue) =>
-
-            // string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
-
-            //SevenZipCompressor a = new SevenZipCompressor();
-
-            //Dictionary<int, string> dico = new Dictionary<int, string>();
-
-            //dico.Add(ArchiveFileInfo.Index, ArchiveFileInfo.FileName);
-
-            //a.ModifyArchive(ArchiveShellObject.Path, dico);
-
-            // todo:
-
-            throw new NotSupportedException("This feature is currently not supported for the content archive items.");
-
-        // public override string ToString() => System.IO.Path.GetFileName(Path);
-
-        /// <summary>
-        /// Returns an <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        /// <returns>An <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.</returns>
-        public override IBrowsableObjectInfo Clone() => Factory.GetBrowsableObjectInfo(new ShellObjectInfo(ArchiveShellObject.ShellObject, ArchiveShellObject.Path, ArchiveShellObject.FileType, ArchiveShellObject.SpecialFolder), ArchiveFileInfo, Path, FileType);
-
-        #endregion
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        public new ArchiveLoader ItemsLoader { get => (ArchiveLoader)base.ItemsLoader; set => base.ItemsLoader = value; }
 
         IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObject;
 
-        public IShellObjectInfo ArchiveShellObject { get; } = null;
-
-        private Icon TryGetIcon(System.Drawing.Size size) =>
-
-            // if (System.IO.Path.HasExtension(Path))
-
-            Microsoft.WindowsAPICodePack.Shell.FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Shell.FileAttributes.Normal, Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.Icon | Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
-
-        private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
-
-        {
-
-            using (Icon icon = TryGetIcon(size))
-
-                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
-        }
-
-        // public ArchiveFileInfo ArchiveFileInfo { get; } = null;
-
-        // public bool AreItemsLoaded { get => areItemsLoaded; private set => OnPropertyChanged(nameof(AreItemsLoaded), nameof(areItemsLoaded), value); }
-
-        // private ReadOnlyObservableCollection<IBrowsableObjectInfo> items = null;
-
-        // public event PropertyChangedEventHandler PropertyChanged;
-
-        //public ReadOnlyObservableCollection<IBrowsableObjectInfo> Items
-        //{
-
-        //    get => items;
-
-        //    public set
-
-        //    {
-
-        //        OnPropertyChanged(nameof(Items), nameof(items), value);
-
-        //        if (value != null)
-
-        //            AreItemsLoaded = true;
-
-        //    }
-
-        //}
-
         public ArchiveFileInfo? ArchiveFileInfo { get; }
 
-        // public FileTypes FileType { get; } = FileTypes.None;
-
-        //public BrowsableObjectInfoItemsLoader ItemsLoader
-        //{
-
-        //    get => ItemsLoader;
-
-        //    set => ItemsLoader = (FolderLoader)value;
-
-        //}
+        public IShellObjectInfo ArchiveShellObject { get; } = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class.
@@ -196,14 +93,14 @@ namespace WinCopies.IO
         public ArchiveItemInfo(IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) : this(archiveShellObject, archiveFileInfo, path, fileType, new ArchiveItemInfoFactory()) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using custom factories for <see cref="ArchiveItemInfo"/>.
+        /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
         /// </summary>
         /// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
         /// <param name="archiveFileInfo">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represent a folder that exists implicitly in the archive.</param>
         /// <param name="path">The full path to this archive item</param>
         /// <param name="fileType">The file type of this archive item</param>
-        /// <param name="archiveItemInfoFactory">The factory this <see cref="ArchiveItemInfo"/> and associated <see cref="FolderLoader"/> and <see cref="ArchiveLoader"/>'s use to create new instances of the <see cref="ArchiveItemInfo"/> class.</param>
-        public ArchiveItemInfo(IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType)
+        /// <param name="factory">The factory this <see cref="ArchiveItemInfo"/> and associated <see cref="ArchiveLoader"/> use to create new instances of the <see cref="ArchiveItemInfo"/> class.</param>
+        public ArchiveItemInfo(IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType, ArchiveItemInfoFactory factory) : base(path, fileType)
 
         {
 
@@ -233,7 +130,7 @@ namespace WinCopies.IO
 
                 ArchiveFileInfo = archiveFileInfo.Value;
 
-            Factory = archiveItemInfoFactory;
+            Factory = factory;
 
 #if DEBUG
 
@@ -279,9 +176,121 @@ namespace WinCopies.IO
 
         }
 
-        IArchiveItemInfoFactory IArchiveItemInfoProvider.Factory => Factory;
+        /// <summary>
+        /// Loads the items of this <see cref="ArchiveItemInfo"/> using custom worker behavior options.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
-        public new ArchiveItemInfoFactory Factory { get => (ArchiveItemInfoFactory)base.Factory; set => base.Factory = value; }
+        /// <summary>
+        /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+
+        /// <summary>
+        /// When overridden in a derived class, returns the parent of this <see cref="ArchiveItemInfo"/>.
+        /// </summary>
+        /// <returns>the parent of this <see cref="ArchiveItemInfo"/>.</returns>
+        protected override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? Factory.GetBrowsableObjectInfo(ArchiveShellObject, null/*archiveParentFileInfo.Value*/, Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder) : ArchiveShellObject;
+
+        /// <summary>
+        /// Currently not implemented.
+        /// </summary>
+        /// <param name="newValue"></param>
+        public override void Rename(string newValue) =>
+
+            // string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
+
+            //SevenZipCompressor a = new SevenZipCompressor();
+
+            //Dictionary<int, string> dico = new Dictionary<int, string>();
+
+            //dico.Add(ArchiveFileInfo.Index, ArchiveFileInfo.FileName);
+
+            //a.ModifyArchive(ArchiveShellObject.Path, dico);
+
+            // todo:
+
+            throw new NotSupportedException("This feature is currently not supported for the content archive items.");
+
+        /// <summary>
+        /// Returns an <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.
+        /// </summary>
+        /// <returns>An <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.</returns>
+        public override IBrowsableObjectInfo Clone() => Factory.GetBrowsableObjectInfo(new ShellObjectInfo(ArchiveShellObject.ShellObject, ArchiveShellObject.Path, ArchiveShellObject.FileType, ArchiveShellObject.SpecialFolder), ArchiveFileInfo, Path, FileType);
+
+        // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public override void Dispose()
+        {
+
+            base.Dispose();
+
+            ArchiveShellObject.Dispose();
+
+        }
+
+        // public override string ToString() => System.IO.Path.GetFileName(Path);
+
+        private Icon TryGetIcon(System.Drawing.Size size) =>
+
+            // if (System.IO.Path.HasExtension(Path))
+
+            Microsoft.WindowsAPICodePack.Shell.FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Shell.FileAttributes.Normal, Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.Icon | Microsoft.WindowsAPICodePack.Shell.GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+
+        private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
+
+        {
+
+            using (Icon icon = TryGetIcon(size))
+
+                return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+
+        }
+
+        // public ArchiveFileInfo ArchiveFileInfo { get; } = null;
+
+        // public bool AreItemsLoaded { get => areItemsLoaded; private set => OnPropertyChanged(nameof(AreItemsLoaded), nameof(areItemsLoaded), value); }
+
+        // private ReadOnlyObservableCollection<IBrowsableObjectInfo> items = null;
+
+        // public event PropertyChangedEventHandler PropertyChanged;
+
+        //public ReadOnlyObservableCollection<IBrowsableObjectInfo> Items
+        //{
+
+        //    get => items;
+
+        //    public set
+
+        //    {
+
+        //        OnPropertyChanged(nameof(Items), nameof(items), value);
+
+        //        if (value != null)
+
+        //            AreItemsLoaded = true;
+
+        //    }
+
+        //}
+
+        // public FileTypes FileType { get; } = FileTypes.None;
+
+        //public BrowsableObjectInfoItemsLoader ItemsLoader
+        //{
+
+        //    get => ItemsLoader;
+
+        //    set => ItemsLoader = (FolderLoader)value;
+
+        //}
 
     }
 

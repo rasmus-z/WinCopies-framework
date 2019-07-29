@@ -1,5 +1,4 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
-using System;
 using System.IO;
 
 namespace WinCopies.IO

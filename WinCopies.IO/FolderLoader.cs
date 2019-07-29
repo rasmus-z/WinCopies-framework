@@ -22,7 +22,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides a background process that can be used to load items of a folder.
     /// </summary>
-    public class FolderLoader : FileSystemObjectItemsLoader, IFolderLoader
+    public class FolderLoader : FileSystemObjectLoader, IFolderLoader
     {
 
         // todo: to turn on ShellObjectWatcher for better compatibility
@@ -112,7 +112,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// <para>Gets the <see cref="FolderLoaderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoItemsLoader.Path"/> property.</para>
+        /// <para>Gets the <see cref="FolderLoaderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoLoader.Path"/> property.</para>
         /// <para>When substituted in a derived class, provides a custom <see cref="FolderLoaderFileSystemWatcher"/>.</para>
         /// </summary>
         /// <returns>An instance of the <see cref="FolderLoaderFileSystemWatcher"/> class.</returns>

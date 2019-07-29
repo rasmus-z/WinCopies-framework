@@ -2,7 +2,7 @@
 
 namespace WinCopies.IO
 {
-    public interface IWMIItemsLoader : IBrowsableObjectInfoItemsLoader
+    public interface IWMIItemsLoader : IBrowsableObjectInfoLoader
     {
 
         /// <summary>

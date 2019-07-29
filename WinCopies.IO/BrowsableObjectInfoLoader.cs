@@ -14,7 +14,7 @@ namespace WinCopies.IO
     /// <summary>
     /// The base class for the <see cref="IBrowsableObjectInfo"/> items loaders.
     /// </summary>
-    public abstract class BrowsableObjectInfoItemsLoader : IBrowsableObjectInfoItemsLoader, IBackgroundWorker
+    public abstract class BrowsableObjectInfoLoader : IBrowsableObjectInfoLoader, IBackgroundWorker
 
     {
 
@@ -25,7 +25,7 @@ namespace WinCopies.IO
 #pragma warning restore CS0649
         private BrowsableObjectInfo _path;
 
-        public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoItemsLoader), true); }
+        public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoLoader), true); }
 
         //public void changePath(IBrowsableObjectInfo newValue)
 
@@ -35,7 +35,7 @@ namespace WinCopies.IO
 
         //}
 
-        IBrowsableObjectInfo IBrowsableObjectInfoItemsLoader.Path => Path;
+        IBrowsableObjectInfo IBrowsableObjectInfoLoader.Path => Path;
 
         /// <summary>
         /// Gets the path from which to load the items.
@@ -87,7 +87,7 @@ namespace WinCopies.IO
 
         }
 
-        public IEnumerable<string> Filter { get => _filter; set => this.SetBackgroundWorkerProperty(nameof(Filter), nameof(_filter), value, typeof(BrowsableObjectInfoItemsLoader), true); }
+        public IEnumerable<string> Filter { get => _filter; set => this.SetBackgroundWorkerProperty(nameof(Filter), nameof(_filter), value, typeof(BrowsableObjectInfoLoader), true); }
 
         /// <summary>
         /// Gets a value that indicates whether the thread is busy.
@@ -156,19 +156,19 @@ namespace WinCopies.IO
         public event EventHandler Disposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader"/> class.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
-        public BrowsableObjectInfoItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
+        public BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class using a custom comparer.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader"/> class using a custom comparer.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
-        public BrowsableObjectInfoItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer)
+        public BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer)
         {
 
             WorkerReportsProgress = workerReportsProgress;
@@ -331,16 +331,16 @@ namespace WinCopies.IO
         public void Cancel() => backgroundWorker.Cancel();
 
         /// <summary>
-        /// Disposes the current <see cref="BrowsableObjectInfoItemsLoader"/>.
+        /// Disposes the current <see cref="BrowsableObjectInfoLoader"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoItemsLoader"/> is busy and does not support cancellation.</exception>
+        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader"/> is busy and does not support cancellation.</exception>
         public virtual void Dispose() => Dispose(false);
 
         /// <summary>
-        /// Disposes the current <see cref="BrowsableObjectInfoItemsLoader"/> and optionally disposes the related <see cref="Path"/>.
+        /// Disposes the current <see cref="BrowsableObjectInfoLoader"/> and optionally disposes the related <see cref="Path"/>.
         /// </summary>
         /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
-        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoItemsLoader"/> is busy and does not support cancellation.</exception>
+        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader"/> is busy and does not support cancellation.</exception>
         public virtual void Dispose(bool disposePath)
 
         {

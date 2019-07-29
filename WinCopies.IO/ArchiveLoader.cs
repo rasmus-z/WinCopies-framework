@@ -11,7 +11,7 @@ using static WinCopies.Util.Util;
 namespace WinCopies.IO
 {
 
-    public class ArchiveLoader : FileSystemObjectItemsLoader
+    public class ArchiveLoader : FileSystemObjectLoader
     {
 
         private static Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();

@@ -10,6 +10,7 @@ using System.Globalization;
 
 namespace WinCopies.IO
 {
+
     public enum WMIItemType
     {
 
@@ -46,13 +47,7 @@ namespace WinCopies.IO
 
             (managementObject as ManagementClass)?.Get();
 
-            try
-            {
-
-                return wmiItemType == WMIItemType.Namespace ? (string)managementObject["Name"] : managementObject.ClassPath.ClassName;
-
-            }
-            catch (Exception) { return managementObject.ClassPath.ClassName; }
+            return wmiItemType == WMIItemType.Namespace ? (string)managementObject["Name"] : managementObject.ClassPath.ClassName;
 
         }
 
@@ -204,7 +199,7 @@ namespace WinCopies.IO
 
         public WMIItemType WMIItemType { get; }
 
-        public new WMIItemInfoFactory Factory        {            get => (WMIItemInfoFactory)base.Factory;            set => base.Factory = value;        }
+        public new WMIItemInfoFactory Factory { get => (WMIItemInfoFactory)base.Factory; set => base.Factory = value; }
 
         public override IBrowsableObjectInfo Clone() => Factory.GetBrowsableObjectInfo((ManagementBaseObject)ManagementObject.Clone(), WMIItemType);
 
@@ -261,4 +256,5 @@ namespace WinCopies.IO
         /// <param name="newValue"></param>
         public override void Rename(string newValue) => throw new NotImplementedException();
     }
+
 }

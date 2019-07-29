@@ -12,10 +12,6 @@ namespace WinCopies.IO
     public interface IBrowsableObjectInfo : IFileSystemObject, IDisposable
     {
 
-        IBrowsableObjectInfoFactory Factory { get; }
-
-        IBrowsableObjectInfoItemsLoader ItemsLoader { get; }
-
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
@@ -42,14 +38,11 @@ namespace WinCopies.IO
         bool IsBrowsable { get; }
 
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is disposing.
+        /// Gets or sets the factory for this <see cref="BrowsableObjectInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        bool IsDisposing { get; }
-
-        /// <summary>
-        /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; }
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="ArgumentNullException">value is null.</exception>
+        IBrowsableObjectInfoFactory Factory { get; }
 
         // todo: really needed? :
 
@@ -59,9 +52,25 @@ namespace WinCopies.IO
         bool AreItemsLoaded { get; }
 
         /// <summary>
+        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        IBrowsableObjectInfoLoader ItemsLoader { get; }
+
+        /// <summary>
+        /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; }
+
+        /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
         /// </summary>
         IBrowsableObjectInfo Parent { get; }
+
+        /// <summary>
+        /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is disposing.
+        /// </summary>
+        bool IsDisposing { get; }
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 
@@ -81,7 +90,7 @@ namespace WinCopies.IO
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        void LoadItems(IBrowsableObjectInfoItemsLoader itemsLoader);
+        void LoadItems(IBrowsableObjectInfoLoader itemsLoader);
 
         /// <summary>
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously.
@@ -99,7 +108,7 @@ namespace WinCopies.IO
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        void LoadItemsAsync(IBrowsableObjectInfoItemsLoader itemsLoader);
+        void LoadItemsAsync(IBrowsableObjectInfoLoader itemsLoader);
 
         /// <summary>
         /// Renames or move to a relative path, or both, the current <see cref="IBrowsableObjectInfo"/> with the specified name.
