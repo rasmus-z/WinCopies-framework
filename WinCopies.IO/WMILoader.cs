@@ -41,7 +41,7 @@ namespace WinCopies.IO
         public WMILoader(bool workerReportsProgress, bool workerSupportsCancellation, WMIItemTypes wmiItemTypes) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), wmiItemTypes) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader"/> class using a custom comparer.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class using a custom comparer.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
@@ -56,19 +56,15 @@ namespace WinCopies.IO
         protected override void OnDoWork(DoWorkEventArgs e)
         {
 
-            // We've already checked if Path is actually an IWMIItemInfo in the OnPathChanging method.
-
-            var path = (WMIItemInfo)Path;
-
             var arrayBuilder = new ArrayAndListBuilder<PathInfo>();
 
             string _path;
 
-            if (path.WMIItemType == WMIItemType.Namespace)
+            if (Path.WMIItemType == WMIItemType.Namespace)
 
             {
 
-                ManagementClass managementClass = path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), path.Factory?.Options?.ObjectGetOptions);
+                ManagementClass managementClass = Path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
 
                 if (WMIItemTypes.HasFlag(WMIItemTypes.Namespace))
 
@@ -77,7 +73,7 @@ namespace WinCopies.IO
 
                         managementClass.Get();
 
-                        using (ManagementObjectCollection.ManagementObjectEnumerator instances = (path.Factory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(path.Factory?.Options?.EnumerationOptions)).GetEnumerator())
+                        using (ManagementObjectCollection.ManagementObjectEnumerator instances = (Path.Factory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(Path.Factory?.Options?.EnumerationOptions)).GetEnumerator())
                         {
 
                             ManagementBaseObject instance;
@@ -124,7 +120,7 @@ namespace WinCopies.IO
                     {
 
                         // MessageBox.Show(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length));
-                        managementClass = new ManagementClass(new ManagementScope(Path.Path, path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path.Substring(0, Path.Path.Length - ":__NAMESPACE".Length)), path.Factory?.Options?.ObjectGetOptions);
+                        managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path.Substring(0, Path.Path.Length - ":__NAMESPACE".Length)), Path.Factory?.Options?.ObjectGetOptions);
 
                         //#if DEBUG
                         //                        if (Path.Path.Contains("CIM"))
@@ -134,7 +130,7 @@ namespace WinCopies.IO
 
                         ManagementBaseObject instance;
 
-                        using (ManagementObjectCollection.ManagementObjectEnumerator instances = (path.Factory?.Options?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(path.Factory?.Options?.EnumerationOptions)).GetEnumerator())
+                        using (ManagementObjectCollection.ManagementObjectEnumerator instances = (Path.Factory?.Options?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(Path.Factory?.Options?.EnumerationOptions)).GetEnumerator())
 
                         {
 
@@ -170,17 +166,19 @@ namespace WinCopies.IO
 
             }
 
-            else if (path.WMIItemType == WMIItemType.Class && WMIItemTypes.HasFlag(WMIItemTypes.Instance))
+            else if (Path.WMIItemType == WMIItemType.Class && WMIItemTypes.HasFlag(WMIItemTypes.Instance))
 
             {
 
                 bool dispose = false;
 
+                ManagementClass managementClass = null;
+
                 try
                 {
 
 #pragma warning disable IDE0019 // Pattern Matching
-                    var managementClass = path.ManagementObject as ManagementClass;
+                    managementClass = Path.ManagementObject as ManagementClass;
 #pragma warning restore IDE0019 // Pattern Matching
 
                     if (managementClass == null)
@@ -190,7 +188,7 @@ namespace WinCopies.IO
                         dispose = true;
 
 #pragma warning disable IDE0067 // Disposing objects before losing scope
-                        managementClass = new ManagementClass(new ManagementScope(Path.Path, path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), path.Factory?.Options?.ObjectGetOptions);
+                        managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
 #pragma warning restore IDE0067 // Disposing objects before losing scope
 
                     }
@@ -199,7 +197,7 @@ namespace WinCopies.IO
 
                     ManagementBaseObject instance;
 
-                    using (var instances = (path.Factory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(path.Factory?.Options?.EnumerationOptions)).GetEnumerator())
+                    using (ManagementObjectCollection.ManagementObjectEnumerator instances = (Path.Factory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(Path.Factory?.Options?.EnumerationOptions)).GetEnumerator())
 
                         while (instances.MoveNext())
 
@@ -210,6 +208,8 @@ namespace WinCopies.IO
                                 do
 
                                 {
+
+                                    instance = instances.Current;
 
                                     _path = WMIItemInfo.GetPath(instance, WMIItemType.Instance);
 
@@ -252,6 +252,10 @@ namespace WinCopies.IO
         public struct PathInfo : IFileSystemObject
         {
 
+            private IComparer<IFileSystemObject> _comparer;
+
+            public IComparer<IFileSystemObject> Comparer { get => _comparer ?? BrowsableObjectInfo.GetDefaultComparer(); set => _comparer = value; }
+
             /// <summary>
             /// Gets the path of this <see cref="PathInfo"/>.
             /// </summary>
@@ -273,6 +277,8 @@ namespace WinCopies.IO
             public FileType FileType => FileType.SpecialFolder;
 
             public ManagementBaseObject ManagementObject { get; set; }
+
+            public int CompareTo(IFileSystemObject fileSystemObject) => Comparer.Compare(this, fileSystemObject);
 
         }
     }

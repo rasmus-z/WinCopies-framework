@@ -431,7 +431,7 @@ namespace WinCopies.IO
                 // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;
                 // new_Path.LoadThumbnail();
 
-                ReportProgress(0, ((IArchiveItemInfoProvider)Path).Factory.GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType));
+                ReportProgress(0, Path.ArchiveItemInfoFactory.GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType));
 
                 // #if DEBUG
 
@@ -492,6 +492,10 @@ namespace WinCopies.IO
 
         {
 
+            private IComparer<IFileSystemObject> _comparer;
+
+            public IComparer<IFileSystemObject> Comparer { get => _comparer ?? BrowsableObjectInfo.GetDefaultComparer(); set => _comparer = value; }
+
             /// <summary>
             /// Gets the path of this <see cref="PathInfo"/>.
             /// </summary>
@@ -509,6 +513,8 @@ namespace WinCopies.IO
             /// Gets the file type of this <see cref="PathInfo"/>.
             /// </summary>
             public FileType FileType { get; set; }
+
+            public int CompareTo(IFileSystemObject fileSystemObject) => Comparer.Compare(this, fileSystemObject);
 
         }
 

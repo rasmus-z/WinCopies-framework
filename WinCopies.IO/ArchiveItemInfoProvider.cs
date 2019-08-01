@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WinCopies.IO
 {
@@ -8,7 +9,7 @@ namespace WinCopies.IO
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType);
 
-        IArchiveItemInfoFactory Factory { get; }
+        IArchiveItemInfoFactory ArchiveItemInfoFactory { get; }
 
         IShellObjectInfo ArchiveShellObject { get; }
 
@@ -20,7 +21,7 @@ namespace WinCopies.IO
 
         private ArchiveItemInfoFactory _archiveItemInfoFactory;
 
-        IArchiveItemInfoFactory IArchiveItemInfoProvider.Factory => _archiveItemInfoFactory;
+        IArchiveItemInfoFactory IArchiveItemInfoProvider.ArchiveItemInfoFactory => _archiveItemInfoFactory;
 
         /// <summary>
         /// Gets or sets the factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.
@@ -47,9 +48,9 @@ namespace WinCopies.IO
 
         IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
-        public ArchiveItemInfoProvider(string path, FileType fileType) : this(path, fileType, new ArchiveItemInfoFactory()) { }
+        public ArchiveItemInfoProvider(string path, FileType fileType) : this(path, fileType, new ArchiveItemInfoFactory(), GetDefaultComparer()) { }
 
-        public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType) => _archiveItemInfoFactory = archiveItemInfoFactory;
+        public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory, IComparer<IFileSystemObject> comparer) : base(path, fileType, comparer) => _archiveItemInfoFactory = archiveItemInfoFactory;
 
     }
 }

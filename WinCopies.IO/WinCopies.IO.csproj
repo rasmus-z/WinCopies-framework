@@ -134,7 +134,7 @@
     <Compile Include="FileTypes.cs" />
     <Compile Include="FolderLoader.cs" />
     <Compile Include="FolderLoaderFileSystemWatcher.cs" />
-    <Compile Include="IArchiveItemInfoProvider.cs" />
+    <Compile Include="ArchiveItemInfoProvider.cs" />
     <Compile Include="IBrowsableObjectInfo.cs" />
     <Compile Include="IBrowsableObjectInfoFactory.cs" />
     <Compile Include="IBrowsableObjectInfoLoader.cs" />

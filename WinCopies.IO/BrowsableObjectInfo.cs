@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 
@@ -14,8 +15,34 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides info to interact with any browsable items.
     /// </summary>
-    public abstract class BrowsableObjectInfo : IBrowsableObjectInfoInternal
+    public abstract class BrowsableObjectInfo : IBrowsableObjectInfo
     {
+
+        public static FileSystemObjectComparer GetDefaultComparer() => new FileSystemObjectComparer();
+
+        private IComparer<IFileSystemObject> _comparer;
+
+        public IComparer<IFileSystemObject> Comparer
+        {
+            get => _comparer; set
+
+            {
+
+                if (ItemsLoader?.IsBusy == true)
+
+                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is busy.");
+
+                if (value is null)
+
+                    throw new ArgumentNullException(nameof(value));
+
+                _comparer = value;
+
+            }
+
+        }
+
+        public virtual int CompareTo(IFileSystemObject fileSystemObject) => Comparer.Compare(this, fileSystemObject);
 
         internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
 
@@ -101,15 +128,14 @@ namespace WinCopies.IO
 
         IBrowsableObjectInfoLoader<IBrowsableObjectInfo> IBrowsableObjectInfo.ItemsLoader => (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)ItemsLoader;
 
-        IBrowsableObjectInfoLoader<IBrowsableObjectInfo> IBrowsableObjectInfoInternal.ItemsLoader { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>) value; }
+        internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
 
         /// <summary>
-        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
+        /// Gets the items loader for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-        public BrowsableObjectInfoLoader<BrowsableObjectInfo> ItemsLoader { get; private set; }
+        public BrowsableObjectInfoLoader<BrowsableObjectInfo> ItemsLoader { get; internal set; }
 
-        internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>) value; }
+        // internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
 
         internal readonly ObservableCollection<IBrowsableObjectInfo> items = new ObservableCollection<IBrowsableObjectInfo>();
 
@@ -139,7 +165,9 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="path">The path of this <see cref="BrowsableObjectInfo"/>.</param>
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-        public BrowsableObjectInfo(string path, FileType fileType)
+        public BrowsableObjectInfo(string path, FileType fileType) : this(path, fileType, GetDefaultComparer()) { }
+
+        public BrowsableObjectInfo(string path, FileType fileType, IComparer<IFileSystemObject> comparer)
 
         {
 
@@ -148,6 +176,8 @@ namespace WinCopies.IO
             FileType = fileType;
 
             Items = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(items);
+
+            Comparer = comparer;
 
         }
 

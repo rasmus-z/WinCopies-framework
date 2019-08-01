@@ -57,7 +57,7 @@ namespace WinCopies.Util.Data
 
         {
 
-            (bool propertyChanged, object oldValue) = this.SetProperty(propertyName, newValue, declaringType, performIntegrityCheck);
+            (bool propertyChanged, object oldValue) = this.SetProperty(propertyName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 

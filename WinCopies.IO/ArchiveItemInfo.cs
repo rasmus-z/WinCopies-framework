@@ -62,12 +62,12 @@ namespace WinCopies.IO
         /// </summary>
         public override bool IsBrowsable => If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, FileType, FileType.Folder, FileType.Drive, FileType.Archive);
 
-        IArchiveItemInfoFactory IArchiveItemInfoProvider.Factory => Factory;
+        IArchiveItemInfoFactory IArchiveItemInfoProvider.ArchiveItemInfoFactory => Factory;
 
         /// <summary>
-        /// Gets or sets the factory for this <see cref="ArchiveItemInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="ArchiveItemInfo"/> and its associated <see cref="ItemsLoader"/>.
+        /// Gets or sets the factory for this <see cref="ArchiveItemInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="ArchiveItemInfo"/> and its associated <see cref="BrowsableObjectInfo.ItemsLoader"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfo.ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
         /// <exception cref="ArgumentNullException">value is null.</exception>
         public new ArchiveItemInfoFactory Factory { get => (ArchiveItemInfoFactory)base.Factory; set => base.Factory = value; }
 

@@ -5,7 +5,7 @@ using WinCopies.Util;
 
 namespace WinCopies.IO
 {
-    public class FileSystemObjectComparer : IComparer<IFileSystemObject>
+    public class FileSystemObjectComparer : Comparer<IFileSystemObject>
 
     {
 
@@ -15,7 +15,7 @@ namespace WinCopies.IO
 
         public FileSystemObjectComparer(StringComparer stringComparer) => StringComparer = stringComparer;
 
-        public int Compare(IFileSystemObject x, IFileSystemObject y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
+        public override int Compare(IFileSystemObject x, IFileSystemObject y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
                 ? StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents())
                 : (x.FileType == FileType.Folder || x.FileType == FileType.Drive) && (y.FileType == FileType.File || y.FileType == FileType.Archive || y.FileType == FileType.Link)
                 ? -1

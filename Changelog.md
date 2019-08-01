@@ -10,7 +10,7 @@ Updates
 -------
 
 2.0
----
+===
 
 WinCopies.Data (1.0)
 --------------------
@@ -35,12 +35,21 @@ WinCopies.Util (2.0)
 			- 'Between' static methods for the other numeric types.
 			- 'ThrowIfNull' static method.
 			- 'GetOrThrowIfNotType' static method.
+			- 'GetIf' methods.
 		- Extension methods:
 			- ToStringWithoutAccents string extension method
 			- Extension methods for LinkedLists
 			- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
+		- Delegates:
+			- EqualityComparison
+			- FieldValidateValueCallback*
+			- FieldValueChangedCallback*
+			- PropertyValidateCallback*
+			- PropertyValueChangedCallback*
+			- ActionParams
+			- Func
+			- FuncParams
 		- Misc:
-			- EqualityComparison, FieldValidateValueCallback*, FieldValueChangedCallback*, PropertyValidateCallback* and PropertyValueChangedCallback* delegates
 			- The view model classes now have an OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
 			- The ReadOnlyObservableCollection has now an OnCollectionChanging protected virtual method.
 	- Parameters:

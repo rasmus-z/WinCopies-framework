@@ -14,8 +14,6 @@ namespace WinCopies.IO
 
         IEnumerable<string> Filter { get; set; }
 
-        IComparer<IFileSystemObject> FileSystemObjectComparer { get; set; }
-
         bool CheckFilter(string path);
 
         void LoadItems();

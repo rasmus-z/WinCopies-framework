@@ -2199,6 +2199,8 @@ namespace WinCopies.Util
 
         }
 
+        // todo: using attributes
+
         private static (bool fieldChanged, object oldValue) SetField(this object obj, FieldInfo field, object previousValue, object newValue, string paramName, bool setOnlyIfNotNull, bool throwIfNull, bool disposeOldValue, FieldValidateValueCallback validateValueCallback, bool throwIfValidationFails, FieldValueChangedCallback valueChangedCallback)
 
         {

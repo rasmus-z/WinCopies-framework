@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Shell;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Security;
@@ -9,6 +10,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WinCopies.Util;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
@@ -36,22 +38,46 @@ namespace WinCopies.IO
 
     }
 
+    public class RegistryItemInfoComparer : Comparer<IRegistryItemInfo>
+
+    {
+
+        private FileSystemObjectComparer _fileSystemObjectComparer;
+
+        public FileSystemObjectComparer FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetField(nameof(_fileSystemObjectComparer), value, typeof(RegistryItemInfoComparer), paramName: nameof(value), setOnlyIfNotNull: true, throwIfNull: true); }
+
+        public RegistryItemInfoComparer() : this(BrowsableObjectInfo.GetDefaultComparer()) { }
+
+        public RegistryItemInfoComparer(FileSystemObjectComparer fileSystemObjectComparer) => FileSystemObjectComparer = fileSystemObjectComparer;
+
+        public override int Compare(IRegistryItemInfo x, IRegistryItemInfo y)
+        {
+
+            int result = GetIf(x.RegistryItemType, y.RegistryItemType, (RegistryItemType _x, RegistryItemType _y) => _x.CompareTo(_y), () => 1, () => -1, () => 0);
+
+            return result == 0 ? FileSystemObjectComparer.Compare(x, y) : result;
+
+        }
+    }
+
     /// <summary>
     /// Represents a Windows registry item that can be used with interoperability with the other <see cref="IBrowsableObjectInfo"/> objects.
     /// </summary>
     public class RegistryItemInfo : BrowsableObjectInfo, IRegistryItemInfo
     {
 
+        public static RegistryItemInfoComparer GetDefaultComparer() => new RegistryItemInfoComparer();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         /// </summary>
-        public RegistryItemInfo() : this(new RegistryItemInfoFactory()) { }
+        public RegistryItemInfo() : this(new RegistryItemInfoFactory(), (IComparer<IFileSystemObject>) GetDefaultComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         /// </summary>
         /// <param name="factory">The factory this <see cref="RegistryItemInfo"/> and associated <see cref="RegistryKeyLoader"/> use to create new instances of the <see cref="RegistryItemInfo"/> class.</param>
-        public RegistryItemInfo(RegistryItemInfoFactory factory) : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder)
+        public RegistryItemInfo(RegistryItemInfoFactory factory, IComparer<IFileSystemObject> comparer) : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder, comparer)
         {
 
             Factory = factory;
@@ -66,14 +92,14 @@ namespace WinCopies.IO
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         /// </summary>
         /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(RegistryKey registryKey) : this(registryKey, new RegistryItemInfoFactory()) { }
+        public RegistryItemInfo(RegistryKey registryKey) : this(registryKey, new RegistryItemInfoFactory(), (IComparer<IFileSystemObject>)GetDefaultComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         /// </summary>
         /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="factory">The factory this <see cref="RegistryItemInfo"/> and associated <see cref="RegistryKeyLoader"/> use to create new instances of the <see cref="RegistryItemInfo"/> class.</param>
-        public RegistryItemInfo(RegistryKey registryKey, RegistryItemInfoFactory factory) : base(registryKey.Name, FileType.SpecialFolder)
+        public RegistryItemInfo(RegistryKey registryKey, RegistryItemInfoFactory factory, IComparer<IFileSystemObject> comparer) : base(registryKey.Name, FileType.SpecialFolder, comparer)
         {
 
             Factory = factory;
@@ -92,14 +118,14 @@ namespace WinCopies.IO
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         /// </summary>
         /// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(string path) : this(path, new RegistryItemInfoFactory()) { }
+        public RegistryItemInfo(string path) : this(path, new RegistryItemInfoFactory(), (IComparer<IFileSystemObject>)GetDefaultComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         /// </summary>
         /// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="factory">The factory this <see cref="RegistryItemInfo"/> and associated <see cref="RegistryKeyLoader"/> use to create new instances of the <see cref="RegistryItemInfo"/> class.</param>
-        public RegistryItemInfo(string path, RegistryItemInfoFactory factory) : base(path, FileType.SpecialFolder)
+        public RegistryItemInfo(string path, RegistryItemInfoFactory factory, IComparer<IFileSystemObject> comparer) : base(path, FileType.SpecialFolder, comparer)
         {
 
             Factory = factory;
@@ -119,7 +145,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(RegistryKey registryKey, string valueName) : this(registryKey, valueName, new RegistryItemInfoFactory()) { }
+        public RegistryItemInfo(RegistryKey registryKey, string valueName) : this(registryKey, valueName, new RegistryItemInfoFactory(), (IComparer<IFileSystemObject>)GetDefaultComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
@@ -127,7 +153,7 @@ namespace WinCopies.IO
         /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="factory">The factory this <see cref="RegistryItemInfo"/> and associated <see cref="RegistryKeyLoader"/> use to create new instances of the <see cref="RegistryItemInfo"/> class.</param>
-        public RegistryItemInfo(RegistryKey registryKey, string valueName, RegistryItemInfoFactory factory) : base(registryKey.Name, FileType.Other)
+        public RegistryItemInfo(RegistryKey registryKey, string valueName, RegistryItemInfoFactory factory, IComparer<IFileSystemObject> comparer) : base(registryKey.Name, FileType.Other, comparer)
 
         {
 
@@ -146,7 +172,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
-        public RegistryItemInfo(string registryKeyPath, string valueName) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, new RegistryItemInfoFactory()) { }
+        public RegistryItemInfo(string registryKeyPath, string valueName) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, new RegistryItemInfoFactory(), (IComparer<IFileSystemObject>)GetDefaultComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
@@ -154,7 +180,7 @@ namespace WinCopies.IO
         /// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="factory">The factory this <see cref="RegistryItemInfo"/> and associated <see cref="RegistryKeyLoader"/> use to create new instances of the <see cref="RegistryItemInfo"/> class.</param>
-        public RegistryItemInfo(string registryKeyPath, string valueName, RegistryItemInfoFactory factory) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, factory) { }
+        public RegistryItemInfo(string registryKeyPath, string valueName, RegistryItemInfoFactory factory, IComparer<IFileSystemObject> comparer) : this(Registry.OpenRegistryKey(registryKeyPath), valueName, factory, comparer) { }
 
         private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
 
@@ -324,7 +350,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems( (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>) new RegistryKeyLoader(workerReportsProgress, workerSupportsCancellation, RegistryItemType == RegistryItemType.RegistryRoot ? RegistryItemTypes.RegistryKey : RegistryItemTypes.RegistryKey | RegistryItemTypes.RegistryValue));
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new RegistryKeyLoader(workerReportsProgress, workerSupportsCancellation, RegistryItemType == RegistryItemType.RegistryRoot ? RegistryItemTypes.RegistryKey : RegistryItemTypes.RegistryKey | RegistryItemTypes.RegistryValue));
 
         /// <summary>
         /// Loads the items of this <see cref="RegistryItemInfo"/> asynchronously using custom worker behavior options.

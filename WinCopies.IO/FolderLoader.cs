@@ -530,6 +530,10 @@ namespace WinCopies.IO
 
         {
 
+            private IComparer<IFileSystemObject> _comparer;
+
+            public IComparer<IFileSystemObject> Comparer { get => _comparer ?? BrowsableObjectInfo.GetDefaultComparer(); set => _comparer = value; }
+
             /// <summary>
             /// Gets the path of this <see cref="PathInfo"/>.
             /// </summary>
@@ -550,9 +554,11 @@ namespace WinCopies.IO
             public string Name { get; set; }
 
             /// <summary>
-            /// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="PathInfo"/>.
+            /// Gets the <see cref="IO.FileType"/> of this <see cref="PathInfo"/>.
             /// </summary>
             public FileType FileType { get; set; }
+
+            public int CompareTo(IFileSystemObject fileSystemObject) => Comparer.Compare(this, fileSystemObject);
 
         }
 

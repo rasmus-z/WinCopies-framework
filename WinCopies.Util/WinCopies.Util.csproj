@@ -135,6 +135,7 @@
     <Compile Include="Data\VisibilityToBooleanConverter.cs" />
     <Compile Include="Data\VisibilityToReversedBooleanConverter.cs" />
     <Compile Include="Date.cs" />
+    <Compile Include="EnumComparer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Generic.xaml.cs">
       <DependentUpon>Generic.xaml</DependentUpon>

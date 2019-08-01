@@ -34,7 +34,7 @@ namespace WinCopies.Util
     /// <param name="x">First parameter to compare</param>
     /// <param name="y">Second parameter to compare</param>
     /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
-    public delegate bool EqualityComparison<T>(T x, T y);
+    public delegate bool EqualityComparison< in T>(T x, T y);
 
     /// <summary>
     /// Delegate for a non-generic predicate.
@@ -43,19 +43,29 @@ namespace WinCopies.Util
     /// <returns><see langword="true"/> if the predicate success, otherwise <see langword="false"/>.</returns>
     public delegate bool Predicate(object value);
 
+    public delegate void ActionParams(params object[] args);
+
+    public delegate void ActionParams< in T>(params T[] args);
+
+    public delegate object Func();
+
+    public delegate object FuncParams(params object[] args);
+
+    public delegate TResult FuncParams<in TParams, out TResult>(params TParams[] args);
+
     /// <summary>
     /// Provides some static helper methods.
     /// </summary>
     public static class Util
     {
-
+        
         public const BindingFlags DefaultBindingFlagsForPropertySet = BindingFlags.Public | BindingFlags.NonPublic |
                          BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
         [Obsolete("This method has been replaced by the WinCopies.Util.Extensions.SetBackgroundWorkerProperty method overloads.")]
         public static (bool propertyChanged, object oldValue) SetPropertyWhenNotBusy<T>(T bgWorker, string propertyName, string fieldName, object newValue, Type declaringType, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet, bool throwIfBusy = true) where T : IBackgroundWorker, INotifyPropertyChanged => bgWorker.IsBusy
                 ? throwIfBusy ? throw new InvalidOperationException("Cannot change property value when BackgroundWorker is busy.") : (false, Extensions.GetField(fieldName, declaringType, bindingFlags).GetValue(bgWorker))
-                : bgWorker.SetProperty(propertyName, fieldName, newValue, declaringType, bindingFlags);
+                : bgWorker.SetProperty(propertyName, fieldName, newValue, declaringType, true, bindingFlags);
 
         /// <summary>
         /// Provides a <see cref="Predicate"/> implementation that always returns <see langword="true"/>.
@@ -1686,90 +1696,63 @@ namespace WinCopies.Util
             }
 
         }
-    }
 
-    public class EnumComparer : IComparer<Enum>
+        public static object GetIf(object x, object y, WinCopies.Util.Comparison comparison, Func lower, Func greater, Func equals)
 
-    {
-        public int Compare(Enum x, object y)
         {
 
-            if (Util.IsNumber(y))
+            if (If<string, Func>(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
 
-            {
+                throw new ArgumentNullException(key);
 
-                object o = x.GetNumValue();
+            int result = comparison(x, y);
 
-                if (o is sbyte sb) return sb.CompareTo(y);
-
-                else if (o is byte b) return b.CompareTo(y);
-
-                else if (o is short s) return s.CompareTo(y);
-
-                else if (o is ushort us) return us.CompareTo(y);
-
-                else if (o is int i) return i.CompareTo(y);
-
-                else if (o is uint ui) return ui.CompareTo(y);
-
-                else if (o is long l) return l.CompareTo(y);
-
-                else if (o is ulong ul) return ul.CompareTo(y);
-
-                else
-
-                    // We shouldn't reach this point.
-
-                    return 0;
-
-            }
-
-            else
-
-                throw new ArgumentException("'y' is not from a numeric type.");
+            return result < 0 ? lower() : result > 0 ? greater() : equals();
 
         }
 
-        public int Compare(object x, Enum y)
+        public static TResult GetIf<TValues, TResult>(TValues x, TValues y, Comparison<TValues> comparison, Func<TResult> lower, Func<TResult> greater, Func<TResult> equals)
+
         {
 
-            if (Util.IsNumber(x))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
 
-            {
+                throw new ArgumentNullException(key);
 
-                object o = y.GetNumValue();
+            int result = comparison(x, y);
 
-                if (o is sbyte sb) return -sb.CompareTo(x);
-
-                else if (o is byte b) return -b.CompareTo(x);
-
-                else if (o is short s) return -s.CompareTo(x);
-
-                else if (o is ushort us) return -us.CompareTo(x);
-
-                else if (o is int i) return -i.CompareTo(x);
-
-                else if (o is uint ui) return -ui.CompareTo(x);
-
-                else if (o is long l) return -l.CompareTo(x);
-
-                else if (o is ulong ul) return -ul.CompareTo(x);
-
-                else
-
-                    // We shouldn't reach this point.
-
-                    return 0;
-
-            }
-
-            else
-
-                throw new ArgumentException("'x' is not from a numeric type.");
+            return result < 0 ? lower() : result > 0 ? greater() : equals();
 
         }
 
-        public int Compare(Enum x, Enum y) => x.CompareTo(y);
+        public static object GetIf(object x, object y, IComparer comparer, Func lower, Func greater, Func equals)
+
+        {
+
+            if (If<string, Func>(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
+
+                throw new ArgumentNullException(key);
+
+            int result = comparer.Compare(x, y);
+
+            return result < 0 ? lower() : result > 0 ? greater() : equals();
+
+        }
+
+        public static TResult GetIf<TValues, TResult>(TValues x, TValues y, WinCopies.Util.Comparison comparison, Func<TResult> lower, Func<TResult> greater, Func<TResult> equals)
+
+        {
+
+            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
+
+                throw new ArgumentNullException(key);
+
+            int result = comparison(x, y);
+
+            return result < 0 ? lower() : result > 0 ? greater() : equals();
+
+        }
+
     }
 
 }

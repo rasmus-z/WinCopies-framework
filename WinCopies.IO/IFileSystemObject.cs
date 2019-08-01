@@ -9,9 +9,11 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides data about file system items.
     /// </summary>
-    public interface IFileSystemObject
+    public interface IFileSystemObject : IComparable<IFileSystemObject>
 
     {
+
+        IComparer<IFileSystemObject> Comparer { get; set; }
 
         /// <summary>
         /// Gets the path of this <see cref="IFileSystemObject"/>.

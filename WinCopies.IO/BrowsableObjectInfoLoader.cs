@@ -132,14 +132,14 @@ namespace WinCopies.IO
         public event EventHandler Disposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader"/> class.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         public BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader"/> class using a custom comparer.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class using a custom comparer.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
@@ -333,7 +333,7 @@ namespace WinCopies.IO
 
                 OnPathChanging(value);
 
-                ((IBrowsableObjectInfoInternal)_path).ItemsLoader = null;
+                _path.ItemsLoader = null;
 
                 value.ItemsLoaderInternal = (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)this;
 
