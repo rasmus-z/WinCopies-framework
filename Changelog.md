@@ -74,7 +74,7 @@ WinCopies.Util (2.0)
 	- ReadOnlyObservableCollection's CollectionChanging event has now the protected access modifier.
 	- Updated doc.
 
-* See WinCopies.Util.Extensions.SetProperty/Field
+\* See WinCopies.Util.Extensions.SetProperty/Field
 
 Project link
 ------------
