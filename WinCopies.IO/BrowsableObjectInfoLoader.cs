@@ -11,10 +11,7 @@ using BackgroundWorker = WinCopies.Util.BackgroundWorker;
 namespace WinCopies.IO
 {
 
-    /// <summary>
-    /// The base class for the <see cref="IBrowsableObjectInfo"/> items loaders.
-    /// </summary>
-    public abstract class BrowsableObjectInfoLoader : IBrowsableObjectInfoLoader, IBackgroundWorker
+    public abstract class BrowsableObjectInfoLoader<TPath> : IBrowsableObjectInfoLoader<TPath>, IBackgroundWorker where TPath : BrowsableObjectInfo
 
     {
 
@@ -23,9 +20,8 @@ namespace WinCopies.IO
         private readonly IComparer<IFileSystemObject> _fileSystemObjectComparer;
         private readonly IEnumerable<string> _filter;
 #pragma warning restore CS0649
-        private BrowsableObjectInfo _path;
 
-        public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoLoader), true); }
+        public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoLoader<TPath>), true); }
 
         //public void changePath(IBrowsableObjectInfo newValue)
 
@@ -34,26 +30,6 @@ namespace WinCopies.IO
 
 
         //}
-
-        IBrowsableObjectInfo IBrowsableObjectInfoLoader.Path => Path;
-
-        /// <summary>
-        /// Gets the path from which to load the items.
-        /// </summary>
-        public BrowsableObjectInfo Path
-        {
-            get => _path; internal set
-
-            {
-
-                OnPathChanging(value);
-
-                _path = value;
-
-                OnPathChanged(value);
-
-            }
-        }
 
         //protected virtual BrowsableObjectInfo PathOverride { get => _path; set => _path = value; }
 
@@ -73,7 +49,7 @@ namespace WinCopies.IO
         private void ItemsChanging(object sender, NotifyCollectionChangedEventArgs e) => OnItemsChanging(e);
 
         /// <summary>
-        /// Provides for classes that derive from this one to do operations when the path is changing and to throw if the path is not from an expected type.
+        /// Provides ability for classes that derive from this one to do operations when the path is changing and to throw if the path is not from an expected type.
         /// </summary>
         /// <param name="path">The new path to set the <see cref="Path"/> property with.</param>
         protected abstract void OnPathChanging(BrowsableObjectInfo path);
@@ -87,7 +63,7 @@ namespace WinCopies.IO
 
         }
 
-        public IEnumerable<string> Filter { get => _filter; set => this.SetBackgroundWorkerProperty(nameof(Filter), nameof(_filter), value, typeof(BrowsableObjectInfoLoader), true); }
+        public IEnumerable<string> Filter { get => _filter; set => this.SetBackgroundWorkerProperty(nameof(Filter), nameof(_filter), value, typeof(BrowsableObjectInfoLoader<TPath>), true); }
 
         /// <summary>
         /// Gets a value that indicates whether the thread is busy.
@@ -193,8 +169,6 @@ namespace WinCopies.IO
 
         }
 
-        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => _path.AreItemsLoaded = true;
-
         public abstract bool CheckFilter(string path);
 
         /// <summary>
@@ -268,8 +242,6 @@ namespace WinCopies.IO
         /// <param name="e">Event args for the current event</param>
         protected abstract void OnDoWork(DoWorkEventArgs e);
 
-        protected virtual void OnProgressChanged(ProgressChangedEventArgs e) => OnAddingPath(e.UserState as IBrowsableObjectInfo);
-
         // /// <summary>
         // /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class with an <see cref="IBrowsableObjectInfo"/>.
         // /// </summary>
@@ -331,16 +303,64 @@ namespace WinCopies.IO
         public void Cancel() => backgroundWorker.Cancel();
 
         /// <summary>
-        /// Disposes the current <see cref="BrowsableObjectInfoLoader"/>.
+        /// Suspends the current thread.
         /// </summary>
-        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader"/> is busy and does not support cancellation.</exception>
+        public void Suspend() => backgroundWorker.Suspend();
+
+        /// <summary>
+        /// Resumes the current thread.
+        /// </summary>
+        public void Resume() => backgroundWorker.Resume();
+
+        private TPath _path;
+
+        /// <summary>
+        /// Gets the path from which to load the items.
+        /// </summary>
+        public TPath Path
+        {
+            get => _path; internal set
+
+            {
+
+                if (IsBusy)
+
+                    throw new InvalidOperationException("The items loader is busy.");
+
+                if (!(value.ItemsLoader is null))
+
+                    throw new InvalidOperationException("The given path has already been added to an items loader.");
+
+                OnPathChanging(value);
+
+                ((IBrowsableObjectInfoInternal)_path).ItemsLoader = null;
+
+                value.ItemsLoaderInternal = (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)this;
+
+                _path = value;
+
+                OnPathChanged(value);
+
+            }
+        }
+
+        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => Path.AreItemsLoaded = true;
+
+        protected virtual void OnAddingPath(IBrowsableObjectInfo path) => Path.items.Add(path);
+
+        protected virtual void OnProgressChanged(ProgressChangedEventArgs e) => OnAddingPath(e.UserState as IBrowsableObjectInfo);
+
+        /// <summary>
+        /// Disposes the current <see cref="BrowsableObjectInfoLoader{T}"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
         public virtual void Dispose() => Dispose(false);
 
         /// <summary>
-        /// Disposes the current <see cref="BrowsableObjectInfoLoader"/> and optionally disposes the related <see cref="Path"/>.
+        /// Disposes the current <see cref="BrowsableObjectInfoLoader{T}"/> and optionally disposes the related <see cref="Path"/>.
         /// </summary>
         /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
-        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader"/> is busy and does not support cancellation.</exception>
+        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
         public virtual void Dispose(bool disposePath)
 
         {
@@ -353,17 +373,6 @@ namespace WinCopies.IO
 
         }
 
-        /// <summary>
-        /// Suspends the current thread.
-        /// </summary>
-        public void Suspend() => backgroundWorker.Suspend();
-
-        /// <summary>
-        /// Resumes the current thread.
-        /// </summary>
-        public void Resume() => backgroundWorker.Resume();
-
-        protected virtual void OnAddingPath(IBrowsableObjectInfo path) => Path.items.Add(path);
     }
 
 }

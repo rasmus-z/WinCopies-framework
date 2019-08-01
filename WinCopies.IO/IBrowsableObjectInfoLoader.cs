@@ -8,15 +8,13 @@ using WinCopies.Util;
 namespace WinCopies.IO
 {
 
-    /// <summary>
-    /// Provides common properties and methods for the <see cref="IBrowsableObjectInfo"/> items loaders.
-    /// </summary>
-    public interface IBrowsableObjectInfoLoader : IBackgroundWorker, IDisposable
+    public interface IBrowsableObjectInfoLoader<TPath> : IBackgroundWorker, IDisposable where TPath : IBrowsableObjectInfo
+
     {
 
         IEnumerable<string> Filter { get; set; }
 
-        IBrowsableObjectInfo Path { get; }
+        IComparer<IFileSystemObject> FileSystemObjectComparer { get; set; }
 
         bool CheckFilter(string path);
 
@@ -36,6 +34,8 @@ namespace WinCopies.IO
         /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
         /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader"/> is busy and does not support cancellation.</exception>
         void Dispose(bool disposePath);
+
+        TPath Path { get; }
 
     }
 

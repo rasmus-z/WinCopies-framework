@@ -14,7 +14,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides info to interact with any browsable items.
     /// </summary>
-    public abstract class BrowsableObjectInfo : IBrowsableObjectInfo
+    public abstract class BrowsableObjectInfo : IBrowsableObjectInfoInternal
     {
 
         internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
@@ -99,36 +99,17 @@ namespace WinCopies.IO
         /// </summary>
         public bool AreItemsLoaded { get; internal set; }
 
-        IBrowsableObjectInfoLoader IBrowsableObjectInfo.ItemsLoader => ItemsLoader;
+        IBrowsableObjectInfoLoader<IBrowsableObjectInfo> IBrowsableObjectInfo.ItemsLoader => (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)ItemsLoader;
 
-        private BrowsableObjectInfoLoader _itemsLoader;
+        IBrowsableObjectInfoLoader<IBrowsableObjectInfo> IBrowsableObjectInfoInternal.ItemsLoader { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>) value; }
 
         /// <summary>
         /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-        protected BrowsableObjectInfoLoader ItemsLoader
-        {
-            get => _itemsLoader; set
-            {
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        public BrowsableObjectInfoLoader<BrowsableObjectInfo> ItemsLoader { get; private set; }
 
-                if (ItemsLoader?.IsBusy == true)
-
-                    throw new InvalidOperationException("The items loader is busy.");
-
-                if (!(value.Path is null))
-
-                    throw new InvalidOperationException("The given items loader has already been added to a BrowsableObjectInfo.");
-
-                _itemsLoader.Path = null;
-
-                value.Path = this;
-
-                _itemsLoader = value;
-
-            }
-
-        }
+        internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>) value; }
 
         internal readonly ObservableCollection<IBrowsableObjectInfo> items = new ObservableCollection<IBrowsableObjectInfo>();
 
@@ -142,7 +123,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
         /// </summary>
-        public virtual IBrowsableObjectInfo Parent        {            get => _parent ?? (_parent = GetParent());            internal set => _parent = value;        }
+        public virtual IBrowsableObjectInfo Parent { get => _parent ?? (_parent = GetParent()); internal set => _parent = value; }
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is disposing.
@@ -181,7 +162,7 @@ namespace WinCopies.IO
 
         {
 
-            if (_itemsLoader?.IsBusy == true)
+            if (ItemsLoader?.IsBusy == true)
 
                 throw new InvalidOperationException($"The {nameof(ItemsLoader)} is busy.");
 
@@ -225,7 +206,7 @@ namespace WinCopies.IO
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        public virtual void LoadItems(IBrowsableObjectInfoLoader itemsLoader)
+        public virtual void LoadItems(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader)
 
         {
 
@@ -233,7 +214,7 @@ namespace WinCopies.IO
 
                 throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, FileType.ToString(), ToString()));
 
-            ItemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoLoader>(itemsLoader, nameof(itemsLoader));
+            ItemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoLoader<BrowsableObjectInfo>>(itemsLoader, nameof(itemsLoader));
 
             ItemsLoader.LoadItems();
 
@@ -267,7 +248,7 @@ namespace WinCopies.IO
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        public virtual void LoadItemsAsync(IBrowsableObjectInfoLoader itemsLoader)
+        public virtual void LoadItemsAsync(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader)
 
         {
 
@@ -275,7 +256,7 @@ namespace WinCopies.IO
 
                 throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, FileType.ToString(), ToString()));
 
-            ItemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoLoader>(itemsLoader, nameof(itemsLoader));
+            ItemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoLoader<BrowsableObjectInfo>>(itemsLoader, nameof(itemsLoader));
 
             ItemsLoader.LoadItemsAsync();
 

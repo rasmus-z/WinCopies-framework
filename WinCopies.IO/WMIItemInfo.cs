@@ -41,7 +41,7 @@ namespace WinCopies.IO
 
         public ManagementBaseObject ManagementObject { get; }
 
-        private static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
+        public static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
 
         {
 
@@ -51,7 +51,7 @@ namespace WinCopies.IO
 
         }
 
-        private static string GetPath(ManagementBaseObject managementObject, WMIItemType wmiItemType)
+        public static string GetPath(ManagementBaseObject managementObject, WMIItemType wmiItemType)
 
         {
 
@@ -244,7 +244,7 @@ namespace WinCopies.IO
 
         }
 
-        private WMIItemsLoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMIItemsLoader(workerReportsProgress, workerSupportsCancellation, WMIItemTypes.Namespace | WMIItemTypes.Class | WMIItemTypes.Instance) { Path = this });
+        private WMILoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMILoader(workerReportsProgress, workerSupportsCancellation, WMIItemTypes.Namespace | WMIItemTypes.Class | WMIItemTypes.Instance) { Path = this });
 
         public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItems();
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Security;
 using System.Windows;
 using WinCopies.Util;
 
@@ -12,7 +13,7 @@ using static WinCopies.Util.Util;
 namespace WinCopies.IO
 {
 
-    public interface IFolderLoader : IFileSystemObjectItemsLoader
+    public interface IFolderLoader<TPath> : IFileSystemObjectLoader<TPath> where TPath : IShellObjectInfo
     {
 
         FolderLoaderFileSystemWatcher FileSystemWatcher { get; }
@@ -22,7 +23,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides a background process that can be used to load items of a folder.
     /// </summary>
-    public class FolderLoader : FileSystemObjectLoader, IFolderLoader
+    public class FolderLoader : FileSystemObjectLoader<ShellObjectInfo>, IFolderLoader<ShellObjectInfo>
     {
 
         // todo: to turn on ShellObjectWatcher for better compatibility
@@ -87,7 +88,7 @@ namespace WinCopies.IO
 
                         FileSystemWatcher = GetFolderLoaderFileSystemWatcher();
 
-                        if ((((ShellObjectInfo)Path).FileType == FileType.Drive && new DriveInfo(((ShellObjectInfo)Path).Path).IsReady) || (((ShellObjectInfo)Path).FileType != FileType.Drive && ((ShellObjectInfo)Path).ShellObject.IsFileSystemObject))
+                        if ((Path.FileType == FileType.Drive && new DriveInfo(Path.Path).IsReady) || (Path.FileType != FileType.Drive && Path.ShellObject.IsFileSystemObject))
 
                         {
 
@@ -149,7 +150,7 @@ namespace WinCopies.IO
                 try
                 {
 
-                    Path.items.Add(((ShellObjectInfo)Path).Factory.GetBrowsableObjectInfo(ShellObject.FromParsingName(path), path));
+                    Path.items.Add(Path.Factory.GetBrowsableObjectInfo(ShellObject.FromParsingName(path), path));
 
                 }
 #if DEBUG
@@ -214,6 +215,8 @@ namespace WinCopies.IO
 
         private void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e) => OnShellObjectDeleted(e.FullPath);
 
+            internal static bool HandleIOException(Exception ex) => ex.Is(false, typeof(IOException), typeof(UnauthorizedAccessException), typeof(SecurityException));
+
         protected override void OnDoWork(DoWorkEventArgs e)
 
         {
@@ -258,7 +261,7 @@ namespace WinCopies.IO
 
 #endif
 
-                if (pathInfo.FileType == FileType.Other || (pathInfo.FileType != FileType.SpecialFolder && FileTypes != Util.Util.GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
+                if (pathInfo.FileType == FileType.Other || (pathInfo.FileType != FileType.SpecialFolder && FileTypes != GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
 
                 // We only make a normalized path if we add the path to the paths to load.
 
@@ -390,9 +393,9 @@ namespace WinCopies.IO
 
                     foreach (string directory in directories)
 
-                        // if (CheckFilter(directory))
+                        if (CheckFilter(directory))
 
-                        AddDirectory(new PathInfo() { Path = directory, ShellObject = ShellObject.FromParsingName(directory) });
+                            AddDirectory(new PathInfo() { Path = directory, ShellObject = ShellObject.FromParsingName(directory) });
 
                     string[] files = Directory.GetFiles(Path.Path);
 
@@ -450,7 +453,7 @@ namespace WinCopies.IO
 
             }
 
-            catch (IOException ex)
+            catch (Exception ex) when (HandleIOException(ex))
             {
 
 #if DEBUG
@@ -483,24 +486,43 @@ namespace WinCopies.IO
 
 
 
-            foreach (PathInfo path_ in pathInfos)
+            PathInfo path_;
 
-            {
+
+
+            using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
+
+
+
+                while (_paths.MoveNext())
+
+                    try
+
+                    {
+
+                        do
+
+                        {
+
+                            path_ = _paths.Current;
 
 #if DEBUG
 
-                Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
-                Debug.WriteLine("path_.Path: " + path_.Path);
-                Debug.WriteLine("path_.Normalized_Path: " + path_.NormalizedPath);
-                Debug.WriteLine("path_.Shell_Object: " + path_.ShellObject);
+                            Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
+                            Debug.WriteLine("path_.Path: " + path_.Path);
+                            Debug.WriteLine("path_.Normalized_Path: " + path_.NormalizedPath);
+                            Debug.WriteLine("path_.Shell_Object: " + path_.ShellObject);
 
 #endif
 
-                // new_Path.LoadThumbnail();
+                            // new_Path.LoadThumbnail();
 
-                ReportProgress(0, ((ShellObjectInfo)Path).Factory.GetBrowsableObjectInfo(path_.ShellObject, path_.Path, path_.FileType, ShellObjectInfo.GetFileType(path_.Path, path_.ShellObject).specialFolder));
+                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.ShellObject, path_.Path, path_.FileType, ShellObjectInfo.GetFileType(path_.Path, path_.ShellObject).specialFolder));
 
-            }
+                        } while (_paths.MoveNext());
+
+                    }
+                    catch (Exception ex) when (HandleIOException(ex)) { }
 
         }
 
@@ -508,16 +530,28 @@ namespace WinCopies.IO
 
         {
 
+            /// <summary>
+            /// Gets the path of this <see cref="PathInfo"/>.
+            /// </summary>
             public string Path { get; set; }
 
             public string NormalizedPath { get; set; }
 
             public ShellObject ShellObject { get; set; }
 
+            /// <summary>
+            /// Gets the localized name of this <see cref="PathInfo"/>.
+            /// </summary>
             public string LocalizedName => ShellObject.GetDisplayName(DisplayNameType.Default);
 
+            /// <summary>
+            /// Gets the name of this <see cref="PathInfo"/>.
+            /// </summary>
             public string Name { get; set; }
 
+            /// <summary>
+            /// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="PathInfo"/>.
+            /// </summary>
             public FileType FileType { get; set; }
 
         }

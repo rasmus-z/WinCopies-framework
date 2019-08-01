@@ -27,7 +27,14 @@ namespace WinCopies.IO
 
     }
 
-    public class RegistryKeyLoader : BrowsableObjectInfoLoader, IRegistryKeyLoader
+    public interface IRegistryKeyLoader<TPath> : IBrowsableObjectInfoLoader<TPath> where TPath : IRegistryItemInfo
+    {
+
+        RegistryItemTypes RegistryItemTypes { get; set; }
+
+    }
+
+    public class RegistryKeyLoader : BrowsableObjectInfoLoader<RegistryItemInfo>, IRegistryKeyLoader<RegistryItemInfo>
     {
 
         private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;

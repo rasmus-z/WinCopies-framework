@@ -18,12 +18,18 @@ namespace WinCopies.IO
         /// </summary>
         string Path { get; }
 
+        /// <summary>
+        /// Gets the localized name of this <see cref="IFileSystemObject"/>.
+        /// </summary>
         string LocalizedName { get; }
 
+        /// <summary>
+        /// Gets the name of this <see cref="IFileSystemObject"/>.
+        /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// Gets the file type of this <see cref="IFileSystemObject"/>.
+        /// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="IFileSystemObject"/>.
         /// </summary>
         FileType FileType { get; }
 

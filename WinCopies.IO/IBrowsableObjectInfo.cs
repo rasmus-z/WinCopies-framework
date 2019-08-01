@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Media.Imaging;
 using WinCopies.Collections;
@@ -54,8 +55,8 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-        IBrowsableObjectInfoLoader ItemsLoader { get; }
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoader { get; }
 
         /// <summary>
         /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
@@ -90,7 +91,7 @@ namespace WinCopies.IO
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        void LoadItems(IBrowsableObjectInfoLoader itemsLoader);
+        void LoadItems(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader);
 
         /// <summary>
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously.
@@ -108,7 +109,7 @@ namespace WinCopies.IO
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        void LoadItemsAsync(IBrowsableObjectInfoLoader itemsLoader);
+        void LoadItemsAsync(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader);
 
         /// <summary>
         /// Renames or move to a relative path, or both, the current <see cref="IBrowsableObjectInfo"/> with the specified name.
@@ -130,6 +131,14 @@ namespace WinCopies.IO
         /// <param name="disposeItemsLoader">Whether to dispose the <see cref="ItemsLoader"/>s of the current path and its parent and items. If this parameter is set to <see langword="true"/>, the <see cref="ItemsLoader"/>s will also be disposed recursively.</param>
         /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
         void Dispose(bool disposeItemsLoader);
+
+    }
+
+    internal interface IBrowsableObjectInfoInternal : IBrowsableObjectInfo
+
+    {
+
+        IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoader { set; }
 
     }
 

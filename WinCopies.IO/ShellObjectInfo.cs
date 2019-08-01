@@ -15,17 +15,15 @@ namespace WinCopies.IO
     /// <summary>
     /// Represents a file system item that can be used with interoperability with the other <see cref="IBrowsableObjectInfo"/> objects.
     /// </summary>
-    public class ShellObjectInfo : BrowsableObjectInfo, IShellObjectInfo
+    public class ShellObjectInfo : ArchiveItemInfoProvider, IShellObjectInfo
     {
 
-        private ArchiveItemInfoFactory _archiveItemInfoFactory;
+        protected override IShellObjectInfo ArchiveShellObjectOverride => FileType == FileType.Archive ? this : null;
 
         /// <summary>
         /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.
         /// </summary>
         public ShellObject ShellObject { get; private set; } = null;
-
-        IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => this;
 
         /// <summary>
         /// Gets the localized name of this <see cref="ShellObjectInfo"/> depending the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
@@ -61,12 +59,6 @@ namespace WinCopies.IO
         /// Gets a value that indicates whether this <see cref="ShellObjectInfo"/> is browsable.
         /// </summary>
         public override bool IsBrowsable => (ShellObject is IEnumerable<ShellObject> || FileType == FileType.Archive) && FileType != FileType.File && FileType != FileType.Link; // FileType == FileTypes.Folder || FileType == FileTypes.Drive || (FileType == FileTypes.SpecialFolder && SpecialFolder != SpecialFolders.Computer) || FileType == FileTypes.Archive;
-
-        /// <summary>
-        /// Gets or sets the items loader for this <see cref="ShellObjectInfo"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-        public new FileSystemObjectLoader ItemsLoader { get => (FolderLoader)base.ItemsLoader; set => base.ItemsLoader = value; }
 
         /// <summary>
         /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a folder, drive or file. See the <see cref="BrowsableObjectInfo.FileType"/> property for more details.
@@ -216,7 +208,7 @@ namespace WinCopies.IO
         /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
-        /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
+        /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
         public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder) : this(shellObject, path, fileType, specialFolder, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
 
         /// <summary>
@@ -322,8 +314,8 @@ namespace WinCopies.IO
         /// <summary>
         /// Loads the items of this <see cref="ShellObjectInfo"/> asynchronously.
         /// </summary>
-        /// <param name="workerReportsProgress">A value that indicates whether the <see cref="BrowsableObjectInfoLoader"/> will report progress.</param>
-        /// <param name="workerSupportsCancellation">A value that indicates whether the <see cref="BrowsableObjectInfoLoader"/> will supports cancellation.</param>
+        /// <param name="workerReportsProgress">A value that indicates whether the <see cref="BrowsableObjectInfoLoader{T}"/> will report progress.</param>
+        /// <param name="workerSupportsCancellation">A value that indicates whether the <see cref="BrowsableObjectInfoLoader{T}"/> will supports cancellation.</param>
         public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation)
         {
 
@@ -337,17 +329,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItems(new FolderLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItems(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
             }
 
             else
 
-                LoadItems(new FolderLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
             //else
 
@@ -370,8 +362,8 @@ namespace WinCopies.IO
         /// <summary>
         /// Loads the items of this <see cref="ShellObjectInfo"/> asynchronously.
         /// </summary>
-        /// <param name="workerReportsProgress">A value that indicates whether the <see cref="BrowsableObjectInfoLoader"/> will report progress.</param>
-        /// <param name="workerSupportsCancellation">A value that indicates whether the <see cref="BrowsableObjectInfoLoader"/> will supports cancellation.</param>
+        /// <param name="workerReportsProgress">A value that indicates whether the <see cref="BrowsableObjectInfoLoader{T}"/> will report progress.</param>
+        /// <param name="workerSupportsCancellation">A value that indicates whether the <see cref="BrowsableObjectInfoLoader{T}"/> will supports cancellation.</param>
         public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation)
         {
 
@@ -385,17 +377,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItemsAsync(new FolderLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItemsAsync(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
             }
 
             else
 
-                LoadItemsAsync(new FolderLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
             //else
 
@@ -453,29 +445,6 @@ namespace WinCopies.IO
         /// <exception cref="InvalidOperationException">The old <see cref="ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
         /// <exception cref="ArgumentNullException">value is null.</exception>
         public new ShellObjectInfoFactory Factory { get => (ShellObjectInfoFactory)base.Factory; set => base.Factory = value; }
-
-        IArchiveItemInfoFactory IArchiveItemInfoProvider.Factory => _archiveItemInfoFactory;
-
-        /// <summary>
-        /// Gets or sets the factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy.</exception>
-        /// <exception cref="ArgumentNullException">The given value is null.</exception>
-        public ArchiveItemInfoFactory ArchiveItemInfoFactory
-        {
-            get => _archiveItemInfoFactory; set
-            {
-
-                ThrowOnInvalidFactoryUpdateOperation(value, nameof(value));
-
-                _archiveItemInfoFactory.Path = null;
-
-                value.Path = this;
-
-                _archiveItemInfoFactory = value;
-
-            }
-        }
 
         /// <summary>
         /// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.

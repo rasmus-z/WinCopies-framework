@@ -24,7 +24,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Represents an archive that can be used with interoperability with the other <see cref="IBrowsableObjectInfo"/> objects.
     /// </summary>
-    public class ArchiveItemInfo : BrowsableObjectInfo, IArchiveItemInfo
+    public class ArchiveItemInfo : ArchiveItemInfoProvider, IArchiveItemInfo
     {
 
         /// <summary>
@@ -71,17 +71,13 @@ namespace WinCopies.IO
         /// <exception cref="ArgumentNullException">value is null.</exception>
         public new ArchiveItemInfoFactory Factory { get => (ArchiveItemInfoFactory)base.Factory; set => base.Factory = value; }
 
-        /// <summary>
-        /// Gets or sets the items loader for this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-        public new ArchiveLoader ItemsLoader { get => (ArchiveLoader)base.ItemsLoader; set => base.ItemsLoader = value; }
-
-        IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObject;
+        //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
         public ArchiveFileInfo? ArchiveFileInfo { get; }
 
-        public IShellObjectInfo ArchiveShellObject { get; } = null;
+        protected override IShellObjectInfo ArchiveShellObjectOverride { get; } = null;
+
+        public IShellObjectInfo ArchiveShellObject => ArchiveShellObjectOverride;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class.
@@ -116,7 +112,7 @@ namespace WinCopies.IO
 
                 throw new ArgumentException($"'{nameof(path)}' must end with '{nameof(archiveFileInfo.Value.FileName)}'");
 
-            ArchiveShellObject = archiveShellObject;
+            ArchiveShellObjectOverride = archiveShellObject;
 
 #if DEBUG 
 
@@ -181,14 +177,14 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
         /// <summary>
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync(new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
         /// <summary>
         /// When overridden in a derived class, returns the parent of this <see cref="ArchiveItemInfo"/>.
