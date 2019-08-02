@@ -8,6 +8,9 @@ using System.Reflection;
 using System.Windows.Media.Imaging;
 using static WinCopies.Util.Util;
 using FileInfo = System.IO.FileInfo;
+using IfCT = WinCopies.Util.Util.ComparisonType;
+using IfCM = WinCopies.Util.Util.ComparisonMode;
+using IfComp = WinCopies.Util.Util.Comparison;
 
 namespace WinCopies.IO
 {
@@ -444,6 +447,8 @@ namespace WinCopies.IO
         /// <exception cref="ArgumentNullException">value is null.</exception>
         public new ShellObjectInfoFactory Factory { get => (ShellObjectInfoFactory)base.Factory; set => base.Factory = value; }
 
+        public override bool IsRenamingSupported => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.File, FileType.Drive, FileType.Archive, FileType.Link);
+
         /// <summary>
         /// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.
         /// </summary>
@@ -452,7 +457,7 @@ namespace WinCopies.IO
 
         {
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.NotEqual, out string key, FileType, GetKeyValuePair(nameof(FileType.Folder), FileType.Folder), GetKeyValuePair(nameof(FileType.File), FileType.File), GetKeyValuePair(nameof(FileType.Drive), FileType.Drive)))
+            if (If(IfCT.Or, IfCM.Logical, IfComp.NotEqual, out string key, FileType, GetKeyValuePair(nameof(FileType.Folder), FileType.Folder), GetKeyValuePair(nameof(FileType.File), FileType.File), GetKeyValuePair(nameof(FileType.Drive), FileType.Drive)))
 
                 throw new InvalidOperationException($"{nameof(FileType)} must have one of the following values: {nameof(FileType.Folder)}, {nameof(FileType.File)} or {nameof(FileType.Drive)}. The value was {key}.");
 

@@ -9,6 +9,9 @@ using System.Windows;
 using WinCopies.Util;
 
 using static WinCopies.Util.Util;
+using IFCT = WinCopies.Util.Util.ComparisonType;
+using IfCM = WinCopies.Util.Util.ComparisonMode;
+using IfComp = WinCopies.Util.Util.Comparison;
 
 namespace WinCopies.IO
 {
@@ -71,15 +74,15 @@ namespace WinCopies.IO
 
             {
 
-                _ = GetOrThrowIfNotType<ShellObjectInfo>((IBrowsableObjectInfo)path, nameof(path));
+                _ = GetOrThrowIfNotType<ShellObjectInfo>(path, nameof(path));
 
-                if (If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, path.FileType, FileType.File, FileType.Archive, FileType.Link, FileType.Other))
+                if (If(IFCT.Or, IfCM.Logical, IfComp.Equal, path.FileType, FileType.File, FileType.Archive, FileType.Link, FileType.Other))
 
                     throw new ArgumentException("'Path' isn't a folder, a drive or a special folder. 'Path': " + path.ToString());
 
                 FileSystemWatcher.EnableRaisingEvents = false;
 
-                if ((((ShellObjectInfo)Path).FileType == FileType.Folder || ((ShellObjectInfo)Path).FileType == FileType.SpecialFolder) && ((ShellObjectInfo)Path).ShellObject.IsFileSystemObject && FileSystemWatcher == null)
+                if ((Path.FileType == FileType.Folder || Path.FileType == FileType.SpecialFolder) && Path.ShellObject.IsFileSystemObject && FileSystemWatcher == null)
 
                 {
 

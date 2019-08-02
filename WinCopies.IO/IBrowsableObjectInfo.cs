@@ -111,6 +111,8 @@ namespace WinCopies.IO
         /// <param name="itemsLoader">A custom items loader.</param>
         void LoadItemsAsync(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader);
 
+        bool IsRenamingSupported { get; }
+
         /// <summary>
         /// Renames or move to a relative path, or both, the current <see cref="IBrowsableObjectInfo"/> with the specified name.
         /// </summary>

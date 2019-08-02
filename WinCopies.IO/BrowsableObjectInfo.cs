@@ -302,6 +302,8 @@ namespace WinCopies.IO
         // /// Frees the <see cref="ArchiveFileStream"/> property to unlock the archive referenced by it and makes it <see langword="null"/>. Calling this method will erase all the <see cref="Items"/> of this <see cref="ShellObjectInfo"/> in memory.
         // /// </summary>
 
+        public abstract bool IsRenamingSupported { get; }
+
         /// <summary>
         /// When overridden in a derived class, renames or move to a relative path, or both, the current <see cref="BrowsableObjectInfo"/> with the specified name.
         /// </summary>

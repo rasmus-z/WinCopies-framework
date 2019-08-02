@@ -10,6 +10,9 @@ using System.Windows.Media.Imaging;
 using TsudaKageyu;
 
 using static WinCopies.Util.Util;
+using IfCT = WinCopies.Util.Util.ComparisonType;
+using IfCM = WinCopies.Util.Util.ComparisonMode;
+using IfComp = WinCopies.Util.Util.Comparison;
 
 namespace WinCopies.IO
 {
@@ -60,7 +63,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
         /// </summary>
-        public override bool IsBrowsable => If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, FileType, FileType.Folder, FileType.Drive, FileType.Archive);
+        public override bool IsBrowsable => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.Drive, FileType.Archive);
 
         IArchiveItemInfoFactory IArchiveItemInfoProvider.ArchiveItemInfoFactory => Factory;
 

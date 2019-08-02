@@ -5,6 +5,9 @@ using System.Windows.Input;
 using WinCopies.Util;
 using WinCopies.Util.Commands;
 using static WinCopies.Util.Util;
+using IfCT = WinCopies.Util.Util.ComparisonType;
+using IfCM = WinCopies.Util.Util.ComparisonMode;
+using IfComp = WinCopies.Util.Util.Comparison;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
@@ -155,7 +158,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         }
 
-        protected virtual void OnCommandCanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = e.Parameter is DialogWindowCommandParameters parameter ? If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, parameter, DialogWindowCommandParameters.Cancel, DialogWindowCommandParameters.No) || (parameter == DialogWindowCommandParameters.OK && DialogButton == DialogButton.OK) || Command == null ? true : Command.CanExecute(CommandParameter) : true;
+        protected virtual void OnCommandCanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = e.Parameter is DialogWindowCommandParameters parameter ? If(IfCT.Or, IfCM.Logical, IfComp.Equal, parameter, DialogWindowCommandParameters.Cancel, DialogWindowCommandParameters.No) || (parameter == DialogWindowCommandParameters.OK && DialogButton == DialogButton.OK) || Command == null ? true : Command.CanExecute(CommandParameter) : true;
 
         protected virtual void OnCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {

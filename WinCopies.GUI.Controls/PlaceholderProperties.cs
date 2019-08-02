@@ -13,7 +13,7 @@ namespace WinCopies.GUI.Controls
     {
 
         /// <summary>
-        /// The method that is called to set a value to a property. If succeed, then call the <see cref="OnPropertyChanged(string, object, object)"/> method. See the Remarks section.
+        /// The method that is called to set a value to a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method. See the Remarks section.
         /// </summary>
         /// <param name="propertyName">The name of the property to set in a new value into</param>
         /// <param name="fieldName">The name of the field to store the new value. This must the field that is called by the property accessors (get and set).</param>

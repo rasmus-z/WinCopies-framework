@@ -5,6 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using static WinCopies.Util.Util;
+using IfCT = WinCopies.Util.Util.ComparisonType;
+using IfCM = WinCopies.Util.Util.ComparisonMode;
+using IfComp = WinCopies.Util.Util.Comparison;
 
 namespace WinCopies.IO
 {
@@ -135,7 +138,7 @@ namespace WinCopies.IO
 
 #endif
 
-                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, paths[i], _shellObject.Name, _shellObject.GetDisplayName(DisplayNameType.RelativeToParent)))
+                                if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], _shellObject.Name, _shellObject.GetDisplayName(DisplayNameType.RelativeToParent)))
 
                                 {
 
