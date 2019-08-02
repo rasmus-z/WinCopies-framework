@@ -29,6 +29,7 @@ WinCopies.Util (2.0)
 	- Classes:
 		- EnumComparer
 		- ArrayAndListBuilder class to build arrays, lists and observable collections like the .Net's StringBuilder does.
+		- Comparer classes and interfaces for sorting support.
 	- Methods:
 		- Static methods:
 			- 'SetField' static method.

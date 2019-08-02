@@ -111,6 +111,7 @@
     <Compile Include="BackgroundWorker.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Collections\Comparers.cs" />
     <Compile Include="Data\CheckableObject.cs" />
     <Compile Include="Commands\CommandAction.cs" />
     <Compile Include="Commands\Commands.cs" />
@@ -135,7 +136,7 @@
     <Compile Include="Data\VisibilityToBooleanConverter.cs" />
     <Compile Include="Data\VisibilityToReversedBooleanConverter.cs" />
     <Compile Include="Date.cs" />
-    <Compile Include="EnumComparer.cs" />
+    <Compile Include="Collections\EnumComparer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Generic.xaml.cs">
       <DependentUpon>Generic.xaml</DependentUpon>

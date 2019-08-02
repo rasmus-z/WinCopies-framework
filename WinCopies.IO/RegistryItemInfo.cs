@@ -53,7 +53,7 @@ namespace WinCopies.IO
         public override int Compare(IRegistryItemInfo x, IRegistryItemInfo y)
         {
 
-            int result = GetIf(x.RegistryItemType, y.RegistryItemType, (RegistryItemType _x, RegistryItemType _y) => _x.CompareTo(_y), () => 1, () => -1, () => 0);
+            int result = GetIf(x.RegistryItemType, y.RegistryItemType, (RegistryItemType _x, RegistryItemType _y) => _x.CompareTo(_y), () => -1, () => 1, () => 0);
 
             return result == 0 ? FileSystemObjectComparer.Compare(x, y) : result;
 
