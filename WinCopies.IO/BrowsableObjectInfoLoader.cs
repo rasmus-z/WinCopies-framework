@@ -147,10 +147,6 @@ namespace WinCopies.IO
         public BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation, System.Collections.Generic.IComparer<IFileSystemObject> fileSystemObjectComparer)
         {
 
-            if (fileSystemObjectComparer is null)
-
-                throw new ArgumentNullException(nameof(fileSystemObjectComparer));
-
             WorkerReportsProgress = workerReportsProgress;
 
             WorkerSupportsCancellation = workerSupportsCancellation;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Management;
-using System.Windows;
 using WinCopies.Util;
 
 namespace WinCopies.IO
@@ -56,7 +55,7 @@ namespace WinCopies.IO
         protected override void OnDoWork(DoWorkEventArgs e)
         {
 
-            var arrayBuilder = new ArrayAndListBuilder<PathInfo>();
+            var paths = new ArrayAndListBuilder<PathInfo>();
 
             string _path;
 
@@ -94,7 +93,7 @@ namespace WinCopies.IO
 
                                         if (CheckFilter(_path))
 
-                                            _ = arrayBuilder.AddLast(new PathInfo() { ManagementObject = instance, Path = _path, Name = WMIItemInfo.GetName(instance, WMIItemType.Namespace) });
+                                            _ = paths.AddLast(new PathInfo() { ManagementObject = instance, Path = _path, Name = WMIItemInfo.GetName(instance, WMIItemType.Namespace) });
 
                                     }
 
@@ -150,7 +149,7 @@ namespace WinCopies.IO
 
                                         if (CheckFilter(_path))
 
-                                            _ = arrayBuilder.AddLast(new PathInfo() { ManagementObject = instance, Path = _path, Name = WMIItemInfo.GetName(instance, WMIItemType.Class) });
+                                            _ = paths.AddLast(new PathInfo() { ManagementObject = instance, Path = _path, Name = WMIItemInfo.GetName(instance, WMIItemType.Class) });
 
                                     } while (instances.MoveNext());
 
@@ -215,7 +214,7 @@ namespace WinCopies.IO
 
                                     if (CheckFilter(_path))
 
-                                        _ = arrayBuilder.AddLast(new PathInfo() { ManagementObject = instance, Path = _path, Name = WMIItemInfo.GetName(instance, WMIItemType.Instance) });
+                                        _ = paths.AddLast(new PathInfo() { ManagementObject = instance, Path = _path, Name = WMIItemInfo.GetName(instance, WMIItemType.Instance) });
 
                                 } while (instances.MoveNext());
 
@@ -223,7 +222,8 @@ namespace WinCopies.IO
                             catch (Exception) { }
 
                 }
-                catch (Exception ex)
+
+                catch (Exception)
 
                 {
                     // MessageBox.Show(ex.Message);
@@ -235,26 +235,63 @@ namespace WinCopies.IO
 
             }
 
-            sortedInstances = arrayBuilder.ToList();
 
-            sortedInstances.Sort((ManagementBaseObject x, ManagementBaseObject y) => ((string)x["Name"]).CompareTo((string)y["Name"]));
 
-            sortedInstances.Sort((ManagementBaseObject x, ManagementBaseObject y) => x.ClassPath.Path.CompareTo(y.ClassPath.Path));
+            IEnumerable<PathInfo> pathInfos;
 
-            sortedInstances.Sort((ManagementBaseObject x, ManagementBaseObject y) => x.ClassPath.ClassName.CompareTo(y.ClassPath.ClassName)); // ((string)x["Name"]).CompareTo((string)y["Name"]));
 
-            foreach (ManagementBaseObject item in sortedInstances)
 
-                ReportProgress(0, new WMIItemInfo(item, WMIItemType.Namespace));
+            if (FileSystemObjectComparer == null)
+
+                pathInfos = paths;
+
+            else
+
+            {
+
+                var _paths = paths.ToList();
+
+                _paths.Sort((IComparer<PathInfo>)FileSystemObjectComparer);
+
+                pathInfos = _paths;
+
+            }
+
+
+
+            PathInfo path_;
+
+
+
+            using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
+
+
+
+                while (_paths.MoveNext())
+
+                    try
+
+                    {
+
+                        do
+
+                        {
+
+                            path_ = _paths.Current;
+
+                            // new_Path.LoadThumbnail();
+
+                            ReportProgress(0, path_.IsRoot ? Path.Factory.GetBrowsableObjectInfo() : Path.Factory.GetBrowsableObjectInfo(path_.ManagementObject, path_.WMIItemType));
+
+                        } while (_paths.MoveNext());
+
+                    }
+                    catch (Exception) { }
 
         }
 
         public struct PathInfo : IFileSystemObject
         {
-
-            private IComparer<IFileSystemObject> _comparer;
-
-            public IComparer<IFileSystemObject> Comparer { get => _comparer ?? BrowsableObjectInfo.GetDefaultComparer(); set => _comparer = value; }
 
             /// <summary>
             /// Gets the path of this <see cref="PathInfo"/>.
@@ -278,7 +315,11 @@ namespace WinCopies.IO
 
             public ManagementBaseObject ManagementObject { get; set; }
 
-            public int CompareTo(IFileSystemObject fileSystemObject) => Comparer.Compare(this, fileSystemObject);
+            public bool IsRoot { get; set; }
+
+            public WMIItemType WMIItemType { get; set; }
+
+            public int CompareTo(IFileSystemObject fileSystemObject) => BrowsableObjectInfo.GetDefaultComparer().Compare(this, fileSystemObject);
 
         }
     }

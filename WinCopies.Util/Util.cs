@@ -598,7 +598,7 @@ namespace WinCopies.Util
 
             // We check the comparison type for the 'and' comparison.
 
-            if (comparisonType == ComparisonType.And)
+            if (comparisonType == IfCT.And)
 
             {
 
@@ -608,11 +608,11 @@ namespace WinCopies.Util
 
                     {
 
-                        if (comparisonMode == ComparisonMode.Binary)
+                        if (comparisonMode == IfCM.Binary)
 
                             for (i++; i < values.Array.Length; i++)
 
-                                checkIfComparison(values.GetValue(i));
+                                _ = checkIfComparison(values.GetValue(i));
 
                         return false;
 
@@ -624,7 +624,7 @@ namespace WinCopies.Util
 
             // We check the comparison type for the 'or' comparison.
 
-            else if (comparisonType == ComparisonType.Or)
+            else if (comparisonType == IfCT.Or)
 
             {
 
@@ -634,11 +634,11 @@ namespace WinCopies.Util
 
                     {
 
-                        if (comparisonMode == ComparisonMode.Binary)
+                        if (comparisonMode == IfCM.Binary)
 
                             for (i++; i < values.Array.Length; i++)
 
-                                checkIfComparison(values.GetValue(i));
+                                _ = checkIfComparison(values.GetValue(i));
 
                         return true;
 
@@ -668,11 +668,11 @@ namespace WinCopies.Util
 
                             {
 
-                                if (comparisonMode == ComparisonMode.Binary)
+                                if (comparisonMode == IfCM.Binary)
 
                                     for (i++; i < values.Array.Length; i++)
 
-                                        checkIfComparison(values.GetValue(i));
+                                        _ = checkIfComparison(values.GetValue(i));
 
                                 return false;
 
@@ -690,7 +690,7 @@ namespace WinCopies.Util
 
         }
 
-        private static bool IfInternal(ComparisonType comparisonType, ComparisonMode comparisonMode, CheckIfComparisonDelegate comparisonDelegate, out object key, IIfKeyValuesEnumerable values)
+        private static bool IfInternal(IfCT comparisonType, IfCM comparisonMode, CheckIfComparisonDelegate comparisonDelegate, out object key, IIfKeyValuesEnumerable values)
 
         {
 
@@ -700,7 +700,7 @@ namespace WinCopies.Util
 
             // We check the comparison type for the 'and' comparison.
 
-            if (comparisonType == ComparisonType.And)
+            if (comparisonType == IfCT.And)
 
             {
 
@@ -714,11 +714,11 @@ namespace WinCopies.Util
 
                     {
 
-                        if (comparisonMode == ComparisonMode.Binary)
+                        if (comparisonMode == IfCM.Binary)
 
                             for (i++; i < values.Array.Length; i++)
 
-                                checkIfComparison(_value.Value);
+                                _ = checkIfComparison(_value.Value);
 
                         key = _value.Key;
 
@@ -736,7 +736,7 @@ namespace WinCopies.Util
 
             // We check the comparison type for the 'or' comparison.
 
-            else if (comparisonType == ComparisonType.Or)
+            else if (comparisonType == IfCT.Or)
 
             {
 
@@ -750,11 +750,11 @@ namespace WinCopies.Util
 
                     {
 
-                        if (comparisonMode == ComparisonMode.Binary)
+                        if (comparisonMode == IfCM.Binary)
 
                             for (i++; i < values.Array.Length; i++)
 
-                                checkIfComparison(_value.Value);
+                                _ = checkIfComparison(_value.Value);
 
                         key = _value.Key;
 
@@ -794,11 +794,11 @@ namespace WinCopies.Util
 
                             {
 
-                                if (comparisonMode == ComparisonMode.Binary)
+                                if (comparisonMode == IfCM.Binary)
 
                                     for (i++; i < values.Array.Length; i++)
 
-                                        checkIfComparison(_value.Value);
+                                        _ = checkIfComparison(_value.Value);
 
                                 key = _value.Key;
 
@@ -824,7 +824,7 @@ namespace WinCopies.Util
 
         }
 
-        private static bool IfInternal<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, CheckIfComparisonDelegate<T> comparisonDelegate, IIfValuesEnumerable<T> values)
+        private static bool IfInternal<T>(IfCT comparisonType, IfCM comparisonMode, CheckIfComparisonDelegate<T> comparisonDelegate, IIfValuesEnumerable<T> values)
 
         {
 
@@ -832,7 +832,7 @@ namespace WinCopies.Util
 
             // We check the comparison type for the 'and' comparison.
 
-            if (comparisonType == ComparisonType.And)
+            if (comparisonType == IfCT.And)
 
             {
 
@@ -842,11 +842,11 @@ namespace WinCopies.Util
 
                     {
 
-                        if (comparisonMode == ComparisonMode.Binary)
+                        if (comparisonMode == IfCM.Binary)
 
                             for (i++; i < values.Array.Length; i++)
 
-                                checkIfComparison(values.GetValue(i));
+                                _ = checkIfComparison(values.GetValue(i));
 
                         return false;
 
@@ -858,7 +858,7 @@ namespace WinCopies.Util
 
             // We check the comparison type for the 'or' comparison.
 
-            else if (comparisonType == ComparisonType.Or)
+            else if (comparisonType == IfCT.Or)
 
             {
 
@@ -868,11 +868,11 @@ namespace WinCopies.Util
 
                     {
 
-                        if (comparisonMode == ComparisonMode.Binary)
+                        if (comparisonMode == IfCM.Binary)
 
                             for (i++; i < values.Array.Length; i++)
 
-                                checkIfComparison(values.GetValue(i));
+                                _ = checkIfComparison(values.GetValue(i));
 
                         return true;
 
@@ -902,11 +902,11 @@ namespace WinCopies.Util
 
                             {
 
-                                if (comparisonMode == ComparisonMode.Binary)
+                                if (comparisonMode == IfCM.Binary)
 
                                     for (i++; i < values.Array.Length; i++)
 
-                                        checkIfComparison(values.GetValue(i));
+                                        _ = checkIfComparison(values.GetValue(i));
 
                                 return false;
 
@@ -924,7 +924,7 @@ namespace WinCopies.Util
 
         }
 
-        private static bool IfInternal<TKey, TValue>(ComparisonType comparisonType, ComparisonMode comparisonMode, CheckIfComparisonDelegate<TValue> comparisonDelegate, out TKey key, IIfKeyValuesEnumerable<TKey, TValue> values)
+        private static bool IfInternal<TKey, TValue>(IfCT comparisonType, IfCM comparisonMode, CheckIfComparisonDelegate<TValue> comparisonDelegate, out TKey key, IIfKeyValuesEnumerable<TKey, TValue> values)
 
         {
 
@@ -934,7 +934,7 @@ namespace WinCopies.Util
 
             // We check the comparison type for the 'and' comparison.
 
-            if (comparisonType == ComparisonType.And)
+            if (comparisonType == IfCT.And)
 
             {
 
@@ -948,11 +948,11 @@ namespace WinCopies.Util
 
                     {
 
-                        if (comparisonMode == ComparisonMode.Binary)
+                        if (comparisonMode == IfCM.Binary)
 
                             for (i++; i < values.Array.Length; i++)
 
-                                checkIfComparison(_value.Value);
+                                _ = checkIfComparison(_value.Value);
 
                         key = _value.Key;
 
@@ -970,7 +970,7 @@ namespace WinCopies.Util
 
             // We check the comparison type for the 'or' comparison.
 
-            else if (comparisonType == ComparisonType.Or)
+            else if (comparisonType == IfCT.Or)
 
             {
 
@@ -984,11 +984,11 @@ namespace WinCopies.Util
 
                     {
 
-                        if (comparisonMode == ComparisonMode.Binary)
+                        if (comparisonMode == IfCM.Binary)
 
                             for (i++; i < values.Array.Length; i++)
 
-                                checkIfComparison(_value.Value);
+                                _ = checkIfComparison(_value.Value);
 
                         key = _value.Key;
 
@@ -1028,11 +1028,11 @@ namespace WinCopies.Util
 
                             {
 
-                                if (comparisonMode == ComparisonMode.Binary)
+                                if (comparisonMode == IfCM.Binary)
 
                                     for (i++; i < values.Array.Length; i++)
 
-                                        checkIfComparison(_value.Value);
+                                        _ = checkIfComparison(_value.Value);
 
                                 key = _value.Key;
 

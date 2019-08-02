@@ -274,10 +274,6 @@ namespace WinCopies.IO
         public struct PathInfo : IFileSystemObject
         {
 
-            private IComparer<IFileSystemObject> _comparer;
-
-            public IComparer<IFileSystemObject> Comparer { get => _comparer ?? BrowsableObjectInfo.GetDefaultComparer(); set => _comparer = value; }
-
             public string Path { get; set; }
 
             public string LocalizedName => Name;
@@ -288,7 +284,7 @@ namespace WinCopies.IO
 
             public bool IsValue { get; set; }
 
-            public int CompareTo(IFileSystemObject fileSystemObject) => Comparer.Compare(this, fileSystemObject);
+            public int CompareTo(IFileSystemObject fileSystemObject) => BrowsableObjectInfo.GetDefaultComparer().Compare(this, fileSystemObject);
 
         }
     }

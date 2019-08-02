@@ -93,7 +93,7 @@ namespace WinCopies.Collections
 
     }
 
-    public class EnumSortingComparer : EnumComparer, IComparer<Enum>
+    public class CustomizableEnumSortingTypeComparer : EnumComparer, IComparer<Enum>
 
     {
 

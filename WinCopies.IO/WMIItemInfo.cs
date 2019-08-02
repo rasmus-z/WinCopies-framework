@@ -39,6 +39,8 @@ namespace WinCopies.IO
     public class WMIItemInfo : BrowsableObjectInfo, IWMIItemInfo
     {
 
+        public static WMIItemInfoComparer GetDefaultComparer() => new WMIItemInfoComparer();
+
         public override bool IsRenamingSupported => false;
 
         public ManagementBaseObject ManagementObject { get; }
@@ -71,7 +73,7 @@ namespace WinCopies.IO
 
         }
 
-        public WMIItemInfo() : this(new ManagementClass(@"\\.\ROOT:__NAMESPACE"), WMIItemType.Namespace) => IsRootNode = true;
+        public WMIItemInfo() : this(new ManagementClass(@"\\.\ROOT:__NAMESPACE"), WMIItemType.Namespace, new WMIItemInfoFactory()) => IsRootNode = true;
 
         public WMIItemInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType) : this(managementObject, wmiItemType, new WMIItemInfoFactory()) { }
 

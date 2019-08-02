@@ -13,8 +13,6 @@ namespace WinCopies.IO
 
     {
 
-        IComparer<IFileSystemObject> Comparer { get; set; }
-
         /// <summary>
         /// Gets the path of this <see cref="IFileSystemObject"/>.
         /// </summary>

@@ -20,29 +20,7 @@ namespace WinCopies.IO
 
         public static FileSystemObjectComparer GetDefaultComparer() => new FileSystemObjectComparer();
 
-        private System.Collections.Generic.IComparer<IFileSystemObject> _comparer;
-
-        public System.Collections.Generic.IComparer<IFileSystemObject> Comparer
-        {
-            get => _comparer; set
-
-            {
-
-                if (ItemsLoader?.IsBusy == true)
-
-                    throw new InvalidOperationException($"The {nameof(ItemsLoader)} is busy.");
-
-                if (value is null)
-
-                    throw new ArgumentNullException(nameof(value));
-
-                _comparer = value;
-
-            }
-
-        }
-
-        public virtual int CompareTo(IFileSystemObject fileSystemObject) => Comparer.Compare(this, fileSystemObject);
+        public virtual int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
 
         internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
 
@@ -167,9 +145,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="path">The path of this <see cref="BrowsableObjectInfo"/>.</param>
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-        public BrowsableObjectInfo(string path, FileType fileType) : this(path, fileType, GetDefaultComparer()) { }
-
-        public BrowsableObjectInfo(string path, FileType fileType, System.Collections.Generic.IComparer<IFileSystemObject> comparer)
+        public BrowsableObjectInfo(string path, FileType fileType)
 
         {
 
@@ -178,8 +154,6 @@ namespace WinCopies.IO
             FileType = fileType;
 
             Items = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(items);
-
-            Comparer = comparer;
 
         }
 
