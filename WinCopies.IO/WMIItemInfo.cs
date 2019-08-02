@@ -39,6 +39,8 @@ namespace WinCopies.IO
     public class WMIItemInfo : BrowsableObjectInfo, IWMIItemInfo
     {
 
+        public override bool IsRenamingSupported => false;
+
         public ManagementBaseObject ManagementObject { get; }
 
         public static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
@@ -246,9 +248,11 @@ namespace WinCopies.IO
 
         private WMILoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMILoader(workerReportsProgress, workerSupportsCancellation, WMIItemTypes.Namespace | WMIItemTypes.Class | WMIItemTypes.Instance) { Path = this });
 
+#pragma warning disable IDE0067 // Dispose objects before losing scope
         public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItems();
 
         public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItemsAsync();
+#pragma warning restore IDE0067 // Dispose objects before losing scope
 
         /// <summary>
         /// Not implemented.

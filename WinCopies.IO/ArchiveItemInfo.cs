@@ -30,6 +30,8 @@ namespace WinCopies.IO
     public class ArchiveItemInfo : ArchiveItemInfoProvider, IArchiveItemInfo
     {
 
+        public override bool IsRenamingSupported => false;
+
         /// <summary>
         /// Gets the localized path of this <see cref="ArchiveItemInfo"/>.
         /// </summary>

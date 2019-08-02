@@ -91,6 +91,16 @@ namespace WinCopies.Collections
 
         public SortingType SortingType { get; set; }
 
+        protected abstract int CompareOverride(T x, T y);
+
+        public sealed override int Compare(T x, T y)
+        {
+
+            int result = CompareOverride(x, y);
+
+            return SortingType == SortingType.Ascending ? result : -result;
+
+        }
     }
 
 }

@@ -17,6 +17,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using WinCopies.Collections;
 using static WinCopies.Util.Generic;
 
 namespace WinCopies.Util
@@ -56,7 +57,7 @@ namespace WinCopies.Util
 
         //}
 
-        //public static bool Contains(this IEnumerable array, object value, IComparer comparer) => array.Contains(value, (object x, object y) => comparer.Compare(x, y));
+        //public static bool Contains(this IEnumerable array, object value, System.Collections.Generic.IComparer comparer) => array.Contains(value, (object x, object y) => comparer.Compare(x, y));
 
         //public static bool Contains(this IEnumerable array, object value, Comparison comparison)
 
@@ -96,7 +97,7 @@ namespace WinCopies.Util
 
         //}
 
-        //public static bool Contains(this object[] array, object value, IComparer comparer, out int index) => array.Contains(value, (object x, object y) => comparer.Compare(x, y), out index);
+        //public static bool Contains(this object[] array, object value, System.Collections.Generic.IComparer comparer, out int index) => array.Contains(value, (object x, object y) => comparer.Compare(x, y), out index);
 
         //public static bool Contains(this object[] array, object value, Comparison comparison, out int index)
 
@@ -128,9 +129,9 @@ namespace WinCopies.Util
 
         //public static bool ContainsRange(this IEnumerable array, IEqualityComparer comparer, IEnumerable values);
 
-        //public static bool ContainsRange(this IEnumerable array, IComparer comparer, params object[] values);
+        //public static bool ContainsRange(this IEnumerable array, System.Collections.Generic.IComparer comparer, params object[] values);
 
-        //public static bool ContainsRange(this IEnumerable array, IComparer comparer, IEnumerable values);
+        //public static bool ContainsRange(this IEnumerable array, System.Collections.Generic.IComparer comparer, IEnumerable values);
 
         //public static bool ContainsRange(this IEnumerable array, Comparison comparison, params object[] values);
 
@@ -144,9 +145,9 @@ namespace WinCopies.Util
 
         //public static bool ContainsRange(this IEnumerable array, IEqualityComparer comparer, out int index, IEnumerable values);
 
-        //public static bool ContainsRange(this IEnumerable array, IComparer comparer, out int index, params object[] values);
+        //public static bool ContainsRange(this IEnumerable array, System.Collections.Generic.IComparer comparer, out int index, params object[] values);
 
-        //public static bool ContainsRange(this IEnumerable array, IComparer comparer, out int index, IEnumerable values);
+        //public static bool ContainsRange(this IEnumerable array, System.Collections.Generic.IComparer comparer, out int index, IEnumerable values);
 
         //public static bool ContainsRange(this IEnumerable array, Comparison comparison, out int index, params object[] values);
 
@@ -156,7 +157,7 @@ namespace WinCopies.Util
 
         //public static bool Contains<T>(this IEnumerable<T> array, T value, IEqualityComparer comparer);
 
-        //public static bool Contains<T>(this IEnumerable<T> array, T value, IComparer comparer);
+        //public static bool Contains<T>(this IEnumerable<T> array, T value, System.Collections.Generic.IComparer comparer);
 
         //public static bool Contains<T>(this IEnumerable<T> array, T value, Comparison comparison);
 
@@ -164,7 +165,7 @@ namespace WinCopies.Util
 
         //public static bool Contains<T>(this IEnumerable<T> array, T value, IEqualityComparer comparer, out int index);
 
-        //public static bool Contains<T>(this IEnumerable<T> array, T value, IComparer comparer, out int index);
+        //public static bool Contains<T>(this IEnumerable<T> array, T value, System.Collections.Generic.IComparer comparer, out int index);
 
         //public static bool Contains<T>(this IEnumerable<T> array, T value, Comparison comparison, out int index);
 
@@ -172,7 +173,7 @@ namespace WinCopies.Util
 
         //public static bool ContainsRange<T>(this IEnumerable<T> array, IEqualityComparer comparer, params T[] values);
 
-        //public static bool ContainsRange<T>(this IEnumerable<T> array, IComparer comparer, params T[] values);
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, System.Collections.Generic.IComparer comparer, params T[] values);
 
         //public static bool ContainsRange<T>(this IEnumerable<T> array, Comparison comparison, params T[] values);
 
@@ -180,7 +181,7 @@ namespace WinCopies.Util
 
         //public static bool ContainsRange<T>(this IEnumerable<T> array, IEqualityComparer comparer, out int index, params T[] values);
 
-        //public static bool ContainsRange<T>(this IEnumerable<T> array, IComparer comparer, out int index, params T[] values);
+        //public static bool ContainsRange<T>(this IEnumerable<T> array, System.Collections.Generic.IComparer comparer, out int index, params T[] values);
 
         //public static bool ContainsRange<T>(this IEnumerable<T> array, Comparison comparison, out int index, params T[] values);
 
@@ -202,7 +203,7 @@ namespace WinCopies.Util
 
             if (collection.Contains(value)) return false;
 
-            collection.Add(value);
+            _ = collection.Add(value);
 
             return true;
 
@@ -1002,7 +1003,7 @@ namespace WinCopies.Util
 
             for (i = startIndex; i < count; i++)
 
-                arrayList.Add(array[i]);
+                _ = arrayList.Add(array[i]);
 
             return arrayList;
 
@@ -1095,11 +1096,11 @@ namespace WinCopies.Util
         public static object[] AppendLong(this Array array, params Array[] arrays) => Util.ConcatenateLong((object[])array, arrays);
 
         /// <summary>
-        /// Sorts an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.
+        /// Sorts an <see cref="System.Collections.ObjectModel.System.Collections.ObjectModel.ObservableCollection{T}"/>.
         /// </summary>
-        /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
-        /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
-        public static void Sort<T>(this ObservableCollection<T> oc)
+        /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
+        /// <param name="oc">The <see cref="System.Collections.ObjectModel.System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
+        public static void Sort<T>(this System.Collections.ObjectModel.ObservableCollection<T> oc)
 
         {
 
@@ -1116,8 +1117,8 @@ namespace WinCopies.Util
         /// </summary>
         /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
         /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
-        /// <param name="comparer">An <see cref="IComparer{T}"/> providing comparison for sorting the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</param>
-        public static void Sort<T>(this ObservableCollection<T> oc, IComparer<T> comparer)
+        /// <param name="comparer">An <see cref="System.Collections.Generic.IComparer{T}"/> providing comparison for sorting the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</param>
+        public static void Sort<T>(this System.Collections.ObjectModel.ObservableCollection<T> oc, System.Collections.Generic.IComparer<T> comparer)
 
         {
 
@@ -1186,11 +1187,11 @@ namespace WinCopies.Util
         /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom comparer.
         /// </summary>
         /// <param name="array">The array to browse</param>
-        /// <param name="comparer">The <see cref="IComparer"/> used to compare the values</param>
+        /// <param name="comparer">The <see cref="System.Collections.IComparer"/> used to compare the values</param>
         /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
-        public static bool ContainsOneValue(this IEnumerable array, IComparer comparer, out bool containsMoreThanOneValue, params object[] values)
+        public static bool ContainsOneValue(this IEnumerable array, System.Collections.IComparer comparer, out bool containsMoreThanOneValue, params object[] values)
 
         {
 
@@ -1308,11 +1309,11 @@ namespace WinCopies.Util
         /// Checks whether an array contains at least one value of a given array using a custom comparer.
         /// </summary>
         /// <param name="array">The array to browse</param>
-        /// <param name="comparer">The <see cref="IComparer"/> used to compare the values</param>
+        /// <param name="comparer">The <see cref="System.Collections.IComparer"/> used to compare the values</param>
         /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
-        public static bool ContainsOneOrMoreValues(this IEnumerable array, IComparer comparer, out bool containsMoreThanOneValue, params object[] values)
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, System.Collections.IComparer comparer, out bool containsMoreThanOneValue, params object[] values)
 
         {
 
@@ -1400,10 +1401,10 @@ namespace WinCopies.Util
         /// Checks whether an array contains at least one value of a given array using a custom comparer.
         /// </summary>
         /// <param name="array">The array to browse</param>
-        /// <param name="comparer">The <see cref="IComparer"/> used to compare the values</param>
+        /// <param name="comparer">The <see cref="System.Collections.IComparer"/> used to compare the values</param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
-        public static bool ContainsOneOrMoreValues(this IEnumerable array, IComparer comparer, params object[] values)
+        public static bool ContainsOneOrMoreValues(this IEnumerable array, System.Collections.IComparer comparer, params object[] values)
 
         {
 
@@ -1507,10 +1508,10 @@ namespace WinCopies.Util
         /// Checks whether an array contains all values of a given array using a custom comparer.
         /// </summary>
         /// <param name="array">The array to browse</param>
-        /// <param name="comparer">The <see cref="IComparer"/> used to compare the values</param>
+        /// <param name="comparer">The <see cref="System.Collections.IComparer"/> used to compare the values</param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
-        public static bool Contains(this IEnumerable array, IComparer comparer, params object[] values)
+        public static bool Contains(this IEnumerable array, System.Collections.IComparer comparer, params object[] values)
 
         {
 
@@ -1619,11 +1620,11 @@ namespace WinCopies.Util
         /// Checks whether an array contains <i>exactly</i> one value of a given array using a custom comparer.
         /// </summary>
         /// <param name="array">The array to browse</param>
-        /// <param name="comparer">The <see cref="IComparer{T}"/> used to compare the values</param>
+        /// <param name="comparer">The <see cref="System.Collections.Generic.IComparer{T}"/> used to compare the values</param>
         /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
-        public static bool ContainsOneValue<T>(this IEnumerable<T> array, IComparer<T> comparer, out bool containsMoreThanOneValue, params T[] values)
+        public static bool ContainsOneValue<T>(this IEnumerable<T> array, System.Collections.Generic.IComparer<T> comparer, out bool containsMoreThanOneValue, params T[] values)
 
         {
 
@@ -1730,11 +1731,11 @@ namespace WinCopies.Util
         /// Checks whether an array contains at least one value of a given array using a custom comparer.
         /// </summary>
         /// <param name="array">The array to browse</param>
-        /// <param name="comparer">The <see cref="IComparer{T}"/> used to compare the values</param>
+        /// <param name="comparer">The <see cref="System.Collections.Generic.IComparer{T}"/> used to compare the values</param>
         /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
-        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, IComparer<T> comparer, out bool containsMoreThanOneValue, params T[] values)
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, System.Collections.Generic.IComparer<T> comparer, out bool containsMoreThanOneValue, params T[] values)
 
         {
 
@@ -1822,10 +1823,10 @@ namespace WinCopies.Util
         /// Checks whether an array contains at least one value of a given array using a custom comparer.
         /// </summary>
         /// <param name="array">The array to browse</param>
-        /// <param name="comparer">The <see cref="IComparer{T}"/> used to compare the values</param>
+        /// <param name="comparer">The <see cref="System.Collections.Generic.IComparer{T}"/> used to compare the values</param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
-        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, IComparer<T> comparer, params T[] values)
+        public static bool ContainsOneOrMoreValues<T>(this IEnumerable<T> array, System.Collections.Generic.IComparer<T> comparer, params T[] values)
 
         {
 
@@ -1929,10 +1930,10 @@ namespace WinCopies.Util
         /// Checks whether an array contains all values of a given array using a custom comparer.
         /// </summary>
         /// <param name="array">The array to browse</param>
-        /// <param name="comparer">The <see cref="IComparer{T}"/> used to compare the values</param>
+        /// <param name="comparer">The <see cref="System.Collections.Generic.IComparer{T}"/> used to compare the values</param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if at least one value has been found, otherwise <see langword="false"/>.</returns>
-        public static bool Contains<T>(this IEnumerable<T> array, IComparer<T> comparer, params T[] values)
+        public static bool Contains<T>(this IEnumerable<T> array, System.Collections.Generic.IComparer<T> comparer, params T[] values)
 
         {
 
@@ -2475,7 +2476,7 @@ namespace WinCopies.Util
 
             FieldInfo field = GetField(fieldName, declaringType, bindingFlags);
 
-            IDisposable previousValue = (IDisposable)field.GetValue(obj);
+            var previousValue = (IDisposable)field.GetValue(obj);
 
             if (!CheckPropertySetIntegrity(declaringType, propertyName, out string methodName, 3, bindingFlags))
 
@@ -2513,7 +2514,7 @@ namespace WinCopies.Util
 
             PropertyInfo property = GetProperty(propertyName, declaringType, bindingFlags);
 
-            IDisposable previousValue = (IDisposable)property.GetValue(obj);
+            var previousValue = (IDisposable)property.GetValue(obj);
 
             if (!property.CanWrite || property.SetMethod == null)
 

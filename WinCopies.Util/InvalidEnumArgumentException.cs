@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using WinCopies.Collections;
 
 namespace WinCopies.Util
 {
@@ -135,7 +136,7 @@ namespace WinCopies.Util
         /// <returns>A text string describing the details of the exception. The value of this property takes one of two forms: Condition Value The paramName is a null reference (Nothing in Visual Basic) or of zero length. The message string passed to the constructor. The paramName is not null reference (Nothing in Visual Basic) and it has a length greater than zero. The message string appended with the name of the invalid parameter.</returns>
         public override string Message => _message ?? base.Message;
 
-        private string _paramName;
+        private readonly string _paramName;
 
         /// <summary>
         /// Gets the name of the parameter that causes this exception.

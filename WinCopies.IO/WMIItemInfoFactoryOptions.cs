@@ -21,7 +21,7 @@ namespace WinCopies.IO
     public class WMIItemInfoFactoryOptions : IWMIItemInfoFactoryOptions
     {
 
-        internal IBrowsableObjectInfoLoader _wmiItemsLoader;
+        internal IBrowsableObjectInfoLoader<IWMIItemInfo> _wmiItemsLoader;
 
         private ConnectionOptions _connectionOptions;
 

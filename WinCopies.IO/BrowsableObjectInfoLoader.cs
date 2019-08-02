@@ -17,11 +17,11 @@ namespace WinCopies.IO
 
         private readonly BackgroundWorker backgroundWorker = new BackgroundWorker();
 #pragma warning disable CS0649 // Set up using reflection
-        private readonly IComparer<IFileSystemObject> _fileSystemObjectComparer;
+        private readonly System.Collections.Generic.IComparer<IFileSystemObject> _fileSystemObjectComparer;
         private readonly IEnumerable<string> _filter;
 #pragma warning restore CS0649
 
-        public IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoLoader<TPath>), true); }
+        public System.Collections.Generic.IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoLoader<TPath>), true); }
 
         //public void changePath(IBrowsableObjectInfo newValue)
 
@@ -144,14 +144,18 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
-        public BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer)
+        public BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation, System.Collections.Generic.IComparer<IFileSystemObject> fileSystemObjectComparer)
         {
+
+            if (fileSystemObjectComparer is null)
+
+                throw new ArgumentNullException(nameof(fileSystemObjectComparer));
 
             WorkerReportsProgress = workerReportsProgress;
 
             WorkerSupportsCancellation = workerSupportsCancellation;
 
-            FileSystemObjectComparer = fileSystemObjectComparer;
+            FileSystemObjectComparer = fileSystemObjectComparer ;
 
             ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
 
@@ -369,7 +373,7 @@ namespace WinCopies.IO
 
             if (disposePath)
 
-                Path.Dispose(true);
+                Path.Dispose();
 
         }
 

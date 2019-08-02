@@ -20,9 +20,9 @@ namespace WinCopies.IO
 
         public static FileSystemObjectComparer GetDefaultComparer() => new FileSystemObjectComparer();
 
-        private IComparer<IFileSystemObject> _comparer;
+        private System.Collections.Generic.IComparer<IFileSystemObject> _comparer;
 
-        public IComparer<IFileSystemObject> Comparer
+        public System.Collections.Generic.IComparer<IFileSystemObject> Comparer
         {
             get => _comparer; set
 
@@ -144,7 +144,9 @@ namespace WinCopies.IO
         /// </summary>
         public virtual ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; } = null;
 
+#pragma warning disable IDE0069 // Disposed in the Dispose() method.
         private IBrowsableObjectInfo _parent = null;
+#pragma warning restore IDE0069
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -167,7 +169,7 @@ namespace WinCopies.IO
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
         public BrowsableObjectInfo(string path, FileType fileType) : this(path, fileType, GetDefaultComparer()) { }
 
-        public BrowsableObjectInfo(string path, FileType fileType, IComparer<IFileSystemObject> comparer)
+        public BrowsableObjectInfo(string path, FileType fileType, System.Collections.Generic.IComparer<IFileSystemObject> comparer)
 
         {
 
@@ -341,16 +343,9 @@ namespace WinCopies.IO
         /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
-        public virtual void Dispose() => Dispose(false, true);
+        public virtual void Dispose() => Dispose(true, true, true, true);
 
-        /// <summary>
-        /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
-        /// </summary>
-        /// <param name="disposeItemsLoader">Whether to dispose the <see cref="ItemsLoader"/>s of the current path and its parent and items. If this parameter is set to <see langword="true"/>, the <see cref="ItemsLoader"/>s will also be disposed recursively.</param>
-        /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
-        public virtual void Dispose(bool disposeItemsLoader) => Dispose(disposeItemsLoader, true);
-
-        private void Dispose(bool disposeItemsLoader, bool disposeParentBrowsableObjectInfo)
+        public void Dispose(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
 
         {
 
@@ -362,15 +357,34 @@ namespace WinCopies.IO
 
             if (disposeItemsLoader && ItemsLoader != null)
 
+            {
+
                 ItemsLoader.Dispose(false);
 
-            if (disposeParentBrowsableObjectInfo && Parent != null)
+                ItemsLoader.Path = null;
 
-                Parent.Dispose(disposeItemsLoader);
+            }
 
-            foreach (IBrowsableObjectInfo browsableObjectInfo in Items)
+            if (disposeParent && Parent != null)
 
-                browsableObjectInfo.Dispose(disposeItemsLoader);
+            {
+
+                Parent.Dispose(disposeItemsLoader, disposeItems, recursively, recursively);
+
+                Parent = null;
+
+            }
+
+            if (disposeItems)
+
+                while (items.Count > 0)
+                {
+
+                    Items[0].Dispose(disposeItemsLoader, recursively, false, recursively);
+
+                    items.RemoveAt(0);
+
+                }
 
             IsDisposing = false;
 

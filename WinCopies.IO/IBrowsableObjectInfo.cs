@@ -132,7 +132,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="disposeItemsLoader">Whether to dispose the <see cref="ItemsLoader"/>s of the current path and its parent and items. If this parameter is set to <see langword="true"/>, the <see cref="ItemsLoader"/>s will also be disposed recursively.</param>
         /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
-        void Dispose(bool disposeItemsLoader);
+        void Dispose(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively);
 
     }
 

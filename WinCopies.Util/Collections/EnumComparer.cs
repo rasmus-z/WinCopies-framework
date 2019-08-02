@@ -87,9 +87,9 @@ namespace WinCopies.Collections
 
         }
 
-        private protected virtual int CompareOverride(Enum x, Enum y) => x.CompareTo(y);
+        private protected virtual int CompareOverrideInternal(Enum x, Enum y) => x.CompareTo(y);
 
-        public sealed override int Compare(Enum x, Enum y) => CompareOverride(x, y);
+        protected sealed override int CompareOverride(Enum x, Enum y) => CompareOverride(x, y);
 
     }
 
@@ -117,7 +117,7 @@ namespace WinCopies.Collections
 
         }
 
-        private protected sealed override int CompareOverride(Enum x, Enum y) 
+        private protected sealed override int CompareOverrideInternal(Enum x, Enum y) 
         {
 
             int result = base.CompareOverride(x, y); 

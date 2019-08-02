@@ -10,7 +10,6 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WinCopies.Util;
-using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
@@ -38,28 +37,6 @@ namespace WinCopies.IO
 
     }
 
-    public class RegistryItemInfoComparer : Comparer<IRegistryItemInfo>
-
-    {
-
-        private FileSystemObjectComparer _fileSystemObjectComparer;
-
-        public FileSystemObjectComparer FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetField(nameof(_fileSystemObjectComparer), value, typeof(RegistryItemInfoComparer), paramName: nameof(value), setOnlyIfNotNull: true, throwIfNull: true); }
-
-        public RegistryItemInfoComparer() : this(BrowsableObjectInfo.GetDefaultComparer()) { }
-
-        public RegistryItemInfoComparer(FileSystemObjectComparer fileSystemObjectComparer) => FileSystemObjectComparer = fileSystemObjectComparer;
-
-        public override int Compare(IRegistryItemInfo x, IRegistryItemInfo y)
-        {
-
-            int result = GetIf(x.RegistryItemType, y.RegistryItemType, (RegistryItemType _x, RegistryItemType _y) => _x.CompareTo(_y), () => -1, () => 1, () => 0);
-
-            return result == 0 ? FileSystemObjectComparer.Compare(x, y) : result;
-
-        }
-    }
-
     /// <summary>
     /// Represents a Windows registry item that can be used with interoperability with the other <see cref="IBrowsableObjectInfo"/> objects.
     /// </summary>
@@ -67,6 +44,8 @@ namespace WinCopies.IO
     {
 
         public static RegistryItemInfoComparer GetDefaultComparer() => new RegistryItemInfoComparer();
+
+        public    override    bool IsRenamingSupported => false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
