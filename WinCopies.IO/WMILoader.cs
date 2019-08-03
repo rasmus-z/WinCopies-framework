@@ -59,11 +59,29 @@ namespace WinCopies.IO
 
             string _path;
 
+            bool dispose = false;
+
+#pragma warning disable IDE0019 // Pattern Matching
+            var managementClass = Path.ManagementObject as ManagementClass;
+#pragma warning restore IDE0019 // Pattern Matching
+
+            if (managementClass == null)
+
+            {
+
+                dispose = true;
+
+#pragma warning disable IDE0067 // Disposing objects before losing scope
+                managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
+#pragma warning restore IDE0067 // Disposing objects before losing scope
+
+            }
+
             if (Path.WMIItemType == WMIItemType.Namespace)
 
             {
 
-                ManagementClass managementClass = Path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
+                managementClass = Path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
 
                 if (WMIItemTypes.HasFlag(WMIItemTypes.Namespace))
 
@@ -169,28 +187,8 @@ namespace WinCopies.IO
 
             {
 
-                bool dispose = false;
-
-                ManagementClass managementClass = null;
-
                 try
                 {
-
-#pragma warning disable IDE0019 // Pattern Matching
-                    managementClass = Path.ManagementObject as ManagementClass;
-#pragma warning restore IDE0019 // Pattern Matching
-
-                    if (managementClass == null)
-
-                    {
-
-                        dispose = true;
-
-#pragma warning disable IDE0067 // Disposing objects before losing scope
-                        managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
-#pragma warning restore IDE0067 // Disposing objects before losing scope
-
-                    }
 
                     managementClass.Get();
 

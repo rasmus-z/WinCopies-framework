@@ -206,57 +206,57 @@ namespace WinCopies.Util
 
         #region 'Throw' methods
 
-        private static void ThrowOnInvalidIfMethodArg(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison)
+        private static void ThrowOnInvalidIfMethodArg(IfCT comparisonType, IfCM comparisonMode, IfComp comparison)
 
         {
 
             ThrowOnNotValidEnumValue(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual)
+            if (comparison == IfComp.ReferenceEqual)
 
-                throw new InvalidEnumArgumentException(nameof(comparison), (int)Comparison.ReferenceEqual, typeof(Comparison));
+                throw new InvalidEnumArgumentException(nameof(comparison), (int)IfComp.ReferenceEqual, typeof(IfComp));
 
         }
 
-        private static void ThrowOnInvalidEqualityIfMethodEnumValue(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison)
+        private static void ThrowOnInvalidEqualityIfMethodEnumValue(IfCT comparisonType, IfCM comparisonMode, IfComp comparison)
 
         {
 
             ThrowOnNotValidEnumValue(comparisonType, comparisonMode);
 
-            if (!(comparison == WinCopies.Util.Util.Comparison.Equal || comparison == Comparison.NotEqual || comparison == Comparison.ReferenceEqual))
+            if (!(comparison == IfComp.Equal || comparison == IfComp.NotEqual || comparison == IfComp.ReferenceEqual))
 
                 // todo:
 
-                throw new ArgumentException($"{comparison} must be equal to {nameof(WinCopies.Util.Util.Comparison.Equal)}, {nameof(Comparison.NotEqual)} or {nameof(Comparison.ReferenceEqual)}");
+                throw new ArgumentException($"{comparison} must be equal to {nameof(IfComp.Equal)}, {nameof(IfComp.NotEqual)} or {nameof(IfComp.ReferenceEqual)}");
 
         }
 
-        private static void ThrowOnInvalidEqualityIfMethodArg(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, Type valueType, EqualityComparison comparisonDelegate)
+        private static void ThrowOnInvalidEqualityIfMethodArg(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, Type valueType, EqualityComparison comparisonDelegate)
 
         {
 
             ThrowOnInvalidEqualityIfMethodEnumValue(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual && comparisonDelegate != null)
+            if (comparison == IfComp.ReferenceEqual && comparisonDelegate != null)
 
-                throw new ArgumentException($"{nameof(comparisonDelegate)} have to be set to null in order to use this method with the {nameof(Comparison.ReferenceEqual)} enum value.");
+                throw new ArgumentException($"{nameof(comparisonDelegate)} have to be set to null in order to use this method with the {nameof(IfComp.ReferenceEqual)} enum value.");
 
-            if (comparison == Comparison.ReferenceEqual && !valueType.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
+            if (comparison == IfComp.ReferenceEqual && !valueType.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
 
         }
 
-        private static void ThrowOnInvalidEqualityIfMethodArg<T>(ComparisonType comparisonType, ComparisonMode comparisonMode, Comparison comparison, EqualityComparison<T> comparisonDelegate)
+        private static void ThrowOnInvalidEqualityIfMethodArg<T>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, EqualityComparison<T> comparisonDelegate)
 
         {
 
             ThrowOnInvalidEqualityIfMethodEnumValue(comparisonType, comparisonMode, comparison);
 
-            if (comparison == Comparison.ReferenceEqual && comparisonDelegate != null)
+            if (comparison == IfComp.ReferenceEqual && comparisonDelegate != null)
 
-                throw new ArgumentException($"{nameof(comparisonDelegate)} have to be set to null in order to use this method with the {nameof(Comparison.ReferenceEqual)} enum value.");
+                throw new ArgumentException($"{nameof(comparisonDelegate)} have to be set to null in order to use this method with the {nameof(IfComp.ReferenceEqual)} enum value.");
 
-            if (comparison == Comparison.ReferenceEqual && !typeof(T).IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
+            if (comparison == IfComp.ReferenceEqual && !typeof(T).IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
 
         }
 
@@ -264,34 +264,34 @@ namespace WinCopies.Util
 
         #region 'Check comparison' methods
 
-        private static bool CheckIfComparison(Comparison comparison, bool predicateResult, int result)
+        private static bool CheckIfComparison(IfComp comparison, bool predicateResult, int result)
         {
             switch (comparison)
 
             {
 
-                case WinCopies.Util.Util.Comparison.Equal:
-                case Comparison.ReferenceEqual:
+                case IfComp.Equal:
+                case IfComp.ReferenceEqual:
 
                     return predicateResult && result == 0;
 
-                case Comparison.LesserOrEqual:
+                case IfComp.LesserOrEqual:
 
                     return result <= 0;
 
-                case Comparison.GreaterOrEqual:
+                case IfComp.GreaterOrEqual:
 
                     return result >= 0;
 
-                case Comparison.Lesser:
+                case IfComp.Lesser:
 
                     return !predicateResult && result < 0;
 
-                case Comparison.Greater:
+                case IfComp.Greater:
 
                     return !predicateResult && result > 0;
 
-                case Comparison.NotEqual:
+                case IfComp.NotEqual:
 
                     return !predicateResult && result != 0;
 
@@ -302,24 +302,24 @@ namespace WinCopies.Util
             }
         }
 
-        private static bool CheckEqualityComparison(Comparison comparison, object value, object valueToCompare, bool predicateResult, EqualityComparison comparisonDelegate)
+        private static bool CheckEqualityComparison(IfComp comparison, object value, object valueToCompare, bool predicateResult, EqualityComparison comparisonDelegate)
         {
 
-            if (comparison == Comparison.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
+            if (comparison == IfComp.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
 
             switch (comparison)
 
             {
 
-                case WinCopies.Util.Util.Comparison.Equal:
+                case IfComp.Equal:
 
                     return predicateResult && comparisonDelegate(value, valueToCompare);
 
-                case Comparison.NotEqual:
+                case IfComp.NotEqual:
 
                     return !predicateResult && !comparisonDelegate(value, valueToCompare);
 
-                case Comparison.ReferenceEqual:
+                case IfComp.ReferenceEqual:
 
 #pragma warning disable IDE0002
                     return object.ReferenceEquals(value, valueToCompare);
@@ -333,7 +333,7 @@ namespace WinCopies.Util
 
         }
 
-        private static bool CheckEqualityComparison<T>(Comparison comparison, T value, T valueToCompare, bool predicateResult, EqualityComparison<T> comparisonDelegate)
+        private static bool CheckEqualityComparison<T>(IfComp comparison, T value, T valueToCompare, bool predicateResult, EqualityComparison<T> comparisonDelegate)
         {
 
             // Because we've already checked that for the 'T' type in the 'If' method and assuming that 'T' is the base type of all the values to test, if 'T' is actually a class, we don't need to check here if the type of the current value is actually a class when comparison is set to ReferenceEqual.
@@ -342,15 +342,15 @@ namespace WinCopies.Util
 
             {
 
-                case WinCopies.Util.Util.Comparison.Equal:
+                case IfComp.Equal:
 
                     return predicateResult && comparisonDelegate(value, valueToCompare);
 
-                case Comparison.NotEqual:
+                case IfComp.NotEqual:
 
                     return !predicateResult && !comparisonDelegate(value, valueToCompare);
 
-                case Comparison.ReferenceEqual:
+                case IfComp.ReferenceEqual:
 
 #pragma warning disable IDE0002
                     return object.ReferenceEquals(value, valueToCompare);
@@ -590,7 +590,7 @@ namespace WinCopies.Util
 
         #endregion
 
-        private static bool IfInternal(ComparisonType comparisonType, ComparisonMode comparisonMode, CheckIfComparisonDelegate comparisonDelegate, IIfValuesEnumerable values)
+        private static bool IfInternal(IfCT comparisonType, IfCM comparisonMode, CheckIfComparisonDelegate comparisonDelegate, IIfValuesEnumerable values)
 
         {
 
@@ -662,8 +662,6 @@ namespace WinCopies.Util
 
                         for (i++; i < values.Array.Length; i++)
 
-                        {
-
                             if (checkIfComparison(values.GetValue(i)))
 
                             {
@@ -677,8 +675,6 @@ namespace WinCopies.Util
                                 return false;
 
                             }
-
-                        }
 
                         return true;
 
@@ -790,6 +786,8 @@ namespace WinCopies.Util
 
                         {
 
+                            _value = values.GetValue(i);
+
                             if (checkIfComparison(_value.Value))
 
                             {
@@ -798,7 +796,7 @@ namespace WinCopies.Util
 
                                     for (i++; i < values.Array.Length; i++)
 
-                                        _ = checkIfComparison(_value.Value);
+                                        _ = checkIfComparison(values.GetValue(i).Value);
 
                                 key = _value.Key;
 
@@ -896,8 +894,6 @@ namespace WinCopies.Util
 
                         for (i++; i < values.Array.Length; i++)
 
-                        {
-
                             if (checkIfComparison(values.GetValue(i)))
 
                             {
@@ -911,8 +907,6 @@ namespace WinCopies.Util
                                 return false;
 
                             }
-
-                        }
 
                         return true;
 
@@ -1024,6 +1018,8 @@ namespace WinCopies.Util
 
                         {
 
+                            _value = values.GetValue(i);
+
                             if (checkIfComparison(_value.Value))
 
                             {
@@ -1032,7 +1028,7 @@ namespace WinCopies.Util
 
                                     for (i++; i < values.Array.Length; i++)
 
-                                        _ = checkIfComparison(_value.Value);
+                                        _ = checkIfComparison(values.GetValue(i).Value);
 
                                 key = _value.Key;
 

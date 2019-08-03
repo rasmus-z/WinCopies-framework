@@ -48,9 +48,9 @@ namespace WinCopies.IO
 
         IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
-        public ArchiveItemInfoProvider(string path, FileType fileType) : this(path, fileType, new ArchiveItemInfoFactory(), GetDefaultComparer()) { }
+        public ArchiveItemInfoProvider(string path, FileType fileType) : this(path, fileType, new ArchiveItemInfoFactory()) { }
 
-        public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory, IComparer<IFileSystemObject> comparer) : base(path, fileType, comparer) => _archiveItemInfoFactory = archiveItemInfoFactory;
+        public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType) => _archiveItemInfoFactory = archiveItemInfoFactory;
 
     }
 }

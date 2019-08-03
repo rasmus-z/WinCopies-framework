@@ -8,6 +8,7 @@ using static WinCopies.Util.Util;
 using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
+using System.Linq;
 
 namespace WinCopies.IO
 {
@@ -30,23 +31,21 @@ namespace WinCopies.IO
 
             string[] paths = path.Split('\\');
 
-            BrowsableObjectInfo browsableObjectInfo;
-
             var shellObject = ShellObject.FromParsingName(paths[0]);
 
-            browsableObjectInfo = Directory.Exists(paths[0])
+#pragma warning disable IDE0068 // Dispose objects before losing scope
+            IBrowsableObjectInfo browsableObjectInfo = Directory.Exists(paths[0])
                 ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile)
                 : File.Exists(paths[0])
                 ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolder.OtherFolderOrFile)
                 : new ShellObjectInfo(shellObject, paths[0], FileType.SpecialFolder, ShellObjectInfo.GetSpecialFolderType(shellObject));
+#pragma warning restore IDE0068 // Dispose objects before losing scope
 
             if (paths.Length == 1)
 
                 return browsableObjectInfo;
 
             bool ok;
-
-            ArchiveLoader ArchiveLoader = null;
 
             // int archiveSubpathsCount = 0;
 
@@ -56,43 +55,49 @@ namespace WinCopies.IO
 
                 ok = false;
 
+                if (If<bool, bool>(IfCT.Xor, IfCM.Logical, IfComp.Equal, out bool key, true, GetKeyValuePair(false, browsableObjectInfo.FileType == FileType.Archive))
+
+                if ( && browsableObjectInfo is ArchiveItemInfo)
+
+                    throw new IOException("The 'Open archive in archive' feature is currently not supported by the WinCopies framework.");
+
                 if (browsableObjectInfo.FileType == FileType.Archive || browsableObjectInfo is ArchiveItemInfo)
 
                 {
 
                     // archiveSubpathsCount++;
 
-                    if (browsableObjectInfo.FileType == FileType.Archive)
+                    ArchiveLoader archiveLoader;
 
-                        ArchiveLoader = new ArchiveLoader(true, false, GetAllEnumFlags<FileTypes>());
+                    archiveLoader = new ArchiveLoader(true, false, GetAllEnumFlags<FileTypes>());
 
-                    ArchiveLoader.Path = browsableObjectInfo;
+                    archiveLoader.Path = browsableObjectInfo;
 
-                    ArchiveLoader.LoadItems();
+                    archiveLoader.LoadItems();
+
+                    archiveLoader.Dispose();
+
+                    archiveLoader = null;
 
                     string s = paths[i].ToLower();
 
-                    foreach (BrowsableObjectInfo _browsableObjectInfo in browsableObjectInfo.Items)
+                    IBrowsableObjectInfo _browsableObjectInfo = browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf('\\') + 1).ToLower() == s);
 
-                        if (_browsableObjectInfo.Path.Substring(_browsableObjectInfo.Path.LastIndexOf('\\') + 1).ToLower() == s)
+                    if (!(_browsableObjectInfo is null))
 
-                        {
+                    {
 
-                            browsableObjectInfo = _browsableObjectInfo;
+                        browsableObjectInfo = _browsableObjectInfo;
 
-                            ok = true;
+                        ok = true;
 
-                            break;
+                        break;
 
-                        }
+                    }
 
                     if (ok)
 
                     {
-
-                        if (browsableObjectInfo.FileType == FileType.Archive && ArchiveLoader != null)
-
-                            throw new IOException("The 'Open archive in archive' feature is currently not supported by the WinCopies framework.");
 
                     }
 

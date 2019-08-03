@@ -12,7 +12,7 @@ namespace WinCopies.IO
 
     {
 
-        System.Collections.Generic.IComparer<IFileSystemObject> FileSystemObjectComparer { get; set; }
+        IComparer<IFileSystemObject> FileSystemObjectComparer { get; set; }
 
         IEnumerable<string> Filter { get; set; }
 
@@ -23,19 +23,19 @@ namespace WinCopies.IO
         void LoadItemsAsync();
 
         /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfoLoader"/>.
+        /// Disposes the current <see cref="IBrowsableObjectInfoLoader{T}"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader"/> is busy and does not support cancellation.</exception>
+        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
         new void Dispose();
 
         /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfoLoader"/> and optionally disposes the related <see cref="Path"/>.
+        /// Disposes the current <see cref="IBrowsableObjectInfoLoader{T}"/> and optionally disposes the related <see cref="Path"/>.
         /// </summary>
         /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
-        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader"/> is busy and does not support cancellation.</exception>
+        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
         void Dispose(bool disposePath);
 
-        TPath Path { get; }
+        TPath Path { get; set; }
 
     }
 

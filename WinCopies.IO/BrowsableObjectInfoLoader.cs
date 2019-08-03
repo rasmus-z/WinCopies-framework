@@ -319,7 +319,7 @@ namespace WinCopies.IO
         /// </summary>
         public TPath Path
         {
-            get => _path; internal set
+            get => _path; set
 
             {
 
