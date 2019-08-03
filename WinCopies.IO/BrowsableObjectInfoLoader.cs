@@ -136,7 +136,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
-        public BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
+        public BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation) : this( path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class using a custom comparer.
@@ -144,14 +144,16 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
-        public BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation, System.Collections.Generic.IComparer<IFileSystemObject> fileSystemObjectComparer)
+        public BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation, System.Collections.Generic.IComparer<IFileSystemObject> fileSystemObjectComparer)
         {
+
+            Path = path;
 
             WorkerReportsProgress = workerReportsProgress;
 
             WorkerSupportsCancellation = workerSupportsCancellation;
 
-            FileSystemObjectComparer = fileSystemObjectComparer ;
+            FileSystemObjectComparer = fileSystemObjectComparer;
 
             ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
 

@@ -34,7 +34,7 @@ namespace WinCopies.IO
             var shellObject = ShellObject.FromParsingName(paths[0]);
 
 #pragma warning disable IDE0068 // Dispose objects before losing scope
-            IBrowsableObjectInfo browsableObjectInfo = Directory.Exists(paths[0])
+            BrowsableObjectInfo browsableObjectInfo = Directory.Exists(paths[0])
                 ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile)
                 : File.Exists(paths[0])
                 ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolder.OtherFolderOrFile)
@@ -45,67 +45,35 @@ namespace WinCopies.IO
 
                 return browsableObjectInfo;
 
-            bool ok;
-
             // int archiveSubpathsCount = 0;
 
             for (int i = 1; i < paths.Length; i++)
 
             {
 
-                ok = false;
+                if (!browsableObjectInfo.IsBrowsable && i < paths.Length - 1)
 
-                if (If<bool, bool>(IfCT.Xor, IfCM.Logical, IfComp.Equal, out bool key, true, GetKeyValuePair(false, browsableObjectInfo.FileType == FileType.Archive))
+                    throw new DirectoryNotFoundException("The path isn't a directory.");
 
-                if ( && browsableObjectInfo is ArchiveItemInfo)
-
-                    throw new IOException("The 'Open archive in archive' feature is currently not supported by the WinCopies framework.");
-
-                if (browsableObjectInfo.FileType == FileType.Archive || browsableObjectInfo is ArchiveItemInfo)
+                if (If(IfCT.Xor, IfCM.Logical, IfComp.Equal, out bool key, true, GetKeyValuePair(false, browsableObjectInfo.FileType == FileType.Archive), GetKeyValuePair(true, browsableObjectInfo is ArchiveItemInfo)))
 
                 {
 
                     // archiveSubpathsCount++;
 
-                    ArchiveLoader archiveLoader;
+                    using (var archiveLoader = new ArchiveLoader((ArchiveItemInfo)browsableObjectInfo, true, false, GetAllEnumFlags<FileTypes>()))
 
-                    archiveLoader = new ArchiveLoader(true, false, GetAllEnumFlags<FileTypes>());
-
-                    archiveLoader.Path = browsableObjectInfo;
-
-                    archiveLoader.LoadItems();
-
-                    archiveLoader.Dispose();
-
-                    archiveLoader = null;
+                        archiveLoader.LoadItems();
 
                     string s = paths[i].ToLower();
 
-                    IBrowsableObjectInfo _browsableObjectInfo = browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf('\\') + 1).ToLower() == s);
-
-                    if (!(_browsableObjectInfo is null))
-
-                    {
-
-                        browsableObjectInfo = _browsableObjectInfo;
-
-                        ok = true;
-
-                        break;
-
-                    }
-
-                    if (ok)
-
-                    {
-
-                    }
-
-                    else
-
-                        throw new FileNotFoundException("The path could not be found.");
+                    browsableObjectInfo = browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf('\\') + 1).ToLower() == s) as BrowsableObjectInfo ?? throw new FileNotFoundException("The path could not be found.");
 
                 }
+
+                else if (key)
+
+                    throw new IOException("The 'Open archive in archive' feature is currently not supported by the WinCopies framework.");
 
                 else
 
@@ -131,47 +99,23 @@ namespace WinCopies.IO
 
                         else
 
-                        {
-
-                            foreach (ShellObject _shellObject in (ShellContainer)shellObject)
-
-                            {
-
 #if DEBUG
 
-                                Debug.WriteLine(_shellObject.GetDisplayName(DisplayNameType.RelativeToParent));
+                        {
 
 #endif
 
-                                if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], _shellObject.Name, _shellObject.GetDisplayName(DisplayNameType.RelativeToParent)))
+                            browsableObjectInfo = new ShellObjectInfo(((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found."), s);
 
-                                {
+#if DEBUG
 
-                                    shellObject = _shellObject;
-
-                                    ok = true;
-
-                                    break;
-
-                                }
-
-                            }
-
-                            if (ok)
-
-                                browsableObjectInfo = new ShellObjectInfo(shellObject, s);
-
-                            else
-
-                                throw new FileNotFoundException("The path could not be found.");
+                            Debug.WriteLine(((ShellObjectInfo)browsableObjectInfo).ShellObject.GetDisplayName(DisplayNameType.RelativeToParent));
 
                         }
 
+#endif
+
                 }
-
-                if (!browsableObjectInfo.IsBrowsable && i < paths.Length - 1)
-
-                    throw new DirectoryNotFoundException("The path isn't a directory.");
 
             }
 
@@ -625,7 +569,7 @@ namespace WinCopies.IO
 
                     if (subPath.EndsWith("%"))
 
-                        stringBuilder.Append(Environment.GetEnvironmentVariable(subPath.Substring(1, subPath.Length - 2)));
+                        _ = stringBuilder.Append(Environment.GetEnvironmentVariable(subPath.Substring(1, subPath.Length - 2)));
 
                     else
 
@@ -633,11 +577,11 @@ namespace WinCopies.IO
 
                 else
 
-                    stringBuilder.Append(subPath);
+                    _ = stringBuilder.Append(subPath);
 
                 if (count < subPaths.Length)
 
-                    stringBuilder.Append('\\');
+                    _ = stringBuilder.Append('\\');
 
             }
 

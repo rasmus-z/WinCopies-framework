@@ -25,6 +25,14 @@ First release
 WinCopies.Util (2.0)
 --------------------
 
+- Major updates:
+	- The BackgroundWorker class now resets its properties in background.
+	- The 'If' methods perform a real 'xor' comparison in binary mode and are faster.
+	- The 'If' methods now set up the out 'key' parameter with the second value and predicate pair that was checked, if any, instead of the default value for the key type when performing a 'xor' comparison.
+	- The ApartmentState, WorkerReportsProgress and WorkerSupportsCancellation properties of the IBackgroundWorker interface are now settable.
+	- The IsNullConverter class now uses the 'is' operator instead of '=='.
+	- The ObservableCollection now calls base methods for avoinding reentrancy.
+
 - Added:
 	- Classes:
 		- EnumComparer
@@ -60,13 +68,6 @@ WinCopies.Util (2.0)
 	- Bug fixed in the BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.
 	- Bug fixed in the BackgroundWorker class: when finalizing, an invalid operation exception was thrown if the BackgroundWorker was busy; now, the BackgroundWorker aborts the working instead of throwing an exception.
 	- Bug fixed in the Is extension method when setting the typeEquality parameter to false.
-
-- Major updates:
-	- The BackgroundWorker class now resets its properties in background.
-	- The 'If' methods perform a real 'xor' comparison in binary mode and are now faster.
-	- The ApartmentState, WorkerReportsProgress and WorkerSupportsCancellation properties of the IBackgroundWorker interface are now settable.
-	- The IsNullConverter class now uses the 'is' operator instead of '=='.
-	- The ObservableCollection now calls base methods for avoinding reentrancy.
 
 - Removals:
 	- The 'performIntegrityCheck' parameter in 'SetProperty' methods has been replaced by the 'throwIfReadOnly' parameter.

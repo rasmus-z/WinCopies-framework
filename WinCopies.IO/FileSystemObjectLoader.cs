@@ -18,9 +18,9 @@ namespace WinCopies.IO
 
         public FileTypes FileTypes { get => _fileTypes; set => this.SetBackgroundWorkerProperty(nameof(FileTypes), nameof(_fileTypes), value, typeof(FileSystemObjectLoader<TPath>), true); }
 
-        public FileSystemObjectLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), fileTypes) { }
+        public FileSystemObjectLoader( TPath path, bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this( path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), fileTypes) { }
 
-        public FileSystemObjectLoader(bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> browsableObjectInfoComparer, FileTypes fileTypes) : base(workerReportsProgress, workerSupportsCancellation, browsableObjectInfoComparer) => _fileTypes = fileTypes;
+        public FileSystemObjectLoader( TPath path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> browsableObjectInfoComparer, FileTypes fileTypes) : base( path, workerReportsProgress, workerSupportsCancellation, browsableObjectInfoComparer) => _fileTypes = fileTypes;
 
         public override bool CheckFilter(string path)
 
