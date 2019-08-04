@@ -1,4 +1,5 @@
 ﻿using System;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
@@ -56,15 +57,9 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="unit">The unit to which one return the size</param>
         /// <returns>The size as the given unit</returns>
-        public double GetValueInUnit(SizeUnit unit)
-
-        {
-
-            return unit == SizeUnit
+        public double GetValueInUnit(SizeUnit unit) => unit == SizeUnit
                 ? Value
                 : unit < SizeUnit ? Value * Math.Pow(1024, (SizeUnit - unit)) : Value / Math.Pow(1024, (unit - SizeUnit));
-
-        }
 
         /// <summary>
         /// The unit of this <see cref="Size"/>.
@@ -109,9 +104,9 @@ namespace WinCopies.IO
 
             {
 
-                _size = _size / 1024;
+                _size /= 1024;
 
-                if (_size < 1) { break; }
+                if (_size < 1) break;
 
                 size = _size;
                 //System.Windows.MessageBox.Show((size < 1).ToString());
@@ -132,10 +127,10 @@ namespace WinCopies.IO
 
         }
 
-        public override bool Equals(object obj) => WinCopies.Util.Util.IsNumber(obj)
+        public override bool Equals(object obj) => IsNumber(obj)
                 ? obj.GetType() == typeof(decimal)
-                    ? (decimal)this.GetValueInUnit(SizeUnit.Byte) == (decimal)obj
-                    : this.GetValueInUnit(SizeUnit.Byte) == (double)obj
+                    ? (decimal)GetValueInUnit(SizeUnit.Byte) == (decimal)obj
+                    : GetValueInUnit(SizeUnit.Byte) == (double)obj
                 : obj is Size ? this == (Size)obj : false;
 
         public override int GetHashCode() => SizeUnit.GetHashCode() ^ Value.GetHashCode();

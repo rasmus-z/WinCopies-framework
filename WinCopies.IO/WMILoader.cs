@@ -37,7 +37,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader( WMIItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, WMIItemTypes wmiItemTypes) : this( path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), wmiItemTypes) { }
+        public WMILoader(WMIItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, WMIItemTypes wmiItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), wmiItemTypes) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class using a custom comparer.
@@ -46,7 +46,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader( WMIItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, WMIItemTypes wmiItemTypes) : base( path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
+        public WMILoader(WMIItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, WMIItemTypes wmiItemTypes) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
 
         protected override void OnPathChanging(BrowsableObjectInfo path) => WinCopies.Util.Util.ThrowIfNotType<IWMIItemInfo>(path, nameof(path));
 
@@ -71,9 +71,9 @@ namespace WinCopies.IO
 
                 dispose = true;
 
-#pragma warning disable IDE0067 // Disposing objects before losing scope
+#pragma warning disable IDE0067 // Dispose objects before losing scope
                 managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
-#pragma warning restore IDE0067 // Disposing objects before losing scope
+#pragma warning restore IDE0067 // Dispose objects before losing scope
 
             }
 
@@ -81,7 +81,7 @@ namespace WinCopies.IO
 
             {
 
-                managementClass = Path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
+                // managementClass = Path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
 
                 if (WMIItemTypes.HasFlag(WMIItemTypes.Namespace))
 
@@ -137,7 +137,7 @@ namespace WinCopies.IO
                     {
 
                         // MessageBox.Show(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length));
-                        managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path.Substring(0, Path.Path.Length - ":__NAMESPACE".Length)), Path.Factory?.Options?.ObjectGetOptions);
+                        // managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path.Substring(0, Path.Path.Length - ":__NAMESPACE".Length)), Path.Factory?.Options?.ObjectGetOptions);
 
                         //#if DEBUG
                         //                        if (Path.Path.Contains("CIM"))
@@ -316,6 +316,10 @@ namespace WinCopies.IO
             public bool IsRoot { get; set; }
 
             public WMIItemType WMIItemType { get; set; }
+
+            public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
+                    ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
+                    : false;
 
             public int CompareTo(IFileSystemObject fileSystemObject) => BrowsableObjectInfo.GetDefaultComparer().Compare(this, fileSystemObject);
 

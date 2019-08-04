@@ -5,11 +5,11 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.Collections
 {
-    public class EnumComparer : Comparer<Enum>
+    public class EnumComparer : System.Collections.Generic.Comparer<Enum>
 
     {
 
-        public virtual int Compare(Enum x, object y)
+        public virtual int CompareToObject(Enum x, object y)
         {
 
             if (IsNumber(y))
@@ -48,7 +48,7 @@ namespace WinCopies.Collections
 
         }
 
-        public virtual int Compare(object x, Enum y)
+        public virtual int CompareToEnum(object x, Enum y)
         {
 
             if (IsNumber(x))
@@ -87,42 +87,46 @@ namespace WinCopies.Collections
 
         }
 
-        private protected virtual int CompareOverrideInternal(Enum x, Enum y) => x.CompareTo(y);
-
-        protected sealed override int CompareOverride(Enum x, Enum y) => CompareOverride(x, y);
+        public override int Compare(Enum x, Enum y) => x.CompareTo(y);
 
     }
 
-    public class CustomizableEnumSortingTypeComparer : EnumComparer, IComparer<Enum>
+    public class CustomizableSortingTypeEnumComparer : EnumComparer, IComparer<Enum>
 
     {
 
         public SortingType SortingType { get; set; }
 
-        public override int Compare(Enum x, object y)
+        protected virtual int CompareToObjectOverride(Enum x, object y) => base.CompareToObject(x, y);
+
+        public sealed override int CompareToObject(Enum x, object y)
         {
 
-            int result = base.Compare(x, y);
+            int result = CompareToObjectOverride(x, y);
 
             return SortingType == SortingType.Ascending ? result : -result;
 
         }
 
-        public override int Compare(object x, Enum y)
+        protected virtual int CompareToEnumOverride(object x, Enum y) => base.CompareToEnum(x, y);
+
+        public sealed override int CompareToEnum(object x, Enum y)
         {
 
-            int result = base.Compare(x, y);
+            int result = CompareToEnumOverride(x, y);
 
             return SortingType == SortingType.Ascending ? result : -result;
 
         }
 
-        private protected sealed override int CompareOverrideInternal(Enum x, Enum y) 
+        protected virtual int CompareOverride(Enum x, Enum y) => base.Compare(x, y);
+
+        public sealed override int Compare(Enum x, Enum y)
         {
 
-            int result = base.CompareOverride(x, y); 
+            int result = CompareOverride(x, y);
 
-            return SortingType == SortingType.Ascending ? result : -result; 
+            return SortingType == SortingType.Ascending ? result : -result;
 
         }
 

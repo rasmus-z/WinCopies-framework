@@ -2936,7 +2936,7 @@ namespace WinCopies.Util
 
             var enumComparer = new EnumComparer();
 
-            int comparisonResult = enumComparer.Compare(@enum, 0);
+            int comparisonResult = enumComparer.CompareToObject(@enum, 0);
 
             object value = @enum.GetNumValue();
 

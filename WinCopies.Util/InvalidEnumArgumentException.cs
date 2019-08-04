@@ -117,7 +117,7 @@ namespace WinCopies.Util
         /// <param name="message">A custom message describing this exception.</param>
         /// <param name="argumentName">The name of the argument that caused the exception.</param>
         /// <param name="invalidValue">The value of the argument that failed.</param>
-        public InvalidEnumArgumentException( string message, string argumentName, Enum invalidValue) : base(argumentName, new EnumComparer().Compare(invalidValue, int.MaxValue) <= 0 ? (int)invalidValue.GetNumValue() : 0, invalidValue.GetType())
+        public InvalidEnumArgumentException( string message, string argumentName, Enum invalidValue) : base(argumentName, new EnumComparer().CompareToObject(invalidValue, int.MaxValue) <= 0 ? (int)invalidValue.GetNumValue() : 0, invalidValue.GetType())
         {
 
             _message = message;

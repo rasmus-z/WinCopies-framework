@@ -373,6 +373,8 @@ namespace WinCopies.IO
 
                 Path.Dispose();
 
+            Path = null;
+
         }
 
     }

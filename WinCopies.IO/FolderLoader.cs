@@ -559,6 +559,10 @@ namespace WinCopies.IO
             /// </summary>
             public FileType FileType { get; set; }
 
+            public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
+                    ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
+                    : false;
+
             public int CompareTo(IFileSystemObject fileSystemObject) => BrowsableObjectInfo.GetDefaultComparer() .Compare(this, fileSystemObject);
 
         }

@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using WinCopies.Util;
 using static WinCopies.Util.Util;
 using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
 using System.Linq;
+using WinCopies.Collections;
+using System.Security;
 
 namespace WinCopies.IO
 {
@@ -17,7 +20,7 @@ namespace WinCopies.IO
     {
         public static readonly string[] EnvironmentPathVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
 
-        public static BrowsableObjectInfo GetBrowsableObjectInfoFromPath(string path)
+        public static BrowsableObjectInfo GetBrowsableObjectInfoFromPath(string path, bool parent/*, bool deepArchiveCheck*/)
 
         {
 
@@ -34,92 +37,126 @@ namespace WinCopies.IO
             var shellObject = ShellObject.FromParsingName(paths[0]);
 
 #pragma warning disable IDE0068 // Dispose objects before losing scope
-            BrowsableObjectInfo browsableObjectInfo = Directory.Exists(paths[0])
-                ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile)
-                : File.Exists(paths[0])
-                ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolder.OtherFolderOrFile)
-                : new ShellObjectInfo(shellObject, paths[0], FileType.SpecialFolder, ShellObjectInfo.GetSpecialFolderType(shellObject));
+                BrowsableObjectInfo browsableObjectInfo = Directory.Exists(paths[0])
+                    ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile)
+                    : File.Exists(paths[0])
+                    ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolder.OtherFolderOrFile)
+                    : new ShellObjectInfo(shellObject, paths[0], FileType.SpecialFolder, ShellObjectInfo.GetSpecialFolderType(shellObject));
 #pragma warning restore IDE0068 // Dispose objects before losing scope
 
-            if (paths.Length == 1)
+                if (paths.Length == 1)
 
-                return browsableObjectInfo;
+                    return browsableObjectInfo;
 
-            // int archiveSubpathsCount = 0;
+                // int archiveSubpathsCount = 0;
 
-            for (int i = 1; i < paths.Length; i++)
+                bool dispose = !parent;
 
-            {
-
-                if (!browsableObjectInfo.IsBrowsable && i < paths.Length - 1)
-
-                    throw new DirectoryNotFoundException("The path isn't a directory.");
-
-                if (If(IfCT.Xor, IfCM.Logical, IfComp.Equal, out bool key, true, GetKeyValuePair(false, browsableObjectInfo.FileType == FileType.Archive), GetKeyValuePair(true, browsableObjectInfo is ArchiveItemInfo)))
+                BrowsableObjectInfo getBrowsableObjectInfo(BrowsableObjectInfo newValue)
 
                 {
 
-                    // archiveSubpathsCount++;
+                    if (dispose)
 
-                    using (var archiveLoader = new ArchiveLoader((ArchiveItemInfo)browsableObjectInfo, true, false, GetAllEnumFlags<FileTypes>()))
+                    {
 
-                        archiveLoader.LoadItems();
+                        var temp = (BrowsableObjectInfo)newValue.Clone();
 
-                    string s = paths[i].ToLower();
+                        browsableObjectInfo.ItemsLoader.Dispose(true);
 
-                    browsableObjectInfo = browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf('\\') + 1).ToLower() == s) as BrowsableObjectInfo ?? throw new FileNotFoundException("The path could not be found.");
+                        return temp;
+
+                    }
+
+                    else
+
+                    {
+
+                        newValue.ItemsLoader.Dispose();
+
+                        return newValue;
+
+                    }
 
                 }
 
-                else if (key)
-
-                    throw new IOException("The 'Open archive in archive' feature is currently not supported by the WinCopies framework.");
-
-                else
+                for (int i = 1; i < paths.Length; i++)
 
                 {
 
-                    shellObject = ((ShellObjectInfo)browsableObjectInfo).ShellObject;
+                    if (!browsableObjectInfo.IsBrowsable && i < paths.Length - 1)
 
-                    string s = shellObject.ParsingName;
+                        throw new DirectoryNotFoundException("The path isn't valid.", browsableObjectInfo);
 
-                    if (!s.EndsWith("\\"))
+                    if (If(IfCT.Xor, IfCM.Logical, IfComp.Equal, out bool key, true, GetKeyValuePair(false, browsableObjectInfo.FileType == FileType.Archive), GetKeyValuePair(true, browsableObjectInfo is ArchiveItemInfo)))
 
-                        s += "\\";
+                    {
 
-                    s += paths[i];
+                        // archiveSubpathsCount++;
 
-                    string _s = s.Replace("\\", "\\\\");
+                        // todo: re-use:
 
-                    if (shellObject.IsFileSystemObject)
+                        using (var archiveLoader = new ArchiveLoader((ArchiveItemInfo)browsableObjectInfo, true, false, GetAllEnumFlags<FileTypes>()))
 
-                        if (Directory.Exists(_s) || File.Exists(_s)) // We also check the files because the path can be an archive.
+                            archiveLoader.LoadItems();
 
-                            browsableObjectInfo = new ShellObjectInfo(ShellObject.FromParsingName(s), s);
+                        string s = paths[i].ToLower();
 
-                        else
+                        browsableObjectInfo = getBrowsableObjectInfo(browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf('\\') + 1).ToLower() == s) as BrowsableObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo));
+
+                    }
+
+                    else if (key && i < paths.Length - 1    /*&& deepArchiveCheck*/)
+
+                        throw new IOException("The 'Open from archive' feature is currently not supported by the WinCopies framework.", browsableObjectInfo);
+
+                    else
+
+                    {
+
+                        shellObject = ((ShellObjectInfo)browsableObjectInfo).ShellObject;
+
+                        string s = shellObject.ParsingName;
+
+                        if (!s.EndsWith("\\"))
+
+                            s += "\\";
+
+                        s += paths[i];
+
+                        string _s = s.Replace("\\", "\\\\");
+
+                    //if (shellObject.IsFileSystemObject)
+
+                    //if (Directory.Exists(_s) || File.Exists(_s)) // We also check the files because the path can be an archive.
+
+                    //    browsableObjectInfo = new ShellObjectInfo(ShellObject.FromParsingName(s), s);
+
+                    //else
+
+                    //#if DEBUG
+
+                    //                    {
+
+                    //#endif
+
+#pragma warning disable IDE0068 // Disposed manually when needed
+                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo(((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo), s));
+#pragma warning restore IDE0068
 
 #if DEBUG
 
-                        {
+                    Debug.WriteLine(((ShellObjectInfo)browsableObjectInfo).ShellObject.GetDisplayName(DisplayNameType.RelativeToParent));
+
+                        //}
 
 #endif
 
-                            browsableObjectInfo = new ShellObjectInfo(((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found."), s);
-
-#if DEBUG
-
-                            Debug.WriteLine(((ShellObjectInfo)browsableObjectInfo).ShellObject.GetDisplayName(DisplayNameType.RelativeToParent));
-
-                        }
-
-#endif
+                    }
 
                 }
 
-            }
-
-            return browsableObjectInfo;
+                return getBrowsableObjectInfo(browsableObjectInfo);
 
         }
 

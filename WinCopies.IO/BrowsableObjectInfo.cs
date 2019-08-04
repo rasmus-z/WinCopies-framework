@@ -292,13 +292,15 @@ namespace WinCopies.IO
         /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
         public abstract IBrowsableObjectInfo Clone();
 
+        public virtual bool Equals(IFileSystemObject fileSystemObject) => Equals((object)fileSystemObject);
+
         /// <summary>
         /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether <b>obj</b> implements the <see cref="IBrowsableObjectInfo"/> interface and both objects references, and <see cref="FileType"/> and <see cref="Path"/> properties are equal.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
-        public override bool Equals(object obj) => obj is IBrowsableObjectInfo _obj
-                ? ReferenceEquals(this, obj) ? true : FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
+        public override bool Equals(object obj) => ReferenceEquals(this, obj)
+                ? true : obj is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
                 : false;
 
         /// <summary>

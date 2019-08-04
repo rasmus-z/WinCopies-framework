@@ -261,6 +261,13 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="newValue"></param>
         public override void Rename(string newValue) => throw new NotImplementedException();
+
+        public override bool Equals(IFileSystemObject fileSystemObject) => Equals( (object) fileSystemObject); 
+
+        public override bool Equals(object obj) => ReferenceEquals(this, obj)
+                ? true : obj is IWMIItemInfo _obj ? WMIItemType == _obj.WMIItemType && Path.ToLower() == _obj.Path.ToLower()
+                : false;
+
     }
 
 }
