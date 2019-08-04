@@ -13,17 +13,17 @@ namespace WinCopies.Data
     public static class ReaderToEntityMapper
     {
 
-        public static T ReaderTo<T>(Func<ReaderToEntityMapperAttribute, string, object> getValueDelegate)
+        public static T ReadTo<T>(Func<ReaderToEntityMapperAttribute, string, object> getValueDelegate)
            where T : class, new()
         {
             var result = new T();
 
-            ReaderTo(result, getValueDelegate);
+            ReadTo(result, getValueDelegate);
 
             return result;
         }
 
-        public static void ReaderTo<T>(T obj, Func<ReaderToEntityMapperAttribute, string, object> getValueDelegate)
+        public static void ReadTo<T>(T obj, Func<ReaderToEntityMapperAttribute, string, object> getValueDelegate)
         {
 
             ReaderToEntityMapperAttribute readerToEntityMapperAttribute;
@@ -46,19 +46,19 @@ namespace WinCopies.Data
             }
         }
 
-        public static T ReaderTo<T>(IDataReader reader)
+        public static T ReadTo<T>(IDataReader reader)
            where T : class, new()
         {
 
             var result = new T();
 
-            ReaderTo(result, reader);
+            ReadTo(result, reader);
 
             return result;
 
         }
 
-        public static void ReaderTo<T>(T obj, IDataReader reader) => ReaderTo(obj, (ReaderToEntityMapperAttribute readerToEntityMapperAttribute, string propName) =>
+        public static void ReadTo<T>(T obj, IDataReader reader) => ReadTo(obj, (ReaderToEntityMapperAttribute readerToEntityMapperAttribute, string propName) =>
         {
 
             object value = reader[readerToEntityMapperAttribute?.TableFieldName ?? propName];
@@ -67,19 +67,19 @@ namespace WinCopies.Data
 
         });
 
-        public static T ReaderTo<T>(XmlNode xmlNode)
+        public static T ReadTo<T>(XmlNode xmlNode)
            where T : class, new()
         {
 
             var result = new T();
 
-            ReaderTo(result, xmlNode);
+            ReadTo(result, xmlNode);
 
             return result;
 
         }
 
-        public static void ReaderTo<T>(T obj, XmlNode xmlNode) => ReaderTo(obj, (ReaderToEntityMapperAttribute readerToEntityMapperAttribute, string propName) =>
+        public static void ReadTo<T>(T obj, XmlNode xmlNode) => ReadTo(obj, (ReaderToEntityMapperAttribute readerToEntityMapperAttribute, string propName) =>
         {
 
             object value = xmlNode[readerToEntityMapperAttribute?.TableFieldName ?? propName];
@@ -88,18 +88,18 @@ namespace WinCopies.Data
 
         });
 
-        public static T ReaderTo<T>(JObject jObject)
+        public static T ReadTo<T>(JObject jObject)
            where T : class, new()
         {
 
             var result = new T();
 
-            ReaderTo(result, jObject);
+            ReadTo(result, jObject);
 
             return result;
 
         }
 
-        public static void ReaderTo<T>(T obj, JObject jObject) => ReaderTo(obj, (ReaderToEntityMapperAttribute readerToEntityMapperAttribute, string propName) => jObject[propName]);
+        public static void ReadTo<T>(T obj, JObject jObject) => ReadTo(obj, (ReaderToEntityMapperAttribute readerToEntityMapperAttribute, string propName) => jObject[propName]);
     }
 }
