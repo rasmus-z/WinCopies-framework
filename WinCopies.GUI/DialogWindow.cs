@@ -8,14 +8,26 @@ using static WinCopies.Util.Util;
 using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
+using System.Windows.Controls;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
     /// <summary>
     /// Represents a common dialog window for WPF.
     /// </summary>
+    [TemplatePart( Name = PART_OkButton, Type = typeof(Button))]
+    [TemplatePart(Name = PART_ApplyButton, Type = typeof(Button))]
+    [TemplatePart(Name = PART_YesButton, Type = typeof(Button))]
+    [TemplatePart(Name = PART_NoButton, Type = typeof(Button))]
+    [TemplatePart(Name = PART_CancelButton, Type = typeof(Button))]
     public partial class DialogWindow : Window, ICommandSource
     {
+
+        private const string PART_OkButton = "PART_OkButton";
+        private const string PART_ApplyButton = "PART_ApplyButton";
+        private const string PART_YesButton = "PART_YesButton";
+        private const string PART_NoButton = "PART_NoButton";
+        private const string PART_CancelButton = "PART_CancelButton";
 
         /// <summary>
         /// Identifies the <see cref="DialogButton"/> dependency property.
@@ -136,22 +148,65 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 
 
-        public DialogWindow() =>
+        public DialogWindow() : this(System.Reflection.Assembly.GetEntryAssembly().GetName().Name) { }
             // InitializeComponent();
 
             // ActionCommand = new WinCopies.Util.DelegateCommand(ActionCommandMethod);
 
-            Init(System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
+        public DialogWindow(string title) => Title = title;
 
-        public DialogWindow(string title) => Init(title);
-
-        private void Init(string title)
-
+        public override void OnApplyTemplate()
         {
 
-            Title = title;
+            base.OnApplyTemplate();
 
-            _ = CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+            switch (DialogButton)
+
+            {
+
+                case DialogButton.OK:
+
+                    _ = (GetTemplateChild(PART_OkButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    break;
+
+                case DialogButton.OKCancel:
+
+                    _ = (GetTemplateChild(PART_OkButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    _ = (GetTemplateChild(PART_CancelButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    break;
+
+                case DialogButton.OKApplyCancel:
+
+                    _ = (GetTemplateChild(PART_OkButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    _ = (GetTemplateChild(PART_ApplyButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    _ = (GetTemplateChild(PART_CancelButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    break;
+
+                case DialogButton.YesNo:
+
+                    _ = (GetTemplateChild(PART_YesButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    _ = (GetTemplateChild(PART_NoButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    break;
+
+                case DialogButton.YesNoCancel:
+
+                    _ = (GetTemplateChild(PART_YesButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    _ = (GetTemplateChild(PART_NoButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    _ = (GetTemplateChild(PART_CancelButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+
+                    break;
+
+            }
 
         }
 
