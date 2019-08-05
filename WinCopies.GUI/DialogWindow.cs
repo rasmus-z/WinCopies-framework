@@ -12,11 +12,8 @@ using IfComp = WinCopies.Util.Util.Comparison;
 namespace WinCopies.GUI.Windows.Dialogs
 {
     /// <summary>
-    /// Logique d'interaction pour DialogBase.xaml. See the remarks section.
+    /// Represents a common dialog window for WPF.
     /// </summary>
-    /// <remarks>
-    /// This class implements the <see cref="Commands.CommonCommand"/> with the following string parameters: OK, Apply, Cancel, Yes, No. For more information about this behavior/design pattern, see the WinCopies website.
-    /// </remarks>
     public partial class DialogWindow : Window, ICommandSource
     {
 
@@ -26,7 +23,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         public static readonly DependencyProperty DialogButtonProperty = DependencyProperty.Register(nameof(DialogButton), typeof(DialogButton), typeof(DialogWindow), new PropertyMetadata(DialogButton.OK, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {
             // MessageBox.Show(e.NewValue.ToString());
-            if (((DialogWindow)d).DefaultButton != DefaultButton.None) throw new Exception("DefaultButton must be set to None in order to perform this action.");
+            if (((DialogWindow)d).DefaultButton != DefaultButton.None) throw new InvalidOperationException($"{nameof(DefaultButton)} must be set to {nameof(DefaultButton.None)} in order to perform this action.");
 
             // ((DialogWindow)d).DefaultButton = DefaultButton.None;
 
@@ -50,11 +47,11 @@ namespace WinCopies.GUI.Windows.Dialogs
         public static readonly DependencyProperty DefaultButtonProperty = DependencyProperty.Register(nameof(DefaultButton), typeof(DefaultButton), typeof(DialogWindow), new PropertyMetadata(DefaultButton.None, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
         {
 
-            DefaultButton defaultButton = (DefaultButton)e.NewValue;
+            var defaultButton = (DefaultButton)e.NewValue;
 
             if (defaultButton == DefaultButton.None) return;
 
-            DialogButton dialogButton = (DialogButton)d.GetValue(DialogButtonProperty);
+            var dialogButton = (DialogButton)d.GetValue(DialogButtonProperty);
 
             void throwArgumentException() => throw new ArgumentException("DefaultButton must be included in DialogButton value.");
 
@@ -154,13 +151,17 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             Title = title;
 
-            CommandBindings.Add(new CommandBinding(Commands.CommonCommand, OnCommandExecuted, OnCommandCanExecute));
+            _ = CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
         }
 
-        protected virtual void OnCommandCanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = e.Parameter is DialogWindowCommandParameters parameter ? If(IfCT.Or, IfCM.Logical, IfComp.Equal, parameter, DialogWindowCommandParameters.Cancel, DialogWindowCommandParameters.No) || (parameter == DialogWindowCommandParameters.OK && DialogButton == DialogButton.OK) || Command == null ? true : Command.CanExecute(CommandParameter) : true;
+        private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnCommandCanExecute(e);
 
-        protected virtual void OnCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        protected virtual void OnCommandCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = e.Parameter is DialogWindowCommandParameters parameter ? If(IfCT.Or, IfCM.Logical, IfComp.Equal, parameter, DialogWindowCommandParameters.Cancel, DialogWindowCommandParameters.No) || (parameter == DialogWindowCommandParameters.OK && DialogButton == DialogButton.OK) || Command == null ? true : Command.CanExecute(CommandParameter) : true;
+
+        private void Command_Executed(object sender, ExecutedRoutedEventArgs e) => OnCommandExecuted(e);
+
+        protected virtual void OnCommandExecuted(ExecutedRoutedEventArgs e)
         {
             if (e.Parameter is DialogWindowCommandParameters d)
 
@@ -176,7 +177,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                     case DialogWindowCommandParameters.Apply:
 
-                        Command.TryExecute(CommandParameter, CommandTarget);
+                        _ = Command.TryExecute(CommandParameter, CommandTarget);
 
                         break;
 

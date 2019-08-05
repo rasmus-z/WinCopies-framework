@@ -3366,17 +3366,33 @@ namespace WinCopies.Util
 
         {
 
-            for (int i = 0; i < s.Length; i++)
+            bool contains(ref int i)
+
+            {
 
                 for (int j = 0; j < value.Length; j++)
 
-                    if (!comparer.Equals(s[i], value[j]))
+                    if (!comparer.Equals(s[i + j], value[j]))
 
-                        break;
+                        return false;
 
-                    else if (j == value.Length - 1)
+                return true;
 
-                        return true;
+            }
+
+            for (int i = 0; i < s.Length; i++)
+
+            {
+
+                if (value.Length > s.Length - i)
+
+                    return false;
+
+                if (contains(ref i))
+
+                    return true;
+
+            }
 
             return false;
 
@@ -3410,25 +3426,47 @@ namespace WinCopies.Util
 
         {
 
-            for (int i = 0; i < s.Length; i++)
+            bool contains(ref int i)
+
+            {
 
                 for (int j = 0; j < value.Length; j++)
 
-                    if (s[i] != value[j])
+                    if (s[i + j] != value[j])
 
-                        break;
+                        return false;
 
-                    else if (j == value.Length - 1)
+                return true;
 
-                    {
+            }
 
-                        index = i;
+            for (int i = 0; i < s.Length; i++)
 
-                        return true;
+            {
 
-                    }
+                if (value.Length > s.Length - i)
 
-            index = default;
+                {
+
+                    index = -1;
+
+                    return false;
+
+                }
+
+                if (contains(ref i))
+
+                {
+
+                    index = i;
+
+                    return true;
+
+                }
+
+            }
+
+            index = -1;
 
             return false;
 
@@ -3461,25 +3499,47 @@ namespace WinCopies.Util
 
         {
 
-            for (int i = 0; i < s.Length; i++)
+            bool contains(ref int i)
+
+            {
 
                 for (int j = 0; j < value.Length; j++)
 
-                    if (!comparer.Equals(s[i], value[j]))
+                    if (!comparer.Equals(s[i + j], value[j]))
 
-                        break;
+                        return false;
 
-                    else if (j == value.Length - 1)
+                return true;
 
-                    {
+            }
 
-                        index = i;
+            for (int i = 0; i < s.Length; i++)
 
-                        return true;
+            {
 
-                    }
+                if (value.Length > s.Length - i)
 
-            index = default;
+                {
+
+                    index = -1;
+
+                    return false;
+
+                }
+
+                if (contains(ref i))
+
+                {
+
+                    index = i;
+
+                    return true;
+
+                }
+
+            }
+
+            index = -1;
 
             return false;
 

@@ -16,13 +16,7 @@ namespace WinCopies.GUI.Windows
         /// <summary>
         /// Identifies the <see cref="ShowHelpButton"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ShowHelpButtonProperty = DependencyProperty.Register(nameof(ShowHelpButton), typeof(bool), typeof(Window), new PropertyMetadata(false, (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
-
-        {
-
-            d.SetValue(IsInHelpModePropertyKey, (bool?)e.NewValue == true ? (bool?)false : null);
-
-        }));
+        public static readonly DependencyProperty ShowHelpButtonProperty = DependencyProperty.Register(nameof(ShowHelpButton), typeof(bool), typeof(Window), new PropertyMetadata(false, (DependencyObject d, DependencyPropertyChangedEventArgs e) => d.SetValue(IsInHelpModePropertyKey, (bool?)e.NewValue == true ? (bool?)false : null)));
 
         public bool ShowHelpButton { get => (bool)GetValue(ShowHelpButtonProperty); set => SetValue(ShowHelpButtonProperty, value); }
 
@@ -64,7 +58,7 @@ namespace WinCopies.GUI.Windows
             {
                 IntPtr hwnd = new WindowInteropHelper(this).Handle;
 
-                WindowUtilities.SetWindow(hwnd, IntPtr.Zero, 0, 0, 0, 0, (WindowStyles)((uint)WindowUtilities.GetWindowStyles(hwnd) & 0xFFFFFFFF ^ ((uint)WindowStyles.MinimizeBox | (uint)WindowStyles.MaximizeBox)), (WindowStylesEx)((uint)WindowUtilities.GetWindowStylesEx(hwnd) | (uint)WindowStylesEx.ContextHelp), SetWindowPositionOptions.NoMove | SetWindowPositionOptions.NoSize | SetWindowPositionOptions.NoZOrder | SetWindowPositionOptions.FrameChanged);
+                WindowUtilities.SetWindow(hwnd, IntPtr.Zero, 0, 0, 0, 0, (WindowStyles)(((uint)WindowUtilities.GetWindowStyles(hwnd) & 0xFFFFFFFF) ^ ((uint)WindowStyles.MinimizeBox | (uint)WindowStyles.MaximizeBox)), (WindowStylesEx)((uint)WindowUtilities.GetWindowStylesEx(hwnd) | (uint)WindowStylesEx.ContextHelp), SetWindowPositionOptions.NoMove | SetWindowPositionOptions.NoSize | SetWindowPositionOptions.NoZOrder | SetWindowPositionOptions.FrameChanged);
 
                 ((HwndSource)PresentationSource.FromVisual(this)).AddHook(OnHelpButtonClickHook);
 

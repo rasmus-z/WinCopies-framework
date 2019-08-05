@@ -65,9 +65,10 @@ WinCopies.Util (2.0)
 		- The WinCopies.Util.Extensions.SetProperty/Field now have multiple new optional parameters to extend the capabilities of these methods.
 
 - Bug fixes:
-	- Bug fixed in the BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.
-	- Bug fixed in the BackgroundWorker class: when finalizing, an invalid operation exception was thrown if the BackgroundWorker was busy; now, the BackgroundWorker aborts the working instead of throwing an exception.
-	- Bug fixed in the Is extension method when setting the typeEquality parameter to false.
+	- BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.
+	- BackgroundWorker class: when finalizing, an invalid operation exception was thrown if the BackgroundWorker was busy; now, the BackgroundWorker aborts the working instead of throwing an exception.
+	- Is extension method: error when setting the typeEquality parameter to false.
+	- String extension methods: unexpected results.
 
 - Removals:
 	- The 'performIntegrityCheck' parameter in 'SetProperty' methods has been replaced by the 'throwIfReadOnly' parameter.
