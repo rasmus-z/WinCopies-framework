@@ -13,6 +13,8 @@ using static WinCopies.IO.FolderLoader;
 namespace WinCopies.IO
 {
 
+    // todo: does not work with encrypted archives
+
     public class ArchiveLoader : FileSystemObjectLoader<ArchiveItemInfoProvider>
     {
 
@@ -93,7 +95,7 @@ namespace WinCopies.IO
         /// <param name="fileTypes">The file types to load.</param>
         public ArchiveLoader( ArchiveItemInfoProvider path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, FileTypes fileTypes) : base( path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes) { }
 
-        protected override void OnPathChanging(BrowsableObjectInfo path)
+        protected override void OnPathChanging(ArchiveItemInfoProvider path)
 
         {
 
@@ -106,8 +108,6 @@ namespace WinCopies.IO
             // PropertyChanged?.Invoke(this, new WinCopies.Util.PropertyChangedEventArgs(nameof(Path), null, path));
 
             // }
-
-            _ = GetOrThrowIfNotType<IArchiveItemInfoProvider>((IBrowsableObjectInfo)path, nameof(path));
 
             /*else*/
             if (path.FileType != FileType.Archive)

@@ -3,7 +3,6 @@ using System.Management;
 
 namespace WinCopies.IO
 {
-    
 
     public class WMIItemInfoFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
     {
@@ -12,12 +11,17 @@ namespace WinCopies.IO
 
         public WMIItemInfoFactoryOptions Options
         {
+
             get => _options; set
             {
 
                 if (Path?.ItemsLoader?.IsBusy == true)
 
                     throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
+
+                _options.Factory = null;
+
+                value.Factory = this;
 
                 _options = value;
 

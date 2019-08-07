@@ -73,6 +73,8 @@ namespace WinCopies.IO
         /// </summary>
         bool IsDisposing { get; }
 
+        bool IsDisposed { get; }    
+
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 
         /// <summary>

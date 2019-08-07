@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Security;
+using System.Security.AccessControl;
 using System.Text;
 using System.Windows;
 using System.Windows.Interop;
@@ -89,7 +90,7 @@ namespace WinCopies.IO
 
             RegistryItemType = RegistryItemType.RegistryKey;
 
-            RegistryKey = registryKey;
+            _registryKey = registryKey;
 
         }
 
@@ -115,7 +116,7 @@ namespace WinCopies.IO
 
             RegistryItemType = RegistryItemType.RegistryKey;
 
-            RegistryKey = Registry.OpenRegistryKey(path);
+            _registryKey = Registry.OpenRegistryKey(path);
 
         }
 
@@ -142,7 +143,7 @@ namespace WinCopies.IO
 
             RegistryItemType = RegistryItemType.RegistryValue;
 
-            RegistryKey = registryKey;
+            _registryKey = registryKey;
 
         }
 
@@ -196,10 +197,34 @@ namespace WinCopies.IO
         /// </summary>
         public RegistryItemType RegistryItemType { get; }
 
+        private RegistryKey _registryKey;
+
         /// <summary>
         /// The <see cref="Microsoft.Win32.RegistryKey"/> that this <see cref="RegistryItemInfo"/> represents.
         /// </summary>
-        public RegistryKey RegistryKey { get; }
+        public RegistryKey RegistryKey
+
+        {
+
+            get
+
+            {
+
+                if (_registryKey is null)
+
+                    OpenRegistryKey();
+
+                return _registryKey;
+
+            }
+
+        }
+
+        public void OpenRegistryKey() => _registryKey = Registry.OpenRegistryKey(Path);
+
+        public void OpenRegistryKey(RegistryKeyPermissionCheck registryKeyPermissionCheck, RegistryRights registryRights) => _registryKey = Registry.OpenRegistryKey(Path, registryKeyPermissionCheck, registryRights);
+
+        public void OpenRegistryKey(bool writable) => _registryKey = Registry.OpenRegistryKey(Path, writable);
 
         /// <summary>
         /// Gets the localized path of this <see cref="RegistryItemInfo"/>.
@@ -250,27 +275,11 @@ namespace WinCopies.IO
         public override IBrowsableObjectInfo Clone()
         {
 
-            switch (RegistryItemType)
+            var browsableObjectInfo = (RegistryItemInfo)base.Clone();
 
-            {
+            browsableObjectInfo._registryKey = null;
 
-                case RegistryItemType.RegistryRoot:
-
-                    return Factory.GetBrowsableObjectInfo();
-
-                case RegistryItemType.RegistryKey:
-
-                    return Factory.GetBrowsableObjectInfo(RegistryKey);
-
-                case RegistryItemType.RegistryValue:
-
-                    return Factory.GetBrowsableObjectInfo(RegistryKey, Name);
-
-                default:
-
-                    return null;
-
-            }
+            return browsableObjectInfo;
 
         }
 
@@ -317,9 +326,9 @@ namespace WinCopies.IO
         /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
-        public override void Dispose()
+        protected override void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
         {
-            base.Dispose();
+            base.DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
 
             RegistryKey.Dispose();
         }

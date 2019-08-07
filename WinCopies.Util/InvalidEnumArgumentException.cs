@@ -55,7 +55,7 @@ namespace WinCopies.Util
         /// <param name="argumentName">The name of the argument that caused the exception.</param>
         /// <param name="invalidValue">The value of the argument that failed.</param>
         /// <param name="enumClass">A <see cref="Type"/> that represents the enumeration class with the valid values.</param>
-        /// <remarks>This constructor will create a localized message saying that the <b>argumentName</b> parameter was invalid because the value passed in was invalid, and that the value should be one of the values in the enumeration class.</remarks>
+        /// <remarks>This constructor will create a localized message saying that the <paramref name="argumentName"/> parameter was invalid because the value passed in was invalid, and that the value should be one of the values in the enumeration class.</remarks>
         public InvalidEnumArgumentException(string argumentName, int invalidValue, Type enumClass) : this(null, argumentName, invalidValue, enumClass) { }
 
         // todo: also for ulong and uint

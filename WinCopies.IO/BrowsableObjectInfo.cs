@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 
@@ -102,6 +103,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates if the items of this <see cref="BrowsableObjectInfo"/> are currently loaded.
         /// </summary>
+        [DefaultValue(false)]
         public bool AreItemsLoaded { get; internal set; }
 
         IBrowsableObjectInfoLoader<IBrowsableObjectInfo> IBrowsableObjectInfo.ItemsLoader => (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)ItemsLoader;
@@ -115,12 +117,12 @@ namespace WinCopies.IO
 
         // internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
 
-        internal readonly ObservableCollection<IBrowsableObjectInfo> items = new ObservableCollection<IBrowsableObjectInfo>();
+        internal ObservableCollection<IBrowsableObjectInfo> items;
 
         /// <summary>
         /// Gets the items of this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        public virtual ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; } = null;
+        public virtual ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; internal set; }
 
 #pragma warning disable IDE0069 // Disposed in the Dispose() method.
         private IBrowsableObjectInfo _parent = null;
@@ -152,6 +154,16 @@ namespace WinCopies.IO
             Path = path;
 
             FileType = fileType;
+
+            SetItemsProperty();
+
+        }
+
+        private void SetItemsProperty()
+
+        {
+
+            items = new ObservableCollection<IBrowsableObjectInfo>();
 
             Items = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(items);
 
@@ -287,15 +299,47 @@ namespace WinCopies.IO
         public abstract void Rename(string newValue);
 
         /// <summary>
-        /// When overridden in a derived class, gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>. How
         /// </summary>
         /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
-        public abstract IBrowsableObjectInfo Clone();
+        public virtual IBrowsableObjectInfo Clone()
+
+        {
+
+            if (IsDisposing)
+
+                throw new InvalidOperationException("The current BrowsableObjectInfo is disposing.");
+
+            if (IsDisposed)
+
+                throw new ObjectDisposedException("The current BrowsableObjectInfo is disposed.");
+
+            var browsableObjectInfo = (BrowsableObjectInfo)MemberwiseClone();
+
+            browsableObjectInfo.AreItemsLoaded = false;
+
+            browsableObjectInfo.ItemsLoaderInternal = null;
+
+            browsableObjectInfo.SetItemsProperty();
+
+            if (browsableObjectInfo.Factory.UseRecursively)
+
+                browsableObjectInfo.Factory = (BrowsableObjectInfoFactory)browsableObjectInfo.Factory.Clone();
+
+            else
+
+                browsableObjectInfo._factory = null;
+
+            browsableObjectInfo._parent = null;
+
+            return browsableObjectInfo;
+
+        }
 
         public virtual bool Equals(IFileSystemObject fileSystemObject) => Equals((object)fileSystemObject);
 
         /// <summary>
-        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether <b>obj</b> implements the <see cref="IBrowsableObjectInfo"/> interface and both objects references, and <see cref="FileType"/> and <see cref="Path"/> properties are equal.
+        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether <paramref name="obj"/> implements the <see cref="IBrowsableObjectInfo"/> interface and both objects references, and <see cref="FileType"/> and <see cref="Path"/> properties are equal.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
@@ -319,13 +363,11 @@ namespace WinCopies.IO
         /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
-        public virtual void Dispose() => Dispose(true, true, true, true);
+        public void Dispose() => Dispose(true, true, true, true);
 
-        public void Dispose(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
+        protected virtual void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
 
         {
-
-            IsDisposing = true;
 
             if (ItemsLoader?.IsBusy == true)
 
@@ -362,9 +404,23 @@ namespace WinCopies.IO
 
                 }
 
+        }
+
+        public void Dispose(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
+
+        {
+
+            IsDisposing = true;
+
+            DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
+
+            IsDisposed = true;
+
             IsDisposing = false;
 
         }
+
+        public bool IsDisposed { get; private set; }
 
     }
 

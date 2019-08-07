@@ -93,28 +93,106 @@ namespace WinCopies.IO
         /// </summary>
         public SpecialFolder SpecialFolder { get; private set; } = SpecialFolder.OtherFolderOrFile;
 
-        /// <summary>
-        /// Gets the <see cref="IO.FileType"/> and <see cref="IO.SpecialFolder"/> for a given path and <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
-        /// </summary>
-        /// <param name="path">The path from which to get the associated <see cref="FileType"/>.</param>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> from which to get the associated <see cref="FileType"/>.</param>
-        /// <returns>The <see cref="FileType"/> and <see cref="IO.SpecialFolder"/> for the given path and <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</returns>
-        public static (FileType fileType, SpecialFolder specialFolder) GetFileType(string path, ShellObject shellObject) => (!shellObject.IsFileSystemObject
-                ? FileType.SpecialFolder
-                : shellObject is FileSystemKnownFolder && ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) && shellObject is ShellFile
-                ? FileType.Archive
-                : shellObject is ShellFile
-                ? shellObject.IsLink
-                    ? FileType.Link
-                    : ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) ? FileType.Archive : FileType.File
-                : System.IO.Path.GetPathRoot(path) == path ? FileType.Drive : FileType.Folder, GetSpecialFolderType(shellObject));
+        ///// <summary>
+        ///// Gets the <see cref="IO.FileType"/> and <see cref="IO.SpecialFolder"/> for a given path and <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
+        ///// </summary>
+        ///// <param name="path">The path from which to get the associated <see cref="FileType"/>.</param>
+        ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> from which to get the associated <see cref="FileType"/>.</param>
+        ///// <returns>The <see cref="FileType"/> and <see cref="IO.SpecialFolder"/> for the given path and <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</returns>
+        //public static (FileType fileType, SpecialFolder specialFolder) GetFileType(string path, ShellObject shellObject) => (!shellObject.IsFileSystemObject
+        //        ? FileType.SpecialFolder
+        //        : shellObject is FileSystemKnownFolder && ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) && shellObject is ShellFile
+        //        ? FileType.Archive
+        //        : shellObject is ShellFile
+        //        ? shellObject.IsLink
+        //            ? FileType.Link
+        //            : ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) ? FileType.Archive : FileType.File
+        //        : System.IO.Path.GetPathRoot(path) == path ? FileType.Drive : FileType.Folder, GetSpecialFolderType(shellObject));
+
+        ///// <summary>
+        ///// Returns the <see cref="IO.SpecialFolder"/> value for a given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
+        ///// </summary>
+        ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> from which to return a <see cref="IO.SpecialFolder"/> value.</param>
+        ///// <returns>A <see cref="IO.SpecialFolder"/> value that correspond to the given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</returns>
+        //public static SpecialFolder GetSpecialFolderType(ShellObject shellObject)
+
+        //{
+
+        //    SpecialFolder? value = null;
+
+        //    PropertyInfo[] knownFoldersProperties = typeof(KnownFolders).GetProperties();
+
+        //    for (int i = 1 ; i < knownFoldersProperties.Length; i++)
+
+        //        try
+        //        {
+
+        //            for (; i < knownFoldersProperties.Length; i++)
+
+        //                if (shellObject.ParsingName == (knownFoldersProperties[i].GetValue(null) as IKnownFolder)?.ParsingName)
+
+        //                    value = (SpecialFolder)typeof(SpecialFolder).GetField(knownFoldersProperties[i].Name).GetValue(null);
+
+        //            break;
+
+        //        }
+
+        //        catch (ShellException) { i++; }
+
+        //    #region Comments
+
+        //    //    else if (shellObject.ParsingName == KnownFolders.MusicLibrary.ParsingName)
+
+        //    //    value = SpecialFolder.MusicLibrary;
+
+        //    //else if (shellObject.ParsingName == KnownFolders.PicturesLibrary.ParsingName)
+
+        //    //    value = SpecialFolder.PicturesLibrary;
+
+        //    //else if (shellObject.ParsingName == KnownFolders.CameraRollLibrary.ParsingName)
+
+        //    //    value = SpecialFolder.CameraRollLibrary;
+
+        //    //else if (shellObject.ParsingName == KnownFolders.SavedPicturesLibrary.ParsingName)
+
+        //    //    value = SpecialFolder.SavedPicturesLibrary;
+
+        //    //else if (shellObject.ParsingName == KnownFolders.RecordedTVLibrary.ParsingName)
+
+        //    //    value = SpecialFolder.RecordedTVLibrary;
+
+        //    //else if (shellObject.ParsingName == KnownFolders.VideosLibrary.ParsingName)
+
+        //    //    value = SpecialFolder.VideosLibrary;
+
+        //    //else if (shellObject.ParsingName == KnownFolders.UsersLibraries.ParsingName)
+
+        //    //    value = SpecialFolder.UsersLibraries;
+
+        //    //else if (shellObject.ParsingName == KnownFolders.Libraries.ParsingName)
+
+        //    //    value = SpecialFolder.Libraries;
+
+        //    //else if (shellObject.ParsingName == KnownFolders.Computer.ParsingName)
+
+        //    //    value = SpecialFolder.Computer;
+
+        //    //else
+
+        //    //    value = SpecialFolder.OtherFolderOrFile;
+
+        //    #endregion
+
+        //    return value ?? SpecialFolder.OtherFolderOrFile;
+
+        //}
 
         /// <summary>
         /// Returns the <see cref="IO.SpecialFolder"/> value for a given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
         /// </summary>
         /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> from which to return a <see cref="IO.SpecialFolder"/> value.</param>
         /// <returns>A <see cref="IO.SpecialFolder"/> value that correspond to the given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</returns>
-        public static SpecialFolder GetSpecialFolderType(ShellObject shellObject)
+        public static SpecialFolder GetSpecialFolder(ShellObject shellObject)
 
         {
 
@@ -122,14 +200,14 @@ namespace WinCopies.IO
 
             PropertyInfo[] knownFoldersProperties = typeof(KnownFolders).GetProperties();
 
-            for (int i = 0; i < knownFoldersProperties.Length; i++)
+            for (int i = 1; i < knownFoldersProperties.Length; i++)
 
                 try
                 {
 
                     for (; i < knownFoldersProperties.Length; i++)
 
-                        if (shellObject.ParsingName == ((IKnownFolder)knownFoldersProperties[i].GetValue(null)).ParsingName)
+                        if (shellObject.ParsingName == knownFoldersProperties[i].Name)
 
                             value = (SpecialFolder)typeof(SpecialFolder).GetField(knownFoldersProperties[i].Name).GetValue(null);
 
@@ -139,71 +217,27 @@ namespace WinCopies.IO
 
                 catch (ShellException) { i++; }
 
-            #region Comments
-
-            //    else if (shellObject.ParsingName == KnownFolders.MusicLibrary.ParsingName)
-
-            //    value = SpecialFolder.MusicLibrary;
-
-            //else if (shellObject.ParsingName == KnownFolders.PicturesLibrary.ParsingName)
-
-            //    value = SpecialFolder.PicturesLibrary;
-
-            //else if (shellObject.ParsingName == KnownFolders.CameraRollLibrary.ParsingName)
-
-            //    value = SpecialFolder.CameraRollLibrary;
-
-            //else if (shellObject.ParsingName == KnownFolders.SavedPicturesLibrary.ParsingName)
-
-            //    value = SpecialFolder.SavedPicturesLibrary;
-
-            //else if (shellObject.ParsingName == KnownFolders.RecordedTVLibrary.ParsingName)
-
-            //    value = SpecialFolder.RecordedTVLibrary;
-
-            //else if (shellObject.ParsingName == KnownFolders.VideosLibrary.ParsingName)
-
-            //    value = SpecialFolder.VideosLibrary;
-
-            //else if (shellObject.ParsingName == KnownFolders.UsersLibraries.ParsingName)
-
-            //    value = SpecialFolder.UsersLibraries;
-
-            //else if (shellObject.ParsingName == KnownFolders.Libraries.ParsingName)
-
-            //    value = SpecialFolder.Libraries;
-
-            //else if (shellObject.ParsingName == KnownFolders.Computer.ParsingName)
-
-            //    value = SpecialFolder.Computer;
-
-            //else
-
-            //    value = SpecialFolder.OtherFolderOrFile;
-
-            #endregion
-
             return value ?? SpecialFolder.OtherFolderOrFile;
 
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class.
-        /// </summary>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
-        public ShellObjectInfo(ShellObject shellObject, string path) : this(shellObject, path, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="ShellObjectInfo"/> class.
+        ///// </summary>
+        ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
+        ///// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
+        //public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder) : this(shellObject, path, fileType, specialFolder, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class using custom factories for <see cref="ShellObjectInfo"/> and <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
-        /// <param name="shellObjectInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent casual file system items.</param>
-        /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
-        public ShellObjectInfo(ShellObject shellObject, string path, ShellObjectInfoFactory shellObjectInfoFactory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, GetFileType(path, shellObject).fileType, archiveItemInfoFactory) =>
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="ShellObjectInfo"/> class using custom factories for <see cref="ShellObjectInfo"/> and <see cref="ArchiveItemInfo"/>.
+        ///// </summary>
+        ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
+        ///// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
+        ///// <param name="shellObjectInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent casual file system items.</param>
+        ///// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
+        //public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder, ShellObjectInfoFactory shellObjectInfoFactory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, archiveItemInfoFactory) =>
 
-            Init(shellObject, nameof(FileType), GetFileType(path, shellObject).specialFolder, shellObjectInfoFactory);
+        //    Init(shellObject, nameof(FileType), specialFolder, shellObjectInfoFactory);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/>.
@@ -253,6 +287,25 @@ namespace WinCopies.IO
 
             SpecialFolder = specialFolder;
 
+            SetFileSystemInfoProperties(shellObject, false);
+
+        }
+
+        private void SetFileSystemInfoProperties(ShellObject shellObject, bool reinit)
+        {
+
+            if (reinit)
+
+            {
+
+                FileSystemInfoProperties = null;
+
+                DriveInfoProperties = null;
+
+                KnownFolderInfo = null;
+
+            }
+
             if (FileType == FileType.Folder || (FileType == FileType.SpecialFolder && shellObject.IsFileSystemObject))
 
                 FileSystemInfoProperties = new DirectoryInfo(Path);
@@ -296,7 +349,33 @@ namespace WinCopies.IO
 
                     string _parent = parentDirectoryInfo.FullName;
 
-                    return Factory.GetBrowsableObjectInfo(ShellObject.FromParsingName(_parent), _parent);
+                    var shellObject = ShellObject.FromParsingName(_parent);
+
+                    FileType fileType;
+
+                    SpecialFolder specialFolder;
+
+                    if (shellObject.IsFileSystemObject)
+
+                    {
+
+                        fileType = FileType.Folder;
+
+                        specialFolder = SpecialFolder.OtherFolderOrFile;
+
+                    }
+
+                    else
+
+                    {
+
+                        fileType = FileType.SpecialFolder;
+
+                        specialFolder = GetSpecialFolder(shellObject);
+
+                    }
+
+                    return Factory.GetBrowsableObjectInfo(shellObject, _parent, fileType, specialFolder);
 
                 }
 
@@ -330,17 +409,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader( this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader( this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
             }
 
             else
 
-                LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader( this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
             //else
 
@@ -378,17 +457,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader( this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader( this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
             }
 
             else
 
-                LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader( this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
             //else
 
@@ -415,10 +494,10 @@ namespace WinCopies.IO
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public override void Dispose()
+        protected override void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
         {
 
-            base.Dispose();
+            base.DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
 
             ShellObject.Dispose();
 
@@ -492,8 +571,18 @@ namespace WinCopies.IO
         /// Gets a new <see cref="ShellObjectInfo"/> that represents the same item that the current <see cref="ShellObjectInfo"/>.
         /// </summary>
         /// <returns>An <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
-        public override IBrowsableObjectInfo Clone() => Factory.GetBrowsableObjectInfo(ShellObject.FromParsingName(ShellObject.ParsingName), Path, FileType, SpecialFolder);
+        public override IBrowsableObjectInfo Clone()
+        {
 
+            var browsableObjectInfo = (ShellObjectInfo)base.Clone();
+
+            browsableObjectInfo.ShellObject = ShellObject.FromParsingName(browsableObjectInfo.ShellObject.ParsingName);
+
+            browsableObjectInfo.SetFileSystemInfoProperties(browsableObjectInfo.ShellObject, true);
+
+            return browsableObjectInfo;
+
+        }
     }
 
 }

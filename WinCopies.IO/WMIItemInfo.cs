@@ -43,7 +43,7 @@ namespace WinCopies.IO
 
         public override bool IsRenamingSupported => false;
 
-        public ManagementBaseObject ManagementObject { get; }
+        public ManagementBaseObject ManagementObject { get; private set; }
 
         public static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
 
@@ -77,7 +77,7 @@ namespace WinCopies.IO
 
         public WMIItemInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType) : this(managementObject, wmiItemType, new WMIItemInfoFactory()) { }
 
-        public WMIItemInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType, WMIItemInfoFactory wmiItemInfoFactory) : base(GetPath(managementObject, wmiItemType), FileType.SpecialFolder)
+        public WMIItemInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType, WMIItemInfoFactory factory) : base(GetPath(managementObject, wmiItemType), FileType.SpecialFolder)
 
         {
 
@@ -95,11 +95,13 @@ namespace WinCopies.IO
 
                 IsRootNode = true;
 
-            Factory = wmiItemInfoFactory;
+            Factory = factory;
 
         }
 
-        public static WMIItemInfo GetWMIItemInfo(string computerName, string serverClassRelativePath)
+        public static WMIItemInfo GetWMIItemInfo(string serverName, string serverClassRelativePath) => GetWMIItemInfo(serverName, serverClassRelativePath, new WMIItemInfoFactory());
+
+        public static WMIItemInfo GetWMIItemInfo(string serverName, string serverClassRelativePath, WMIItemInfoFactory factory)
 
         {
 
@@ -107,7 +109,7 @@ namespace WinCopies.IO
 
             _ = stringBuilder.Append(@"\\");
 
-            _ = stringBuilder.Append(computerName);
+            _ = stringBuilder.Append(serverName);
 
             _ = stringBuilder.Append(@"\");
 
@@ -115,7 +117,7 @@ namespace WinCopies.IO
 
             _ = stringBuilder.Append(":__NAMESPACE");
 
-            return new WMIItemInfo(new ManagementClass(stringBuilder.ToString()), WMIItemType.Namespace);
+            return new WMIItemInfo(new ManagementClass(stringBuilder.ToString()), WMIItemType.Namespace, factory);
 
         }
 
@@ -205,7 +207,16 @@ namespace WinCopies.IO
 
         public new WMIItemInfoFactory Factory { get => (WMIItemInfoFactory)base.Factory; set => base.Factory = value; }
 
-        public override IBrowsableObjectInfo Clone() => Factory.GetBrowsableObjectInfo((ManagementBaseObject)ManagementObject.Clone(), WMIItemType);
+        public override IBrowsableObjectInfo Clone()
+        {
+
+            var browsableObjectInfo = (WMIItemInfo)base.Clone();
+
+            browsableObjectInfo.ManagementObject = (ManagementBaseObject)ManagementObject.Clone();
+
+            return browsableObjectInfo;
+
+        }
 
         protected override IBrowsableObjectInfo GetParent()
         {
@@ -248,7 +259,7 @@ namespace WinCopies.IO
 
         }
 
-        private WMILoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMILoader( this, workerReportsProgress, workerSupportsCancellation, WMIItemTypes.Namespace | WMIItemTypes.Class | WMIItemTypes.Instance) { Path = this });
+        private WMILoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMILoader(this, workerReportsProgress, workerSupportsCancellation, WMIItemTypes.Namespace | WMIItemTypes.Class | WMIItemTypes.Instance) { Path = this });
 
 #pragma warning disable IDE0067 // Dispose objects before losing scope
         public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItems();
@@ -262,11 +273,20 @@ namespace WinCopies.IO
         /// <param name="newValue"></param>
         public override void Rename(string newValue) => throw new NotImplementedException();
 
-        public override bool Equals(IFileSystemObject fileSystemObject) => Equals( (object) fileSystemObject); 
+        public override bool Equals(IFileSystemObject fileSystemObject) => Equals((object)fileSystemObject);
 
         public override bool Equals(object obj) => ReferenceEquals(this, obj)
                 ? true : obj is IWMIItemInfo _obj ? WMIItemType == _obj.WMIItemType && Path.ToLower() == _obj.Path.ToLower()
                 : false;
+
+        protected override void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
+        {
+
+            base.DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
+
+            ManagementObject.Dispose();
+
+        }
 
     }
 

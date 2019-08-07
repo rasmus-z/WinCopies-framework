@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace WinCopies.IO
 {
-    public interface IWMIItemInfoFactoryOptions
+    public interface IWMIItemInfoFactoryOptions : ICloneable
     {
+
+        IWMIItemInfoFactory Factory { get; }
 
         ConnectionOptions ConnectionOptions { get; set; }
 
@@ -21,7 +23,7 @@ namespace WinCopies.IO
     public class WMIItemInfoFactoryOptions : IWMIItemInfoFactoryOptions
     {
 
-        internal IBrowsableObjectInfoLoader<IWMIItemInfo> _wmiItemsLoader;
+        public IWMIItemInfoFactory Factory { get; internal set; }
 
         private ConnectionOptions _connectionOptions;
 
@@ -44,7 +46,7 @@ _connectionOptions = value;
         {
             get => ConnectionOptionsOverride; set
             {
-                if (_wmiItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
+                if (Factory?.Path?.ItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
 
                 ConnectionOptionsOverride = value;
             }
@@ -68,7 +70,7 @@ _connectionOptions = value;
 
             get => ObjectGetOptionsOverride; set
             {
-                if (_wmiItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
+                if (Factory?.Path?.ItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
 
                 ObjectGetOptionsOverride = value;
             }
@@ -91,10 +93,28 @@ _connectionOptions = value;
         {
             get => EnumerationOptionsOverride; set
             {
-                if (_wmiItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
+                if (Factory?.Path?.ItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
 
                 EnumerationOptionsOverride = value;
             }
+        }
+
+        public virtual object Clone()
+
+        {
+
+            var options = (WMIItemInfoFactoryOptions)MemberwiseClone();
+
+            options.Factory = null;
+
+            options._connectionOptions = (ConnectionOptions) options.ConnectionOptions.Clone();
+
+            options._enumerationOptions = (EnumerationOptions) options.EnumerationOptions.Clone();
+
+            options._objectGetOptions = (ObjectGetOptions) options.ObjectGetOptions.Clone();
+
+            return options;
+
         }
 
     }

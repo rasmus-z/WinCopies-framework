@@ -10,7 +10,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides common properties for <see cref="IBrowsableObjectInfo"/> factories.
     /// </summary>
-    public interface IBrowsableObjectInfoFactory
+    public interface IBrowsableObjectInfoFactory : ICloneable
 
     {
 
@@ -22,7 +22,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Whether to add the current <see cref="IBrowsableObjectInfoFactory"/> to all the new objects created from this <see cref="IBrowsableObjectInfoFactory"/>.
         /// </summary>
-        bool UseCurrentFactoryRecursively { get; set; }
+        bool UseRecursively { get; set; }
 
     }
 

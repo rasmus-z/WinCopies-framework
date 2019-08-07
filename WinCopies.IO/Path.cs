@@ -41,7 +41,7 @@ namespace WinCopies.IO
                     ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile)
                     : File.Exists(paths[0])
                     ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolder.OtherFolderOrFile)
-                    : new ShellObjectInfo(shellObject, paths[0], FileType.SpecialFolder, ShellObjectInfo.GetSpecialFolderType(shellObject));
+                    : new ShellObjectInfo(shellObject, paths[0], FileType.SpecialFolder, ShellObjectInfo.GetSpecialFolder(shellObject));
 #pragma warning restore IDE0068 // Dispose objects before losing scope
 
                 if (paths.Length == 1)

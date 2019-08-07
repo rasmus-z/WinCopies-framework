@@ -52,5 +52,21 @@ namespace WinCopies.IO
 
         public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType) => _archiveItemInfoFactory = archiveItemInfoFactory;
 
+        public override IBrowsableObjectInfo Clone()
+        {
+
+            var browsableObjectInfo = (ArchiveItemInfoProvider)base.Clone();
+
+            if (browsableObjectInfo.ArchiveItemInfoFactory.UseRecursively)
+
+                browsableObjectInfo.ArchiveItemInfoFactory = (ArchiveItemInfoFactory) browsableObjectInfo.ArchiveItemInfoFactory.Clone();
+
+            else
+
+                browsableObjectInfo._archiveItemInfoFactory = null;
+
+            return browsableObjectInfo;
+
+        }
     }
 }

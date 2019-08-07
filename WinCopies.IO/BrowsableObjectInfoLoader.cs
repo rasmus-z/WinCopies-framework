@@ -49,12 +49,12 @@ namespace WinCopies.IO
         private void ItemsChanging(object sender, NotifyCollectionChangedEventArgs e) => OnItemsChanging(e);
 
         /// <summary>
-        /// Provides ability for classes that derive from this one to do operations when the path is changing and to throw if the path is not from an expected type.
+        /// Provides ability for classes that derive from this one to do operations when the path is changing.
         /// </summary>
         /// <param name="path">The new path to set the <see cref="Path"/> property with.</param>
-        protected abstract void OnPathChanging(BrowsableObjectInfo path);
+        protected virtual void OnPathChanging(TPath path) { }
 
-        protected virtual void OnPathChanged(BrowsableObjectInfo path)
+        protected virtual void OnPathChanged(TPath path)
         {
 
             ((INotifyCollectionChanging)_path.Items).CollectionChanging -= ItemsChanging;

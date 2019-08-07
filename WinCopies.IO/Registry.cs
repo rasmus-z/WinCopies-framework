@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.AccessControl;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 
@@ -456,21 +457,25 @@ namespace WinCopies.IO
 
         //}
 
-        public static RegistryKey OpenRegistryKey(string path)
+        public static RegistryKey OpenRegistryKey(string name) => OpenRegistryKey(name, RegistryKeyPermissionCheck.Default, RegistryRights.ReadKey);
+
+        public static RegistryKey OpenRegistryKey(string name, bool writable) => writable ?    OpenRegistryKey(name, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.WriteKey) : OpenRegistryKey(name, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
+
+        public static RegistryKey OpenRegistryKey(string name, RegistryKeyPermissionCheck registryKeyPermissionCheck, RegistryRights registryRights)
 
         {
 
-            ThrowIfNullEmptyOrWhiteSpace(path, nameof(path));
+            ThrowIfNullEmptyOrWhiteSpace(name, nameof(name));
 
             string registryKeyName;
 
-            if (path.Contains('\\', out int result))
+            if (name.Contains('\\', out int result))
 
             {
 
-                registryKeyName = path.Substring(0, result);
+                registryKeyName = name.Substring(0, result);
 
-                path = path.Length == 1 ? "" : path.Substring(result + 1);
+                name = name.Length == 1 ? "" : name.Substring(result + 1);
 
             }
 
@@ -478,9 +483,9 @@ namespace WinCopies.IO
 
             {
 
-                registryKeyName = path;
+                registryKeyName = name;
 
-                path = "";
+                name = "";
 
             }
 
@@ -502,9 +507,9 @@ namespace WinCopies.IO
 
             if (If(ComparisonType.Or, ComparisonMode.Logical, WinCopies.Util.Util.Comparison.Equal, out RegistryKey registryKey, registryKeyName, registryKeys))
 
-                return path.Length > 0 ? registryKey.OpenSubKey(path) : registryKey;
+                return name.Length > 0 ? registryKey.OpenSubKey(name, registryKeyPermissionCheck, registryRights) : registryKey;
 
-            else throw new RegistryException(string.Format(Generic.RegistryKeyNotExists, path), path);
+            else throw new RegistryException(string.Format(Generic.RegistryKeyNotExists, name), name);
 
         }
 

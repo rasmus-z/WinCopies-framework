@@ -10,7 +10,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides a base class for <see cref="BrowsableObjectInfo"/> factories.
     /// </summary>
-    public class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
+    public abstract class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
 
     {
 
@@ -19,37 +19,43 @@ namespace WinCopies.IO
         /// </summary>
         public IBrowsableObjectInfo Path { get; internal set; }
 
-        private readonly bool _useCurrentFactoryRecursively;
-
         /// <summary>
         /// Whether to add the current <see cref="BrowsableObjectInfoFactory"/> to all the new objects created from this <see cref="BrowsableObjectInfoFactory"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">On setting: The <see cref="Path"/>'s <see cref="IBrowsableObjectInfo.ItemsLoader"/> of the current <see cref="BrowsableObjectInfoFactory"/> is busy.</exception>
-        public bool UseCurrentFactoryRecursively
+        public bool UseRecursively { get; set; }
+
+        protected virtual void ThrowOnInvalidPropertySet()
+
         {
-            get => _useCurrentFactoryRecursively; set
 
-            {
+            if (Path?.ItemsLoader?.IsBusy == true)
 
-                if (Path?.ItemsLoader?.IsBusy == true)
-
-                    throw new InvalidOperationException($"The Path's ItemsLoader of the current {nameof(BrowsableObjectInfoFactory)} is busy.");
-
-            }
+                throw new InvalidOperationException($"The Path's ItemsLoader of the current {nameof(BrowsableObjectInfoFactory)} is busy.");
 
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class and sets the <see cref="UseCurrentFactoryRecursively"/> property to <see langword="true"/>.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class and sets the <see cref="UseRecursively"/> property to <see langword="true"/>.
         /// </summary>
-        public BrowsableObjectInfoFactory() : this(true) { }
+        public BrowsableObjectInfoFactory() : this(false) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
         /// </summary>
         /// <param name="useRecursively">Whether to add the new <see cref="BrowsableObjectInfoFactory"/> to all the new objects created from the new <see cref="IBrowsableObjectInfoFactory"/>.</param>
-        public BrowsableObjectInfoFactory(bool useRecursively) => _useCurrentFactoryRecursively = useRecursively;
+        public BrowsableObjectInfoFactory(bool useRecursively) => UseRecursively = useRecursively;
 
+        public virtual object Clone()
+        {
+
+            var factory = (BrowsableObjectInfoFactory) MemberwiseClone();
+
+            factory.Path = null;
+
+            return factory;
+
+        }
     }
 
 }

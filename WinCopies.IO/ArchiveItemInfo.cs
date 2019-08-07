@@ -13,6 +13,7 @@ using static WinCopies.Util.Util;
 using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
+using System.Linq;
 
 namespace WinCopies.IO
 {
@@ -78,9 +79,11 @@ namespace WinCopies.IO
 
         //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
-        public ArchiveFileInfo? ArchiveFileInfo { get; }
+        public ArchiveFileInfo? ArchiveFileInfo { get; private set; }
 
-        protected override IShellObjectInfo ArchiveShellObjectOverride { get; } = null;
+        private IShellObjectInfo _archiveShellObject;
+
+        protected override IShellObjectInfo ArchiveShellObjectOverride => _archiveShellObject;
 
         public IShellObjectInfo ArchiveShellObject => ArchiveShellObjectOverride;
 
@@ -117,7 +120,7 @@ namespace WinCopies.IO
 
                 throw new ArgumentException($"'{nameof(path)}' must end with '{nameof(archiveFileInfo.Value.FileName)}'");
 
-            ArchiveShellObjectOverride = archiveShellObject;
+            _archiveShellObject = archiveShellObject;
 
 #if DEBUG 
 
@@ -182,14 +185,14 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader( this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
         /// <summary>
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader( this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
 
         /// <summary>
         /// When overridden in a derived class, returns the parent of this <see cref="ArchiveItemInfo"/>.
@@ -221,17 +224,30 @@ namespace WinCopies.IO
         /// Returns an <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.
         /// </summary>
         /// <returns>An <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.</returns>
-        public override IBrowsableObjectInfo Clone() => Factory.GetBrowsableObjectInfo(new ShellObjectInfo(ArchiveShellObject.ShellObject, ArchiveShellObject.Path, ArchiveShellObject.FileType, ArchiveShellObject.SpecialFolder), ArchiveFileInfo, Path, FileType);
+        public override IBrowsableObjectInfo Clone()
+        {
+
+            var browsableObjectInfo = (ArchiveItemInfo)base.Clone();
+
+            browsableObjectInfo._archiveShellObject = (IShellObjectInfo)browsableObjectInfo.ArchiveShellObject.Clone();
+
+            using (var sevenZipExtractor = new SevenZipExtractor(ArchiveShellObject.Path))
+
+                browsableObjectInfo.ArchiveFileInfo = sevenZipExtractor.ArchiveFileData.FirstOrDefault(item => item.FileName == Path.Substring(ArchiveShellObject.Path.Length));
+
+            return browsableObjectInfo;
+
+        }
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public override void Dispose()
+        protected override void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
         {
 
-            base.Dispose();
+            base.DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
 
             ArchiveShellObject.Dispose();
 

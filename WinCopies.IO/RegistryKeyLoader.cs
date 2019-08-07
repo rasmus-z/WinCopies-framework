@@ -61,7 +61,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader( RegistryItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this( path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(RegistryItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryKeyLoader"/> class using a custom comparer.
@@ -70,7 +70,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader( RegistryItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base( path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(RegistryItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
 
         public override bool CheckFilter(string path)
 
@@ -112,17 +112,15 @@ namespace WinCopies.IO
 
         }
 
-        protected override void OnPathChanging(BrowsableObjectInfo path) => ThrowOnInvalidRegistryTypesOption();
+        protected override void OnPathChanging(RegistryItemInfo path) => ThrowOnInvalidRegistryTypesOption();
 
         private void ThrowOnInvalidRegistryTypesOption()
 
         {
 
-            if (Path is RegistryItemInfo registryItemInfo)
+            if (Path.RegistryItemType == RegistryItemType.RegistryRoot && RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryValue))
 
-                if (registryItemInfo.RegistryItemType == RegistryItemType.RegistryRoot && RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryValue))
-
-                    throw new InvalidOperationException("The 'RegistryValue' option is not valid for the registry root path.");
+                throw new InvalidOperationException("The 'RegistryValue' option is not valid for the registry root path.");
 
         }
 

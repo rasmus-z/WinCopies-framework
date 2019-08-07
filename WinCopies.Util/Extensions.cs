@@ -2785,8 +2785,8 @@ namespace WinCopies.Util
         /// Determines whether an enum has multiple flags.
         /// </summary>
         /// <param name="flagsEnum">The enum to check.</param>
-        /// <returns><see langword="true"/> if <b>flagsEnum</b> type has the <see cref="FlagsAttribute"/> and has multiple flags; otherwise, <see langword="false"/>.</returns>
-        /// <remarks><b>flagsEnum</b> type must have the <see cref="FlagsAttribute"/>.</remarks>
+        /// <returns><see langword="true"/> if <paramref name="flagsEnum"/> type has the <see cref="FlagsAttribute"/> and has multiple flags; otherwise, <see langword="false"/>.</returns>
+        /// <remarks><paramref name="flagsEnum"/> type must have the <see cref="FlagsAttribute"/>.</remarks>
         public static bool HasMultipleFlags(this Enum flagsEnum)
 
         {
@@ -2924,8 +2924,8 @@ namespace WinCopies.Util
         /// <param name="throwIfNotFlagsEnum">Whether to throw if the given enum does not have the <see cref="FlagsAttribute"/> attribute.</param>
         /// <param name="throwIfZero">Whether to throw if the given enum is zero.</param>
         /// <returns><see langword="true"/> if the given value is in the enum values range, otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentException"><b>enum</b> does not have the <see cref="FlagsAttribute"/> and <b>throwIfNotFlags</b> is set to <see langword="true"/>.</exception>
-        /// <exception cref="InvalidEnumArgumentException"><b>enum</b> is equal to zero and the <b>throwIfZero</b> parameter is set to true or <b>enum</b> is lesser than zero.</exception>
+        /// <exception cref="ArgumentException"><paramref name="enum"/> does not have the <see cref="FlagsAttribute"/> and <paramref name="throwIfNotFlagsEnum"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="InvalidEnumArgumentException"><paramref name="enum"/> is equal to zero and the <paramref name="throwIfZero"/> parameter is set to true or <paramref name="enum"/> is lesser than zero.</exception>
         /// <seealso cref="ThrowIfNotValidFlagsEnumValue( Enum, bool, bool)"/>
         /// <seealso cref="ThrowIfNotValidFlagsEnumValue(Enum, string, bool, bool)"/>
         public static bool IsValidFlagsEnumValue(this Enum @enum, bool throwIfNotFlagsEnum, bool throwIfZero)
@@ -3004,8 +3004,8 @@ namespace WinCopies.Util
         /// <param name="enum">The enum value to check.</param>
         /// <param name="throwIfNotFlagsEnum">Whether to throw if the given enum does not have the <see cref="FlagsAttribute"/> attribute.</param>
         /// <param name="throwIfZero">Whether to throw if the given enum is zero.</param>
-        /// <exception cref="ArgumentException"><b>enum</b> does not have the <see cref="FlagsAttribute"/> and <b>throwIfNotFlags</b> is set to <see langword="true"/>.</exception>
-        /// <exception cref="InvalidEnumArgumentException"><b>enum</b> is equal to zero and the <b>throwIfZero</b> parameter is set to true or <b>enum</b> is lesser than zero.</exception>
+        /// <exception cref="ArgumentException"><paramref name="enum"/> does not have the <see cref="FlagsAttribute"/> and <paramref name="throwIfNotFlagsEnum"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="InvalidEnumArgumentException"><paramref name="enum"/> is equal to zero and the <paramref name="throwIfZero"/> parameter is set to true or <paramref name="enum"/> is lesser than zero.</exception>
         /// <seealso cref="IsValidEnumValue(Enum)"/>
         /// <seealso cref="ThrowIfNotValidEnumValue(Enum, string)"/>
         public static void ThrowIfNotValidFlagsEnumValue(this Enum @enum, bool throwIfNotFlagsEnum, bool throwIfZero)
@@ -3023,8 +3023,8 @@ namespace WinCopies.Util
         /// <param name="argumentName">The parameter name.</param>
         /// <param name="throwIfNotFlagsEnum">Whether to throw if the given enum does not have the <see cref="FlagsAttribute"/> attribute.</param>
         /// <param name="throwIfZero">Whether to throw if the given enum is zero.</param>
-        /// <exception cref="ArgumentException"><b>enum</b> does not have the <see cref="FlagsAttribute"/> and <b>throwIfNotFlags</b> is set to <see langword="true"/>.</exception>
-        /// <exception cref="InvalidEnumArgumentException"><b>enum</b> is equal to zero and the <b>throwIfZero</b> parameter is set to true or <b>enum</b> is lesser than zero.</exception>
+        /// <exception cref="ArgumentException"><paramref name="enum"/> does not have the <see cref="FlagsAttribute"/> and <paramref name="throwIfNotFlagsEnum"/> is set to <see langword="true"/>.</exception>
+        /// <exception cref="InvalidEnumArgumentException"><paramref name="enum"/> is equal to zero and the <paramref name="throwIfZero"/> parameter is set to true or <paramref name="enum"/> is lesser than zero.</exception>
         /// <seealso cref="IsValidEnumValue(Enum)"/>
         /// <seealso cref="ThrowIfNotValidEnumValue(Enum)"/>
         public static void ThrowIfNotValidFlagsEnumValue(this Enum @enum, string argumentName, bool throwIfNotFlagsEnum, bool throwIfZero)
@@ -3130,7 +3130,7 @@ namespace WinCopies.Util
         /// <param name="b">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this sbyte b, sbyte x, sbyte y) => b >= x && b <= y;
 
         /// <summary>
@@ -3139,7 +3139,7 @@ namespace WinCopies.Util
         /// <param name="b">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this byte b, byte x, byte y) => b >= x && b <= y;
 
         /// <summary>
@@ -3148,7 +3148,7 @@ namespace WinCopies.Util
         /// <param name="s">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this short s, short x, short y) => s >= x && s <= y;
 
         /// <summary>
@@ -3157,7 +3157,7 @@ namespace WinCopies.Util
         /// <param name="s">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this ushort s, ushort x, ushort y) => s >= x && s <= y;
 
         /// <summary>
@@ -3166,7 +3166,7 @@ namespace WinCopies.Util
         /// <param name="i">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this int i, int x, int y) => i >= x && i <= y;
 
         /// <summary>
@@ -3175,7 +3175,7 @@ namespace WinCopies.Util
         /// <param name="i">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this uint i, uint x, uint y) => i >= x && i <= y;
 
         /// <summary>
@@ -3184,7 +3184,7 @@ namespace WinCopies.Util
         /// <param name="l">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this long l, long x, long y) => l >= x && l <= y;
 
         /// <summary>
@@ -3193,7 +3193,7 @@ namespace WinCopies.Util
         /// <param name="l">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this ulong l, ulong x, ulong y) => l >= x && l <= y;
 
         /// <summary>
@@ -3202,7 +3202,7 @@ namespace WinCopies.Util
         /// <param name="f">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this float f, float x, float y) => f >= x && f <= y;
 
         /// <summary>
@@ -3211,7 +3211,7 @@ namespace WinCopies.Util
         /// <param name="d">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this double d, double x, double y) => d >= x && d <= y;
 
         /// <summary>
@@ -3220,7 +3220,7 @@ namespace WinCopies.Util
         /// <param name="d">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <b>b</b> is between <b>x</b> and <b>y</b>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this decimal d, decimal x, decimal y) => d >= x && d <= y;
 
         public static void Execute(this ICommand command, object commandParameter, IInputElement commandTarget)

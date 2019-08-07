@@ -48,8 +48,6 @@ namespace WinCopies.IO
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
         public WMILoader(WMIItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, WMIItemTypes wmiItemTypes) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
 
-        protected override void OnPathChanging(BrowsableObjectInfo path) => WinCopies.Util.Util.ThrowIfNotType<IWMIItemInfo>(path, nameof(path));
-
         public override bool CheckFilter(string path) => throw new NotImplementedException();
 
         protected override void OnDoWork(DoWorkEventArgs e)
