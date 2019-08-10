@@ -57,10 +57,8 @@ namespace WinCopies.IO
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
         /// </summary>
         /// <param name="factory">The factory this <see cref="RegistryItemInfo"/> and associated <see cref="RegistryKeyLoader"/> use to create new instances of the <see cref="RegistryItemInfo"/> class.</param>
-        public RegistryItemInfo(RegistryItemInfoFactory factory) : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder)
+        public RegistryItemInfo(RegistryItemInfoFactory factory) : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder, factory)
         {
-
-            Factory = factory;
 
             Name = Path;
 
@@ -79,10 +77,8 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="factory">The factory this <see cref="RegistryItemInfo"/> and associated <see cref="RegistryKeyLoader"/> use to create new instances of the <see cref="RegistryItemInfo"/> class.</param>
-        public RegistryItemInfo(RegistryKey registryKey, RegistryItemInfoFactory factory) : base(registryKey.Name, FileType.SpecialFolder)
+        public RegistryItemInfo(RegistryKey registryKey, RegistryItemInfoFactory factory) : base(registryKey.Name, FileType.SpecialFolder, factory)
         {
-
-            Factory = factory;
 
             string[] name = registryKey.Name.Split('\\');
 
@@ -105,10 +101,8 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="factory">The factory this <see cref="RegistryItemInfo"/> and associated <see cref="RegistryKeyLoader"/> use to create new instances of the <see cref="RegistryItemInfo"/> class.</param>
-        public RegistryItemInfo(string path, RegistryItemInfoFactory factory) : base(path, FileType.SpecialFolder)
+        public RegistryItemInfo(string path, RegistryItemInfoFactory factory) : base(path, FileType.SpecialFolder, factory)
         {
-
-            Factory = factory;
 
             string[] name = path.Split('\\');
 
@@ -133,11 +127,9 @@ namespace WinCopies.IO
         /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
         /// <param name="factory">The factory this <see cref="RegistryItemInfo"/> and associated <see cref="RegistryKeyLoader"/> use to create new instances of the <see cref="RegistryItemInfo"/> class.</param>
-        public RegistryItemInfo(RegistryKey registryKey, string valueName, RegistryItemInfoFactory factory) : base(registryKey.Name, FileType.Other)
+        public RegistryItemInfo(RegistryKey registryKey, string valueName, RegistryItemInfoFactory factory) : base(registryKey.Name, FileType.Other, factory)
 
         {
-
-            Factory = factory;
 
             Name = valueName;
 
@@ -268,20 +260,34 @@ namespace WinCopies.IO
         /// <exception cref="ArgumentNullException">value is null.</exception>
         public new RegistryItemInfoFactory Factory { get => (RegistryItemInfoFactory)base.Factory; set => base.Factory = value; }
 
-        /// <summary>
-        /// Gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
-        public override IBrowsableObjectInfo Clone()
+        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds)
         {
 
-            var browsableObjectInfo = (RegistryItemInfo)base.Clone();
+            switch (RegistryItemType)
 
-            browsableObjectInfo._registryKey = null;
+            {
 
-            return browsableObjectInfo;
+                case RegistryItemType.RegistryRoot:
+
+                    return new RegistryItemInfo();
+
+                case RegistryItemType.RegistryKey:
+
+                    return new RegistryItemInfo(Path);
+
+                case RegistryItemType.RegistryValue:
+
+                    return new RegistryItemInfo(Path.Substring(0, Path.LastIndexOf('\\')), Path.Substring(Path.LastIndexOf('\\') + 1));
+
+                default:
+
+                    throw new InvalidOperationException("RegistryItemType is not valid.");
+
+            }
 
         }
+
+        public override bool NeedsObjectsReconstruction => base.NeedsObjectsReconstruction ||     !(_registryKey is null); // If _registryKey is null, reconstructing registry does not make sense, so we return false.
 
         /// <summary>
         /// Returns the parent of this <see cref="RegistryItemInfo"/>.

@@ -21,7 +21,30 @@ namespace WinCopies.IO
     public class ShellObjectInfo : ArchiveItemInfoProvider, IShellObjectInfo
     {
 
-        protected override IShellObjectInfo ArchiveShellObjectOverride => FileType == FileType.Archive ? this : null;
+        private ArchiveItemInfoFactory _archiveItemInfoFactory;
+
+        /// <summary>
+        /// Gets or sets the factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy.</exception>
+        /// <exception cref="ArgumentNullException">The given value is null.</exception>
+        public override ArchiveItemInfoFactory ArchiveItemInfoFactory
+        {
+            get => _archiveItemInfoFactory; set
+            {
+
+                ThrowOnInvalidFactoryUpdateOperation(value, nameof(value));
+
+                _archiveItemInfoFactory.Path = null;
+
+                value.Path = this;
+
+                _archiveItemInfoFactory = value;
+
+            }
+        }
+
+        public override IShellObjectInfo ArchiveShellObject => FileType == FileType.Archive ? this : null;
 
         /// <summary>
         /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="ShellObjectInfo"/>.
@@ -246,24 +269,30 @@ namespace WinCopies.IO
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
-        public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder) : this(shellObject, path, fileType, specialFolder, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
+        public ShellObjectInfo(Func<ShellObject> shellObjectDelegate, string path, FileType fileType, SpecialFolder specialFolder) : this(shellObjectDelegate, path, fileType, specialFolder, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/>s and <see cref="ArchiveItemInfo"/>s.
         /// </summary>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
+        /// <param name="shellObjectDelegate">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
         /// <param name="factory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>s and <see cref="ArchiveLoader"/>s use to create new objects that represent casual file system items.</param>
         /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
-        public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, archiveItemInfoFactory) =>
+        public ShellObjectInfo(Func<ShellObject> shellObjectDelegate, string path, FileType fileType, SpecialFolder specialFolder, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, archiveItemInfoFactory) =>
 
-            Init(shellObject, nameof(fileType), specialFolder, factory); // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
+            Init(shellObjectDelegate, nameof(fileType), specialFolder, factory); // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
 
-        private void Init(ShellObject shellObject, string fileTypeParameterName, SpecialFolder specialFolder, ShellObjectInfoFactory shellObjectInfoFactory)
+        private Func<ShellObject> _shellObjectDelegate;
+
+        private void Init(Func<ShellObject> shellObjectDelegate, string fileTypeParameterName, SpecialFolder specialFolder, ShellObjectInfoFactory shellObjectInfoFactory)
 
         {
+
+            _shellObjectDelegate = shellObjectDelegate;
+
+            ShellObject shellObject = shellObjectDelegate();
 
 #if DEBUG
 
@@ -567,22 +596,21 @@ namespace WinCopies.IO
 
         }
 
-        /// <summary>
-        /// Gets a new <see cref="ShellObjectInfo"/> that represents the same item that the current <see cref="ShellObjectInfo"/>.
-        /// </summary>
-        /// <returns>An <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
-        public override IBrowsableObjectInfo Clone()
+        public override bool NeedsObjectsReconstruction => true;
+
+        protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo, bool preserveIds)
         {
 
-            var browsableObjectInfo = (ShellObjectInfo)base.Clone();
+            base.OnDeepClone(browsableObjectInfo, preserveIds);
 
-            browsableObjectInfo.ShellObject = ShellObject.FromParsingName(browsableObjectInfo.ShellObject.ParsingName);
+            if (ArchiveItemInfoFactory.UseRecursively)
 
-            browsableObjectInfo.SetFileSystemInfoProperties(browsableObjectInfo.ShellObject, true);
-
-            return browsableObjectInfo;
+                ((ShellObjectInfo)browsableObjectInfo).ArchiveItemInfoFactory = ArchiveItemInfoFactory.Clone();
 
         }
+
+        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ShellObjectInfo(_shellObjectDelegate, Path, FileType, SpecialFolder);
+
     }
 
 }

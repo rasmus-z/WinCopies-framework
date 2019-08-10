@@ -68,8 +68,6 @@ namespace WinCopies.IO
         /// </summary>
         public override bool IsBrowsable => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.Drive, FileType.Archive);
 
-        IArchiveItemInfoFactory IArchiveItemInfoProvider.ArchiveItemInfoFactory => Factory;
-
         /// <summary>
         /// Gets or sets the factory for this <see cref="ArchiveItemInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="ArchiveItemInfo"/> and its associated <see cref="BrowsableObjectInfo.ItemsLoader"/>.
         /// </summary>
@@ -77,34 +75,34 @@ namespace WinCopies.IO
         /// <exception cref="ArgumentNullException">value is null.</exception>
         public new ArchiveItemInfoFactory Factory { get => (ArchiveItemInfoFactory)base.Factory; set => base.Factory = value; }
 
+        public sealed override ArchiveItemInfoFactory ArchiveItemInfoFactory { get => Factory; set => Factory = value; }
+
         //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
+
+        private Func<ArchiveFileInfo?> _archiveFileInfoDelegate;
 
         public ArchiveFileInfo? ArchiveFileInfo { get; private set; }
 
-        private IShellObjectInfo _archiveShellObject;
-
-        protected override IShellObjectInfo ArchiveShellObjectOverride => _archiveShellObject;
-
-        public IShellObjectInfo ArchiveShellObject => ArchiveShellObjectOverride;
+        public override IShellObjectInfo ArchiveShellObject { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class.
         /// </summary>
         /// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
-        /// <param name="archiveFileInfo">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represent a folder that exists implicitly in the archive.</param>
+        /// <param name="archiveFileInfoDelegate">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represent a folder that exists implicitly in the archive.</param>
         /// <param name="path">The full path to this archive item</param>
         /// <param name="fileType">The file type of this archive item</param>
-        public ArchiveItemInfo(IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType) : this(archiveShellObject, archiveFileInfo, path, fileType, new ArchiveItemInfoFactory()) { }
+        public ArchiveItemInfo(IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfoDelegate, string path, FileType fileType) : this(archiveShellObject, archiveFileInfoDelegate, path, fileType, new ArchiveItemInfoFactory()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
         /// </summary>
         /// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
-        /// <param name="archiveFileInfo">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represent a folder that exists implicitly in the archive.</param>
+        /// <param name="archiveFileInfoDelegate">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represent a folder that exists implicitly in the archive.</param>
         /// <param name="path">The full path to this archive item</param>
         /// <param name="fileType">The file type of this archive item</param>
         /// <param name="factory">The factory this <see cref="ArchiveItemInfo"/> and associated <see cref="ArchiveLoader"/> use to create new instances of the <see cref="ArchiveItemInfo"/> class.</param>
-        public ArchiveItemInfo(IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType, ArchiveItemInfoFactory factory) : base(path, fileType)
+        public ArchiveItemInfo(IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfoDelegate, string path, FileType fileType, ArchiveItemInfoFactory factory) : base(path, fileType, factory)
 
         {
 
@@ -114,13 +112,17 @@ namespace WinCopies.IO
 
                 throw new ArgumentException("'fileType' can't be a SpecialFolder.");
 
-            if (archiveFileInfo.HasValue && !path.EndsWith(archiveFileInfo.Value.FileName))
+            _archiveFileInfoDelegate = archiveFileInfoDelegate;
+
+            ArchiveFileInfo = archiveFileInfoDelegate();
+
+            if ( ArchiveFileInfo.HasValue &&    !path.EndsWith( ArchiveFileInfo. Value.FileName))
 
                 // todo:
 
-                throw new ArgumentException($"'{nameof(path)}' must end with '{nameof(archiveFileInfo.Value.FileName)}'");
+                throw new ArgumentException($"'{nameof(path)}' must end with '{nameof(ArchiveFileInfo.Value.FileName)}'");
 
-            _archiveShellObject = archiveShellObject;
+            ArchiveShellObject = archiveShellObject;
 
 #if DEBUG 
 
@@ -129,12 +131,6 @@ namespace WinCopies.IO
 #endif
 
             // Path = path;
-
-            if (archiveFileInfo.HasValue)
-
-                ArchiveFileInfo = archiveFileInfo.Value;
-
-            Factory = factory;
 
 #if DEBUG
 
@@ -220,24 +216,18 @@ namespace WinCopies.IO
 
             throw new NotSupportedException("This feature is currently not supported for the content archive items.");
 
-        /// <summary>
-        /// Returns an <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        /// <returns>An <see cref="ArchiveItemInfo"/> that represents the same item that the current <see cref="ArchiveItemInfo"/>.</returns>
-        public override IBrowsableObjectInfo Clone()
-        {
+        // protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)
+        // {
 
-            var browsableObjectInfo = (ArchiveItemInfo)base.Clone();
+            // base.OnDeepClone(browsableObjectInfo);
 
-            browsableObjectInfo._archiveShellObject = (IShellObjectInfo)browsableObjectInfo.ArchiveShellObject.Clone();
+            //using (var sevenZipExtractor = new SevenZipExtractor(ArchiveShellObject.Path))
 
-            using (var sevenZipExtractor = new SevenZipExtractor(ArchiveShellObject.Path))
+            //    browsableObjectInfo.ArchiveFileInfo = sevenZipExtractor.ArchiveFileData.FirstOrDefault(item => item.FileName == Path.Substring(ArchiveShellObject.Path.Length));
 
-                browsableObjectInfo.ArchiveFileInfo = sevenZipExtractor.ArchiveFileData.FirstOrDefault(item => item.FileName == Path.Substring(ArchiveShellObject.Path.Length));
+        // }
 
-            return browsableObjectInfo;
-
-        }
+        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ArchiveItemInfo((IShellObjectInfo)ArchiveShellObject.DeepClone(preserveIds), _archiveFileInfoDelegate, Path, FileType);
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 
@@ -270,6 +260,8 @@ namespace WinCopies.IO
                 return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         }
+
+        public override bool NeedsObjectsReconstruction => true; // True because of the ShellObjectInfo's ShellObject
 
         // public ArchiveFileInfo ArchiveFileInfo { get; } = null;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 
@@ -108,7 +109,7 @@ namespace WinCopies.IO
 
         IBrowsableObjectInfoLoader<IBrowsableObjectInfo> IBrowsableObjectInfo.ItemsLoader => (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)ItemsLoader;
 
-        internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
+        // internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
 
         /// <summary>
         /// Gets the items loader for this <see cref="BrowsableObjectInfo"/>.
@@ -147,13 +148,15 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="path">The path of this <see cref="BrowsableObjectInfo"/>.</param>
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-        public BrowsableObjectInfo(string path, FileType fileType)
+        public BrowsableObjectInfo(string path, FileType fileType, BrowsableObjectInfoFactory factory)
 
         {
 
             Path = path;
 
             FileType = fileType;
+
+            Factory = factory;
 
             SetItemsProperty();
 
@@ -299,12 +302,53 @@ namespace WinCopies.IO
         public abstract void Rename(string newValue);
 
         /// <summary>
-        /// When overridden in a derived class, gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>. How
+        /// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
-        /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
-        public virtual IBrowsableObjectInfo Clone()
+        /// <param name="browsableObjectInfo">The cloned <see cref="BrowsableObjectInfo"/>.</param>
+        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
+        protected virtual void OnDeepClone(BrowsableObjectInfo browsableObjectInfo, bool preserveIds)
 
         {
+
+            // browsableObjectInfo.AreItemsLoaded = false;
+
+            browsableObjectInfo.ItemsLoader = ItemsLoader.clone();
+
+            // browsableObjectInfo.SetItemsProperty();
+
+            //if (Factory.UseRecursively)
+
+            browsableObjectInfo.Factory = (BrowsableObjectInfoFactory)browsableObjectInfo.Factory.Clone();
+
+            // else
+
+            // browsableObjectInfo._factory = null;
+
+            // browsableObjectInfo._parent = null;
+
+        }
+
+        /// <summary>
+        /// The <see cref="OnDeepClone(BrowsableObjectInfo, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride"/>, you'll have to override this method if your class has to reinitialize members.
+        /// </summary>
+        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
+        protected abstract BrowsableObjectInfo DeepCloneOverride(bool preserveIds);
+
+        ///// <summary>
+        ///// When overridden in a derived class, gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>. How
+        ///// </summary>
+        ///// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
+        public object DeepClone(bool preserveIds)
+
+        {
+
+            //var callee = new StackFrame(0).GetMethod();
+
+            //var caller = new StackFrame(1).GetMethod();
+
+            //if (callee.DeclaringType.Equals(caller.DeclaringType) || (caller.IsConstructor && caller.DeclaringType.BaseType.Equals(this.GetType())))
+
+            //{
 
             if (IsDisposing)
 
@@ -314,25 +358,17 @@ namespace WinCopies.IO
 
                 throw new ObjectDisposedException("The current BrowsableObjectInfo is disposed.");
 
-            var browsableObjectInfo = (BrowsableObjectInfo)MemberwiseClone();
+            var browsableObjectInfo = DeepCloneOverride(preserveIds);
 
-            browsableObjectInfo.AreItemsLoaded = false;
-
-            browsableObjectInfo.ItemsLoaderInternal = null;
-
-            browsableObjectInfo.SetItemsProperty();
-
-            if (browsableObjectInfo.Factory.UseRecursively)
-
-                browsableObjectInfo.Factory = (BrowsableObjectInfoFactory)browsableObjectInfo.Factory.Clone();
-
-            else
-
-                browsableObjectInfo._factory = null;
-
-            browsableObjectInfo._parent = null;
+            OnDeepClone(browsableObjectInfo, preserveIds);
 
             return browsableObjectInfo;
+
+            //}
+
+            //    else
+
+            //        throw new InvalidOperationException("The type of the caller of the current constructor is not the same as the type of this constructor.");
 
         }
 
@@ -421,6 +457,8 @@ namespace WinCopies.IO
         }
 
         public bool IsDisposed { get; private set; }
+
+        public virtual bool NeedsObjectsReconstruction => (!(ItemsLoader is null) && ItemsLoader.needs) || Factory.NeedsObjectsReconstruction;
 
     }
 

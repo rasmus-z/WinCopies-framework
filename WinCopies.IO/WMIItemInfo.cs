@@ -43,6 +43,8 @@ namespace WinCopies.IO
 
         public override bool IsRenamingSupported => false;
 
+        private Func<ManagementBaseObject> _managementObjectDelegate;
+
         public ManagementBaseObject ManagementObject { get; private set; }
 
         public static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
@@ -73,29 +75,29 @@ namespace WinCopies.IO
 
         }
 
-        public WMIItemInfo() : this(new ManagementClass(@"\\.\ROOT:__NAMESPACE"), WMIItemType.Namespace, new WMIItemInfoFactory()) => IsRootNode = true;
+        public WMIItemInfo() : this(@"\\.\ROOT:__NAMESPACE", () =>    new ManagementClass(@"\\.\ROOT:__NAMESPACE"), WMIItemType.Namespace, new WMIItemInfoFactory()) => IsRootNode = true;
 
-        public WMIItemInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType) : this(managementObject, wmiItemType, new WMIItemInfoFactory()) { }
+        public WMIItemInfo(string path, Func<ManagementBaseObject> managementObjectDelegate, WMIItemType wmiItemType) : this(path, managementObjectDelegate, wmiItemType, new WMIItemInfoFactory()) { }
 
-        public WMIItemInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType, WMIItemInfoFactory factory) : base(GetPath(managementObject, wmiItemType), FileType.SpecialFolder)
+        public WMIItemInfo(string path, Func<ManagementBaseObject> managementObjectDelegate, WMIItemType wmiItemType, WMIItemInfoFactory factory) : base(path, FileType.SpecialFolder, factory)
 
         {
 
             ThrowOnEnumNotValidEnumValue(wmiItemType, WMIItemType.Namespace, WMIItemType.Class);
 
-            ManagementObject = managementObject;
+            _managementObjectDelegate = managementObjectDelegate;
+
+            ManagementObject = managementObjectDelegate();
 
             if (wmiItemType != WMIItemType.Instance)
 
-                Name = GetName(managementObject, wmiItemType);
+                Name = GetName(ManagementObject, wmiItemType);
 
             WMIItemType = wmiItemType;
 
             if (wmiItemType == WMIItemType.Namespace && Path.ToUpper().EndsWith("ROOT:__NAMESPACE"))
 
                 IsRootNode = true;
-
-            Factory = factory;
 
         }
 
@@ -117,7 +119,9 @@ namespace WinCopies.IO
 
             _ = stringBuilder.Append(":__NAMESPACE");
 
-            return new WMIItemInfo(new ManagementClass(stringBuilder.ToString()), WMIItemType.Namespace, factory);
+            string path = stringBuilder.ToString();
+
+            return new WMIItemInfo(path, () => new ManagementClass(path), WMIItemType.Namespace, factory);
 
         }
 
@@ -207,16 +211,9 @@ namespace WinCopies.IO
 
         public new WMIItemInfoFactory Factory { get => (WMIItemInfoFactory)base.Factory; set => base.Factory = value; }
 
-        public override IBrowsableObjectInfo Clone()
-        {
+        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => IsRootNode ? new WMIItemInfo() : new WMIItemInfo(Path, _managementObjectDelegate, WMIItemType);
 
-            var browsableObjectInfo = (WMIItemInfo)base.Clone();
-
-            browsableObjectInfo.ManagementObject = (ManagementBaseObject)ManagementObject.Clone();
-
-            return browsableObjectInfo;
-
-        }
+        public override bool NeedsObjectsReconstruction => true;
 
         protected override IBrowsableObjectInfo GetParent()
         {

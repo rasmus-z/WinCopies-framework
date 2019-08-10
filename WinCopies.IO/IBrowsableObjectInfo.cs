@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Media.Imaging;
 using WinCopies.Collections;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
@@ -10,7 +11,7 @@ namespace WinCopies.IO
     /// <summary>
     /// Provides info to interact with any browsable items.
     /// </summary>
-    public interface IBrowsableObjectInfo : IFileSystemObject, IDisposable
+    public interface IBrowsableObjectInfo : IFileSystemObject, IDeepCloneable, IDisposable
     {
 
         /// <summary>
@@ -73,7 +74,7 @@ namespace WinCopies.IO
         /// </summary>
         bool IsDisposing { get; }
 
-        bool IsDisposed { get; }    
+        bool IsDisposed { get; }
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 
@@ -123,11 +124,11 @@ namespace WinCopies.IO
 
         // string ToString();
 
-        /// <summary>
-        /// Gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.</returns>
-        IBrowsableObjectInfo Clone();
+        ///// <summary>
+        ///// Gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.
+        ///// </summary>
+        ///// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.</returns>
+        //IBrowsableObjectInfo Clone();
 
         /// <summary>
         /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.

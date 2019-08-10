@@ -19,54 +19,32 @@ namespace WinCopies.IO
 
     {
 
-        private ArchiveItemInfoFactory _archiveItemInfoFactory;
+        //    IArchiveItemInfoFactory IArchiveItemInfoProvider.ArchiveItemInfoFactory => ArchiveItemInfoFactory;
 
-        IArchiveItemInfoFactory IArchiveItemInfoProvider.ArchiveItemInfoFactory => _archiveItemInfoFactory;
+        public abstract ArchiveItemInfoFactory ArchiveItemInfoFactory { get; set; }
 
-        /// <summary>
-        /// Gets or sets the factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy.</exception>
-        /// <exception cref="ArgumentNullException">The given value is null.</exception>
-        public ArchiveItemInfoFactory ArchiveItemInfoFactory
-        {
-            get => _archiveItemInfoFactory; set
-            {
+        IArchiveItemInfoFactory IArchiveItemInfoProvider.ArchiveItemInfoFactory => ArchiveItemInfoFactory;
 
-                ThrowOnInvalidFactoryUpdateOperation(value, nameof(value));
+        public abstract IShellObjectInfo ArchiveShellObject { get; }
 
-                _archiveItemInfoFactory.Path = null;
+        //    IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
-                value.Path = this;
+        //    public ArchiveItemInfoProvider(string path, FileType fileType) : this(path, fileType) { }
 
-                _archiveItemInfoFactory = value;
+        //    public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, ) { }
 
-            }
-        }
+        public ArchiveItemInfoProvider(string path, FileType fileType, BrowsableObjectInfoFactory factory) : base(path, fileType, factory) { }
 
-        protected abstract IShellObjectInfo ArchiveShellObjectOverride { get; }
+        //    protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)
+        //    {
 
-        IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
+        //        base.OnDeepClone(browsableObjectInfo);
 
-        public ArchiveItemInfoProvider(string path, FileType fileType) : this(path, fileType, new ArchiveItemInfoFactory()) { }
+        //        if (ArchiveItemInfoFactory.UseRecursively)
 
-        public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType) => _archiveItemInfoFactory = archiveItemInfoFactory;
+        //            (((ArchiveItemInfoProvider)browsableObjectInfo).ArchiveItemInfoFactory = ArchiveItemInfoFactory.Clone();
 
-        public override IBrowsableObjectInfo Clone()
-        {
+        //    }
 
-            var browsableObjectInfo = (ArchiveItemInfoProvider)base.Clone();
-
-            if (browsableObjectInfo.ArchiveItemInfoFactory.UseRecursively)
-
-                browsableObjectInfo.ArchiveItemInfoFactory = (ArchiveItemInfoFactory) browsableObjectInfo.ArchiveItemInfoFactory.Clone();
-
-            else
-
-                browsableObjectInfo._archiveItemInfoFactory = null;
-
-            return browsableObjectInfo;
-
-        }
     }
 }
