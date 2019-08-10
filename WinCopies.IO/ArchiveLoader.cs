@@ -18,6 +18,8 @@ namespace WinCopies.IO
     public class ArchiveLoader : FileSystemObjectLoader<ArchiveItemInfoProvider>
     {
 
+        protected override BrowsableObjectInfoLoader<ArchiveItemInfoProvider> DeepCloneOverride(bool preserveIds) => new ArchiveLoader(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer)FileSystemObjectComparer.DeepClone(preserveIds), FileTypes);
+
         private static readonly Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();
 
         public static ReadOnlyDictionary<InArchiveFormat, string[]> InArchiveFormats { get; }
@@ -84,7 +86,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader( ArchiveItemInfoProvider path, bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this( path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), fileTypes) { }
+        public ArchiveLoader(ArchiveItemInfoProvider path, bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), fileTypes) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveLoader"/> class using a custom comparer.
@@ -93,7 +95,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader( ArchiveItemInfoProvider path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, FileTypes fileTypes) : base( path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes) { }
+        public ArchiveLoader(ArchiveItemInfoProvider path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer, FileTypes fileTypes) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes) { }
 
         protected override void OnPathChanging(ArchiveItemInfoProvider path)
 
@@ -514,7 +516,7 @@ namespace WinCopies.IO
                     ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
                     : false;
 
-            public int CompareTo(IFileSystemObject fileSystemObject) => BrowsableObjectInfo.GetDefaultComparer() .Compare(this, fileSystemObject);
+            public int CompareTo(IFileSystemObject fileSystemObject) => BrowsableObjectInfo.GetDefaultComparer().Compare(this, fileSystemObject);
 
         }
 

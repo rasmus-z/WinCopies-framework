@@ -140,6 +140,7 @@
     <Compile Include="IBrowsableObjectInfoFactory.cs" />
     <Compile Include="IBrowsableObjectInfoLoader.cs" />
     <Compile Include="IFileSystemObject.cs" />
+    <Compile Include="IFileSystemObjectComparer.cs" />
     <Compile Include="IOException.cs" />
     <Compile Include="IRegistryItemInfo.cs" />
     <Compile Include="IRegistryItemInfoFactory.cs" />

@@ -3567,5 +3567,19 @@ namespace WinCopies.Util
 
         #endregion
 
+        public static void ThrowIfDisposingOrDisposed(this IDisposable obj)
+
+        {
+
+            if (obj.IsDisposing)
+
+                throw new InvalidOperationException("The current BrowsableObjectInfo is disposing.");
+
+            if (obj.IsDisposed)
+
+                throw new ObjectDisposedException("The current BrowsableObjectInfo is disposed.");
+
+        }
+
     }
 }

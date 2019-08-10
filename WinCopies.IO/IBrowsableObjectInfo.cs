@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Windows.Media.Imaging;
 using WinCopies.Collections;
 using WinCopies.Util;
+using IDisposable = WinCopies.Util.IDisposable;
 
 namespace WinCopies.IO
 {

@@ -17,7 +17,7 @@ namespace WinCopies.Util.Commands
          DependencyProperty.Register("CommandParameter", typeof(object), typeof(CommandAction),
          new PropertyMetadata(null, OnCommandParameterChanged));
 
-        private IDisposable canExecuteChanged;
+        private System.IDisposable canExecuteChanged;
 
         public ICommand Command
         {

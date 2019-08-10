@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WinCopies.Util;
+using IDisposable = WinCopies.Util.IDisposable;
 
 namespace WinCopies.IO
 {
 
-    public interface IBrowsableObjectInfoLoader<TPath> : IBackgroundWorker, IDisposable where TPath : IBrowsableObjectInfo
+    public interface IBrowsableObjectInfoLoader<TPath> : IBackgroundWorker, IDeepCloneable, IDisposable where TPath : IBrowsableObjectInfo
 
     {
 
-        IComparer<IFileSystemObject> FileSystemObjectComparer { get; set; }
+        IFileSystemObjectComparer FileSystemObjectComparer { get; set; }
 
         IEnumerable<string> Filter { get; set; }
 

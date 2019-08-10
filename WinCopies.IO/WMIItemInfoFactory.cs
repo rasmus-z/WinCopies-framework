@@ -7,6 +7,10 @@ namespace WinCopies.IO
     public class WMIItemInfoFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
     {
 
+        public override bool NeedsObjectsReconstruction => Options?.needs;
+
+        protected override BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds) => new WMIItemInfoFactory(Options?.Clone());
+
         private WMIItemInfoFactoryOptions _options;
 
         public WMIItemInfoFactoryOptions Options
@@ -15,9 +19,7 @@ namespace WinCopies.IO
             get => _options; set
             {
 
-                if (Path?.ItemsLoader?.IsBusy == true)
-
-                    throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
+                ThrowOnInvalidPropertySet(Path);
 
                 _options.Factory = null;
 
@@ -37,7 +39,7 @@ namespace WinCopies.IO
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => new WMIItemInfo();
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementBaseObject managementObject, WMIItemType wmiItemType) => new WMIItemInfo(managementObject, wmiItemType);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, Func<ManagementBaseObject> managementObject, WMIItemType wmiItemType) => new WMIItemInfo(path, managementObject, wmiItemType);
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementScope managementScope, ManagementPath managementPath, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(managementScope, managementPath, _options?.ObjectGetOptions), wmiItemType);
 

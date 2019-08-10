@@ -49,6 +49,7 @@ WinCopies.Util (2.0)
 			- ToStringWithoutAccents string extension method
 			- Extension methods for LinkedLists
 			- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
+			- Extension method for throwing if an object that implements IDisposable is disposing or disposed.
 		- Delegates:
 			- EqualityComparison
 			- FieldValidateValueCallback*
@@ -65,6 +66,7 @@ WinCopies.Util (2.0)
 		- The WinCopies.Util.Extensions.SetProperty/Field now have multiple new optional parameters to extend the capabilities of these methods.
 	- Interfaces:
 		- IDeepCloneable
+		- IDisposable
 
 - Bug fixes:
 	- BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.

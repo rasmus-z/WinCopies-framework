@@ -10,6 +10,7 @@ using TsudaKageyu;
 using WinCopies.Collections;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
+using IDisposable = WinCopies.Util.IDisposable;
 
 namespace WinCopies.IO
 {
@@ -116,7 +117,7 @@ namespace WinCopies.IO
         /// </summary>
         public BrowsableObjectInfoLoader<BrowsableObjectInfo> ItemsLoader { get; internal set; }
 
-        // internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
+        internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
 
         internal ObservableCollection<IBrowsableObjectInfo> items;
 
@@ -302,7 +303,7 @@ namespace WinCopies.IO
         public abstract void Rename(string newValue);
 
         /// <summary>
-        /// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride"/>, you'll have to override this method if your class has to reinitialize members.
+        /// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
         /// <param name="browsableObjectInfo">The cloned <see cref="BrowsableObjectInfo"/>.</param>
         /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
@@ -312,13 +313,13 @@ namespace WinCopies.IO
 
             // browsableObjectInfo.AreItemsLoaded = false;
 
-            browsableObjectInfo.ItemsLoader = ItemsLoader.clone();
+            browsableObjectInfo.ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)ItemsLoader.DeepClone(preserveIds);
 
             // browsableObjectInfo.SetItemsProperty();
 
             //if (Factory.UseRecursively)
 
-            browsableObjectInfo.Factory = (BrowsableObjectInfoFactory)browsableObjectInfo.Factory.Clone();
+            browsableObjectInfo.Factory = (BrowsableObjectInfoFactory)browsableObjectInfo.Factory.DeepClone(preserveIds);
 
             // else
 
@@ -329,7 +330,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// The <see cref="OnDeepClone(BrowsableObjectInfo, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride"/>, you'll have to override this method if your class has to reinitialize members.
+        /// When overridden in a derived class, gets a deep clone of this <see cref="BrowsableObjectInfo"/>. The <see cref="OnDeepClone(BrowsableObjectInfo, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
         /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
         protected abstract BrowsableObjectInfo DeepCloneOverride(bool preserveIds);
@@ -350,15 +351,9 @@ namespace WinCopies.IO
 
             //{
 
-            if (IsDisposing)
+            ((IDisposable)this).ThrowIfDisposingOrDisposed();
 
-                throw new InvalidOperationException("The current BrowsableObjectInfo is disposing.");
-
-            if (IsDisposed)
-
-                throw new ObjectDisposedException("The current BrowsableObjectInfo is disposed.");
-
-            var browsableObjectInfo = DeepCloneOverride(preserveIds);
+            BrowsableObjectInfo browsableObjectInfo = DeepCloneOverride(preserveIds);
 
             OnDeepClone(browsableObjectInfo, preserveIds);
 
@@ -458,7 +453,7 @@ namespace WinCopies.IO
 
         public bool IsDisposed { get; private set; }
 
-        public virtual bool NeedsObjectsReconstruction => (!(ItemsLoader is null) && ItemsLoader.needs) || Factory.NeedsObjectsReconstruction;
+        public virtual bool NeedsObjectsReconstruction => (!(ItemsLoader is null) && ItemsLoader.NeedsObjectsReconstruction) || Factory.NeedsObjectsReconstruction;
 
     }
 

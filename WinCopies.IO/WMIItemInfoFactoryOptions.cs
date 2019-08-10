@@ -4,10 +4,11 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using System.Threading.Tasks;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
-    public interface IWMIItemInfoFactoryOptions : ICloneable
+    public interface IWMIItemInfoFactoryOptions : IDeepCloneable
     {
 
         IWMIItemInfoFactory Factory { get; }
@@ -31,12 +32,7 @@ namespace WinCopies.IO
         /// Gets or sets options for the WMI connections.
         /// </summary>
         /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader{T}"/> is busy.</exception>
-        protected virtual ConnectionOptions ConnectionOptionsOverride
-        {
-            get => _connectionOptions; set =>
-
-_connectionOptions = value;
-        }
+        protected virtual ConnectionOptions ConnectionOptionsOverride { get => _connectionOptions; set => _connectionOptions = value; }
 
         /// <summary>
         /// Gets or sets options for the WMI connections.
@@ -46,9 +42,13 @@ _connectionOptions = value;
         {
             get => ConnectionOptionsOverride; set
             {
-                if (Factory?.Path?.ItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
+
+                if (!(Factory is null))
+
+                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory.Path);
 
                 ConnectionOptionsOverride = value;
+
             }
         }
 
@@ -58,7 +58,19 @@ _connectionOptions = value;
         /// Gets or sets options for getting management objects.
         /// </summary>
         /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader{T}"/> is busy.</exception>
-        protected virtual ObjectGetOptions ObjectGetOptionsOverride { get => _objectGetOptions; set => _objectGetOptions = value; }
+        protected virtual ObjectGetOptions ObjectGetOptionsOverride
+        {
+            get => _objectGetOptions; set
+            {
+
+                if (!(Factory is null))
+
+                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory.Path);
+
+                _objectGetOptions = value;
+
+            }
+        }
 
         /// <summary>
         /// Gets or sets options for getting management objects.
@@ -70,9 +82,13 @@ _connectionOptions = value;
 
             get => ObjectGetOptionsOverride; set
             {
-                if (Factory?.Path?.ItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
+
+                if (!(Factory is null))
+
+                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory.Path);
 
                 ObjectGetOptionsOverride = value;
+
             }
 
         }
@@ -93,9 +109,13 @@ _connectionOptions = value;
         {
             get => EnumerationOptionsOverride; set
             {
-                if (Factory?.Path?.ItemsLoader?.IsBusy == true) throw new InvalidOperationException($"The parent {nameof(IBrowsableObjectInfo.ItemsLoader)} is busy.");
+
+                if (!(Factory is null))
+
+                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory.Path);
 
                 EnumerationOptionsOverride = value;
+
             }
         }
 
@@ -107,11 +127,11 @@ _connectionOptions = value;
 
             options.Factory = null;
 
-            options._connectionOptions = (ConnectionOptions) options.ConnectionOptions.Clone();
+            options._connectionOptions = (ConnectionOptions)options.ConnectionOptions.Clone();
 
-            options._enumerationOptions = (EnumerationOptions) options.EnumerationOptions.Clone();
+            options._enumerationOptions = (EnumerationOptions)options.EnumerationOptions.Clone();
 
-            options._objectGetOptions = (ObjectGetOptions) options.ObjectGetOptions.Clone();
+            options._objectGetOptions = (ObjectGetOptions)options.ObjectGetOptions.Clone();
 
             return options;
 

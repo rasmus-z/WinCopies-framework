@@ -378,7 +378,9 @@ namespace WinCopies.IO
 
                     string _parent = parentDirectoryInfo.FullName;
 
-                    var shellObject = ShellObject.FromParsingName(_parent);
+                    Func<ShellObject> shellObjectDelegate = () => ShellObject.FromParsingName(_parent);
+
+                    var shellObject = shellobjectdelegate
 
                     FileType fileType;
 
@@ -404,7 +406,7 @@ namespace WinCopies.IO
 
                     }
 
-                    return Factory.GetBrowsableObjectInfo(shellObject, _parent, fileType, specialFolder);
+                    return Factory.GetBrowsableObjectInfo(() => shellObject, _parent, fileType, specialFolder);
 
                 }
 
@@ -605,7 +607,7 @@ namespace WinCopies.IO
 
             if (ArchiveItemInfoFactory.UseRecursively)
 
-                ((ShellObjectInfo)browsableObjectInfo).ArchiveItemInfoFactory = ArchiveItemInfoFactory.Clone();
+                ((ShellObjectInfo)browsableObjectInfo).ArchiveItemInfoFactory = (ArchiveItemInfoFactory)ArchiveItemInfoFactory.DeepClone(preserveIds);
 
         }
 

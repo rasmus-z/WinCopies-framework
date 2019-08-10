@@ -20,7 +20,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="shellObject">The <see cref="ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
-        IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(Func<ShellObject> shellObject, string path, FileType fileType, SpecialFolder specialFolder);
 
         /// <summary>
         /// Gets a new <see cref="IBrowsableObjectInfo"/> that represents the given <see cref="ShellObject"/>, path, <see cref="FileType"/> and <see cref="SpecialFolder"/>.
@@ -29,7 +29,7 @@ namespace WinCopies.IO
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
-        IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(Func<ShellObject> shellObject, string path, FileType fileType, SpecialFolder specialFolder, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory);
 
     }
 }

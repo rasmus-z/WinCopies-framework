@@ -3,7 +3,7 @@ using System.IO;
 
 namespace WinCopies.IO
 {
-    public interface IShellObjectInfo : IBrowsableObjectInfo, ArchiveItemInfoProvider
+    public interface IShellObjectInfo : IBrowsableObjectInfo, IArchiveItemInfoProvider
     {
 
         /// <summary>

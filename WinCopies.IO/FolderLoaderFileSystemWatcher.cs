@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
+using WinCopies.Util;
+using IDisposable = WinCopies.Util.IDisposable;
 
 namespace WinCopies.IO
 {
-    public class FolderLoaderFileSystemWatcher : IDisposable
+    public class FolderLoaderFileSystemWatcher : IDeepCloneable, IDisposable
     {
 
         /// <summary>
@@ -32,6 +34,26 @@ namespace WinCopies.IO
         /// </summary>
         public FolderLoaderFileSystemWatcher() => Init();
 
+        public virtual bool NeedsObjectsReconstruction => true; // True because of the FileSystemWatcher property.
+
+        protected virtual void OnDeepClone(FolderLoaderFileSystemWatcher folderLoaderFileSystemWatcher, bool preserveIds) { }
+
+        protected virtual FolderLoaderFileSystemWatcher DeepCloneOverride(bool preserveIds) => new FolderLoaderFileSystemWatcher();
+
+        public object DeepClone(bool preserveIds)
+
+        {
+
+            ((IDisposable)this).ThrowIfDisposingOrDisposed();
+
+            FolderLoaderFileSystemWatcher folderLoaderFileSystemWatcher = DeepCloneOverride(preserveIds);
+
+            OnDeepClone(folderLoaderFileSystemWatcher, preserveIds);
+
+            return folderLoaderFileSystemWatcher;
+
+        }
+
         protected virtual void Init()
 
         {
@@ -46,10 +68,28 @@ namespace WinCopies.IO
 
         }
 
+        public bool IsDisposing { get; private set; }
+
+        public bool IsDisposed { get; private set; }
+
         /// <summary>
         /// Frees all resources used by the <see cref="FileSystemWatcher"/> property.
         /// </summary>
-        public virtual void Dispose() => FileSystemWatcher.Dispose();
+        public void Dispose()
+
+        {
+
+            IsDisposing = true;
+
+            DisposeOverride();
+
+            IsDisposed = true;
+
+            IsDisposing = false;
+
+        }
+
+        protected virtual void DisposeOverride() => FileSystemWatcher.Dispose();
 
     }
 }

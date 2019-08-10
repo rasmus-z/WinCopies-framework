@@ -19,17 +19,30 @@ namespace WinCopies.IO
         /// </summary>
         public IBrowsableObjectInfo Path { get; internal set; }
 
+        private bool _useRecursively;
+
         /// <summary>
         /// Whether to add the current <see cref="BrowsableObjectInfoFactory"/> to all the new objects created from this <see cref="BrowsableObjectInfoFactory"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">On setting: The <see cref="Path"/>'s <see cref="IBrowsableObjectInfo.ItemsLoader"/> of the current <see cref="BrowsableObjectInfoFactory"/> is busy.</exception>
-        public bool UseRecursively { get; set; }
+        public bool UseRecursively
+        {
+            get => _useRecursively; set
 
-        protected virtual void ThrowOnInvalidPropertySet()
+            {
+
+                ThrowOnInvalidPropertySet(Path);
+
+                _useRecursively = value;
+
+            }
+        }
+
+        internal static void ThrowOnInvalidPropertySet(IBrowsableObjectInfo path)
 
         {
 
-            if (Path?.ItemsLoader?.IsBusy == true)
+            if (path?.ItemsLoader?.IsBusy == true)
 
                 throw new InvalidOperationException($"The Path's ItemsLoader of the current {nameof(BrowsableObjectInfoFactory)} is busy.");
 
@@ -48,13 +61,13 @@ namespace WinCopies.IO
 
         protected virtual void OnDeepClone(BrowsableObjectInfoFactory factory, bool preserveIds) { }
 
-        public abstract BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds);
+        protected abstract BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds);
 
         public virtual object DeepClone(bool preserveIds)
 
         {
 
-            var browsableObjectInfoFactory = DeepCloneOverride(preserveIds);
+            BrowsableObjectInfoFactory browsableObjectInfoFactory = DeepCloneOverride(preserveIds);
 
             OnDeepClone(browsableObjectInfoFactory, preserveIds);
 

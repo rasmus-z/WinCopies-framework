@@ -23,6 +23,8 @@ namespace WinCopies.IO
     public class WMILoader : BrowsableObjectInfoLoader<WMIItemInfo>, IWMILoader<WMIItemInfo>
     {
 
+        protected override BrowsableObjectInfoLoader<WMIItemInfo> DeepCloneOverride(bool preserveIds) => new WMILoader(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer)FileSystemObjectComparer.DeepClone(preserveIds), WMIItemTypes);
+
         private readonly WMIItemTypes _wmiItemTypes;
 
         /// <summary>
@@ -46,7 +48,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(WMIItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, WMIItemTypes wmiItemTypes) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
+        public WMILoader(WMIItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer, WMIItemTypes wmiItemTypes) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
 
         public override bool CheckFilter(string path) => throw new NotImplementedException();
 

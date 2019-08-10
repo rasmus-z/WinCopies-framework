@@ -7,6 +7,7 @@ using WinCopies.Collections;
 using WinCopies.Util;
 
 using BackgroundWorker = WinCopies.Util.BackgroundWorker;
+using IDisposable = WinCopies.Util.IDisposable;
 
 namespace WinCopies.IO
 {
@@ -17,11 +18,11 @@ namespace WinCopies.IO
 
         private readonly BackgroundWorker backgroundWorker = new BackgroundWorker();
 #pragma warning disable CS0649 // Set up using reflection
-        private readonly System.Collections.Generic.IComparer<IFileSystemObject> _fileSystemObjectComparer;
+        private readonly IFileSystemObjectComparer _fileSystemObjectComparer;
         private readonly IEnumerable<string> _filter;
 #pragma warning restore CS0649
 
-        public System.Collections.Generic.IComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoLoader<TPath>), true); }
+        public IFileSystemObjectComparer FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoLoader<TPath>), true); }
 
         //public void changePath(IBrowsableObjectInfo newValue)
 
@@ -136,7 +137,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
-        public BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation) : this( path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
+        public BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class using a custom comparer.
@@ -144,8 +145,10 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
-        public BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation, System.Collections.Generic.IComparer<IFileSystemObject> fileSystemObjectComparer)
+        public BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer)
         {
+
+            // todo: internal set because this is an initialization
 
             Path = path;
 
@@ -170,6 +173,39 @@ namespace WinCopies.IO
             backgroundWorker.Disposed += (object sender, EventArgs e) => Disposed?.Invoke(this, e);
 
         }
+
+        public bool IsDisposing { get; private set; }
+
+        public bool IsDisposed { get; private set; }
+
+        /// <summary>
+        /// This method does anything because it is designed for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation, and is here for overriding only. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
+        /// </summary>
+        /// <param name="browsableObjectInfoLoader">The cloned <see cref="BrowsableObjectInfoLoader{T}"/>.</param>
+        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
+        protected virtual void OnDeepClone(BrowsableObjectInfoLoader<TPath> browsableObjectInfoLoader, bool preserveIds) { }
+
+        /// <summary>
+        /// When overridden in a derived class, gets a deep clone of this <see cref="BrowsableObjectInfoLoader{T}"/>. The <see cref="OnDeepClone(BrowsableObjectInfoLoader{TPath}, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
+        /// </summary>
+        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
+        protected abstract BrowsableObjectInfoLoader<TPath> DeepCloneOverride(bool preserveIds);
+
+        public object DeepClone(bool preserveIds)
+
+        {
+
+            ((IDisposable)this).ThrowIfDisposingOrDisposed();
+
+            BrowsableObjectInfoLoader<TPath> browsableObjectInfoLoader = DeepCloneOverride(preserveIds);
+
+            OnDeepClone(browsableObjectInfoLoader, preserveIds);
+
+            return browsableObjectInfoLoader;
+
+        }
+
+        public virtual bool NeedsObjectsReconstruction => FileSystemObjectComparer.NeedsObjectsReconstruction;
 
         public abstract bool CheckFilter(string path);
 
@@ -329,13 +365,15 @@ namespace WinCopies.IO
 
                     throw new InvalidOperationException("The items loader is busy.");
 
-                if (!(value.ItemsLoader is null))
+                if (!(value?.ItemsLoader is null))
 
                     throw new InvalidOperationException("The given path has already been added to an items loader.");
 
                 OnPathChanging(value);
 
-                _path.ItemsLoader = null;
+                if (!(_path is null))
+
+                    _path.ItemsLoader = null;
 
                 value.ItemsLoaderInternal = (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)this;
 
@@ -356,14 +394,28 @@ namespace WinCopies.IO
         /// Disposes the current <see cref="BrowsableObjectInfoLoader{T}"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
-        public virtual void Dispose() => Dispose(false);
+        public void Dispose() => Dispose(false);
+
+        public void Dispose(bool disposePath)
+
+        {
+
+            IsDisposing = true;
+
+            DisposeOverride(disposePath);
+
+            IsDisposed = true;
+
+            IsDisposing = false;
+
+        }
 
         /// <summary>
         /// Disposes the current <see cref="BrowsableObjectInfoLoader{T}"/> and optionally disposes the related <see cref="Path"/>.
         /// </summary>
         /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
         /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
-        public virtual void Dispose(bool disposePath)
+        protected virtual void DisposeOverride(bool disposePath)
 
         {
 
