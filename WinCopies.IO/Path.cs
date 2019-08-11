@@ -12,13 +12,14 @@ using IfComp = WinCopies.Util.Util.Comparison;
 using System.Linq;
 using WinCopies.Collections;
 using System.Security;
+using System.Reflection;
 
 namespace WinCopies.IO
 {
     public static class Path
 
     {
-        public static readonly string[] EnvironmentPathVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
+        public static readonly string[] PathEnvironmentVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
 
         public static BrowsableObjectInfo GetBrowsableObjectInfoFromPath(string path, bool parent/*, bool deepArchiveCheck*/)
 
@@ -34,97 +35,105 @@ namespace WinCopies.IO
 
             string[] paths = path.Split('\\');
 
-            var shellObject = ShellObject.FromParsingName(paths[0]);
+            Func<ShellObject> shellObjectDelegate = () => ShellObject.FromParsingName(paths[0]);
+
+            var shellObject = shellObjectDelegate();
 
 #pragma warning disable IDE0068 // Dispose objects before losing scope
-                BrowsableObjectInfo browsableObjectInfo = Directory.Exists(paths[0])
-                    ? new ShellObjectInfo(shellObject, paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile)
-                    : File.Exists(paths[0])
-                    ? new ShellObjectInfo(shellObject, paths[0], FileType.File, SpecialFolder.OtherFolderOrFile)
-                    : new ShellObjectInfo(shellObject, paths[0], FileType.SpecialFolder, ShellObjectInfo.GetSpecialFolder(shellObject));
+            BrowsableObjectInfo browsableObjectInfo = shellObject.IsFileSystemObject
+                ? new ShellObjectInfo(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObjectDelegate, shellObject)
+                                : new ShellObjectInfo(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObjectDelegate, shellObject);
 #pragma warning restore IDE0068 // Dispose objects before losing scope
 
-                if (paths.Length == 1)
+            if (paths.Length == 1)
 
-                    return browsableObjectInfo;
+                return browsableObjectInfo;
 
-                // int archiveSubpathsCount = 0;
+            // int archiveSubpathsCount = 0;
 
-                bool dispose = !parent;
+            bool dispose = !parent;
 
-                BrowsableObjectInfo getBrowsableObjectInfo(BrowsableObjectInfo newValue)
+            BrowsableObjectInfo getBrowsableObjectInfo(BrowsableObjectInfo newValue)
+
+            {
+
+                if (dispose)
 
                 {
 
-                    if (dispose)
+                    var temp = (BrowsableObjectInfo)newValue.DeepClone(false);
 
-                    {
+                    browsableObjectInfo.ItemsLoader.Dispose(true);
 
-                        var temp = (BrowsableObjectInfo)newValue.Clone();
-
-                        browsableObjectInfo.ItemsLoader.Dispose(true);
-
-                        return temp;
-
-                    }
-
-                    else
-
-                    {
-
-                        newValue.ItemsLoader.Dispose();
-
-                        return newValue;
-
-                    }
+                    return temp;
 
                 }
 
-                for (int i = 1; i < paths.Length; i++)
+                else
 
                 {
 
-                    if (!browsableObjectInfo.IsBrowsable && i < paths.Length - 1)
+                    newValue.ItemsLoader.Dispose();
 
-                        throw new DirectoryNotFoundException("The path isn't valid.", browsableObjectInfo);
+                    return newValue;
 
-                    if (If(IfCT.Xor, IfCM.Logical, IfComp.Equal, out bool key, true, GetKeyValuePair(false, browsableObjectInfo.FileType == FileType.Archive), GetKeyValuePair(true, browsableObjectInfo is ArchiveItemInfo)))
+                }
 
-                    {
+            }
 
-                        // archiveSubpathsCount++;
+            for (int i = 1; i < paths.Length; i++)
 
-                        // todo: re-use:
+            {
 
-                        using (var archiveLoader = new ArchiveLoader((ArchiveItemInfo)browsableObjectInfo, true, false, GetAllEnumFlags<FileTypes>()))
+                if (!browsableObjectInfo.IsBrowsable && i < paths.Length - 1)
 
-                            archiveLoader.LoadItems();
+                    throw new DirectoryNotFoundException("The path isn't valid.", browsableObjectInfo);
 
-                        string s = paths[i].ToLower();
+                if (If(IfCT.Xor, IfCM.Logical, IfComp.Equal, out bool key, true, GetKeyValuePair(false, browsableObjectInfo.FileType == FileType.Archive), GetKeyValuePair(true, browsableObjectInfo is ArchiveItemInfo)))
 
-                        browsableObjectInfo = getBrowsableObjectInfo(browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf('\\') + 1).ToLower() == s) as BrowsableObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo));
+                {
 
-                    }
+                    // archiveSubpathsCount++;
 
-                    else if (key && i < paths.Length - 1    /*&& deepArchiveCheck*/)
+                    // todo: re-use:
 
-                        throw new IOException("The 'Open from archive' feature is currently not supported by the WinCopies framework.", browsableObjectInfo);
+                    using (var archiveLoader = new ArchiveLoader((ArchiveItemInfo)browsableObjectInfo, GetAllEnumFlags<FileTypes>(), true, false))
 
-                    else
+                        archiveLoader.LoadItems();
 
-                    {
+                    string s = paths[i].ToLower();
 
-                        shellObject = ((ShellObjectInfo)browsableObjectInfo).ShellObject;
+                    browsableObjectInfo = getBrowsableObjectInfo(browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf('\\') + 1).ToLower() == s) as BrowsableObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo));
 
-                        string s = shellObject.ParsingName;
+                }
 
-                        if (!s.EndsWith("\\"))
+                else if (key && i < paths.Length - 1    /*&& deepArchiveCheck*/)
 
-                            s += "\\";
+                    throw new IOException("The 'Open from archive' feature is currently not supported by the WinCopies framework.", browsableObjectInfo);
 
-                        s += paths[i];
+                else
 
-                        string _s = s.Replace("\\", "\\\\");
+                {
+
+                    shellObject = ((ShellObjectInfo)browsableObjectInfo).ShellObject;
+
+                    string s = shellObject.ParsingName;
+
+                    if (!s.EndsWith("\\"))
+
+                        s += "\\";
+
+                    s += paths[i];
+
+                    // string _s = s.Replace("\\", "\\\\");
+
+                    Func<ShellObject> func = () => ((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo);
+
+                    shellObject = func();
+
+                    SpecialFolder specialFolder = GetSpecialFolder(shellObject);
+
+                    FileType fileType = specialFolder == SpecialFolder.OtherFolderOrFile ? shellObject.IsLink ? FileType.Link : shellObject is ShellFile shellFile ? ArchiveItemInfo.IsSupportedArchiveFormat(System.IO.Path.GetExtension(s)) ? FileType.Archive : FileType.File : FileType.Drive : FileType.SpecialFolder;
 
                     //if (shellObject.IsFileSystemObject)
 
@@ -141,22 +150,22 @@ namespace WinCopies.IO
                     //#endif
 
 #pragma warning disable IDE0068 // Disposed manually when needed
-                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo(((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo), s));
+                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo(s, fileType, specialFolder,    func, null));
 #pragma warning restore IDE0068
 
 #if DEBUG
 
                     Debug.WriteLine(((ShellObjectInfo)browsableObjectInfo).ShellObject.GetDisplayName(DisplayNameType.RelativeToParent));
 
-                        //}
+                    //}
 
 #endif
 
-                    }
-
                 }
 
-                return getBrowsableObjectInfo(browsableObjectInfo);
+            }
+
+            return getBrowsableObjectInfo(browsableObjectInfo);
 
         }
 
@@ -348,57 +357,87 @@ namespace WinCopies.IO
 
         //        }
 
-        // todo: to check and translate all the methods below:
-
-        public static SpecialFolder GetSpecialFolderFromPath(string path, ShellObject shellObject)
+        /// <summary>
+        /// Returns the <see cref="IO.SpecialFolder"/> value for a given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
+        /// </summary>
+        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> from which to return a <see cref="IO.SpecialFolder"/> value.</param>
+        /// <returns>A <see cref="IO.SpecialFolder"/> value that correspond to the given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</returns>
+        public static SpecialFolder GetSpecialFolder(ShellObject shellObject)
 
         {
 
-            SpecialFolder specialFolder = SpecialFolder.OtherFolderOrFile;
+            SpecialFolder? value = null;
 
-            if (path.EndsWith("\\")) path = path.Substring(0, path.Length - 1);
+            PropertyInfo[] knownFoldersProperties = typeof(KnownFolders).GetProperties();
 
-#if DEBUG
+            for (int i = 1; i < knownFoldersProperties.Length; i++)
 
-            Debug.WriteLine(path);
-
-#endif
-
-            if (path.EndsWith(":"))
-
-                specialFolder = SpecialFolder.OtherFolderOrFile;
-
-            else if (path.Contains(":"))
-
-                // todo: to add other values
-
-                if (shellObject is IKnownFolder)
-
+                try
                 {
 
-                    string shellObjectParsingName = shellObject.ParsingName;
+                    for (; i < knownFoldersProperties.Length; i++)
 
-                    if (shellObjectParsingName == KnownFolders.Libraries.ParsingName) specialFolder = SpecialFolder.UsersLibraries;
+                        if (shellObject.ParsingName == knownFoldersProperties[i].Name)
 
-                    else if (shellObjectParsingName == KnownFolders.Desktop.ParsingName) specialFolder = SpecialFolder.Desktop;
+                            value = (SpecialFolder)typeof(SpecialFolder).GetField(knownFoldersProperties[i].Name).GetValue(null);
+
+                    break;
 
                 }
 
-                else
+                catch (ShellException) { i++; }
 
-                if (path == KnownFolders.UsersLibraries.ParsingName || path == KnownFolders.UsersLibraries.LocalizedName)
-
-                    specialFolder = SpecialFolder.UsersLibraries;
-
-            // else if (basePath.StartsWith(LibrariesName + "\\") || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
-
-            // else if
-
-            return specialFolder;
+            return value ?? SpecialFolder.OtherFolderOrFile;
 
         }
 
-        // TODO : attention : supprimer les répétitions ! - voir : file_Type as FileTypes? 
+        //        public static SpecialFolder GetSpecialFolderFromPath(string path, ShellObject shellObject)
+
+        //        {
+
+        //            SpecialFolder specialFolder = SpecialFolder.OtherFolderOrFile;
+
+        //            if (path.EndsWith("\\")) path = path.Substring(0, path.Length - 1);
+
+        //#if DEBUG
+
+        //            Debug.WriteLine(path);
+
+        //#endif
+
+        //            if (path.EndsWith(":"))
+
+        //                specialFolder = SpecialFolder.OtherFolderOrFile;
+
+        //            else if (path.Contains(":"))
+
+        //                // todo: to add other values
+
+        //                if (shellObject is IKnownFolder)
+
+        //                {
+
+        //                    string shellObjectParsingName = shellObject.ParsingName;
+
+        //                    if (shellObjectParsingName == KnownFolders.Libraries.ParsingName) specialFolder = SpecialFolder.UsersLibraries;
+
+        //                    else if (shellObjectParsingName == KnownFolders.Desktop.ParsingName) specialFolder = SpecialFolder.Desktop;
+
+        //                }
+
+        //                else
+
+        //                if (path == KnownFolders.UsersLibraries.ParsingName || path == KnownFolders.UsersLibraries.LocalizedName)
+
+        //                    specialFolder = SpecialFolder.UsersLibraries;
+
+        //            // else if (basePath.StartsWith(LibrariesName + "\\") || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
+
+        //            // else if
+
+        //            return specialFolder;
+
+        //        }
 
         public static string RenamePathWithAutomaticNumber(string path, string destPath)
 
@@ -632,7 +671,7 @@ namespace WinCopies.IO
 
             var paths = new List<KeyValuePair<string, string>>();
 
-            foreach (string environmentPathVariable in EnvironmentPathVariables)
+            foreach (string environmentPathVariable in PathEnvironmentVariables)
 
             {
 

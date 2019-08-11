@@ -28,6 +28,8 @@ namespace WinCopies.IO
 
         private ConnectionOptions _connectionOptions;
 
+        private Func<ConnectionOptions> _connectionOptionsDelegate;
+
         /// <summary>
         /// Gets or sets options for the WMI connections.
         /// </summary>
@@ -53,6 +55,8 @@ namespace WinCopies.IO
         }
 
         private ObjectGetOptions _objectGetOptions;
+
+        private Func<ObjectGetOptions> _objectGetOptionsDelegate;
 
         /// <summary>
         /// Gets or sets options for getting management objects.
@@ -93,7 +97,9 @@ namespace WinCopies.IO
 
         }
 
-        EnumerationOptions _enumerationOptions;
+        private EnumerationOptions _enumerationOptions;
+
+        private Func<EnumerationOptions> _enumerationOptionsDelegate;
 
         /// <summary>
         /// Gets or sets options for management objects.
@@ -119,19 +125,39 @@ namespace WinCopies.IO
             }
         }
 
-        public virtual object Clone()
+        public bool NeedsObjectsReconstruction => true;
+
+        public WMIItemInfoFactoryOptions() : this(null, null, null) { }
+
+        public WMIItemInfoFactoryOptions(Func<ConnectionOptions> connectionOptions, Func<ObjectGetOptions> objectGetOptions, Func<EnumerationOptions> enumerationOptions)
 
         {
 
-            var options = (WMIItemInfoFactoryOptions)MemberwiseClone();
+            _connectionOptionsDelegate = connectionOptions;
 
-            options.Factory = null;
+            _connectionOptions = connectionOptions();
 
-            options._connectionOptions = (ConnectionOptions)options.ConnectionOptions.Clone();
+            _objectGetOptionsDelegate = objectGetOptions;
 
-            options._enumerationOptions = (EnumerationOptions)options.EnumerationOptions.Clone();
+            _objectGetOptions = objectGetOptions();
 
-            options._objectGetOptions = (ObjectGetOptions)options.ObjectGetOptions.Clone();
+            _enumerationOptionsDelegate = enumerationOptions;
+
+            _enumerationOptions = enumerationOptions();
+
+        }
+
+        protected virtual void OnDeepClone(WMIItemInfoFactoryOptions wMIItemInfoFactoryOptions, bool preserveIds) { }
+
+        protected virtual WMIItemInfoFactoryOptions DeepCloneOverride(bool preserveIds) => new WMIItemInfoFactoryOptions(_connectionOptionsDelegate, _objectGetOptionsDelegate, _enumerationOptionsDelegate);
+
+        public object DeepClone(bool preserveIds)
+
+        {
+
+            var options = DeepCloneOverride(preserveIds);
+
+            OnDeepClone(options, preserveIds);
 
             return options;
 

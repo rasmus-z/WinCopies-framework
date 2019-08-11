@@ -34,7 +34,7 @@ namespace WinCopies.IO
 
         public override bool NeedsObjectsReconstruction => true;
 
-        protected override BrowsableObjectInfoLoader<ShellObjectInfo> DeepCloneOverride(bool preserveIds) => new FolderLoader(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer)FileSystemObjectComparer.DeepClone(preserveIds), FileTypes);
+        protected override BrowsableObjectInfoLoader<ShellObjectInfo> DeepCloneOverride(bool preserveIds) => new FolderLoader(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer)FileSystemObjectComparer.DeepClone(preserveIds));
 
         // todo: to turn on ShellObjectWatcher for better compatibility
 
@@ -72,7 +72,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public FolderLoader(ShellObjectInfo path, bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), fileTypes) { }
+        public FolderLoader(ShellObjectInfo path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FolderLoader"/> class using a custom comparer.
@@ -81,7 +81,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public FolderLoader(ShellObjectInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IComparer<IFileSystemObject> fileSystemObjectComparer, FileTypes fileTypes) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes) { }
+        public FolderLoader(ShellObjectInfo path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) { }
 
         protected override void OnPathChanging(ShellObjectInfo path)
         {
@@ -163,7 +163,7 @@ namespace WinCopies.IO
 
                     // todo: may not work with ShellObjectWatcher
 
-                    Path.items.Add(Path.Factory.GetBrowsableObjectInfo(ShellObject.FromParsingName(path), path, FileType.File, SpecialFolder.OtherFolderOrFile));
+                    Path.items.Add(Path.Factory.GetBrowsableObjectInfo(path, FileType.File, SpecialFolder.OtherFolderOrFile, () =>    ShellObject.FromParsingName(path), null));
 
                 }
 #if DEBUG
@@ -385,7 +385,7 @@ namespace WinCopies.IO
 
                 pathInfo.FileType = isLink
                     ? FileType.Link
-                    : ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
+                    : ArchiveItemInfo. IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
 
                 // We only make a normalized path if we add the path to the paths to load.
 
@@ -532,7 +532,7 @@ namespace WinCopies.IO
 
                             // new_Path.LoadThumbnail();
 
-                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.ShellObject, path_.Path, path_.FileType, ShellObjectInfo.GetSpecialFolder(path_.ShellObject)));
+                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.FileType, IO.Path. GetSpecialFolder(path_.ShellObject), () =>    path_.ShellObject, null));
 
                         } while (_paths.MoveNext());
 

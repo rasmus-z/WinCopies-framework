@@ -159,14 +159,6 @@ namespace WinCopies.IO
 
             Factory = factory;
 
-            SetItemsProperty();
-
-        }
-
-        private void SetItemsProperty()
-
-        {
-
             items = new ObservableCollection<IBrowsableObjectInfo>();
 
             Items = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(items);

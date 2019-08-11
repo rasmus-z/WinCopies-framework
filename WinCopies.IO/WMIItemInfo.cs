@@ -43,6 +43,8 @@ namespace WinCopies.IO
 
         public override bool IsRenamingSupported => false;
 
+        private const string RootPath = @"\\.\ROOT:__NAMESPACE";
+
         private Func<ManagementBaseObject> _managementObjectDelegate;
 
         public ManagementBaseObject ManagementObject { get; private set; }
@@ -75,11 +77,11 @@ namespace WinCopies.IO
 
         }
 
-        public WMIItemInfo() : this(@"\\.\ROOT:__NAMESPACE", () =>    new ManagementClass(@"\\.\ROOT:__NAMESPACE"), WMIItemType.Namespace, new WMIItemInfoFactory()) => IsRootNode = true;
+        public WMIItemInfo() : this(RootPath, WMIItemType.Namespace, () => new ManagementClass(RootPath), new WMIItemInfoFactory()) => IsRootNode = true;
 
-        public WMIItemInfo(string path, Func<ManagementBaseObject> managementObjectDelegate, WMIItemType wmiItemType) : this(path, managementObjectDelegate, wmiItemType, new WMIItemInfoFactory()) { }
+        public WMIItemInfo(string path, WMIItemType wmiItemType, Func<ManagementBaseObject> managementObjectDelegate) : this(path, wmiItemType, managementObjectDelegate, new WMIItemInfoFactory()) { }
 
-        public WMIItemInfo(string path, Func<ManagementBaseObject> managementObjectDelegate, WMIItemType wmiItemType, WMIItemInfoFactory factory) : base(path, FileType.SpecialFolder, factory)
+        public WMIItemInfo(string path, WMIItemType wmiItemType, Func<ManagementBaseObject> managementObjectDelegate, WMIItemInfoFactory factory) : base(path, FileType.SpecialFolder, factory)
 
         {
 
@@ -121,7 +123,7 @@ namespace WinCopies.IO
 
             string path = stringBuilder.ToString();
 
-            return new WMIItemInfo(path, () => new ManagementClass(path), WMIItemType.Namespace, factory);
+            return new WMIItemInfo(path, WMIItemType.Namespace, () => new ManagementClass(path), factory);
 
         }
 
@@ -211,7 +213,7 @@ namespace WinCopies.IO
 
         public new WMIItemInfoFactory Factory { get => (WMIItemInfoFactory)base.Factory; set => base.Factory = value; }
 
-        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => IsRootNode ? new WMIItemInfo() : new WMIItemInfo(Path, _managementObjectDelegate, WMIItemType);
+        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => IsRootNode ? new WMIItemInfo() : new WMIItemInfo(Path, WMIItemType, _managementObjectDelegate);
 
         public override bool NeedsObjectsReconstruction => true;
 
@@ -256,7 +258,7 @@ namespace WinCopies.IO
 
         }
 
-        private WMILoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMILoader(this, workerReportsProgress, workerSupportsCancellation, WMIItemTypes.Namespace | WMIItemTypes.Class | WMIItemTypes.Instance) { Path = this });
+        private WMILoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMILoader(this, GetAllEnumFlags<WMIItemTypes>(), workerReportsProgress, workerSupportsCancellation) { Path = this });
 
 #pragma warning disable IDE0067 // Dispose objects before losing scope
         public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItems();

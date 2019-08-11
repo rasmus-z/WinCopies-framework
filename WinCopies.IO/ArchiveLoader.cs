@@ -18,7 +18,7 @@ namespace WinCopies.IO
     public class ArchiveLoader : FileSystemObjectLoader<ArchiveItemInfoProvider>
     {
 
-        protected override BrowsableObjectInfoLoader<ArchiveItemInfoProvider> DeepCloneOverride(bool preserveIds) => new ArchiveLoader(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer)FileSystemObjectComparer.DeepClone(preserveIds), FileTypes);
+        protected override BrowsableObjectInfoLoader<ArchiveItemInfoProvider> DeepCloneOverride(bool preserveIds) => new ArchiveLoader(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer)FileSystemObjectComparer.DeepClone(preserveIds));
 
         private static readonly Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();
 
@@ -54,7 +54,7 @@ namespace WinCopies.IO
 
             dic.Add(InArchiveFormat.Dmg, new string[] { ".dmg" });
 
-            dic.Add(InArchiveFormat.Elf, new string[] { "", ".axf", ".bin", ".elf", ".o", ".prx", ".puff", ".ko", ".mod", ".so" });
+            dic.Add(InArchiveFormat.Elf, new string[] { ".axf", ".bin", ".elf", ".o", ".prx", ".puff", ".ko", ".mod", ".so" });
 
             dic.Add(InArchiveFormat.Fat, null);
 
@@ -70,11 +70,59 @@ namespace WinCopies.IO
 
             dic.Add(InArchiveFormat.Lzma, new string[] { "lzma" });
 
-            dic.Add(InArchiveFormat.Lzma86, null);
+            dic.Add(InArchiveFormat.Lzma86, new string[] { ".lzma86" });
 
             dic.Add(InArchiveFormat.Lzw, new string[] { ".lzw" });
 
-            dic.Add(InArchiveFormat.MachO, new string[] { "", ".o", ".dylib", ".bundle" });
+            dic.Add(InArchiveFormat.MachO, new string[] { ".o", ".dylib", ".bundle" });
+
+            dic.Add(InArchiveFormat.Mbr, new string[] { ".mbr" });
+
+            dic.Add(InArchiveFormat.Msi, new string[] { ".msi", ".msp" });
+
+            dic.Add(InArchiveFormat.Mslz, new string[] { ".mslz" });
+
+            dic.Add(InArchiveFormat.Mub, new string[] { ".mub" });
+
+            dic.Add(InArchiveFormat.Nsis, new string[] { ".exe" });
+
+            dic.Add(InArchiveFormat.Ntfs, null);
+
+            dic.Add(InArchiveFormat.PE, new string[] { ".dll", ".ocx", ".sys", ".scr", ".drv", ".efi" });
+
+            dic.Add(InArchiveFormat.Ppmd);
+
+            dic.Add(InArchiveFormat.Rar, null);
+
+            dic.Add(InArchiveFormat.Rar4, null);
+
+            dic.Add(InArchiveFormat.Rpm, null);
+
+            dic.Add(InArchiveFormat.Split, null);
+
+            dic.Add(InArchiveFormat.SquashFS, null);
+
+            dic.Add(InArchiveFormat.Swf, null);
+
+            dic.Add(InArchiveFormat.Swfc, null);
+
+            dic.Add(InArchiveFormat.Tar, null);
+
+            dic.Add(InArchiveFormat.TE, null);
+
+            dic.Add(InArchiveFormat.Udf, null);
+
+            dic.Add(InArchiveFormat.UEFIc, null);
+
+            dic.Add(InArchiveFormat.UEFIs, null);
+
+            dic.Add(InArchiveFormat.Vhd, null);
+
+            dic.Add(InArchiveFormat.Wim, null);
+
+            dic.Add(InArchiveFormat.Xar, null);
+
+            dic.Add(InArchiveFormat.XZ, null);
 
             InArchiveFormats = new ReadOnlyDictionary<InArchiveFormat, string[]>(dic);
 
@@ -86,7 +134,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(ArchiveItemInfoProvider path, bool workerReportsProgress, bool workerSupportsCancellation, FileTypes fileTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer(), fileTypes) { }
+        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveLoader"/> class using a custom comparer.
@@ -95,7 +143,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(ArchiveItemInfoProvider path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer, FileTypes fileTypes) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer, fileTypes) { }
+        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) { }
 
         protected override void OnPathChanging(ArchiveItemInfoProvider path)
 
@@ -121,24 +169,6 @@ namespace WinCopies.IO
         }
 
         // protected override void OnProgressChanged(object sender, ProgressChangedEventArgs e) => PathsOverride.Add((ArchiveItemInfo)e.UserState);
-
-        public static bool IsSupportedArchiveFormat(string extension)
-
-        {
-
-            foreach (KeyValuePair<InArchiveFormat, string[]> value in InArchiveFormats)
-
-                if (value.Value != null)
-
-                    foreach (string _extension in value.Value)
-
-                        if (_extension == extension)
-
-                            return true;
-
-            return false;
-
-        }
 
         protected override void OnDoWork(DoWorkEventArgs e)
 
@@ -243,7 +273,7 @@ namespace WinCopies.IO
 
                             pathInfo.FileType = pathInfo.Path.Substring(pathInfo.Path.Length).EndsWith(".lnk")
                                 ? FileType.Link
-                                : IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
+                                : ArchiveItemInfo. IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
 
                             // We only make a normalized path if we add the path to the paths to load.
 
@@ -433,7 +463,7 @@ namespace WinCopies.IO
                 // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;
                 // new_Path.LoadThumbnail();
 
-                ReportProgress(0, Path.ArchiveItemInfoFactory.GetBrowsableObjectInfo(((ArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType));
+                ReportProgress(0, Path.ArchiveItemInfoFactory.GetBrowsableObjectInfo(Path.Path + "\\" + path.Path, path.FileType, Path.ArchiveShellObject, () => path.ArchiveFileInfo));
 
                 // #if DEBUG
 

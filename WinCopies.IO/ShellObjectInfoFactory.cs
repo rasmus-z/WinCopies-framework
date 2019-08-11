@@ -14,7 +14,7 @@ namespace WinCopies.IO
 
         ArchiveItemInfoFactory _archiveItemInfoFactory;
 
-        ArchiveItemInfoFactory ArchiveItemInfoFactory { get => _archiveItemInfoFactory; set { ThrowOnInvalidPropertySet(); _archiveItemInfoFactory = value; } }
+        ArchiveItemInfoFactory ArchiveItemInfoFactory { get => _archiveItemInfoFactory; set { ThrowOnInvalidPropertySet(Path); _archiveItemInfoFactory = value; } }
 
         IArchiveItemInfoFactory IShellObjectInfoFactory.ArchiveItemInfoFactory => ArchiveItemInfoFactory;
 
@@ -27,9 +27,9 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="shellObject">The <see cref="ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(Func<ShellObject> shellObject, string path, FileType fileType, SpecialFolder specialFolder) => UseRecursively ? GetBrowsableObjectInfo(shellObject, path, fileType, specialFolder, (ShellObjectInfoFactory)this.DeepClone(false), Path is ShellObjectInfo shellObjectInfo && shellObjectInfo.ArchiveItemInfoFactory.UseRecursively == true
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject) => UseRecursively ? GetBrowsableObjectInfo(path, fileType, specialFolder, shellObjectDelegate, shellObject, (ShellObjectInfoFactory)this.DeepClone(false), Path is ShellObjectInfo shellObjectInfo && shellObjectInfo.ArchiveItemInfoFactory.UseRecursively == true
                 ? (ArchiveItemInfoFactory)shellObjectInfo.ArchiveItemInfoFactory.DeepClone(false)
-                : (ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(false) ?? new ArchiveItemInfoFactory()) : new ShellObjectInfo(shellObject, path, fileType, specialFolder, new ShellObjectInfoFactory(), Path is ShellObjectInfo _shellObjectInfo && _shellObjectInfo.ArchiveItemInfoFactory.UseRecursively == true
+                : (ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(false) ?? new ArchiveItemInfoFactory()) : new ShellObjectInfo(path, fileType, specialFolder, shellObjectDelegate, shellObject, new ShellObjectInfoFactory(), Path is ShellObjectInfo _shellObjectInfo && _shellObjectInfo.ArchiveItemInfoFactory.UseRecursively == true
                 ? (ArchiveItemInfoFactory)_shellObjectInfo.ArchiveItemInfoFactory.DeepClone(false)
                 : (ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(false) ?? new ArchiveItemInfoFactory());
 
@@ -40,7 +40,7 @@ namespace WinCopies.IO
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(Func<ShellObject> shellObject, string path, FileType fileType, SpecialFolder specialFolder, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) => new ShellObjectInfo(shellObject, path, fileType, specialFolder, factory, archiveItemInfoFactory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) => new ShellObjectInfo(path, fileType, specialFolder, shellObjectDelegate, shellObject, factory, archiveItemInfoFactory);
 
         protected override BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds) => new ShellObjectInfoFactory(UseRecursively, (ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(preserveIds));
 

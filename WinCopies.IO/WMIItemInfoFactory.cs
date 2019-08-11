@@ -7,9 +7,9 @@ namespace WinCopies.IO
     public class WMIItemInfoFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
     {
 
-        public override bool NeedsObjectsReconstruction => Options?.needs;
+        public override bool NeedsObjectsReconstruction => !(Options is null);
 
-        protected override BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds) => new WMIItemInfoFactory(Options?.Clone());
+        protected override BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds) => new WMIItemInfoFactory((WMIItemInfoFactoryOptions)Options?.DeepClone(false));
 
         private WMIItemInfoFactoryOptions _options;
 
@@ -39,11 +39,11 @@ namespace WinCopies.IO
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => new WMIItemInfo();
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, Func<ManagementBaseObject> managementObject, WMIItemType wmiItemType) => new WMIItemInfo(path, managementObject, wmiItemType);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, Func<ManagementBaseObject> managementObject) => new WMIItemInfo(path, wmiItemType, managementObject);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(ManagementScope managementScope, ManagementPath managementPath, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(managementScope, managementPath, _options?.ObjectGetOptions), wmiItemType);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, Func<ManagementScope> managementScope, Func<ManagementPath> managementPath) => GetBrowsableObjectInfo(path, wmiItemType, () => new ManagementObject(managementScope(), managementPath(), _options?.ObjectGetOptions));
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(new ManagementObject(new ManagementScope(path, _options?.ConnectionOptions), new ManagementPath(path), _options?.ObjectGetOptions), wmiItemType);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(path, wmiItemType, () => new ManagementObject(new ManagementScope(path, _options?.ConnectionOptions), new ManagementPath(path), _options?.ObjectGetOptions));
 
     }
 }

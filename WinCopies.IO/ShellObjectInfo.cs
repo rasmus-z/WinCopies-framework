@@ -210,40 +210,6 @@ namespace WinCopies.IO
 
         //}
 
-        /// <summary>
-        /// Returns the <see cref="IO.SpecialFolder"/> value for a given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
-        /// </summary>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> from which to return a <see cref="IO.SpecialFolder"/> value.</param>
-        /// <returns>A <see cref="IO.SpecialFolder"/> value that correspond to the given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</returns>
-        public static SpecialFolder GetSpecialFolder(ShellObject shellObject)
-
-        {
-
-            SpecialFolder? value = null;
-
-            PropertyInfo[] knownFoldersProperties = typeof(KnownFolders).GetProperties();
-
-            for (int i = 1; i < knownFoldersProperties.Length; i++)
-
-                try
-                {
-
-                    for (; i < knownFoldersProperties.Length; i++)
-
-                        if (shellObject.ParsingName == knownFoldersProperties[i].Name)
-
-                            value = (SpecialFolder)typeof(SpecialFolder).GetField(knownFoldersProperties[i].Name).GetValue(null);
-
-                    break;
-
-                }
-
-                catch (ShellException) { i++; }
-
-            return value ?? SpecialFolder.OtherFolderOrFile;
-
-        }
-
         ///// <summary>
         ///// Initializes a new instance of the <see cref="ShellObjectInfo"/> class.
         ///// </summary>
@@ -269,7 +235,7 @@ namespace WinCopies.IO
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
-        public ShellObjectInfo(Func<ShellObject> shellObjectDelegate, string path, FileType fileType, SpecialFolder specialFolder) : this(shellObjectDelegate, path, fileType, specialFolder, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
+        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject) : this(path, fileType, specialFolder, shellObjectDelegate, shellObject, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/>s and <see cref="ArchiveItemInfo"/>s.
@@ -280,19 +246,21 @@ namespace WinCopies.IO
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
         /// <param name="factory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>s and <see cref="ArchiveLoader"/>s use to create new objects that represent casual file system items.</param>
         /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
-        public ShellObjectInfo(Func<ShellObject> shellObjectDelegate, string path, FileType fileType, SpecialFolder specialFolder, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, archiveItemInfoFactory) =>
+        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, archiveItemInfoFactory) =>
 
-            Init(shellObjectDelegate, nameof(fileType), specialFolder, factory); // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
+            Init(specialFolder, shellObjectDelegate, shellObject, nameof(fileType), factory); // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
 
         private Func<ShellObject> _shellObjectDelegate;
 
-        private void Init(Func<ShellObject> shellObjectDelegate, string fileTypeParameterName, SpecialFolder specialFolder, ShellObjectInfoFactory shellObjectInfoFactory)
+        private void Init(SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject, string fileTypeParameterName, ShellObjectInfoFactory shellObjectInfoFactory)
 
         {
 
             _shellObjectDelegate = shellObjectDelegate;
 
-            ShellObject shellObject = shellObjectDelegate();
+            if (shellObject is null)
+
+                shellObject = shellObjectDelegate();
 
 #if DEBUG
 
@@ -366,59 +334,61 @@ namespace WinCopies.IO
         protected override IBrowsableObjectInfo GetParent()
         {
 
+            (FileType, SpecialFolder) getFileType(ShellObject _shellObject)
+
+            {
+
+                SpecialFolder specialFolder = IO.Path. GetSpecialFolder(_shellObject);
+
+                FileType fileType = specialFolder == SpecialFolder.OtherFolderOrFile ? FileType.Folder : FileType.SpecialFolder;
+
+                return (fileType, specialFolder);
+
+            }
+
             if (FileType == FileType.Folder || FileType == FileType.Archive || (FileType == FileType.SpecialFolder && ShellObject.IsFileSystemObject))
 
             {
 
                 DirectoryInfo parentDirectoryInfo = FileType == FileType.Archive ? new DirectoryInfo(System.IO.Path.GetDirectoryName(Path)) : Directory.GetParent(Path);
 
-                if (parentDirectoryInfo != null)
+                string parent = parentDirectoryInfo.FullName;
 
-                {
+                ShellObject shellObjectDelegate() => ShellObject.FromParsingName(parent);
 
-                    string _parent = parentDirectoryInfo.FullName;
+                ShellObject shellObject = shellObjectDelegate();
 
-                    Func<ShellObject> shellObjectDelegate = () => ShellObject.FromParsingName(_parent);
+                (FileType fileType, SpecialFolder specialFolder) = getFileType(shellObject);
 
-                    var shellObject = shellobjectdelegate
-
-                    FileType fileType;
-
-                    SpecialFolder specialFolder;
-
-                    if (shellObject.IsFileSystemObject)
-
-                    {
-
-                        fileType = FileType.Folder;
-
-                        specialFolder = SpecialFolder.OtherFolderOrFile;
-
-                    }
-
-                    else
-
-                    {
-
-                        fileType = FileType.SpecialFolder;
-
-                        specialFolder = GetSpecialFolder(shellObject);
-
-                    }
-
-                    return Factory.GetBrowsableObjectInfo(() => shellObject, _parent, fileType, specialFolder);
-
-                }
-
-                else return null;
+                return Factory.GetBrowsableObjectInfo(parent, fileType, specialFolder, shellObjectDelegate, shellObject);
 
             }
 
-            else return FileType == FileType.Drive
-                ? Factory.GetBrowsableObjectInfo(ShellObject.Parent, KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolder.Computer)
-                : FileType == FileType.SpecialFolder && SpecialFolder != SpecialFolder.Computer
-                ? Factory.GetBrowsableObjectInfo(ShellObject.Parent, KnownFolderHelper.FromParsingName(ShellObject.Parent.ParsingName).Path)
-                : null;
+            else if (FileType == FileType.Drive)
+
+                return Factory.GetBrowsableObjectInfo(KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolder.Computer, () => ShellObject.Parent, null);
+
+            else if (FileType == FileType.SpecialFolder && SpecialFolder != SpecialFolder.Computer)
+
+            {
+
+                Func<ShellObject> shellObjectDelegate = () => ShellObject.Parent;
+
+                ShellObject shellObject = shellObjectDelegate();
+
+                string path = Path;
+
+                if (path.EndsWith("\\"))
+
+                    path = path.Remove(path.Length - 1);
+
+                (FileType fileType, SpecialFolder specialFolder) = getFileType(shellObject);
+
+                return Factory.GetBrowsableObjectInfo(path.Remove(path.LastIndexOf('\\')), fileType, specialFolder, shellObjectDelegate, shellObject);
+
+            }
+
+            else return null;
 
         }
 
@@ -440,17 +410,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             }
 
             else
 
-                LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             //else
 
@@ -488,17 +458,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             }
 
             else
 
-                LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, workerReportsProgress, workerSupportsCancellation, GetAllEnumFlags<FileTypes>()));
+                LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             //else
 
@@ -611,7 +581,7 @@ namespace WinCopies.IO
 
         }
 
-        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ShellObjectInfo(_shellObjectDelegate, Path, FileType, SpecialFolder);
+        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ShellObjectInfo(Path, FileType, SpecialFolder, _shellObjectDelegate, null);
 
     }
 

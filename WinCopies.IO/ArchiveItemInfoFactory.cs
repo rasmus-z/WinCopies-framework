@@ -6,7 +6,7 @@ namespace WinCopies.IO
     public interface IArchiveItemInfoFactory : IBrowsableObjectInfoFactory
     {
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfo, string path, FileType fileType);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfo);
 
     }
 
@@ -17,9 +17,9 @@ namespace WinCopies.IO
 
         public ArchiveItemInfoFactory(bool useRecursively) : base(useRecursively) { }
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfo, string path, FileType fileType) =>
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfo) =>
 
-            UseRecursively ? new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType, (ArchiveItemInfoFactory)DeepClone(false)) : new ArchiveItemInfo(archiveShellObject, archiveFileInfo, path, fileType);
+            UseRecursively ? new ArchiveItemInfo(path, fileType, archiveShellObject, archiveFileInfo, (ArchiveItemInfoFactory)DeepClone(false)) : new ArchiveItemInfo(path, fileType, archiveShellObject, archiveFileInfo);
 
         protected override BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds) => new ArchiveItemInfoFactory(UseRecursively);
 
