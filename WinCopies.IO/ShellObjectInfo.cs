@@ -372,7 +372,7 @@ namespace WinCopies.IO
 
             {
 
-                Func<ShellObject> shellObjectDelegate = () => ShellObject.Parent;
+                ShellObject shellObjectDelegate() => ShellObject.Parent;
 
                 ShellObject shellObject = shellObjectDelegate();
 
@@ -495,10 +495,10 @@ namespace WinCopies.IO
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        protected override void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
+        protected override void DisposeOverride( bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
         {
 
-            base.DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
+            base.DisposeOverride( disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
 
             ShellObject.Dispose();
 
@@ -527,46 +527,46 @@ namespace WinCopies.IO
         /// <exception cref="ArgumentNullException">value is null.</exception>
         public new ShellObjectInfoFactory Factory { get => (ShellObjectInfoFactory)base.Factory; set => base.Factory = value; }
 
-        public override bool IsRenamingSupported => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.File, FileType.Drive, FileType.Archive, FileType.Link);
+        // public override bool IsRenamingSupported => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.File, FileType.Drive, FileType.Archive, FileType.Link);
 
-        /// <summary>
-        /// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.
-        /// </summary>
-        /// <param name="newValue">The new name or relative path for this <see cref="ShellObjectInfo"/>.</param>
-        public override void Rename(string newValue)
+        ///// <summary>
+        ///// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.
+        ///// </summary>
+        ///// <param name="newValue">The new name or relative path for this <see cref="ShellObjectInfo"/>.</param>
+        //public override void Rename(string newValue)
 
-        {
+        //{
 
-            if (If(IfCT.Or, IfCM.Logical, IfComp.NotEqual, out string key, FileType, GetKeyValuePair(nameof(FileType.Folder), FileType.Folder), GetKeyValuePair(nameof(FileType.File), FileType.File), GetKeyValuePair(nameof(FileType.Drive), FileType.Drive)))
+        //    if (If(IfCT.Or, IfCM.Logical, IfComp.NotEqual, out string key, FileType, GetKeyValuePair(nameof(FileType.Folder), FileType.Folder), GetKeyValuePair(nameof(FileType.File), FileType.File), GetKeyValuePair(nameof(FileType.Drive), FileType.Drive)))
 
-                throw new InvalidOperationException($"{nameof(FileType)} must have one of the following values: {nameof(FileType.Folder)}, {nameof(FileType.File)} or {nameof(FileType.Drive)}. The value was {key}.");
+        //        throw new InvalidOperationException($"{nameof(FileType)} must have one of the following values: {nameof(FileType.Folder)}, {nameof(FileType.File)} or {nameof(FileType.Drive)}. The value was {key}.");
 
-            string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
+        //    string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
 
-            switch (FileType)
-            {
+        //    switch (FileType)
+        //    {
 
-                case FileType.Folder:
+        //        case FileType.Folder:
 
-                    Directory.Move(Path, getNewPath());
+        //            Directory.Move(Path, getNewPath());
 
-                    break;
+        //            break;
 
-                case FileType.File:
+        //        case FileType.File:
 
-                    File.Move(Path, getNewPath());
+        //            File.Move(Path, getNewPath());
 
-                    break;
+        //            break;
 
-                case FileType.Drive:
+        //        case FileType.Drive:
 
-                    DriveInfoProperties.VolumeLabel = newValue;
+        //            DriveInfoProperties.VolumeLabel = newValue;
 
-                    break;
+        //            break;
 
-            }
+        //    }
 
-        }
+        //}
 
         public override bool NeedsObjectsReconstruction => true;
 

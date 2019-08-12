@@ -44,9 +44,9 @@ namespace WinCopies.IO
     public class RegistryItemInfo : BrowsableObjectInfo, IRegistryItemInfo
     {
 
-        public static RegistryItemInfoComparer GetDefaultComparer() => new RegistryItemInfoComparer();
+        public static RegistryItemInfoComparer GetDefaultRegistryItemInfoComparer() => new RegistryItemInfoComparer();
 
-        public override bool IsRenamingSupported => false;
+        // public override bool IsRenamingSupported => false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
@@ -287,7 +287,7 @@ namespace WinCopies.IO
 
         }
 
-        public override bool NeedsObjectsReconstruction => base.NeedsObjectsReconstruction ||     !(_registryKey is null); // If _registryKey is null, reconstructing registry does not make sense, so we return false.
+        public override bool NeedsObjectsReconstruction => base.NeedsObjectsReconstruction || !(_registryKey is null); // If _registryKey is null, reconstructing registry does not make sense, so we return false.
 
         /// <summary>
         /// Returns the parent of this <see cref="RegistryItemInfo"/>.
@@ -332,9 +332,9 @@ namespace WinCopies.IO
         /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
-        protected override void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
+        protected override void DisposeOverride(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
         {
-            base.DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
+            base.DisposeOverride(disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
 
             RegistryKey.Dispose();
         }
@@ -353,53 +353,59 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new RegistryKeyLoader(this, workerReportsProgress, workerSupportsCancellation, RegistryItemType == RegistryItemType.RegistryRoot ? RegistryItemTypes.RegistryKey : RegistryItemTypes.RegistryKey | RegistryItemTypes.RegistryValue));
 
-        /// <summary>
-        /// Renames or move to a relative path, or both, the current <see cref="RegistryItemInfo"/> with the specified name.
-        /// </summary>
-        /// <param name="newValue">The new name or relative path for this <see cref="RegistryItemInfo"/>.</param>
-        public override void Rename(string newValue)
+        ///// <summary>
+        ///// Renames or move to a relative path, or both, the current <see cref="RegistryItemInfo"/> with the specified name.
+        ///// </summary>
+        ///// <param name="newValue">The new name or relative path for this <see cref="RegistryItemInfo"/>.</param>
+        //public override void Rename(string newValue)
 
-        {
+        //{
 
-            switch (RegistryItemType)
+        //    switch (RegistryItemType)
 
-            {
+        //    {
 
-                case RegistryItemType.RegistryRoot:
+        //        case RegistryItemType.RegistryRoot:
 
-                    throw new InvalidOperationException("This node is the registry root node and cannot be renamed.");
+        //            throw new InvalidOperationException("This node is the registry root node and cannot be renamed.");
 
-                case RegistryItemType.RegistryKey:
+        //        case RegistryItemType.RegistryKey:
 
-                    // todo:
+        //            // todo:
 
-                    throw new InvalidOperationException("This feature is currently not supported.");
+        //            throw new InvalidOperationException("This feature is currently not supported.");
 
-                case RegistryItemType.RegistryValue:
+        //        case RegistryItemType.RegistryValue:
 
-                    if (RegistryKey.GetValue(newValue) != null)
+        //            if (RegistryKey.GetValue(newValue) != null)
 
-                        throw new InvalidOperationException("A value with the specified name already exists in this registry key.");
+        //                throw new InvalidOperationException("A value with the specified name already exists in this registry key.");
 
-                    object value = RegistryKey.GetValue(Name);
+        //            object value = RegistryKey.GetValue(Name);
 
-                    RegistryValueKind valueKind = RegistryKey.GetValueKind(Name);
+        //            RegistryValueKind valueKind = RegistryKey.GetValueKind(Name);
 
-                    RegistryKey.DeleteValue(Name);
+        //            RegistryKey.DeleteValue(Name);
 
-                    RegistryKey.SetValue(newValue, value, valueKind);
+        //            RegistryKey.SetValue(newValue, value, valueKind);
 
-                    break;
+        //            break;
 
-            }
+        //    }
 
-        }
+        //}
 
-        public override bool Equals(IFileSystemObject fileSystemObject) => Equals((object)fileSystemObject);
+        // public override bool Equals(IFileSystemObject fileSystemObject) => Equals((object)fileSystemObject);
 
         public override bool Equals(object obj) => ReferenceEquals(this, obj)
                 ? true : obj is IRegistryItemInfo _obj ? RegistryItemType == _obj.RegistryItemType && Path.ToLower() == _obj.Path.ToLower()
                 : false;
+
+        public int CompareTo(IRegistryItemInfo other) => GetDefaultRegistryItemInfoComparer().Compare(this, other);
+
+        public bool Equals(IRegistryItemInfo other) => Equals(other as object);
+
+        public override int GetHashCode() => base.GetHashCode() ^ RegistryItemType.GetHashCode();
 
     }
 }

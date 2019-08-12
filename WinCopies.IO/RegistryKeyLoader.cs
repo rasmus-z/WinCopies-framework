@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
-using Microsoft.Win32;
-using WinCopies.Util;
-using System.Windows;
 using System.Security;
-using System.IO;
+
+using Microsoft.Win32;
+
+using WinCopies.Util;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
@@ -74,45 +72,45 @@ namespace WinCopies.IO
         /// <param name="registryItemTypes">The registry item types to load.</param>
         public RegistryKeyLoader(RegistryItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
 
-        public override bool CheckFilter(string path)
+        //public override bool CheckFilter(string path)
 
-        {
+        //{
 
-            if (Filter == null) return true;
+        //    if (Filter == null) return true;
 
-            foreach (string filter in Filter)
+        //    foreach (string filter in Filter)
 
-            {
+        //    {
 
-                bool checkFilters(string[] filters)
+        //        bool checkFilters(string[] filters)
 
-                {
+        //        {
 
-                    foreach (string _filter in filters)
+        //            foreach (string _filter in filters)
 
-                    {
+        //            {
 
-                        if (_filter == "") continue;
+        //                if ( string.IsNullOrEmpty( _filter ) ) continue;
 
-                        if (path.Length >= _filter.Length && path.Contains(_filter))
+        //                if (path.Length >= _filter.Length && path.Contains(_filter))
 
-                            path = path.Substring(path.IndexOf(_filter) + _filter.Length);
+        //                    path = path.Substring(path.IndexOf(_filter) + _filter.Length);
 
-                        else return false;
+        //                else return false;
 
-                    }
+        //            }
 
-                    return true;
+        //            return true;
 
-                }
+        //        }
 
-                return checkFilters(filter.Split('*'));
+        //        return checkFilters(filter.Split('*'));
 
-            }
+        //    }
 
-            return true;
+        //    return true;
 
-        }
+        //}
 
         protected override void OnPathChanging(RegistryItemInfo path) => ThrowOnInvalidRegistryTypesOption();
 
@@ -149,7 +147,7 @@ namespace WinCopies.IO
 
                     if (CheckFilter(path))
 
-                        _ = paths.AddLast(pathInfo = new PathInfo() { Path = path, Name = name, IsValue = isValue });
+                        _ = paths.AddLast(pathInfo = new PathInfo(path, path.RemoveAccents(), name, isValue ? FileType.SpecialFolder : FileType.Other, isValue));
 
                 }
 
@@ -271,25 +269,25 @@ namespace WinCopies.IO
 
         }
 
-        public struct PathInfo : IFileSystemObject
+        protected class PathInfo : IO.PathInfo
         {
 
-            public string Path { get; set; }
+            public override string LocalizedName => Name;
 
-            public string LocalizedName => Name;
+            public override string Name { get; }
 
-            public string Name { get; set; }
+            public string NormalizedPath { get; }
 
-            public FileType FileType => FileType.SpecialFolder;
+            public bool IsValue { get; }
 
-            public bool IsValue { get; set; }
+            public PathInfo(string path, string normalizedPath, string name, FileType fileType, bool isValue) : base(path, normalizedPath, fileType)
+            {
 
-            public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
-                    ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
-                    : false;
+                Name = name;
 
-            public int CompareTo(IFileSystemObject fileSystemObject) => BrowsableObjectInfo.GetDefaultComparer().Compare(this, fileSystemObject);
+                IsValue = isValue;
 
+            }
         }
     }
 }

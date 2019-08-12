@@ -1,8 +1,9 @@
-﻿using System.Management;
+﻿using System;
+using System.Management;
 
 namespace WinCopies.IO
 {
-    public interface IWMIItemInfo : IBrowsableObjectInfo
+    public interface IWMIItemInfo : IBrowsableObjectInfo, IComparable<IFileSystemObject>, IEquatable<IFileSystemObject>
     {
 
         ManagementBaseObject ManagementObject { get; }

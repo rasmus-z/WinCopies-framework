@@ -19,7 +19,7 @@ namespace WinCopies.IO
 
         IBrowsableObjectInfo GetBrowsableObjectInfo( string path, WMIItemType wmiItemType, Func< ManagementScope > managementScope, Func< ManagementPath > managementPath);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType);
+        IBrowsableObjectInfo GetBrowsableObjectInfo( string path, WMIItemType wmiItemType);
 
     }
 

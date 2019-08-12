@@ -50,7 +50,7 @@ namespace WinCopies.IO
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
         public WMILoader(WMIItemInfo path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer) : base(path, workerReportsProgress, workerSupportsCancellation, fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
 
-        public override bool CheckFilter(string path) => throw new NotImplementedException();
+        //public override bool CheckFilter(string path) => throw new NotImplementedException();
 
         protected override void OnDoWork(DoWorkEventArgs e)
         {
@@ -111,7 +111,7 @@ namespace WinCopies.IO
 
                                         if (CheckFilter(_path))
 
-                                            _ = paths.AddLast(new PathInfo() { ManagementObject = instance, Path = _path, Name = WMIItemInfo.GetName(instance, WMIItemType.Namespace) });
+                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Namespace), FileType.SpecialFolder, instance, WMIItemType.Namespace));
 
                                     }
 
@@ -119,16 +119,21 @@ namespace WinCopies.IO
 
                                 }
 
+#pragma warning disable CA1031 // Do not catch general exception types
                                 catch (Exception) { }
+#pragma warning restore CA1031 // Do not catch general exception types
 
                         }
 
                     }
+
+#pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception)
 
                     {
                         // MessageBox.Show(ex.Message);
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
 
                 if (WMIItemTypes.HasFlag(WMIItemTypes.Class))
 
@@ -167,19 +172,23 @@ namespace WinCopies.IO
 
                                         if (CheckFilter(_path))
 
-                                            _ = paths.AddLast(new PathInfo() { ManagementObject = instance, Path = _path, Name = WMIItemInfo.GetName(instance, WMIItemType.Class) });
+                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Class), FileType.SpecialFolder, instance, WMIItemType.Class) { });
 
                                     } while (instances.MoveNext());
 
                                 }
 
+#pragma warning disable CA1031 // Do not catch general exception types
                                 catch (Exception) { }
+#pragma warning restore CA1031 // Do not catch general exception types
 
                         }
 
                     }
 
+#pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception) { }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             }
 
@@ -212,20 +221,25 @@ namespace WinCopies.IO
 
                                     if (CheckFilter(_path))
 
-                                        _ = paths.AddLast(new PathInfo() { ManagementObject = instance, Path = _path, Name = WMIItemInfo.GetName(instance, WMIItemType.Instance) });
+                                        _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Instance), FileType.Other, instance, WMIItemType.Instance));
 
                                 } while (instances.MoveNext());
 
                             }
+
+#pragma warning disable CA1031 // Do not catch general exception types
                             catch (Exception) { }
+#pragma warning restore CA1031 // Do not catch general exception types
 
                 }
 
+#pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception)
 
                 {
                     // MessageBox.Show(ex.Message);
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
 
                 if (dispose)
 
@@ -279,51 +293,48 @@ namespace WinCopies.IO
 
                             // new_Path.LoadThumbnail();
 
-                            ReportProgress(0, path_.IsRoot ? Path.Factory.GetBrowsableObjectInfo() : Path.Factory.GetBrowsableObjectInfo( path_.Path, path_.WMIItemType, () =>    path_.ManagementObject));
+                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.WMIItemType, () => path_.ManagementObject));
 
                         } while (_paths.MoveNext());
 
                     }
+
+#pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception) { }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         }
 
-        public struct PathInfo : IFileSystemObject
+        protected class PathInfo : IO.PathInfo
         {
-
-            /// <summary>
-            /// Gets the path of this <see cref="PathInfo"/>.
-            /// </summary>
-            public string Path { get; set; }
 
             /// <summary>
             /// Gets the localized name of this <see cref="PathInfo"/>.
             /// </summary>
-            public string LocalizedName => Name;
+            public override string LocalizedName => Name;
 
             /// <summary>
             /// Gets the name of this <see cref="PathInfo"/>.
             /// </summary>
-            public string Name { get; set; }
+            public override string Name { get; }
 
-            /// <summary>
-            /// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="PathInfo"/>.
-            /// </summary>
-            public FileType FileType => FileType.SpecialFolder;
+            public ManagementBaseObject ManagementObject { get; }
 
-            public ManagementBaseObject ManagementObject { get; set; }
+            public WMIItemType WMIItemType { get; }
 
-            public bool IsRoot { get; set; }
+            public PathInfo(string path, string normalizedPath, string name, FileType fileType, ManagementBaseObject managementObject, WMIItemType wmiItemType) : base(path, normalizedPath, fileType)
+            {
 
-            public WMIItemType WMIItemType { get; set; }
+                Name = name;
 
-            public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
-                    ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
-                    : false;
+                ManagementObject = managementObject;
 
-            public int CompareTo(IFileSystemObject fileSystemObject) => BrowsableObjectInfo.GetDefaultComparer().Compare(this, fileSystemObject);
+                WMIItemType = wmiItemType;
+
+            }
 
         }
+
     }
 
 }

@@ -15,37 +15,15 @@ using IDisposable = WinCopies.Util.IDisposable;
 namespace WinCopies.IO
 {
 
+#pragma warning disable CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
     /// <summary>
     /// Provides info to interact with any browsable items.
     /// </summary>
-    public abstract class BrowsableObjectInfo : IBrowsableObjectInfo
+    public abstract class BrowsableObjectInfo : FileSystemObject, IBrowsableObjectInfo
+#pragma warning restore CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
     {
 
-        public static FileSystemObjectComparer GetDefaultComparer() => new FileSystemObjectComparer();
-
-        public virtual int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
-
         internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
-
-        /// <summary>
-        /// Gets the path of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public virtual string Path { get; }
-
-        /// <summary>
-        /// When overridden in a derived class, gets the localized path of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract string LocalizedName { get; }
-
-        /// <summary>
-        /// When overridden in a derived class, gets the name of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract string Name { get; }
-
-        /// <summary>
-        /// The file type of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public virtual FileType FileType { get; private set; } = FileType.Other;
 
         /// <summary>
         /// When overridden in a derived class, gets the small <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
@@ -149,13 +127,9 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="path">The path of this <see cref="BrowsableObjectInfo"/>.</param>
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-        public BrowsableObjectInfo(string path, FileType fileType, BrowsableObjectInfoFactory factory)
+        protected BrowsableObjectInfo(string path, FileType fileType, BrowsableObjectInfoFactory factory) : base(path, fileType)
 
         {
-
-            Path = path;
-
-            FileType = fileType;
 
             Factory = factory;
 
@@ -286,13 +260,13 @@ namespace WinCopies.IO
         // /// Frees the <see cref="ArchiveFileStream"/> property to unlock the archive referenced by it and makes it <see langword="null"/>. Calling this method will erase all the <see cref="Items"/> of this <see cref="ShellObjectInfo"/> in memory.
         // /// </summary>
 
-        public abstract bool IsRenamingSupported { get; }
+        // public abstract bool IsRenamingSupported { get; }
 
-        /// <summary>
-        /// When overridden in a derived class, renames or move to a relative path, or both, the current <see cref="BrowsableObjectInfo"/> with the specified name.
-        /// </summary>
-        /// <param name="newValue">The new name or relative path for this <see cref="BrowsableObjectInfo"/>.</param>
-        public abstract void Rename(string newValue);
+        ///// <summary>
+        ///// When overridden in a derived class, renames or move to a relative path, or both, the current <see cref="BrowsableObjectInfo"/> with the specified name.
+        ///// </summary>
+        ///// <param name="newValue">The new name or relative path for this <see cref="BrowsableObjectInfo"/>.</param>
+        //public abstract void Rename(string newValue);
 
         /// <summary>
         /// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
@@ -359,50 +333,43 @@ namespace WinCopies.IO
 
         }
 
-        public virtual bool Equals(IFileSystemObject fileSystemObject) => Equals((object)fileSystemObject);
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether <paramref name="obj"/> implements the <see cref="IBrowsableObjectInfo"/> interface and both objects references, and <see cref="FileType"/> and <see cref="Path"/> properties are equal.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
-        public override bool Equals(object obj) => ReferenceEquals(this, obj)
-                ? true : obj is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
-                : false;
-
-        /// <summary>
-        /// Gets an hash code for this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        /// <returns>The hash codes of the <see cref="FileType"/> and the <see cref="Path"/> property.</returns>
-        public override int GetHashCode() => FileType.GetHashCode() ^ Path.ToLower().GetHashCode();
-
-        /// <summary>
-        /// Gets a string representation of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        /// <returns>The <see cref="LocalizedName"/> of this <see cref="BrowsableObjectInfo"/>.</returns>
-        public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
-
+#pragma warning disable CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
         /// <summary>
         /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
         public void Dispose() => Dispose(true, true, true, true);
+#pragma warning restore CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
 
-        protected virtual void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
+        /// <summary>
+        /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
+        /// </summary>
+        /// <param name="disposeItemsLoader">Whether to dispose the items loader of the current path.</param>
+        /// <param name="disposeParent">Whether to dispose the parent of the current path.</param>
+        /// <param name="disposeItems">Whether to dispose the items of the current path.</param>
+        /// <param name="recursively">Whether to dispose recursively.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
+        protected virtual void DisposeOverride(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
 
         {
 
-            if (ItemsLoader?.IsBusy == true)
-
-                ItemsLoader.Cancel();
-
-            if (disposeItemsLoader && ItemsLoader != null)
+            if (ItemsLoader != null)
 
             {
 
-                ItemsLoader.Dispose(false);
+                if (ItemsLoader.IsBusy)
 
-                ItemsLoader.Path = null;
+                    ItemsLoader.Cancel();
+
+                if (disposeItemsLoader)
+
+                {
+
+                    ItemsLoader.Dispose(false);
+
+                    ItemsLoader.Path = null;
+
+                }
 
             }
 
@@ -410,7 +377,7 @@ namespace WinCopies.IO
 
             {
 
-                Parent.Dispose(disposeItemsLoader, disposeItems, recursively, recursively);
+                Parent.Dispose(disposeItemsLoader && recursively, recursively, disposeItems && recursively, recursively);
 
                 Parent = null;
 
@@ -421,7 +388,7 @@ namespace WinCopies.IO
                 while (items.Count > 0)
                 {
 
-                    Items[0].Dispose(disposeItemsLoader, recursively, false, recursively);
+                    Items[0].Dispose(disposeItemsLoader && recursively, false, recursively, recursively);
 
                     items.RemoveAt(0);
 
@@ -429,13 +396,23 @@ namespace WinCopies.IO
 
         }
 
-        public void Dispose(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
+        /// <summary>
+        /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
+        /// </summary>
+        /// <param name="disposeItemsLoader">Whether to dispose the items loader of the current path.</param>
+        /// <param name="disposeParent">Whether to dispose the parent of the current path.</param>
+        /// <param name="disposeItems">Whether to dispose the items of the current path.</param>
+        /// <param name="recursively">Whether to dispose recursively.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
+        public void Dispose(bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
 
         {
 
             IsDisposing = true;
 
-            DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
+            DisposeOverride(true, disposeItemsLoader, disposeParent, disposeItems, recursively);
+
+            GC.SuppressFinalize(this);
 
             IsDisposed = true;
 
@@ -443,10 +420,17 @@ namespace WinCopies.IO
 
         }
 
+        ~BrowsableObjectInfo()
+
+        {
+
+            DisposeOverride(false, false, false, false, false);
+
+        }
+
         public bool IsDisposed { get; private set; }
 
         public virtual bool NeedsObjectsReconstruction => (!(ItemsLoader is null) && ItemsLoader.NeedsObjectsReconstruction) || Factory.NeedsObjectsReconstruction;
-
     }
 
 }

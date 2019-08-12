@@ -70,13 +70,6 @@ namespace WinCopies.IO
         /// </summary>
         IBrowsableObjectInfo Parent { get; }
 
-        /// <summary>
-        /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is disposing.
-        /// </summary>
-        bool IsDisposing { get; }
-
-        bool IsDisposed { get; }
-
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 
         /// <summary>
@@ -115,13 +108,13 @@ namespace WinCopies.IO
         /// <param name="itemsLoader">A custom items loader.</param>
         void LoadItemsAsync(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader);
 
-        bool IsRenamingSupported { get; }
+        // bool IsRenamingSupported { get; }
 
-        /// <summary>
-        /// Renames or move to a relative path, or both, the current <see cref="IBrowsableObjectInfo"/> with the specified name.
-        /// </summary>
-        /// <param name="newValue">The new name or relative path for this <see cref="IBrowsableObjectInfo"/>.</param>
-        void Rename(string newValue);
+        ///// <summary>
+        ///// Renames or move to a relative path, or both, the current <see cref="IBrowsableObjectInfo"/> with the specified name.
+        ///// </summary>
+        ///// <param name="newValue">The new name or relative path for this <see cref="IBrowsableObjectInfo"/>.</param>
+        //void Rename(string newValue);
 
         // string ToString();
 
@@ -134,9 +127,12 @@ namespace WinCopies.IO
         /// <summary>
         /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
-        /// <param name="disposeItemsLoader">Whether to dispose the <see cref="ItemsLoader"/>s of the current path and its parent and items. If this parameter is set to <see langword="true"/>, the <see cref="ItemsLoader"/>s will also be disposed recursively.</param>
-        /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
-        void Dispose(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively);
+        /// <param name="disposeItemsLoader">Whether to dispose the items loader of the current path.</param>
+        /// <param name="disposeParent">Whether to dispose the parent of the current path.</param>
+        /// <param name="disposeItems">Whether to dispose the items of the current path.</param>
+        /// <param name="recursively">Whether to dispose recursively.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
+        void Dispose(bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively);
 
     }
 

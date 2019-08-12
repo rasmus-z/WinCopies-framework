@@ -16,7 +16,9 @@ namespace WinCopies.IO
 
     {
 
+#pragma warning disable IDE0069 // Disposed in the Dispose method overrides.
         private readonly BackgroundWorker backgroundWorker = new BackgroundWorker();
+#pragma warning restore IDE0069
 #pragma warning disable CS0649 // Set up using reflection
         private readonly IFileSystemObjectComparer _fileSystemObjectComparer;
         private readonly IEnumerable<string> _filter;
@@ -137,7 +139,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
-        public BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
+        protected BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class using a custom comparer.
@@ -145,7 +147,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
-        public BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer)
+        protected BrowsableObjectInfoLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer fileSystemObjectComparer)
         {
 
             // todo: internal set because this is an initialization
@@ -207,7 +209,19 @@ namespace WinCopies.IO
 
         public virtual bool NeedsObjectsReconstruction => FileSystemObjectComparer.NeedsObjectsReconstruction;
 
-        public abstract bool CheckFilter(string path);
+        public virtual bool CheckFilter(string path)
+
+        {
+
+            if (Filter is null) return true;
+
+            foreach (string filter in Filter)
+
+                if (!IO.Path.MatchToFilter(path, filter)) return false;
+
+            return true;
+
+        }
 
         /// <summary>
         /// Notifies of the progress.
@@ -390,11 +404,13 @@ namespace WinCopies.IO
 
         protected virtual void OnProgressChanged(ProgressChangedEventArgs e) => OnAddingPath(e.UserState as IBrowsableObjectInfo);
 
+#pragma warning disable CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
         /// <summary>
         /// Disposes the current <see cref="BrowsableObjectInfoLoader{T}"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
         public void Dispose() => Dispose(false);
+#pragma warning restore CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
 
         public void Dispose(bool disposePath)
 
@@ -402,7 +418,9 @@ namespace WinCopies.IO
 
             IsDisposing = true;
 
-            DisposeOverride(disposePath);
+            DisposeOverride(true, disposePath);
+
+            GC.SuppressFinalize(this);
 
             IsDisposed = true;
 
@@ -415,7 +433,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
         /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
-        protected virtual void DisposeOverride(bool disposePath)
+        protected virtual void DisposeOverride(bool disposing, bool disposePath)
 
         {
 
@@ -426,6 +444,14 @@ namespace WinCopies.IO
                 Path.Dispose();
 
             Path = null;
+
+        }
+
+        ~BrowsableObjectInfoLoader()
+
+        {
+
+            DisposeOverride(false, false);
 
         }
 

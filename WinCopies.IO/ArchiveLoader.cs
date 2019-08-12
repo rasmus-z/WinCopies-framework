@@ -196,7 +196,9 @@ namespace WinCopies.IO
                 Debug.WriteLine("Path.ShellObject: " + (Path as ShellObjectInfo)?.ShellObject.ToString());
 
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception) { }
+#pragma warning restore CA1031 // Do not catch general exception types
 
 #endif
 
@@ -241,45 +243,31 @@ namespace WinCopies.IO
                     using (var archiveExtractor = new SevenZipExtractor(archiveFileStream))
                     {
 
-                        void AddPath(ref PathInfo pathInfo)
+                        void AddPath(ref string _path, FileType fileType, ref ArchiveFileInfo? archiveFileInfo)
 
                         {
 
-                            if (pathInfo.FileType == FileType.Other || (FileTypes != Util.Util.GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
+                            if (fileType == FileType.Other || (FileTypes != GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(fileType)))) return;
 
                             // We only make a normalized path if we add the path to the paths to load.
 
-                            pathInfo.NormalizedPath = pathInfo.Path.RemoveAccents();
-
-                            paths.AddLast(pathInfo);
+                            paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), fileType, archiveFileInfo));
 
                         }
 
-                        void AddDirectory(PathInfo pathInfo)
-
-                        {
+                        void AddDirectory(string _path, ArchiveFileInfo? archiveFileInfo) =>
 
                             // if (FileTypes.HasFlag(FileTypesFlags.All) || (FileTypes.HasFlag(FileTypesFlags.Folder) && System.IO.Path.GetPathRoot(pathInfo.Path) != pathInfo.Path) || (FileTypes.HasFlag(FileTypesFlags.Drive) && System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path))
 
-                            pathInfo.FileType = FileType.Folder;
+                            AddPath(ref _path, FileType.Folder, ref archiveFileInfo);
 
-                            AddPath(ref pathInfo);
-
-                        }
-
-                        void AddFile(PathInfo pathInfo)
-
-                        {
-
-                            pathInfo.FileType = pathInfo.Path.Substring(pathInfo.Path.Length).EndsWith(".lnk")
-                                ? FileType.Link
-                                : ArchiveItemInfo. IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
+                        void AddFile(string _path, ArchiveFileInfo? archiveFileInfo) =>
 
                             // We only make a normalized path if we add the path to the paths to load.
 
-                            AddPath(ref pathInfo);
-
-                        }
+                            AddPath(ref _path, _path.Substring(_path.Length).EndsWith(".lnk")
+                                ? FileType.Link
+                                : IO.Path.IsSupportedArchiveFormat(System.IO.Path.GetExtension(_path)) ? FileType.Archive : FileType.File, ref archiveFileInfo);
 
                         ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
 
@@ -325,27 +313,23 @@ namespace WinCopies.IO
 
                                         return;
 
-                                path = new PathInfo() { Path = fileName };
-
                                 if (fileName.ToLower() == archiveFileInfo.FileName.ToLower())
 
                                 {
 
-                                    path.ArchiveFileInfo = archiveFileInfo;
-
                                     if (archiveFileInfo.IsDirectory)
 
-                                        AddDirectory(path);
+                                        AddDirectory(fileName, archiveFileInfo);
 
                                     else if (CheckFilter(archiveFileInfo.FileName))
 
-                                        AddFile(path);
+                                        AddFile(fileName, archiveFileInfo);
 
                                 }
 
                                 else
 
-                                    AddDirectory(path);
+                                    AddDirectory(fileName, archiveFileInfo);
 
                                 // }
 
@@ -520,33 +504,25 @@ namespace WinCopies.IO
 
         // todo: really needed? :
 
-        public struct PathInfo : IFileSystemObject
+        protected class PathInfo : IO.PathInfo
 
         {
 
-            /// <summary>
-            /// Gets the path of this <see cref="PathInfo"/>.
-            /// </summary>
-            public string Path { get; set; }
+            public string NormalizedPath { get; }
 
-            public string NormalizedPath { get; set; }
+            public ArchiveFileInfo? ArchiveFileInfo { get; }
 
-            public ArchiveFileInfo? ArchiveFileInfo { get; set; }
+            public override string LocalizedName => Name;
 
-            public string LocalizedName => Path;
+            public override string Name => System.IO.Path.GetFileName(Path);
 
-            public string Name { get; set; }
+            public PathInfo(string path, string normalizedPath, FileType fileType, ArchiveFileInfo? archiveFileInfo) : base(path, normalizedPath, fileType) => ArchiveFileInfo = archiveFileInfo;
 
-            /// <summary>
-            /// Gets the file type of this <see cref="PathInfo"/>.
-            /// </summary>
-            public FileType FileType { get; set; }
+            //public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
+            //        ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
+            //        : false;
 
-            public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
-                    ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
-                    : false;
-
-            public int CompareTo(IFileSystemObject fileSystemObject) => BrowsableObjectInfo.GetDefaultComparer().Compare(this, fileSystemObject);
+            //public int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
 
         }
 

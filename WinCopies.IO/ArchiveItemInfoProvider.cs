@@ -9,8 +9,14 @@ namespace WinCopies.IO
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType);
 
+            /// <summary>
+            /// The factory used to create the new <see cref="IArchiveItemInfo"/>s.
+            /// </summary>
         IArchiveItemInfoFactory ArchiveItemInfoFactory { get; }
 
+        /// <summary>
+        /// The parent <see cref="IShellObjectInfo"/> of the current archive item.
+        /// </summary>
         IShellObjectInfo ArchiveShellObject { get; }
 
     }
@@ -21,10 +27,16 @@ namespace WinCopies.IO
 
         //    IArchiveItemInfoFactory IArchiveItemInfoProvider.ArchiveItemInfoFactory => ArchiveItemInfoFactory;
 
+        /// <summary>
+        /// The factory used to create the new <see cref="IArchiveItemInfo"/>s.
+        /// </summary>
         public abstract ArchiveItemInfoFactory ArchiveItemInfoFactory { get; set; }
 
         IArchiveItemInfoFactory IArchiveItemInfoProvider.ArchiveItemInfoFactory => ArchiveItemInfoFactory;
 
+        /// <summary>
+        /// The parent <see cref="IShellObjectInfo"/> of the current archive item.
+        /// </summary>
         public abstract IShellObjectInfo ArchiveShellObject { get; }
 
         //    IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
@@ -33,7 +45,7 @@ namespace WinCopies.IO
 
         //    public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, ) { }
 
-        public ArchiveItemInfoProvider(string path, FileType fileType, BrowsableObjectInfoFactory factory) : base(path, fileType, factory) { }
+        protected ArchiveItemInfoProvider(string path, FileType fileType, BrowsableObjectInfoFactory factory) : base(path, fileType, factory) { }
 
         //    protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)
         //    {

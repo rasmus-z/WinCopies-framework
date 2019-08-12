@@ -19,9 +19,15 @@ using System.Collections.Generic;
 namespace WinCopies.IO
 {
 
-    public interface IArchiveItemInfo : IBrowsableObjectInfo, IArchiveItemInfoProvider
+    /// <summary>
+    /// Represents an archive that can be used with interoperability with the other <see cref="IBrowsableObjectInfo"/> objects.
+    /// </summary>
+    public interface IArchiveItemInfo : IArchiveItemInfoProvider
     {
 
+        /// <summary>
+        /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="IArchiveItemInfo"/> represents.
+        /// </summary>
         ArchiveFileInfo? ArchiveFileInfo { get; }
 
     }
@@ -32,25 +38,7 @@ namespace WinCopies.IO
     public class ArchiveItemInfo : ArchiveItemInfoProvider, IArchiveItemInfo
     {
 
-        public static bool IsSupportedArchiveFormat(string extension)
-
-        {
-
-            foreach (KeyValuePair<InArchiveFormat, string[]> value in InArchiveFormats)
-
-                if (value.Value != null)
-
-                    foreach (string _extension in value.Value)
-
-                        if (_extension == extension)
-
-                            return true;
-
-            return false;
-
-        }
-
-        public override bool IsRenamingSupported => false;
+        // public override bool IsRenamingSupported => false;
 
         /// <summary>
         /// Gets the localized path of this <see cref="ArchiveItemInfo"/>.
@@ -94,14 +82,23 @@ namespace WinCopies.IO
         /// <exception cref="ArgumentNullException">value is null.</exception>
         public new ArchiveItemInfoFactory Factory { get => (ArchiveItemInfoFactory)base.Factory; set => base.Factory = value; }
 
+        /// <summary>
+        /// The factory used to create the new <see cref="IArchiveItemInfo"/>s.
+        /// </summary>
         public sealed override ArchiveItemInfoFactory ArchiveItemInfoFactory { get => Factory; set => Factory = value; }
 
         //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
         private readonly Func<ArchiveFileInfo?> _archiveFileInfoDelegate;
 
+        /// <summary>
+        /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="IArchiveItemInfo"/> represents.
+        /// </summary>
         public ArchiveFileInfo? ArchiveFileInfo { get; private set; }
 
+        /// <summary>
+        /// The parent <see cref="IShellObjectInfo"/> of the current archive item.
+        /// </summary>
         public override IShellObjectInfo ArchiveShellObject { get; }
 
         /// <summary>
@@ -215,25 +212,25 @@ namespace WinCopies.IO
         /// <returns>the parent of this <see cref="ArchiveItemInfo"/>.</returns>
         protected override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? Factory.GetBrowsableObjectInfo(Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder, ArchiveShellObject, null/*archiveParentFileInfo.Value*/) : ArchiveShellObject;
 
-        /// <summary>
-        /// Currently not implemented.
-        /// </summary>
-        /// <param name="newValue"></param>
-        public override void Rename(string newValue) =>
+        ///// <summary>
+        ///// Currently not implemented.
+        ///// </summary>
+        ///// <param name="newValue"></param>
+        //public override void Rename(string newValue) =>
 
-            // string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
+        //    // string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
 
-            //SevenZipCompressor a = new SevenZipCompressor();
+        //    //SevenZipCompressor a = new SevenZipCompressor();
 
-            //Dictionary<int, string> dico = new Dictionary<int, string>();
+        //    //Dictionary<int, string> dico = new Dictionary<int, string>();
 
-            //dico.Add(ArchiveFileInfo.Index, ArchiveFileInfo.FileName);
+        //    //dico.Add(ArchiveFileInfo.Index, ArchiveFileInfo.FileName);
 
-            //a.ModifyArchive(ArchiveShellObject.Path, dico);
+        //    //a.ModifyArchive(ArchiveShellObject.Path, dico);
 
-            // todo:
+        //    // todo:
 
-            throw new NotSupportedException("This feature is currently not supported for the content archive items.");
+        //    throw new NotSupportedException("This feature is currently not supported for the content archive items.");
 
         // protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)
         // {
@@ -253,10 +250,10 @@ namespace WinCopies.IO
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        protected override void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
+        protected override void DisposeOverride( bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
         {
 
-            base.DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
+            base.DisposeOverride( disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
 
             ArchiveShellObject.Dispose();
 

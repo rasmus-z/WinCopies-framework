@@ -28,7 +28,7 @@ namespace WinCopies.IO
 
         private ConnectionOptions _connectionOptions;
 
-        private Func<ConnectionOptions> _connectionOptionsDelegate;
+        private readonly Func<ConnectionOptions> _connectionOptionsDelegate;
 
         /// <summary>
         /// Gets or sets options for the WMI connections.
@@ -56,7 +56,7 @@ namespace WinCopies.IO
 
         private ObjectGetOptions _objectGetOptions;
 
-        private Func<ObjectGetOptions> _objectGetOptionsDelegate;
+        private readonly Func<ObjectGetOptions> _objectGetOptionsDelegate;
 
         /// <summary>
         /// Gets or sets options for getting management objects.
@@ -99,7 +99,7 @@ namespace WinCopies.IO
 
         private EnumerationOptions _enumerationOptions;
 
-        private Func<EnumerationOptions> _enumerationOptionsDelegate;
+        private readonly Func<EnumerationOptions> _enumerationOptionsDelegate;
 
         /// <summary>
         /// Gets or sets options for management objects.
@@ -155,7 +155,7 @@ namespace WinCopies.IO
 
         {
 
-            var options = DeepCloneOverride(preserveIds);
+            WMIItemInfoFactoryOptions options = DeepCloneOverride(preserveIds);
 
             OnDeepClone(options, preserveIds);
 

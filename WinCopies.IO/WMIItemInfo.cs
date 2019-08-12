@@ -39,13 +39,13 @@ namespace WinCopies.IO
     public class WMIItemInfo : BrowsableObjectInfo, IWMIItemInfo
     {
 
-        public static WMIItemInfoComparer GetDefaultComparer() => new WMIItemInfoComparer();
+        public static WMIItemInfoComparer GetDefaultWMIItemInfoComparer() => new WMIItemInfoComparer();
 
-        public override bool IsRenamingSupported => false;
+        // public override bool IsRenamingSupported => false;
 
         private const string RootPath = @"\\.\ROOT:__NAMESPACE";
-
-        private Func<ManagementBaseObject> _managementObjectDelegate;
+        private const string Namespace = ":__NAMESPACE";
+        private readonly Func<ManagementBaseObject> _managementObjectDelegate;
 
         public ManagementBaseObject ManagementObject { get; private set; }
 
@@ -55,7 +55,9 @@ namespace WinCopies.IO
 
             (managementObject as ManagementClass)?.Get();
 
-            return wmiItemType == WMIItemType.Namespace ? (string)managementObject["Name"] : managementObject.ClassPath.ClassName;
+            const string name = "Name";
+
+            return wmiItemType == WMIItemType.Namespace ? (string)managementObject[name] : managementObject.ClassPath.ClassName;
 
         }
 
@@ -119,7 +121,7 @@ namespace WinCopies.IO
 
             _ = stringBuilder.Append(IsNullEmptyOrWhiteSpace(serverClassRelativePath) ? "ROOT" : serverClassRelativePath);
 
-            _ = stringBuilder.Append(":__NAMESPACE");
+            _ = stringBuilder.Append(Namespace);
 
             string path = stringBuilder.ToString();
 
@@ -230,7 +232,7 @@ namespace WinCopies.IO
 
                 case WMIItemType.Namespace:
 
-                    path = Path.Substring(0, Path.LastIndexOf('\\')) + ":__NAMESPACE";
+                    path = Path.Substring(0, Path.LastIndexOf('\\')) + Namespace;
 
                     return path.EndsWith("root:__namespace", true, CultureInfo.InvariantCulture)
                         ? Factory.GetBrowsableObjectInfo()
@@ -240,7 +242,7 @@ namespace WinCopies.IO
 
                     return Path.EndsWith("root:" + Name, true, CultureInfo.InvariantCulture)
                         ? Factory.GetBrowsableObjectInfo()
-                        : Factory.GetBrowsableObjectInfo(Path.Substring(0, Path.IndexOf(':')) + ":__NAMESPACE", WMIItemType.Namespace);
+                        : Factory.GetBrowsableObjectInfo(Path.Substring(0, Path.IndexOf(':')) + Namespace, WMIItemType.Namespace);
 
                 case WMIItemType.Instance:
 
@@ -266,22 +268,26 @@ namespace WinCopies.IO
         public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItemsAsync();
 #pragma warning restore IDE0067 // Dispose objects before losing scope
 
-        /// <summary>
-        /// Not implemented.
-        /// </summary>
-        /// <param name="newValue"></param>
-        public override void Rename(string newValue) => throw new NotImplementedException();
-
-        public override bool Equals(IFileSystemObject fileSystemObject) => Equals((object)fileSystemObject);
+        ///// <summary>
+        ///// Not implemented.
+        ///// </summary>
+        ///// <param name="newValue"></param>
+        //public override void Rename(string newValue) => throw new NotImplementedException();
 
         public override bool Equals(object obj) => ReferenceEquals(this, obj)
                 ? true : obj is IWMIItemInfo _obj ? WMIItemType == _obj.WMIItemType && Path.ToLower() == _obj.Path.ToLower()
                 : false;
 
-        protected override void DisposeOverride(bool disposeItemsLoader, bool disposeItems, bool disposeParent, bool recursively)
+        public int CompareTo( IWMIItemInfo other ) => GetDefaultWMIItemInfoComparer().Compare(this, other);
+
+        public bool Equals( IWMIItemInfo other ) => Equals(other as object);
+
+        public override int GetHashCode() => base.GetHashCode() ^ WMIItemType.GetHashCode();
+
+        protected override void DisposeOverride( bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
         {
 
-            base.DisposeOverride(disposeItemsLoader, disposeItems, disposeParent, recursively);
+            base.DisposeOverride( disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
 
             ManagementObject.Dispose();
 

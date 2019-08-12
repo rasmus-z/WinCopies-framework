@@ -130,6 +130,7 @@
     <Compile Include="BrowsableObjectInfoFactory.cs" />
     <Compile Include="BrowsableObjectInfoLoader.cs" />
     <Compile Include="DesktopAppInfo.cs" />
+    <Compile Include="FileSystemObject.cs" />
     <Compile Include="FileSystemObjectComparer.cs" />
     <Compile Include="FileSystemObjectLoader.cs" />
     <Compile Include="FileTypes.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="IShellObjectInfoFactory.cs" />
     <Compile Include="IWMIItemInfo.cs" />
     <Compile Include="IWMIItemInfoFactory.cs" />
+    <Compile Include="PathInfo.cs" />
     <Compile Include="RegistryItemInfoComparer.cs" />
     <Compile Include="SpecialFolder.cs" />
     <Compile Include="WMIItemInfoComparer.cs" />

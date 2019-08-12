@@ -35,9 +35,9 @@ namespace WinCopies.IO
 
             string[] paths = path.Split('\\');
 
-            Func<ShellObject> shellObjectDelegate = () => ShellObject.FromParsingName(paths[0]);
+            ShellObject shellObjectDelegate() => ShellObject.FromParsingName(paths[0]);
 
-            var shellObject = shellObjectDelegate();
+            ShellObject shellObject = shellObjectDelegate();
 
 #pragma warning disable IDE0068 // Dispose objects before losing scope
             BrowsableObjectInfo browsableObjectInfo = shellObject.IsFileSystemObject
@@ -127,13 +127,13 @@ namespace WinCopies.IO
 
                     // string _s = s.Replace("\\", "\\\\");
 
-                    Func<ShellObject> func = () => ((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo);
+                    ShellObject func() => ((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo);
 
                     shellObject = func();
 
                     SpecialFolder specialFolder = GetSpecialFolder(shellObject);
 
-                    FileType fileType = specialFolder == SpecialFolder.OtherFolderOrFile ? shellObject.IsLink ? FileType.Link : shellObject is ShellFile shellFile ? ArchiveItemInfo.IsSupportedArchiveFormat(System.IO.Path.GetExtension(s)) ? FileType.Archive : FileType.File : FileType.Drive : FileType.SpecialFolder;
+                    FileType fileType = specialFolder == SpecialFolder.OtherFolderOrFile ? shellObject.IsLink ? FileType.Link : shellObject is ShellFile shellFile ? IO.Path .IsSupportedArchiveFormat(System.IO.Path.GetExtension(s)) ? FileType.Archive : FileType.File : FileType.Drive : FileType.SpecialFolder;
 
                     //if (shellObject.IsFileSystemObject)
 
@@ -169,6 +169,24 @@ namespace WinCopies.IO
 
         }
 
+        public static bool IsSupportedArchiveFormat(string extension)
+
+        {
+
+            foreach (KeyValuePair<InArchiveFormat, string[]> value in InArchiveFormats)
+
+                if (value.Value != null)
+
+                    foreach (string _extension in value.Value)
+
+                        if (_extension == extension)
+
+                            return true;
+
+            return false;
+
+        }
+
         public static bool MatchToFilter(string path, string filter)
 
         {
@@ -183,7 +201,7 @@ namespace WinCopies.IO
 
                 {
 
-                    if (_filter == "") continue;
+                    if ( string.IsNullOrEmpty( _filter ) ) continue;
 
                     if (pathWithoutExtension.Length >= _filter.Length && pathWithoutExtension.Contains(_filter))
 
@@ -372,20 +390,20 @@ namespace WinCopies.IO
 
             for (int i = 1; i < knownFoldersProperties.Length; i++)
 
-                try
-                {
+                // try
+                // {
 
-                    for (; i < knownFoldersProperties.Length; i++)
+                    // for (; i < knownFoldersProperties.Length; i++)
 
                         if (shellObject.ParsingName == knownFoldersProperties[i].Name)
 
                             value = (SpecialFolder)typeof(SpecialFolder).GetField(knownFoldersProperties[i].Name).GetValue(null);
 
-                    break;
+                    // break;
 
-                }
+                // }
 
-                catch (ShellException) { i++; }
+                // catch (ShellException) { i++; }
 
             return value ?? SpecialFolder.OtherFolderOrFile;
 
