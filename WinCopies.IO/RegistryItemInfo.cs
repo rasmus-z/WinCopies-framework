@@ -44,7 +44,7 @@ namespace WinCopies.IO
     public class RegistryItemInfo : BrowsableObjectInfo, IRegistryItemInfo
     {
 
-        public static RegistryItemInfoComparer GetDefaultRegistryItemInfoComparer() => new RegistryItemInfoComparer();
+        public static RegistryItemInfoComparer<IRegistryItemInfo> GetDefaultRegistryItemInfoComparer() => new RegistryItemInfoComparer<IRegistryItemInfo>();
 
         // public override bool IsRenamingSupported => false;
 

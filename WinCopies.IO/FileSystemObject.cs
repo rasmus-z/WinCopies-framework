@@ -81,7 +81,7 @@ namespace WinCopies.IO
 
         public static bool operator >=(FileSystemObject left, FileSystemObject right) => left is null ? right is null : left.CompareTo(right) >= 0;
 
-        public static FileSystemObjectComparer GetDefaultComparer() => new FileSystemObjectComparer();
+        public static FileSystemObjectComparer<IFileSystemObject> GetDefaultComparer() => new FileSystemObjectComparer<IFileSystemObject>();
 
         public virtual int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
 

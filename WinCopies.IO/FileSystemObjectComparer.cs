@@ -6,15 +6,15 @@ using IDisposable = WinCopies.Util.IDisposable;
 
 namespace WinCopies.IO
 {
-    public class FileSystemObjectComparer : Comparer<IFileSystemObject>, IFileSystemObjectComparer
+    public class FileSystemObjectComparer<T> : Comparer<T>, IFileSystemObjectComparer<T> where T : IFileSystemObject
 
     {
 
         public virtual bool NeedsObjectsReconstruction => true; // True because of the StirngComparer property.
 
-        protected virtual void OnDeepClone(FileSystemObjectComparer fileSystemObjectComparer, bool preserveIds) { }
+        protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer, bool preserveIds) { }
 
-        protected virtual FileSystemObjectComparer DeepCloneOverride(bool preserveIds) => new FileSystemObjectComparer(_stringComparerDelegate);
+        protected virtual FileSystemObjectComparer<T> DeepCloneOverride(bool preserveIds) => new FileSystemObjectComparer<T>(_stringComparerDelegate);
 
         public object DeepClone(bool preserveIds)
 
@@ -22,7 +22,7 @@ namespace WinCopies.IO
 
             ((IDisposable)this).ThrowIfDisposingOrDisposed();
 
-            FileSystemObjectComparer fileSystemObjectComparer = DeepCloneOverride(preserveIds);
+            FileSystemObjectComparer<T> fileSystemObjectComparer = DeepCloneOverride(preserveIds);
 
             OnDeepClone(fileSystemObjectComparer, preserveIds);
 
@@ -45,7 +45,7 @@ namespace WinCopies.IO
 
         }
 
-        protected override int CompareOverride(IFileSystemObject x, IFileSystemObject y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
+        protected override int CompareOverride(T x, T y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
                 ? StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents())
                 : (x.FileType == FileType.Folder || x.FileType == FileType.Drive) && (y.FileType == FileType.File || y.FileType == FileType.Archive || y.FileType == FileType.Link)
                 ? -1

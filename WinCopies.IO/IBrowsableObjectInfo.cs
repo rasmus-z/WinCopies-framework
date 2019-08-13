@@ -10,7 +10,7 @@ namespace WinCopies.IO
 {
 
     /// <summary>
-    /// Provides info to interact with any browsable items.
+    /// Provides interoperability for interacting with browsable items.
     /// </summary>
     public interface IBrowsableObjectInfo : IFileSystemObject, IDeepCloneable, IDisposable
     {

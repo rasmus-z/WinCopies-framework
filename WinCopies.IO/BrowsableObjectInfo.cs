@@ -15,12 +15,10 @@ using IDisposable = WinCopies.Util.IDisposable;
 namespace WinCopies.IO
 {
 
-#pragma warning disable CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
     /// <summary>
-    /// Provides info to interact with any browsable items.
+    /// The base class for all browsable items of the WinCopies framework.
     /// </summary>
     public abstract class BrowsableObjectInfo : FileSystemObject, IBrowsableObjectInfo
-#pragma warning restore CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
     {
 
         internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
@@ -83,7 +81,6 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates if the items of this <see cref="BrowsableObjectInfo"/> are currently loaded.
         /// </summary>
-        [DefaultValue(false)]
         public bool AreItemsLoaded { get; internal set; }
 
         IBrowsableObjectInfoLoader<IBrowsableObjectInfo> IBrowsableObjectInfo.ItemsLoader => (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)ItemsLoader;
@@ -104,9 +101,7 @@ namespace WinCopies.IO
         /// </summary>
         public virtual ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; internal set; }
 
-#pragma warning disable IDE0069 // Disposed in the Dispose() method.
         private IBrowsableObjectInfo _parent = null;
-#pragma warning restore IDE0069
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -114,7 +109,7 @@ namespace WinCopies.IO
         public virtual IBrowsableObjectInfo Parent { get => _parent ?? (_parent = GetParent()); internal set => _parent = value; }
 
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is disposing.
+        /// Gets a value that indicates whether the current object is disposing.
         /// </summary>
         public bool IsDisposing { get; private set; }
 
@@ -127,6 +122,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="path">The path of this <see cref="BrowsableObjectInfo"/>.</param>
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
+        /// <param name="factory">The factory for this <see cref="BrowsableObjectInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo"/> and its associated <see cref="ItemsLoader"/>.</param>
         protected BrowsableObjectInfo(string path, FileType fileType, BrowsableObjectInfoFactory factory) : base(path, fileType)
 
         {
@@ -301,10 +297,11 @@ namespace WinCopies.IO
         /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
         protected abstract BrowsableObjectInfo DeepCloneOverride(bool preserveIds);
 
-        ///// <summary>
-        ///// When overridden in a derived class, gets a new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>. How
-        ///// </summary>
-        ///// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
+        /// <summary>
+        /// Gets a deep clone of this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
+        /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
         public object DeepClone(bool preserveIds)
 
         {
@@ -333,17 +330,16 @@ namespace WinCopies.IO
 
         }
 
-#pragma warning disable CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
         /// <summary>
         /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
         public void Dispose() => Dispose(true, true, true, true);
-#pragma warning restore CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
 
         /// <summary>
         /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
+        /// <param name="disposing">Whether to dispose managed resources.</param>
         /// <param name="disposeItemsLoader">Whether to dispose the items loader of the current path.</param>
         /// <param name="disposeParent">Whether to dispose the parent of the current path.</param>
         /// <param name="disposeItems">Whether to dispose the items of the current path.</param>
@@ -420,7 +416,9 @@ namespace WinCopies.IO
 
         }
 
+#pragma warning disable CS1591
         ~BrowsableObjectInfo()
+#pragma warning restore CS1591
 
         {
 
@@ -428,8 +426,14 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Gets a value that indicates whether the current object is disposed.
+        /// </summary>
         public bool IsDisposed { get; private set; }
 
+        /// <summary>
+        /// Gets a value that indicates whether this object needs to reconstruct objects on deep clone.
+        /// </summary>
         public virtual bool NeedsObjectsReconstruction => (!(ItemsLoader is null) && ItemsLoader.NeedsObjectsReconstruction) || Factory.NeedsObjectsReconstruction;
     }
 

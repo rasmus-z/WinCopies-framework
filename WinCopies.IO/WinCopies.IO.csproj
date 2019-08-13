@@ -137,6 +137,7 @@
     <Compile Include="FolderLoader.cs" />
     <Compile Include="FolderLoaderFileSystemWatcher.cs" />
     <Compile Include="ArchiveItemInfoProvider.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IBrowsableObjectInfo.cs" />
     <Compile Include="IBrowsableObjectInfoFactory.cs" />
     <Compile Include="IBrowsableObjectInfoLoader.cs" />

@@ -132,7 +132,7 @@ namespace WinCopies.IO
 
             ArchiveFileInfo = archiveFileInfoDelegate();
 
-            if ( ArchiveFileInfo.HasValue &&    !path.EndsWith( ArchiveFileInfo. Value.FileName))
+            if (ArchiveFileInfo.HasValue && !path.EndsWith(ArchiveFileInfo.Value.FileName))
 
                 // todo:
 
@@ -235,14 +235,18 @@ namespace WinCopies.IO
         // protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)
         // {
 
-            // base.OnDeepClone(browsableObjectInfo);
+        // base.OnDeepClone(browsableObjectInfo);
 
-            //using (var sevenZipExtractor = new SevenZipExtractor(ArchiveShellObject.Path))
+        //using (var sevenZipExtractor = new SevenZipExtractor(ArchiveShellObject.Path))
 
-            //    browsableObjectInfo.ArchiveFileInfo = sevenZipExtractor.ArchiveFileData.FirstOrDefault(item => item.FileName == Path.Substring(ArchiveShellObject.Path.Length));
+        //    browsableObjectInfo.ArchiveFileInfo = sevenZipExtractor.ArchiveFileData.FirstOrDefault(item => item.FileName == Path.Substring(ArchiveShellObject.Path.Length));
 
         // }
 
+        /// <summary>
+        /// Gets a deep clone of this <see cref="BrowsableObjectInfo"/>. The <see cref="BrowsableObjectInfo.OnDeepClone(BrowsableObjectInfo, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
+        /// </summary>
+        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
         protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ArchiveItemInfo(Path, FileType, (IShellObjectInfo)ArchiveShellObject.DeepClone(preserveIds), _archiveFileInfoDelegate);
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
@@ -250,10 +254,10 @@ namespace WinCopies.IO
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        protected override void DisposeOverride( bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
+        protected override void DisposeOverride(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
         {
 
-            base.DisposeOverride( disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
+            base.DisposeOverride(disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
 
             ArchiveShellObject.Dispose();
 
@@ -277,6 +281,9 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Gets a value that indicates whether this object needs to reconstruct objects on deep clone.
+        /// </summary>
         public override bool NeedsObjectsReconstruction => true; // True because of the ShellObjectInfo's ShellObject
 
         // public ArchiveFileInfo ArchiveFileInfo { get; } = null;

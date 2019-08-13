@@ -44,6 +44,9 @@ namespace WinCopies.IO
             }
         }
 
+        /// <summary>
+        /// The parent <see cref="IShellObjectInfo"/> of the current archive item. If the current <see cref="ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="ShellObjectInfo"/>, or <see langword="null"/> otherwise.
+        /// </summary>
         public override IShellObjectInfo ArchiveShellObject => FileType == FileType.Archive ? this : null;
 
         /// <summary>
@@ -87,17 +90,17 @@ namespace WinCopies.IO
         public override bool IsBrowsable => (ShellObject is IEnumerable<ShellObject> || FileType == FileType.Archive) && FileType != FileType.File && FileType != FileType.Link; // FileType == FileTypes.Folder || FileType == FileTypes.Drive || (FileType == FileTypes.SpecialFolder && SpecialFolder != SpecialFolders.Computer) || FileType == FileTypes.Archive;
 
         /// <summary>
-        /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a folder, drive or file. See the <see cref="BrowsableObjectInfo.FileType"/> property for more details.
+        /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a folder, drive or file. See the <see cref="FileSystemObject.FileType"/> property for more details.
         /// </summary>
         public FileSystemInfo FileSystemInfoProperties { get; private set; } = null;
 
         /// <summary>
-        /// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a drive. See the <see cref="BrowsableObjectInfo.FileType"/> property for more details.
+        /// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a drive. See the <see cref="FileSystemObject.FileType"/> property for more details.
         /// </summary>
         public DriveInfo DriveInfoProperties { get; private set; } = null;
 
         /// <summary>
-        /// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a system known folder. See the <see cref="BrowsableObjectInfo.FileType"/> property for more details.
+        /// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a system known folder. See the <see cref="FileSystemObject.FileType"/> property for more details.
         /// </summary>
         public IKnownFolder KnownFolderInfo { get; private set; } = null;
 
@@ -231,19 +234,21 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/>.
         /// </summary>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
+        /// <param name="shellObjectDelegate">A delegate that will be used by the <see cref="BrowsableObjectInfo.DeepClone(bool)"/> method.</param>
+        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents, or <see langword="null"/> to use <paramref name="shellObjectDelegate"/> in this constructor.</param>
         public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject) : this(path, fileType, specialFolder, shellObjectDelegate, shellObject, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/>s and <see cref="ArchiveItemInfo"/>s.
         /// </summary>
-        /// <param name="shellObjectDelegate">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
         /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
+        /// <param name="shellObjectDelegate">A delegate that will be used by the <see cref="BrowsableObjectInfo.DeepClone(bool)"/> method.</param>
+        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents, or <see langword="null"/> to use <paramref name="shellObjectDelegate"/> in this constructor.</param>
         /// <param name="factory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>s and <see cref="ArchiveLoader"/>s use to create new objects that represent casual file system items.</param>
         /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
         public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, archiveItemInfoFactory) =>
@@ -338,7 +343,7 @@ namespace WinCopies.IO
 
             {
 
-                SpecialFolder specialFolder = IO.Path. GetSpecialFolder(_shellObject);
+                SpecialFolder specialFolder = IO.Path.GetSpecialFolder(_shellObject);
 
                 FileType fileType = specialFolder == SpecialFolder.OtherFolderOrFile ? FileType.Folder : FileType.SpecialFolder;
 
@@ -493,12 +498,18 @@ namespace WinCopies.IO
         // /// </summary>
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
-        protected override void DisposeOverride( bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
+        /// <param name="disposing">Whether to dispose managed resources.</param>
+        /// <param name="disposeItemsLoader">Whether to dispose the items loader of the current path.</param>
+        /// <param name="disposeParent">Whether to dispose the parent of the current path.</param>
+        /// <param name="disposeItems">Whether to dispose the items of the current path.</param>
+        /// <param name="recursively">Whether to dispose recursively.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy and does not support cancellation.</exception>
+        protected override void DisposeOverride(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
         {
 
-            base.DisposeOverride( disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
+            base.DisposeOverride(disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
 
             ShellObject.Dispose();
 
@@ -521,9 +532,9 @@ namespace WinCopies.IO
         public override string ToString() => string.IsNullOrEmpty(Path) ? ShellObject.GetDisplayName(DisplayNameType.Default) : System.IO.Path.GetFileName(Path);
 
         /// <summary>
-        /// Gets or sets the factory for this <see cref="ShellObjectInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="ShellObjectInfo"/> and its associated <see cref="ItemsLoader"/>.
+        /// Gets or sets the factory for this <see cref="ShellObjectInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="ShellObjectInfo"/> and its associated <see cref="BrowsableObjectInfo.ItemsLoader"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfo.ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
         /// <exception cref="ArgumentNullException">value is null.</exception>
         public new ShellObjectInfoFactory Factory { get => (ShellObjectInfoFactory)base.Factory; set => base.Factory = value; }
 
@@ -568,8 +579,16 @@ namespace WinCopies.IO
 
         //}
 
+        /// <summary>
+        /// Gets a value that indicates whether this object needs to reconstruct objects on deep clone.
+        /// </summary>
         public override bool NeedsObjectsReconstruction => true;
 
+        /// <summary>
+        /// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
+        /// </summary>
+        /// <param name="browsableObjectInfo">The cloned <see cref="BrowsableObjectInfo"/>.</param>
+        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
         protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo, bool preserveIds)
         {
 
@@ -581,6 +600,10 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Gets a deep clone of this <see cref="BrowsableObjectInfo"/>. The <see cref="OnDeepClone(BrowsableObjectInfo, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
+        /// </summary>
+        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
         protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ShellObjectInfo(Path, FileType, SpecialFolder, _shellObjectDelegate, null);
 
     }

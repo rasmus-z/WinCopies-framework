@@ -39,7 +39,7 @@ namespace WinCopies.IO
     public class WMIItemInfo : BrowsableObjectInfo, IWMIItemInfo
     {
 
-        public static WMIItemInfoComparer GetDefaultWMIItemInfoComparer() => new WMIItemInfoComparer();
+        public static WMIItemInfoComparer<IWMIItemInfo> GetDefaultWMIItemInfoComparer() => new WMIItemInfoComparer<IWMIItemInfo>();
 
         // public override bool IsRenamingSupported => false;
 

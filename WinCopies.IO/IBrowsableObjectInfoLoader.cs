@@ -13,7 +13,7 @@ namespace WinCopies.IO
 
     {
 
-        IFileSystemObjectComparer FileSystemObjectComparer { get; set; }
+        IFileSystemObjectComparer<IFileSystemObject> FileSystemObjectComparer { get; set; }
 
         IEnumerable<string> Filter { get; set; }
 

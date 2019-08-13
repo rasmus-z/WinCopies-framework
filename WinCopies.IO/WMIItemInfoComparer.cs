@@ -4,19 +4,19 @@ using WinCopies.Util;
 
 namespace WinCopies.IO
 {
-    public class WMIItemInfoComparer : Comparer<IWMIItemInfo>
+    public class WMIItemInfoComparer<T> : FileSystemObjectComparer<T> where T : IWMIItemInfo
 
     {
 
-        private readonly FileSystemObjectComparer _fileSystemObjectComparer;
+        private readonly FileSystemObjectComparer<IFileSystemObject> _fileSystemObjectComparer;
 
-        public FileSystemObjectComparer FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetField(nameof(_fileSystemObjectComparer), value, typeof(RegistryItemInfoComparer), paramName: nameof(value), setOnlyIfNotNull: true, throwIfNull: true); }
+        public FileSystemObjectComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetField(nameof(_fileSystemObjectComparer), value, typeof(WMIItemInfoComparer<T>), paramName: nameof(value), setOnlyIfNotNull: true, throwIfNull: true); }
 
         public WMIItemInfoComparer() : this(BrowsableObjectInfo.GetDefaultComparer()) { }
 
-        public WMIItemInfoComparer(FileSystemObjectComparer fileSystemObjectComparer) => FileSystemObjectComparer = fileSystemObjectComparer;
+        public WMIItemInfoComparer(FileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) => FileSystemObjectComparer = fileSystemObjectComparer;
 
-        protected override int CompareOverride(IWMIItemInfo x, IWMIItemInfo y)
+        protected override int CompareOverride(T x, T y)
         {
 
             int result = GetIf(x.WMIItemType, y.WMIItemType, (WMIItemType _x, WMIItemType _y) => _x.CompareTo(_y), () => -1, () => 1, () => 0);
