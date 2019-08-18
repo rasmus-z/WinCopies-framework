@@ -239,7 +239,7 @@ namespace WinCopies.IO
         /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
         /// <param name="shellObjectDelegate">A delegate that will be used by the <see cref="BrowsableObjectInfo.DeepClone(bool)"/> method.</param>
         /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents, or <see langword="null"/> to use <paramref name="shellObjectDelegate"/> in this constructor.</param>
-        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject) : this(path, fileType, specialFolder, shellObjectDelegate, shellObject, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
+        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject) : this(path, fileType, specialFolder, shellObjectDelegate, shellObject, null, null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/>s and <see cref="ArchiveItemInfo"/>s.
@@ -251,13 +251,13 @@ namespace WinCopies.IO
         /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents, or <see langword="null"/> to use <paramref name="shellObjectDelegate"/> in this constructor.</param>
         /// <param name="factory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>s and <see cref="ArchiveLoader"/>s use to create new objects that represent casual file system items.</param>
         /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
-        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, archiveItemInfoFactory) =>
+        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, factory ?? new ShellObjectInfoFactory()) =>
 
-            Init(specialFolder, shellObjectDelegate, shellObject, nameof(fileType), factory); // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
+            Init(specialFolder, shellObjectDelegate, shellObject, nameof(fileType), archiveItemInfoFactory); // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
 
         private Func<ShellObject> _shellObjectDelegate;
 
-        private void Init(SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject, string fileTypeParameterName, ShellObjectInfoFactory shellObjectInfoFactory)
+        private void Init(SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject, string fileTypeParameterName, ArchiveItemInfoFactory archiveItemInfoFactory)
 
         {
 
@@ -279,7 +279,7 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(Generic.FileTypeAndSpecialFolderNotCorrespond, fileTypeParameterName, nameof(specialFolder), FileType, specialFolder));
 
-            Factory = shellObjectInfoFactory;
+            ArchiveItemInfoFactory = archiveItemInfoFactory ?? new ArchiveItemInfoFactory();
 
             ShellObject = shellObject;
 
@@ -383,13 +383,13 @@ namespace WinCopies.IO
 
                 string path = Path;
 
-                if (path.EndsWith("\\"))
+                if (path.EndsWith(IO.Path.PathSeparator.ToString()))
 
                     path = path.Remove(path.Length - 1);
 
                 (FileType fileType, SpecialFolder specialFolder) = getFileType(shellObject);
 
-                return Factory.GetBrowsableObjectInfo(path.Remove(path.LastIndexOf('\\')), fileType, specialFolder, shellObjectDelegate, shellObject);
+                return Factory.GetBrowsableObjectInfo(path.Remove(path.LastIndexOf(IO.Path.PathSeparator)), fileType, specialFolder, shellObjectDelegate, shellObject);
 
             }
 
@@ -552,7 +552,7 @@ namespace WinCopies.IO
 
         //        throw new InvalidOperationException($"{nameof(FileType)} must have one of the following values: {nameof(FileType.Folder)}, {nameof(FileType.File)} or {nameof(FileType.Drive)}. The value was {key}.");
 
-        //    string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
+        //    string getNewPath() => System.IO.Path.GetDirectoryName(Path) + IO.Path.PathSeparator + newValue;
 
         //    switch (FileType)
         //    {
@@ -580,7 +580,7 @@ namespace WinCopies.IO
         //}
 
         /// <summary>
-        /// Gets a value that indicates whether this object needs to reconstruct objects on deep clone.
+        /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
         /// </summary>
         public override bool NeedsObjectsReconstruction => true;
 
@@ -604,7 +604,7 @@ namespace WinCopies.IO
         /// Gets a deep clone of this <see cref="BrowsableObjectInfo"/>. The <see cref="OnDeepClone(BrowsableObjectInfo, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
         /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ShellObjectInfo(Path, FileType, SpecialFolder, _shellObjectDelegate, null);
+        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ShellObjectInfo(Path, FileType, SpecialFolder, _shellObjectDelegate, null, (ShellObjectInfoFactory) Factory.DeepClone(preserveIds), (ArchiveItemInfoFactory) ArchiveItemInfoFactory.DeepClone(preserveIds));
 
     }
 

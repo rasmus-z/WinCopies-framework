@@ -55,7 +55,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets or sets the factory for this <see cref="BrowsableObjectInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo"/> and its associated <see cref="ItemsLoader"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="ItemsLoader"/> is running. OR The given factory has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
         /// <exception cref="ArgumentNullException">value is null.</exception>
         protected BrowsableObjectInfoFactory Factory
         {
@@ -123,6 +123,8 @@ namespace WinCopies.IO
         /// <param name="path">The path of this <see cref="BrowsableObjectInfo"/>.</param>
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
         /// <param name="factory">The factory for this <see cref="BrowsableObjectInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo"/> and its associated <see cref="ItemsLoader"/>.</param>
+        /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="factory"/> is null.</exception>
         protected BrowsableObjectInfo(string path, FileType fileType, BrowsableObjectInfoFactory factory) : base(path, fileType)
 
         {
@@ -432,7 +434,7 @@ namespace WinCopies.IO
         public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets a value that indicates whether this object needs to reconstruct objects on deep clone.
+        /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
         /// </summary>
         public virtual bool NeedsObjectsReconstruction => (!(ItemsLoader is null) && ItemsLoader.NeedsObjectsReconstruction) || Factory.NeedsObjectsReconstruction;
     }

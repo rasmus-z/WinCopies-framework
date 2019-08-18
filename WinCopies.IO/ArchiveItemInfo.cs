@@ -108,7 +108,7 @@ namespace WinCopies.IO
         /// <param name="archiveFileInfoDelegate">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represent a folder that exists implicitly in the archive.</param>
         /// <param name="path">The full path to this archive item</param>
         /// <param name="fileType">The file type of this archive item</param>
-        public ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfoDelegate) : this(path, fileType, archiveShellObject, archiveFileInfoDelegate, new ArchiveItemInfoFactory()) { }
+        public ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfoDelegate) : this(path, fileType, archiveShellObject, archiveFileInfoDelegate, null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
@@ -118,7 +118,7 @@ namespace WinCopies.IO
         /// <param name="path">The full path to this archive item</param>
         /// <param name="fileType">The file type of this archive item</param>
         /// <param name="factory">The factory this <see cref="ArchiveItemInfo"/> and associated <see cref="ArchiveLoader"/> use to create new instances of the <see cref="ArchiveItemInfo"/> class.</param>
-        public ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfoDelegate, ArchiveItemInfoFactory factory) : base(path, fileType, factory)
+        public ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, Func<ArchiveFileInfo?> archiveFileInfoDelegate, ArchiveItemInfoFactory factory) : base(path, fileType, factory ?? new ArchiveItemInfoFactory())
 
         {
 
@@ -168,7 +168,7 @@ namespace WinCopies.IO
 
             //{
 
-            //if (_archiveFileInfo.FileName.Substring(0, path.LastIndexOf('\\')) == parent)
+            //if (_archiveFileInfo.FileName.Substring(0, path.LastIndexOf(IO.Path.PathSeparator)) == parent)
 
             //{
 
@@ -210,7 +210,7 @@ namespace WinCopies.IO
         /// When overridden in a derived class, returns the parent of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
         /// <returns>the parent of this <see cref="ArchiveItemInfo"/>.</returns>
-        protected override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains("\\")*/ ? Factory.GetBrowsableObjectInfo(Path.Substring(0, Path.LastIndexOf('\\')), FileType.Folder, ArchiveShellObject, null/*archiveParentFileInfo.Value*/) : ArchiveShellObject;
+        protected override IBrowsableObjectInfo GetParent() => Path.Length > ArchiveShellObject.Path.Length /*&& Path.Contains(IO.Path.PathSeparator)*/ ? Factory.GetBrowsableObjectInfo(Path.Substring(0, Path.LastIndexOf(IO.Path.PathSeparator)), FileType.Folder, ArchiveShellObject, null/*archiveParentFileInfo.Value*/) : ArchiveShellObject;
 
         ///// <summary>
         ///// Currently not implemented.
@@ -218,7 +218,7 @@ namespace WinCopies.IO
         ///// <param name="newValue"></param>
         //public override void Rename(string newValue) =>
 
-        //    // string getNewPath() => System.IO.Path.GetDirectoryName(Path) + "\\" + newValue;
+        //    // string getNewPath() => System.IO.Path.GetDirectoryName(Path) + IO.Path.PathSeparator + newValue;
 
         //    //SevenZipCompressor a = new SevenZipCompressor();
 
@@ -247,7 +247,7 @@ namespace WinCopies.IO
         /// Gets a deep clone of this <see cref="BrowsableObjectInfo"/>. The <see cref="BrowsableObjectInfo.OnDeepClone(BrowsableObjectInfo, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
         /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ArchiveItemInfo(Path, FileType, (IShellObjectInfo)ArchiveShellObject.DeepClone(preserveIds), _archiveFileInfoDelegate);
+        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ArchiveItemInfo(Path, FileType, (IShellObjectInfo)ArchiveShellObject.DeepClone(preserveIds), _archiveFileInfoDelegate, (ArchiveItemInfoFactory) Factory.DeepClone(preserveIds));
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 
@@ -282,7 +282,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Gets a value that indicates whether this object needs to reconstruct objects on deep clone.
+        /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
         /// </summary>
         public override bool NeedsObjectsReconstruction => true; // True because of the ShellObjectInfo's ShellObject
 

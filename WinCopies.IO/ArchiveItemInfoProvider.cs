@@ -58,6 +58,8 @@ namespace WinCopies.IO
         /// <param name="path">The path of this <see cref="ArchiveItemInfoProvider"/>.</param>
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="ArchiveItemInfoProvider"/>.</param>
         /// <param name="factory">The factory for this <see cref="ArchiveItemInfoProvider"/>. This factory is used to create new <see cref="IArchiveItemInfoProvider"/>s from the current <see cref="ArchiveItemInfoProvider"/> and its associated <see cref="BrowsableObjectInfo.ItemsLoader"/>.</param>
+        /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="factory"/> is null.</exception>
         protected ArchiveItemInfoProvider(string path, FileType fileType, BrowsableObjectInfoFactory factory) : base(path, fileType, factory) { }
 
         //    protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)

@@ -51,13 +51,13 @@ namespace WinCopies.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class and sets the <see cref="UseRecursively"/> property to <see langword="true"/>.
         /// </summary>
-        public BrowsableObjectInfoFactory() : this(false) { }
+        protected BrowsableObjectInfoFactory() : this(false) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
         /// </summary>
-        /// <param name="useRecursively">Whether to add the new <see cref="BrowsableObjectInfoFactory"/> to all the new objects created from the new <see cref="IBrowsableObjectInfoFactory"/>.</param>
-        public BrowsableObjectInfoFactory(bool useRecursively) => UseRecursively = useRecursively;
+        /// <param name="useRecursively">Whether to add a clone of the new <see cref="BrowsableObjectInfoFactory"/> to all the new objects created from the new <see cref="BrowsableObjectInfoFactory"/>.</param>
+        protected BrowsableObjectInfoFactory(bool useRecursively) => UseRecursively = useRecursively;
 
         protected virtual void OnDeepClone(BrowsableObjectInfoFactory factory, bool preserveIds) { }
 
@@ -75,6 +75,9 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
+        /// </summary>
         public virtual bool NeedsObjectsReconstruction => false;
 
     }

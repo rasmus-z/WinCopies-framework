@@ -291,9 +291,9 @@ namespace WinCopies.IO
 
                     //        path = knownFolder.Path;
 
-                    //        if (pathInfo.Path.Contains("\\"))
+                    //        if (pathInfo.Path.Contains(IO.Path.PathSeparator))
 
-                    //            path += pathInfo.Path.Substring(pathInfo.Path.IndexOf('\\')) + 1;
+                    //            path += pathInfo.Path.Substring(pathInfo.Path.IndexOf(IO.Path.PathSeparator)) + 1;
 
                     //    }
 
@@ -313,7 +313,7 @@ namespace WinCopies.IO
 
                     {
 
-                        path = browsableObjectInfo.Name + "\\" + path;
+                        path = browsableObjectInfo.Name + IO.Path.PathSeparator + path;
 
                         newPath = browsableObjectInfo.Parent;
 
@@ -327,9 +327,9 @@ namespace WinCopies.IO
 
                 //string path = pathInfo.Path;
 
-                //if (path.Contains("\\"))
+                //if (path.Contains(IO.Path.PathSeparator))
 
-                //    path = path.Substring(0, path.IndexOf("\\"));
+                //    path = path.Substring(0, path.IndexOf(IO.Path.PathSeparator));
 
                 //foreach (PropertyInfo prop in props)
 

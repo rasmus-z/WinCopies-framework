@@ -8,11 +8,13 @@ namespace WinCopies.IO
 
     {
 
+#pragma warning disable CS0649 // Set up using reflection
         private readonly FileSystemObjectComparer<IFileSystemObject> _fileSystemObjectComparer;
+#pragma warning restore
 
         public FileSystemObjectComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetField(nameof(_fileSystemObjectComparer), value, typeof(WMIItemInfoComparer<T>), paramName: nameof(value), setOnlyIfNotNull: true, throwIfNull: true); }
 
-        public WMIItemInfoComparer() : this(BrowsableObjectInfo.GetDefaultComparer()) { }
+        public WMIItemInfoComparer() : this(FileSystemObject.GetDefaultComparer()) { }
 
         public WMIItemInfoComparer(FileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) => FileSystemObjectComparer = fileSystemObjectComparer;
 

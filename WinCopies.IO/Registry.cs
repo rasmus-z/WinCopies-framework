@@ -47,15 +47,15 @@ namespace WinCopies.IO
 
         //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(extension)));
 
-        //    RegistryKey value = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + '\\' + extension)
-        //        ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts + '\\' + extension);
+        //    RegistryKey value = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + IO.Path.PathSeparator + extension)
+        //        ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts + IO.Path.PathSeparator + extension);
 
         //    if (value == null)
 
         //    {
 
         //        value = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(extension)
-        //        ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + '\\' + extension);
+        //        ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + IO.Path.PathSeparator + extension);
 
         //        return value?.GetValue("") as string;
 
@@ -332,13 +332,13 @@ namespace WinCopies.IO
 
         //        }
 
-        //        registryKey = disposeAndGetNewRegistryKey(registryKey, mainRegistryKey.OpenSubKey(extensionOrPerceivedType + '\\' + OpenWithList));
+        //        registryKey = disposeAndGetNewRegistryKey(registryKey, mainRegistryKey.OpenSubKey(extensionOrPerceivedType + IO.Path.PathSeparator + OpenWithList));
 
         //        keyValueNames = registryKey?.GetSubKeyNames();
 
         //        foreach (string ___value in keyValueNames)
 
-        //            checkAndAddFileTypeIfSucceeded(___value, mainRegistryKey.Name.EndsWith('\\' + SystemFileAssociations) ? OpenRegistryKey(mainRegistryKey.Name.Substring(0, mainRegistryKey.Name.LastIndexOf('\\' + SystemFileAssociations))) : mainRegistryKey);
+        //            checkAndAddFileTypeIfSucceeded(___value, mainRegistryKey.Name.EndsWith(IO.Path.PathSeparator + SystemFileAssociations) ? OpenRegistryKey(mainRegistryKey.Name.Substring(0, mainRegistryKey.Name.LastIndexOf(IO.Path.PathSeparator + SystemFileAssociations))) : mainRegistryKey);
 
         //    }
 
@@ -390,7 +390,7 @@ namespace WinCopies.IO
 
         //        // checkAndAddFileTypeIfSucceeded((string)valueAsObject, registryKey, true);
 
-        //        onOpenWithList(_registryKey.OpenSubKey(SystemFileAssociations) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations), _registryKey.OpenSubKey(SystemFileAssociations + '\\' + (string)valueAsObject) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations + '\\' + (string)valueAsObject), (string)valueAsObject);
+        //        onOpenWithList(_registryKey.OpenSubKey(SystemFileAssociations) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations), _registryKey.OpenSubKey(SystemFileAssociations + IO.Path.PathSeparator + (string)valueAsObject) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(SystemFileAssociations + IO.Path.PathSeparator + (string)valueAsObject), (string)valueAsObject);
 
         //        #endregion
 
@@ -414,7 +414,7 @@ namespace WinCopies.IO
 
         //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(fileType)));
 
-        //    return Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + '\\' + fileType) ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClassesApplications + '\\' + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ApplicationsBackslash + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + '\\' + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClassesApplications + '\\' + fileType) ?? null;
+        //    return Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClasses + IO.Path.PathSeparator + fileType) ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SoftwareClassesApplications + IO.Path.PathSeparator + fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileType) ?? Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ApplicationsBackslash + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClasses + IO.Path.PathSeparator + fileType) ?? Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SoftwareClassesApplications + IO.Path.PathSeparator + fileType) ?? null;
 
         //}
 
@@ -430,7 +430,7 @@ namespace WinCopies.IO
 
         //        throw new ArgumentException(string.Format(StringParameterEmptyOrWhiteSpaces, nameof(fileType)));
 
-        //    string fileExtsPath = Microsoft.Win32.Registry.CurrentUser.Name + '\\' + SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts;
+        //    string fileExtsPath = Microsoft.Win32.Registry.CurrentUser.Name + IO.Path.PathSeparator + SoftwareMicrosoftWindowsCurrentVersionExplorerFileExts;
 
         //    string classesRootName = nameof(Microsoft.Win32.Registry.ClassesRoot.Name);
 
@@ -469,7 +469,7 @@ namespace WinCopies.IO
 
             string registryKeyName;
 
-            if (name.Contains('\\', out int result))
+            if (name.Contains(IO.Path.PathSeparator, out int result))
 
             {
 

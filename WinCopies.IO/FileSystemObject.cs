@@ -8,26 +8,30 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
+
+    /// <summary>
+    /// The base class for all file system objects in the WinCopies framework. This class can represent virtual file system objects (for example registry items, WMI items, ...).
+    /// </summary>
     public abstract class FileSystemObject : IFileSystemObject
     {
 
         /// <summary>
-        /// Gets the path of this <see cref="BrowsableObjectInfo"/>.
+        /// Gets the path of this <see cref="FileSystemObject"/>.
         /// </summary>
         public virtual string Path { get; }
 
         /// <summary>
-        /// When overridden in a derived class, gets the localized path of this <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets the localized path of this <see cref="FileSystemObject"/>.
         /// </summary>
         public abstract string LocalizedName { get; }
 
         /// <summary>
-        /// When overridden in a derived class, gets the name of this <see cref="BrowsableObjectInfo"/>.
+        /// When overridden in a derived class, gets the name of this <see cref="FileSystemObject"/>.
         /// </summary>
         public abstract string Name { get; }
 
         /// <summary>
-        /// The file type of this <see cref="BrowsableObjectInfo"/>.
+        /// The file type of this <see cref="FileSystemObject"/>.
         /// </summary>
         public virtual FileType FileType { get; private set; } = FileType.Other;
 
@@ -46,43 +50,93 @@ namespace WinCopies.IO
 
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="IFileSystemObject"/> is equal to the current object by calling the <see cref="Equals(object)"/> method.
+        /// </summary>
+        /// <param name="fileSystemObject">The <see cref="IFileSystemObject"/> to compare with the current object.</param>
+        /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
         public virtual bool Equals(IFileSystemObject fileSystemObject) => Equals(fileSystemObject as object);
 
         /// <summary>
-        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether <paramref name="obj"/> implements the <see cref="IBrowsableObjectInfo"/> interface and both objects references, and <see cref="FileType"/> and <see cref="Path"/> properties are equal.
+        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether both objects's references are equal, <paramref name="obj"/> implements the <see cref="IFileSystemObject"/> interface and <see cref="FileType"/> and <see cref="Path"/> properties are equal.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
-        public override bool Equals(object obj) => ReferenceEquals(this, obj)
-                ? true : obj is IFileSystemObject _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
+        /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
+        public override bool Equals(object obj) => obj is null ? false : ReferenceEquals(this, obj)
+                ? true : obj is IFileSystemObject _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower() // TODO: make better string comparison
                 : false;
 
         /// <summary>
-        /// Gets an hash code for this <see cref="BrowsableObjectInfo"/>.
+        /// Gets an hash code for this <see cref="FileSystemObject"/>.
         /// </summary>
-        /// <returns>The hash codes of the <see cref="FileType"/> and the <see cref="Path"/> property.</returns>
+        /// <returns>The hash code of the <see cref="FileType"/> and the <see cref="Path"/> property.</returns>
         public override int GetHashCode() => FileType.GetHashCode() ^ Path.ToLower().GetHashCode();
 
         /// <summary>
-        /// Gets a string representation of this <see cref="BrowsableObjectInfo"/>.
+        /// Gets a string representation of this <see cref="FileSystemObject"/>.
         /// </summary>
-        /// <returns>The <see cref="LocalizedName"/> of this <see cref="BrowsableObjectInfo"/>.</returns>
+        /// <returns>The <see cref="LocalizedName"/> of this <see cref="FileSystemObject"/>.</returns>
         public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
 
+        /// <summary>
+        /// Checks if two <see cref="FileSystemObject"/>s are equal.
+        /// </summary>
+        /// <param name="left">Left operand.</param>
+        /// <param name="right">Right operand.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObject"/>s are equal.</returns>
         public static bool operator ==(FileSystemObject left, FileSystemObject right) => left is null ? right is null : left.Equals(right);
 
+        /// <summary>
+        /// Checks if two <see cref="FileSystemObject"/>s are different.
+        /// </summary>
+        /// <param name="left">Left operand.</param>
+        /// <param name="right">Right operand.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObject"/>s are different.</returns>
         public static bool operator !=(FileSystemObject left, FileSystemObject right) => !(left == right);
 
+        /// <summary>
+        /// Checks if a given <see cref="FileSystemObject"/> is lesser than an other <see cref="FileSystemObject"/>.
+        /// </summary>
+        /// <param name="left">Left operand.</param>
+        /// <param name="right">Right operand.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is lesser than the <see cref="FileSystemObject"/> to compare with..</returns>
         public static bool operator <(FileSystemObject left, FileSystemObject right) => left is null ? right is object : left.CompareTo(right) < 0;
 
+        /// <summary>
+        /// Checks if a given <see cref="FileSystemObject"/> is lesser or equal to an other <see cref="FileSystemObject"/>.
+        /// </summary>
+        /// <param name="left">Left operand.</param>
+        /// <param name="right">Right operand.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is lesser or equal to the <see cref="FileSystemObject"/> to compare with..</returns>
         public static bool operator <=(FileSystemObject left, FileSystemObject right) => left is null || left.CompareTo(right) <= 0;
 
+        /// <summary>
+        /// Checks if a given <see cref="FileSystemObject"/> is greater than an other <see cref="FileSystemObject"/>.
+        /// </summary>
+        /// <param name="left">Left operand.</param>
+        /// <param name="right">Right operand.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is greater than the <see cref="FileSystemObject"/> to compare with..</returns>
         public static bool operator >(FileSystemObject left, FileSystemObject right) => left is object && left.CompareTo(right) > 0;
 
+        /// <summary>
+        /// Checks if a given <see cref="FileSystemObject"/> is greater or equal to an other <see cref="FileSystemObject"/>.
+        /// </summary>
+        /// <param name="left">Left operand.</param>
+        /// <param name="right">Right operand.</param>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is greater or equal to the <see cref="FileSystemObject"/> to compare with..</returns>
         public static bool operator >=(FileSystemObject left, FileSystemObject right) => left is null ? right is null : left.CompareTo(right) >= 0;
 
+        /// <summary>
+        /// Gets a default comparer for <see cref="FileSystemObject"/>s.
+        /// </summary>
+        /// <returns>A default comparer for <see cref="FileSystemObject"/>s.</returns>
         public static FileSystemObjectComparer<IFileSystemObject> GetDefaultComparer() => new FileSystemObjectComparer<IFileSystemObject>();
 
+        /// <summary>
+        /// Compares the current object to a given <see cref="FileSystemObject"/>.
+        /// </summary>
+        /// <param name="fileSystemObject">The <see cref="FileSystemObject"/> to compare with.</param>
+        /// <returns>The comparison result. See <see cref="IComparable{T}.CompareTo(T)"/> for more details.</returns>
         public virtual int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
 
     }

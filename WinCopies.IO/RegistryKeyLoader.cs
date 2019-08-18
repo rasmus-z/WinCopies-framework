@@ -143,7 +143,7 @@ namespace WinCopies.IO
 
                 {
 
-                    string path = pathWithoutName + '\\' + name;
+                    string path = pathWithoutName + IO.Path.PathSeparator + name;
 
                     if (CheckFilter(path))
 
@@ -193,7 +193,7 @@ namespace WinCopies.IO
 
                                 foreach (string item in items)
 
-                                    checkAndAppend(item.Substring(0, item.LastIndexOf('\\')), item.Substring(item.LastIndexOf('\\') + 1), false);
+                                    checkAndAppend(item.Substring(0, item.LastIndexOf(IO.Path.PathSeparator)), item.Substring(item.LastIndexOf(IO.Path.PathSeparator) + 1), false);
 
                             }
 

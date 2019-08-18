@@ -13,27 +13,140 @@ using System.Linq;
 using WinCopies.Collections;
 using System.Security;
 using System.Reflection;
+using SevenZip;
+using System.Collections.ObjectModel;
 
 namespace WinCopies.IO
 {
     public static class Path
 
     {
+
+        public const char PathSeparator = '\\';
+
         public static readonly string[] PathEnvironmentVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
+
+        private static readonly Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();
+
+        public static ReadOnlyDictionary<InArchiveFormat, string[]> InArchiveFormats { get; }
+
+        // public new event PropertyChangedEventHandler PropertyChanged;
+
+        static Path()
+
+        {
+
+            // todo: to add the other 'in' archive formats
+
+            dic.Add(InArchiveFormat.Zip, new string[] { ".zip" });
+
+            dic.Add(InArchiveFormat.SevenZip, new string[] { ".7z" });
+
+            dic.Add(InArchiveFormat.Arj, new string[] { ".arj" });
+
+            dic.Add(InArchiveFormat.BZip2, new string[] { ".bz2", ".tar", ".xz" });
+
+            dic.Add(InArchiveFormat.Cab, new string[] { ".cab" });
+
+            dic.Add(InArchiveFormat.Chm, new string[] { ".chm" });
+
+            dic.Add(InArchiveFormat.Compound, new string[] { ".cfb" });
+
+            dic.Add(InArchiveFormat.Cpio, new string[] { ".cpio" });
+
+            dic.Add(InArchiveFormat.CramFS, null);
+
+            dic.Add(InArchiveFormat.Deb, new string[] { ".deb", ".udeb" });
+
+            dic.Add(InArchiveFormat.Dmg, new string[] { ".dmg" });
+
+            dic.Add(InArchiveFormat.Elf, new string[] { ".axf", ".bin", ".elf", ".o", ".prx", ".puff", ".ko", ".mod", ".so" });
+
+            dic.Add(InArchiveFormat.Fat, null);
+
+            dic.Add(InArchiveFormat.Flv, new string[] { ".flv" });
+
+            dic.Add(InArchiveFormat.GZip, new string[] { ".gz" });
+
+            dic.Add(InArchiveFormat.Hfs, new string[] { ".hfs" });
+
+            dic.Add(InArchiveFormat.Iso, new string[] { ".iso" });
+
+            dic.Add(InArchiveFormat.Lzh, new string[] { ".lzh" });
+
+            dic.Add(InArchiveFormat.Lzma, new string[] { "lzma" });
+
+            dic.Add(InArchiveFormat.Lzma86, new string[] { ".lzma86" });
+
+            dic.Add(InArchiveFormat.Lzw, new string[] { ".lzw" });
+
+            dic.Add(InArchiveFormat.MachO, new string[] { ".o", ".dylib", ".bundle" });
+
+            dic.Add(InArchiveFormat.Mbr, new string[] { ".mbr" });
+
+            dic.Add(InArchiveFormat.Msi, new string[] { ".msi", ".msp" });
+
+            dic.Add(InArchiveFormat.Mslz, new string[] { ".mslz" });
+
+            dic.Add(InArchiveFormat.Mub, new string[] { ".mub" });
+
+            dic.Add(InArchiveFormat.Nsis, new string[] { ".exe" });
+
+            dic.Add(InArchiveFormat.Ntfs, null);
+
+            dic.Add(InArchiveFormat.PE, new string[] { ".dll", ".ocx", ".sys", ".scr", ".drv", ".efi" });
+
+            dic.Add(InArchiveFormat.Ppmd, new string[] { ".ppmd" });
+
+            dic.Add(InArchiveFormat.Rar, new string[] { ".rar" });
+
+            dic.Add(InArchiveFormat.Rar4, null);
+
+            dic.Add(InArchiveFormat.Rpm, new string[] { ".rpm" });
+
+            dic.Add(InArchiveFormat.Split, new string[] { ".split" });
+
+            dic.Add(InArchiveFormat.SquashFS, null);
+
+            dic.Add(InArchiveFormat.Swf, new string[] { ".swf" });
+
+            dic.Add(InArchiveFormat.Swfc, null);
+
+            dic.Add(InArchiveFormat.Tar, new string[] { ".tar", "tar.gz", "tar.bz2", "tar.xz" });
+
+            dic.Add(InArchiveFormat.TE, null);
+
+            dic.Add(InArchiveFormat.Udf, null);
+
+            dic.Add(InArchiveFormat.UEFIc, null);
+
+            dic.Add(InArchiveFormat.UEFIs, null);
+
+            dic.Add(InArchiveFormat.Vhd, new string[] { ".vhd" });
+
+            dic.Add(InArchiveFormat.Wim, new string[] { ".wim", ".swm" });
+
+            dic.Add(InArchiveFormat.Xar, new string[] { ".xar" });
+
+            dic.Add(InArchiveFormat.XZ, new string[] { ".xz" });
+
+            InArchiveFormats = new ReadOnlyDictionary<InArchiveFormat, string[]>(dic);
+
+        }
 
         public static BrowsableObjectInfo GetBrowsableObjectInfoFromPath(string path, bool parent/*, bool deepArchiveCheck*/)
 
         {
 
-            path = path.Replace('/', '\\');
+            path = path.Replace('/', PathSeparator);
 
-            if (path.EndsWith("\\") && !path.EndsWith(":\\") && !path.EndsWith(":\\\\"))
+            if (path.EndsWith(IO.Path.PathSeparator.ToString()) && !path.EndsWith(":\\") && !path.EndsWith(":\\\\"))
 
-                path = path.Substring(0, path.LastIndexOf("\\"));
+                path = path.Substring(0, path.LastIndexOf(PathSeparator));
 
             path = GetRealPathFromEnvironmentVariables(path);
 
-            string[] paths = path.Split('\\');
+            string[] paths = path.Split(PathSeparator);
 
             ShellObject shellObjectDelegate() => ShellObject.FromParsingName(paths[0]);
 
@@ -103,7 +216,7 @@ namespace WinCopies.IO
 
                     string s = paths[i].ToLower();
 
-                    browsableObjectInfo = getBrowsableObjectInfo(browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf('\\') + 1).ToLower() == s) as BrowsableObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo));
+                    browsableObjectInfo = getBrowsableObjectInfo(browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf(IO.Path.PathSeparator) + 1).ToLower() == s) as BrowsableObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo));
 
                 }
 
@@ -119,13 +232,13 @@ namespace WinCopies.IO
 
                     string s = shellObject.ParsingName;
 
-                    if (!s.EndsWith("\\"))
+                    if (!s.EndsWith(PathSeparator.ToString()))
 
-                        s += "\\";
+                        s += PathSeparator;
 
                     s += paths[i];
 
-                    // string _s = s.Replace("\\", "\\\\");
+                    // string _s = s.Replace(IO.Path.PathSeparator, "\\\\");
 
                     ShellObject func() => ((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo);
 
@@ -133,7 +246,7 @@ namespace WinCopies.IO
 
                     SpecialFolder specialFolder = GetSpecialFolder(shellObject);
 
-                    FileType fileType = specialFolder == SpecialFolder.OtherFolderOrFile ? shellObject.IsLink ? FileType.Link : shellObject is ShellFile shellFile ? IO.Path .IsSupportedArchiveFormat(System.IO.Path.GetExtension(s)) ? FileType.Archive : FileType.File : FileType.Drive : FileType.SpecialFolder;
+                    FileType fileType = specialFolder == SpecialFolder.OtherFolderOrFile ? shellObject.IsLink ? FileType.Link : shellObject is ShellFile shellFile ? IO.Path.IsSupportedArchiveFormat(System.IO.Path.GetExtension(s)) ? FileType.Archive : FileType.File : FileType.Drive : FileType.SpecialFolder;
 
                     //if (shellObject.IsFileSystemObject)
 
@@ -150,7 +263,7 @@ namespace WinCopies.IO
                     //#endif
 
 #pragma warning disable IDE0068 // Disposed manually when needed
-                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo(s, fileType, specialFolder,    func, null));
+                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo(s, fileType, specialFolder, func, null));
 #pragma warning restore IDE0068
 
 #if DEBUG
@@ -191,7 +304,7 @@ namespace WinCopies.IO
 
         {
 
-            string pathWithoutExtension = System.IO.Path.GetDirectoryName(path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path);
+            string pathWithoutExtension = System.IO.Path.GetDirectoryName(path) + IO.Path.PathSeparator + System.IO.Path.GetFileNameWithoutExtension(path);
 
             bool checkFilters(string[] filters)
 
@@ -201,7 +314,7 @@ namespace WinCopies.IO
 
                 {
 
-                    if ( string.IsNullOrEmpty( _filter ) ) continue;
+                    if (string.IsNullOrEmpty(_filter)) continue;
 
                     if (pathWithoutExtension.Length >= _filter.Length && pathWithoutExtension.Contains(_filter))
 
@@ -271,7 +384,7 @@ namespace WinCopies.IO
 
         //#endif
 
-        //            if (basePath.EndsWith("\\"))
+        //            if (basePath.EndsWith(IO.Path.PathSeparator))
 
         //                basePath = basePath.Substring(0, basePath.Length - 1);
 
@@ -359,7 +472,7 @@ namespace WinCopies.IO
 
         //                    fileType = FileType.Folder;
 
-        //                // else if (basePath.StartsWith(LibrariesName + "\\") || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
+        //                // else if (basePath.StartsWith(LibrariesName + IO.Path.PathSeparator) || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
 
         //                // else if
 
@@ -393,21 +506,23 @@ namespace WinCopies.IO
                 // try
                 // {
 
-                    // for (; i < knownFoldersProperties.Length; i++)
+                // for (; i < knownFoldersProperties.Length; i++)
 
-                        if (shellObject.ParsingName == knownFoldersProperties[i].Name)
+                if (shellObject.ParsingName == knownFoldersProperties[i].Name)
 
-                            value = (SpecialFolder)typeof(SpecialFolder).GetField(knownFoldersProperties[i].Name).GetValue(null);
+                    value = (SpecialFolder)typeof(SpecialFolder).GetField(knownFoldersProperties[i].Name).GetValue(null);
 
-                    // break;
+            // break;
 
-                // }
+            // }
 
-                // catch (ShellException) { i++; }
+            // catch (ShellException) { i++; }
 
             return value ?? SpecialFolder.OtherFolderOrFile;
 
         }
+
+        // todo:
 
         //        public static SpecialFolder GetSpecialFolderFromPath(string path, ShellObject shellObject)
 
@@ -415,7 +530,7 @@ namespace WinCopies.IO
 
         //            SpecialFolder specialFolder = SpecialFolder.OtherFolderOrFile;
 
-        //            if (path.EndsWith("\\")) path = path.Substring(0, path.Length - 1);
+        //            if (path.EndsWith(IO.Path.PathSeparator)) path = path.Substring(0, path.Length - 1);
 
         //#if DEBUG
 
@@ -449,7 +564,7 @@ namespace WinCopies.IO
 
         //                    specialFolder = SpecialFolder.UsersLibraries;
 
-        //            // else if (basePath.StartsWith(LibrariesName + "\\") || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
+        //            // else if (basePath.StartsWith(LibrariesName + IO.Path.PathSeparator) || basePath.StartsWith(LibrariesLocalizedName)) { shellObject=(ShellObject)KnownFolders.Libraries KnownFolders.Libraries.Path + basePath.Substring(KnownFolders.Libraries.LocalizedName.Length);
 
         //            // else if
 
@@ -457,197 +572,197 @@ namespace WinCopies.IO
 
         //        }
 
-        public static string RenamePathWithAutomaticNumber(string path, string destPath)
+        //        public static string RenamePathWithAutomaticNumber(string path, string destPath)
 
-        {
+        //        {
 
-            string newPath = destPath + "\\" + System.IO.Path.GetFileName(path);
+        //            string newPath = destPath + IO.Path.PathSeparator + System.IO.Path.GetFileName(path);
 
-            if (!(Directory.Exists(newPath) || File.Exists(newPath)))
+        //            if (!(Directory.Exists(newPath) || File.Exists(newPath)))
 
-                //if (System.IO.Directory.Exists(path))
+        //                //if (System.IO.Directory.Exists(path))
 
-                //    System.IO.Directory.Move(path, newPath);
+        //                //    System.IO.Directory.Move(path, newPath);
 
-                //else if (System.IO.File.Exists(path))
+        //                //else if (System.IO.File.Exists(path))
 
-                //    System.IO.File.Move(path, newPath);
+        //                //    System.IO.File.Move(path, newPath);
 
-                return newPath;
+        //                return newPath;
 
 
 
-            long pathParenthesesNumber = -1;
+        //            long pathParenthesesNumber = -1;
 
-            string getFileNameWithoutParentheses(string fileName, out long parenthesesNumber)
+        //            string getFileNameWithoutParentheses(string fileName, out long parenthesesNumber)
 
-            {
+        //            {
 
-                // We remove, if any, the last parentheses that are in the file name if they contain a number and if this number is lesser than long.MaxValue.
+        //                // We remove, if any, the last parentheses that are in the file name if they contain a number and if this number is lesser than long.MaxValue.
 
-                if (fileName.Contains(" (") && fileName.EndsWith(")"))
+        //                if (fileName.Contains(" (") && fileName.EndsWith(")"))
 
-                {
+        //                {
 
-                    int index = fileName.LastIndexOf(" (");
+        //                    int index = fileName.LastIndexOf(" (");
 
-                    string parenthesesContent = fileName.Substring(index + 2, fileName.Length - (index + 3));
+        //                    string parenthesesContent = fileName.Substring(index + 2, fileName.Length - (index + 3));
 
-                    if (/*parenthesesContent.Length > 0 &&*/ long.TryParse(parenthesesContent, out parenthesesNumber) && parenthesesNumber >= 0)
+        //                    if (/*parenthesesContent.Length > 0 &&*/ long.TryParse(parenthesesContent, out parenthesesNumber) && parenthesesNumber >= 0)
 
-                        return fileName.Substring(0, index);
+        //                        return fileName.Substring(0, index);
 
-                }
+        //                }
 
-                parenthesesNumber = -1;
+        //                parenthesesNumber = -1;
 
-                return fileName;
+        //                return fileName;
 
-            }
+        //            }
 
-            // Variables initialization
+        //            // Variables initialization
 
-            // long number = 1;
+        //            // long number = 1;
 
-            string _fileNameWithoutExtension = "";
+        //            string _fileNameWithoutExtension = "";
 
-            long _parenthesesNumber = -1;
+        //            long _parenthesesNumber = -1;
 
 
 
-            // We get all items that are in the same folder as the destPath parameter.
+        //            // We get all items that are in the same folder as the destPath parameter.
 
-            string[] directories = Directory.GetDirectories(destPath);
+        //            string[] directories = Directory.GetDirectories(destPath);
 
-            string[] files = Directory.GetFiles(destPath);
+        //            string[] files = Directory.GetFiles(destPath);
 
 
 
-            // Then, we get the file name of the current path without its extension.
+        //            // Then, we get the file name of the current path without its extension.
 
-            string fileNameWithoutExtension = getFileNameWithoutParentheses(System.IO.Path.GetFileNameWithoutExtension(path), out pathParenthesesNumber);
+        //            string fileNameWithoutExtension = getFileNameWithoutParentheses(System.IO.Path.GetFileNameWithoutExtension(path), out pathParenthesesNumber);
 
 
 
-            foreach (string directory in directories)
+        //            foreach (string directory in directories)
 
-            {
+        //            {
 
-                // de nouveau on reprend le nom de l'élément, ici, le dossier, sans son extension éventuelle:
+        //                // de nouveau on reprend le nom de l'élément, ici, le dossier, sans son extension éventuelle:
 
-                _fileNameWithoutExtension = getFileNameWithoutParentheses(System.IO.Path.GetFileNameWithoutExtension(directory), out _parenthesesNumber);
+        //                _fileNameWithoutExtension = getFileNameWithoutParentheses(System.IO.Path.GetFileNameWithoutExtension(directory), out _parenthesesNumber);
 
 
 
-                // On fait ensuite une comparaison du nom de l'élément introduit par l'utilisateur avec le nom du dossier véirifé actuellement :
+        //                // On fait ensuite une comparaison du nom de l'élément introduit par l'utilisateur avec le nom du dossier véirifé actuellement :
 
-                if (_fileNameWithoutExtension.ToLower() == fileNameWithoutExtension.ToLower() && _parenthesesNumber > pathParenthesesNumber)
+        //                if (_fileNameWithoutExtension.ToLower() == fileNameWithoutExtension.ToLower() && _parenthesesNumber > pathParenthesesNumber)
 
-#if DEBUG
+        //#if DEBUG
 
-                {
+        //                {
 
-                    Debug.WriteLine(pathParenthesesNumber.ToString() + " " + _parenthesesNumber.ToString());
+        //                    Debug.WriteLine(pathParenthesesNumber.ToString() + " " + _parenthesesNumber.ToString());
 
-#endif
+        //#endif
 
-                    pathParenthesesNumber = _parenthesesNumber;
+        //                    pathParenthesesNumber = _parenthesesNumber;
 
-#if DEBUG
+        //#if DEBUG
 
-                }
+        //                }
 
-#endif
+        //#endif
 
-            }
+        //            }
 
 
 
-            foreach (string file in files)
+        //            foreach (string file in files)
 
-            {
+        //            {
 
-                // de nouveau on reprend le nom de l'élément, ici, le dossier, sans son extension éventuelle:
+        //                // de nouveau on reprend le nom de l'élément, ici, le dossier, sans son extension éventuelle:
 
-                _fileNameWithoutExtension = getFileNameWithoutParentheses(System.IO.Path.GetFileNameWithoutExtension(file), out _parenthesesNumber);
+        //                _fileNameWithoutExtension = getFileNameWithoutParentheses(System.IO.Path.GetFileNameWithoutExtension(file), out _parenthesesNumber);
 
 
 
-                // On fait ensuite une comparaison du nom de l'élément introduit par l'utilisateur avec le nom du dossier véirifé actuellement :
+        //                // On fait ensuite une comparaison du nom de l'élément introduit par l'utilisateur avec le nom du dossier véirifé actuellement :
 
-                if (_fileNameWithoutExtension.ToLower() == fileNameWithoutExtension.ToLower() && _parenthesesNumber > pathParenthesesNumber)
+        //                if (_fileNameWithoutExtension.ToLower() == fileNameWithoutExtension.ToLower() && _parenthesesNumber > pathParenthesesNumber)
 
-#if DEBUG
+        //#if DEBUG
 
-                {
+        //                {
 
-                    // if (long.TryParse(partOfName, out number_2))
+        //                    // if (long.TryParse(partOfName, out number_2))
 
-                    // {
+        //                    // {
 
-                    Debug.WriteLine(pathParenthesesNumber.ToString() + " " + _parenthesesNumber.ToString());
+        //                    Debug.WriteLine(pathParenthesesNumber.ToString() + " " + _parenthesesNumber.ToString());
 
-#endif
+        //#endif
 
-                    pathParenthesesNumber = _parenthesesNumber;
+        //                    pathParenthesesNumber = _parenthesesNumber;
 
-                    // }
+        //                    // }
 
 
 
-#if DEBUG
+        //#if DEBUG
 
-                }
+        //                }
 
-#endif
+        //#endif
 
-            }
+        //            }
 
 
 
-            return destPath + "\\" + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
+        //            return destPath + PathSeparator + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
 
 
-            // string new_Name = destPath + "\\" + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
+        //            // string new_Name = destPath + IO.Path.PathSeparator + fileNameWithoutExtension + " (" + (pathParenthesesNumber + 1).ToString() + ")" + System.IO.Path.GetExtension(path);
 
 
 
-            // TODO : pertinent ? si oui, utiliser WinCopies.IO.FilesProcesses (avec un boolean pour voir s'il faut l'uitliser ou pas) ?
+        //            // TODO : pertinent ? si oui, utiliser WinCopies.IO.FilesProcesses (avec un boolean pour voir s'il faut l'uitliser ou pas) ?
 
 
 
-            // if (Directory.Exists(path) || File.Exists(path))
+        //            // if (Directory.Exists(path) || File.Exists(path))
 
-            // System.IO.Directory.Move(path, new_Name);
+        //            // System.IO.Directory.Move(path, new_Name);
 
 
-            // DirectoryInfo.MoveTo(Rename_Window.NewFullName)
+        //            // DirectoryInfo.MoveTo(Rename_Window.NewFullName)
 
-            // else if (File.Exists(path))
+        //            // else if (File.Exists(path))
 
-            // System.IO.File.Move(path, new_Name);
+        //            // System.IO.File.Move(path, new_Name);
 
-            // return new_Name;
+        //            // return new_Name;
 
-            // return null;
+        //            // return null;
 
-            // FileInfo.MoveTo(
+        //            // FileInfo.MoveTo(
 
-            // Case FileTypes.Drive, FileTypes.Folder, FileTypes.File
+        //            // Case FileTypes.Drive, FileTypes.Folder, FileTypes.File
 
 
 
-            // ProcessDialogResult = True
+        //            // ProcessDialogResult = True
 
-            // Close()
+        //            // Close()
 
-        }
+        //        }
 
         public static string GetRealPathFromEnvironmentVariables(string path)
 
         {
 
-            string[] subPaths = path.Split('\\');
+            string[] subPaths = path.Split(PathSeparator);
 
             var stringBuilder = new StringBuilder();
 
@@ -675,7 +790,7 @@ namespace WinCopies.IO
 
                 if (count < subPaths.Length)
 
-                    _ = stringBuilder.Append('\\');
+                    _ = stringBuilder.Append(PathSeparator);
 
             }
 
@@ -683,45 +798,45 @@ namespace WinCopies.IO
 
         }
 
-        public static string GetShortcutPath(string path)
+        //public static string GetShortcutPath(string path)
 
-        {
+        //{
 
-            var paths = new List<KeyValuePair<string, string>>();
+        //    var paths = new List<KeyValuePair<string, string>>();
 
-            foreach (string environmentPathVariable in PathEnvironmentVariables)
+        //    foreach (string environmentPathVariable in PathEnvironmentVariables)
 
-            {
+        //    {
 
-                string _path = Environment.GetEnvironmentVariable(environmentPathVariable);
+        //        string _path = Environment.GetEnvironmentVariable(environmentPathVariable);
 
-                if (_path != null)
+        //        if (_path != null)
 
-                    paths.Add(new KeyValuePair<string, string>(environmentPathVariable, _path));
+        //            paths.Add(new KeyValuePair<string, string>(environmentPathVariable, _path));
 
-            }
-
-
-
-            paths.Sort((KeyValuePair<string, string> x, KeyValuePair<string, string> y) => x.Value.Length < y.Value.Length ? 1 : x.Value.Length == y.Value.Length ? 0 : -1);
+        //    }
 
 
 
-            foreach (KeyValuePair<string, string> _path in paths)
+        //    paths.Sort((KeyValuePair<string, string> x, KeyValuePair<string, string> y) => x.Value.Length < y.Value.Length ? 1 : x.Value.Length == y.Value.Length ? 0 : -1);
 
-                if (path.StartsWith(_path.Value))
 
-                {
 
-                    path = "%" + _path.Key + "%" + path.Substring(_path.Value.Length);
+        //    foreach (KeyValuePair<string, string> _path in paths)
 
-                    break;
+        //        if (path.StartsWith(_path.Value))
 
-                }
+        //        {
 
-            return path;
+        //            path = "%" + _path.Key + "%" + path.Substring(_path.Value.Length);
 
-        }
+        //            break;
+
+        //        }
+
+        //    return path;
+
+        //}
 
     }
 }

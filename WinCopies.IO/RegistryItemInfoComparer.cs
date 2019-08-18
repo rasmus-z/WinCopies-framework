@@ -14,7 +14,7 @@ namespace WinCopies.IO
 
         public IFileSystemObjectComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetField(nameof(_fileSystemObjectComparer), value, typeof(RegistryItemInfoComparer<T>), paramName: nameof(value), setOnlyIfNotNull: true, throwIfNull: true); }
 
-        public RegistryItemInfoComparer() : this(BrowsableObjectInfo.GetDefaultComparer()) { }
+        public RegistryItemInfoComparer() : this(FileSystemObject.GetDefaultComparer()) { }
 
         public RegistryItemInfoComparer(IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) => FileSystemObjectComparer = fileSystemObjectComparer;
 

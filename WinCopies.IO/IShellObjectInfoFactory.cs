@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace WinCopies.IO
 {
     /// <summary>
-    /// A factory to create new <see cref="IBrowsableObjectInfo"/>'s.
+    /// A factory to create new <see cref="IBrowsableObjectInfo"/>s.
     /// </summary>
     public interface IShellObjectInfoFactory : IBrowsableObjectInfoFactory
     {

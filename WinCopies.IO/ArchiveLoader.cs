@@ -20,114 +20,6 @@ namespace WinCopies.IO
 
         protected override BrowsableObjectInfoLoader<ArchiveItemInfoProvider> DeepCloneOverride(bool preserveIds) => new ArchiveLoader(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IArchiveItemInfo>)FileSystemObjectComparer.DeepClone(preserveIds));
 
-        private static readonly Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();
-
-        public static ReadOnlyDictionary<InArchiveFormat, string[]> InArchiveFormats { get; }
-
-        // public new event PropertyChangedEventHandler PropertyChanged;
-
-        static ArchiveLoader()
-
-        {
-
-            // todo: to add the other 'in' archive formats
-
-            dic.Add(InArchiveFormat.Zip, new string[] { ".zip" });
-
-            dic.Add(InArchiveFormat.SevenZip, new string[] { ".7z" });
-
-            dic.Add(InArchiveFormat.Arj, new string[] { ".arj" });
-
-            dic.Add(InArchiveFormat.BZip2, new string[] { ".bz2", ".tar", ".xz" });
-
-            dic.Add(InArchiveFormat.Cab, new string[] { ".cab" });
-
-            dic.Add(InArchiveFormat.Chm, new string[] { ".chm" });
-
-            dic.Add(InArchiveFormat.Compound, new string[] { ".cfb" });
-
-            dic.Add(InArchiveFormat.Cpio, new string[] { ".cpio" });
-
-            dic.Add(InArchiveFormat.CramFS, null);
-
-            dic.Add(InArchiveFormat.Deb, new string[] { ".deb", ".udeb" });
-
-            dic.Add(InArchiveFormat.Dmg, new string[] { ".dmg" });
-
-            dic.Add(InArchiveFormat.Elf, new string[] { ".axf", ".bin", ".elf", ".o", ".prx", ".puff", ".ko", ".mod", ".so" });
-
-            dic.Add(InArchiveFormat.Fat, null);
-
-            dic.Add(InArchiveFormat.Flv, new string[] { ".flv" });
-
-            dic.Add(InArchiveFormat.GZip, new string[] { ".gz" });
-
-            dic.Add(InArchiveFormat.Hfs, new string[] { ".hfs" });
-
-            dic.Add(InArchiveFormat.Iso, new string[] { ".iso" });
-
-            dic.Add(InArchiveFormat.Lzh, new string[] { ".lzh" });
-
-            dic.Add(InArchiveFormat.Lzma, new string[] { "lzma" });
-
-            dic.Add(InArchiveFormat.Lzma86, new string[] { ".lzma86" });
-
-            dic.Add(InArchiveFormat.Lzw, new string[] { ".lzw" });
-
-            dic.Add(InArchiveFormat.MachO, new string[] { ".o", ".dylib", ".bundle" });
-
-            dic.Add(InArchiveFormat.Mbr, new string[] { ".mbr" });
-
-            dic.Add(InArchiveFormat.Msi, new string[] { ".msi", ".msp" });
-
-            dic.Add(InArchiveFormat.Mslz, new string[] { ".mslz" });
-
-            dic.Add(InArchiveFormat.Mub, new string[] { ".mub" });
-
-            dic.Add(InArchiveFormat.Nsis, new string[] { ".exe" });
-
-            dic.Add(InArchiveFormat.Ntfs, null);
-
-            dic.Add(InArchiveFormat.PE, new string[] { ".dll", ".ocx", ".sys", ".scr", ".drv", ".efi" });
-
-            dic.Add(InArchiveFormat.Ppmd);
-
-            dic.Add(InArchiveFormat.Rar, null);
-
-            dic.Add(InArchiveFormat.Rar4, null);
-
-            dic.Add(InArchiveFormat.Rpm, null);
-
-            dic.Add(InArchiveFormat.Split, null);
-
-            dic.Add(InArchiveFormat.SquashFS, null);
-
-            dic.Add(InArchiveFormat.Swf, null);
-
-            dic.Add(InArchiveFormat.Swfc, null);
-
-            dic.Add(InArchiveFormat.Tar, null);
-
-            dic.Add(InArchiveFormat.TE, null);
-
-            dic.Add(InArchiveFormat.Udf, null);
-
-            dic.Add(InArchiveFormat.UEFIc, null);
-
-            dic.Add(InArchiveFormat.UEFIs, null);
-
-            dic.Add(InArchiveFormat.Vhd, null);
-
-            dic.Add(InArchiveFormat.Wim, null);
-
-            dic.Add(InArchiveFormat.Xar, null);
-
-            dic.Add(InArchiveFormat.XZ, null);
-
-            InArchiveFormats = new ReadOnlyDictionary<InArchiveFormat, string[]>(dic);
-
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveLoader"/> class.
         /// </summary>
@@ -143,7 +35,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IArchiveItemInfo> fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) { }
+        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IArchiveItemInfo> fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
 
         protected override void OnPathChanging(ArchiveItemInfoProvider path)
 
@@ -295,15 +187,15 @@ namespace WinCopies.IO
 
                                 fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
 
-                                if (fileName.StartsWith("\\"))
+                                if (fileName.StartsWith(IO.Path.PathSeparator))
 
                                     fileName = fileName.Substring(1);
 
-                                if (fileName.Contains("\\"))
+                                if (fileName.Contains(IO.Path.PathSeparator))
 
-                                    fileName = fileName.Substring(0, fileName.IndexOf("\\"));
+                                    fileName = fileName.Substring(0, fileName.IndexOf(IO.Path.PathSeparator));
 
-                                /*if (!archiveFileInfo.FileName.Substring(archiveFileInfo.FileName.Length).Contains("\\"))*/
+                                /*if (!archiveFileInfo.FileName.Substring(archiveFileInfo.FileName.Length).Contains(IO.Path.PathSeparator))*/
 
                                 // {
 
@@ -339,7 +231,7 @@ namespace WinCopies.IO
 
                         foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
 
-                            // _path = archiveFileInfo.FileName.Replace('/', '\\');
+                            // _path = archiveFileInfo.FileName.Replace('/', IO.Path.PathSeparator);
 
                             addPath(archiveFileInfo);
 
@@ -349,9 +241,9 @@ namespace WinCopies.IO
 
                         //    if (relativePath != "")
 
-                        //        relativePath = "\\";
+                        //        relativePath = IO.Path.PathSeparator;
 
-                        //    relativePath += ((ArchiveItemInfo)Path).Path/*.Replace('/', '\\')*/;
+                        //    relativePath += ((ArchiveItemInfo)Path).Path/*.Replace('/', IO.Path.PathSeparator)*/;
 
                         //}
 
@@ -447,7 +339,7 @@ namespace WinCopies.IO
                 // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;
                 // new_Path.LoadThumbnail();
 
-                ReportProgress(0, Path.ArchiveItemInfoFactory.GetBrowsableObjectInfo(Path.Path + "\\" + path.Path, path.FileType, Path.ArchiveShellObject, () => path.ArchiveFileInfo));
+                ReportProgress(0, Path.ArchiveItemInfoFactory.GetBrowsableObjectInfo(Path.Path + IO.Path.PathSeparator + path.Path, path.FileType, Path.ArchiveShellObject, () => path.ArchiveFileInfo));
 
                 // #if DEBUG
 
@@ -487,7 +379,7 @@ namespace WinCopies.IO
 
 #else
 
-                ReportProgress(0, ((IArchiveItemInfoProvider)Path).Factory.GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType));
+                ReportProgress(0, ((IArchiveItemInfoProvider)Path).Factory.GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + IO.Path.PathSeparator + path.Path, path.FileType));
 
 #endif
 

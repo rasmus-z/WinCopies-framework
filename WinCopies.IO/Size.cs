@@ -35,9 +35,24 @@ namespace WinCopies.IO
         TeraByte = 4,
 
         /// <summary>
-        /// A size given in yotabytes.
+        /// A size given in petabytes.
         /// </summary>
-        YotaByte = 5
+        PetaByte = 5,
+
+        /// <summary>
+        /// A size given in exabytes.
+        /// </summary>
+        Exabyte = 6,
+
+        /// <summary>
+        /// A size given in zettabytes.
+        /// </summary>
+        Zettabyte = 7,
+
+        /// <summary>
+        /// A size given in yottabytes.
+        /// </summary>
+        Yottabyte = 8
 
     }
 
@@ -100,7 +115,7 @@ namespace WinCopies.IO
 
             // if (size == 0) return new Size((long) size, sizeUnit);
 
-            while (sizeUnit != SizeUnit.YotaByte)
+            while (sizeUnit != SizeUnit.Yottabyte)
 
             {
 
@@ -175,7 +190,25 @@ namespace WinCopies.IO
 
                     break;
 
-                case SizeUnit.YotaByte:
+                case SizeUnit.PetaByte:
+
+                    value = "Pb";
+
+                    break;
+
+                case SizeUnit.Exabyte:
+
+                    value = "Eb";
+
+                    break;
+
+                case SizeUnit.Zettabyte:
+
+                    value = "Zb";
+
+                    break;
+
+                case SizeUnit.Yottabyte:
 
                     value = "Yb";
 
