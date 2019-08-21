@@ -10,7 +10,7 @@ namespace WinCopies.Util
     /// <summary>
     /// Represents a BackgroundWorker that runs in a MTA thread by default and automatically stops on background when reports progress.
     /// </summary>
-    public class BackgroundWorker : Component, IBackgroundWorker
+    public class BackgroundWorker : Component, IBackgroundWorker2
     {
 
         ///// <para>FR: Cet evènement se produit lorsque le thread d'arrière plan démarre. Placez votre code de traitement ici.</para>
@@ -311,15 +311,29 @@ namespace WinCopies.Util
 
         ///// <para>FR: Annule le traitement en cours de manière asynchrone.</para>
         /// <summary>
+        /// Cancels the working asynchronously with a custom cancellation info.
+        /// </summary>
+        /// <param name="stateInfo">A custom cancellation info.</param>
+        public void CancelAsync(object stateInfo) => Cancel(false, stateInfo);
+
+        ///// <para>FR: Annule le traitement en cours.</para>
+        /// <summary>
+        /// Cancels the working using a custom cancellation info.
+        /// </summary>
+        /// <param name="stateInfo">A custom cancellation info.</param>
+        public void Cancel(object stateInfo) => Cancel(true, stateInfo);
+
+        ///// <para>FR: Annule le traitement en cours de manière asynchrone.</para>
+        /// <summary>
         /// Cancels the working asynchronously.
         /// </summary>
-        public void CancelAsync(object stateInfo) => Cancel(false, stateInfo);
+        public void CancelAsync() => Cancel(false, null);
 
         ///// <para>FR: Annule le traitement en cours.</para>
         /// <summary>
         /// Cancels the working.
         /// </summary>
-        public void Cancel(object stateInfo) => Cancel(true, stateInfo);
+        public void Cancel() => Cancel(true, null);
 
         private void Cancel(bool abort, object stateInfo)
         {

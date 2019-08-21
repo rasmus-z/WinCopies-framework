@@ -104,4 +104,20 @@ namespace WinCopies.Util
         event RunWorkerCompletedEventHandler RunWorkerCompleted;
 
     }
+
+    public interface IBackgroundWorker2 : IBackgroundWorker
+
+    {
+
+        /// <summary>
+        /// Cancels the working asynchronously.
+        /// </summary>
+        void CancelAsync(object stateInfo = null);
+
+        /// <summary>
+        /// Cancels the working.
+        /// </summary>
+        void Cancel(object stateInfo = null);
+
+    }
 }
