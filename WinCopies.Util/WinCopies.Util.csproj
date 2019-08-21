@@ -141,6 +141,7 @@
     <Compile Include="Generic.xaml.cs">
       <DependentUpon>Generic.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IBackgroundWorker.cs" />
     <Compile Include="Collections\INotifyCollectionChanging.cs" />
     <Compile Include="Data\MenuItem.cs" />

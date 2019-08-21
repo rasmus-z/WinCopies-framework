@@ -105,6 +105,9 @@ namespace WinCopies.Util
 
     }
 
+    /// <summary>
+    /// Represents a BackgroundWorker that runs in a MTA thread by default and automatically stops on background when reports progress. This interface is the successor of the <see cref="IBackgroundWorker"/> interface, but it still implement the <see cref="IBackgroundWorker"/> interface for compatibility.
+    /// </summary>
     public interface IBackgroundWorker2 : IBackgroundWorker
 
     {
