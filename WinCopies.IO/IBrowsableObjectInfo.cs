@@ -58,7 +58,7 @@ namespace WinCopies.IO
         /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-        IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoader { get; }
+        IBrowsableObjectInfoLoader ItemsLoader { get; }
 
         /// <summary>
         /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
@@ -84,11 +84,11 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation);
 
-        /// <summary>
-        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
-        /// </summary>
-        /// <param name="itemsLoader">A custom items loader.</param>
-        void LoadItems(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader);
+        ///// <summary>
+        ///// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
+        ///// </summary>
+        ///// <param name="itemsLoader">A custom items loader.</param>
+        //void LoadItems(IBrowsableObjectInfoLoader itemsLoader);
 
         /// <summary>
         /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously.
@@ -102,11 +102,11 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation);
 
-        /// <summary>
-        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
-        /// </summary>
-        /// <param name="itemsLoader">A custom items loader.</param>
-        void LoadItemsAsync(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader);
+        ///// <summary>
+        ///// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
+        ///// </summary>
+        ///// <param name="itemsLoader">A custom items loader.</param>
+        //void LoadItemsAsync(IBrowsableObjectInfoLoader itemsLoader);
 
         // bool IsRenamingSupported { get; }
 

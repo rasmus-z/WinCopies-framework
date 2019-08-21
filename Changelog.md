@@ -26,7 +26,10 @@ WinCopies.Util (2.0)
 --------------------
 
 - Major updates:
-	- The BackgroundWorker class now resets its properties in background.
+	- WinCopies.Util.BackgroundWorker class:
+		- The BackgroundWorker class now resets its properties in background.
+		- If a ThreadAbortException is thrown, and is not caught, in the background thread, the BackgroundWorker will consider that a cancellation has occurred.
+		- Info can now be passed to the Cancel and CancelAsync methods.
 	- The 'If' methods perform a real 'xor' comparison in binary mode and are faster.
 	- The 'If' methods now set up the out 'key' parameter with the second value and predicate pair that was checked, if any, instead of the default value for the key type when performing a 'xor' comparison.
 	- The ApartmentState, WorkerReportsProgress and WorkerSupportsCancellation properties of the IBackgroundWorker interface are now settable.

@@ -200,6 +200,8 @@ namespace WinCopies.IO
 
             _ = stringBuilder.Append(@IO.Path.PathSeparator);
 
+            _ = stringBuilder.Append(@IO.Path.PathSeparator);
+
             _ = stringBuilder.Append(serverName);
 
             _ = stringBuilder.Append(IO.Path.PathSeparator);
@@ -348,9 +350,9 @@ namespace WinCopies.IO
         private WMILoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMILoader(this, GetAllEnumFlags<WMIItemTypes>(), workerReportsProgress, workerSupportsCancellation) { Path = this });
 
 #pragma warning disable IDE0067 // Dispose objects before losing scope
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItems();
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems( GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation) ) ; 
 
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation).LoadItemsAsync();
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync( GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation) ) ; 
 #pragma warning restore IDE0067 // Dispose objects before losing scope
 
         ///// <summary>

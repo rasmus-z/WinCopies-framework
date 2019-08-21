@@ -9,7 +9,7 @@ using IDisposable = WinCopies.Util.IDisposable;
 namespace WinCopies.IO
 {
 
-    public interface IBrowsableObjectInfoLoader<TPath> : IBackgroundWorker, IDeepCloneable, IDisposable where TPath : IBrowsableObjectInfo
+    public interface IBrowsableObjectInfoLoader :    IBackgroundWorker, IDeepCloneable, IDisposable
 
     {
 
@@ -29,14 +29,22 @@ namespace WinCopies.IO
         /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
         new void Dispose();
 
+        IBrowsableObjectInfo Path { get; }
+
+    }
+
+    public interface IBrowsableObjectInfoLoader<TPath> : IBrowsableObjectInfoLoader where TPath : IBrowsableObjectInfo
+
+    {
+
+        TPath Path { get; set; }
+
         /// <summary>
         /// Disposes the current <see cref="IBrowsableObjectInfoLoader{T}"/> and optionally disposes the related <see cref="Path"/>.
         /// </summary>
         /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
         /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
         void Dispose(bool disposePath);
-
-        TPath Path { get; set; }
 
     }
 

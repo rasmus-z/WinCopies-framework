@@ -279,7 +279,17 @@ namespace WinCopies.IO
 
                 throw new ArgumentException(string.Format(Generic.FileTypeAndSpecialFolderNotCorrespond, fileTypeParameterName, nameof(specialFolder), FileType, specialFolder));
 
-            ArchiveItemInfoFactory = archiveItemInfoFactory ?? new ArchiveItemInfoFactory();
+            if (archiveItemInfoFactory is null)
+
+                archiveItemInfoFactory = new ArchiveItemInfoFactory();
+
+            else
+
+                ThrowOnInvalidFactoryUpdateOperation(archiveItemInfoFactory, nameof(archiveItemInfoFactory));
+
+            archiveItemInfoFactory.Path = this;
+
+            _archiveItemInfoFactory = archiveItemInfoFactory;
 
             ShellObject = shellObject;
 
@@ -415,17 +425,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                    LoadItems((BrowsableObjectInfoLoader)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                    LoadItems((BrowsableObjectInfoLoader)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             }
 
             else
 
-                LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                LoadItems((BrowsableObjectInfoLoader)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             //else
 
@@ -463,17 +473,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                    LoadItemsAsync((BrowsableObjectInfoLoader)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                    LoadItemsAsync((BrowsableObjectInfoLoader)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             }
 
             else
 
-                LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                LoadItemsAsync((BrowsableObjectInfoLoader)new FolderLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             //else
 
@@ -604,7 +614,7 @@ namespace WinCopies.IO
         /// Gets a deep clone of this <see cref="BrowsableObjectInfo"/>. The <see cref="OnDeepClone(BrowsableObjectInfo, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
         /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ShellObjectInfo(Path, FileType, SpecialFolder, _shellObjectDelegate, null, (ShellObjectInfoFactory) Factory.DeepClone(preserveIds), (ArchiveItemInfoFactory) ArchiveItemInfoFactory.DeepClone(preserveIds));
+        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => new ShellObjectInfo(Path, FileType, SpecialFolder, _shellObjectDelegate, null, (ShellObjectInfoFactory)Factory.DeepClone(preserveIds), (ArchiveItemInfoFactory)ArchiveItemInfoFactory.DeepClone(preserveIds));
 
     }
 

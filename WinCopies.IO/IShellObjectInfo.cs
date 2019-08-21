@@ -12,17 +12,17 @@ namespace WinCopies.IO
         ShellObject ShellObject { get; }
 
         /// <summary>
-        /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="BrowsableObjectInfo.FileType"/> property for more details.
+        /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObject.FileType"/> property for more details.
         /// </summary>
         FileSystemInfo FileSystemInfoProperties { get; }
 
         /// <summary>
-        /// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a drive. See the <see cref="BrowsableObjectInfo.FileType"/> property for more details.
+        /// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a drive. See the <see cref="IFileSystemObject.FileType"/> property for more details.
         /// </summary>
         DriveInfo DriveInfoProperties { get; }
 
         /// <summary>
-        /// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a system known folder. See the <see cref="BrowsableObjectInfo.FileType"/> property for more details.
+        /// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a system known folder. See the <see cref="IFileSystemObject.FileType"/> property for more details.
         /// </summary>
         IKnownFolder KnownFolderInfo { get; }
 

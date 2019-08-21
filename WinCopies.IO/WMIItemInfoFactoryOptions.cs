@@ -135,15 +135,15 @@ namespace WinCopies.IO
 
             _connectionOptionsDelegate = connectionOptions;
 
-            _connectionOptions = connectionOptions();
+            _connectionOptions = connectionOptions?.Invoke();
 
             _objectGetOptionsDelegate = objectGetOptions;
 
-            _objectGetOptions = objectGetOptions();
+            _objectGetOptions = objectGetOptions?.Invoke();
 
             _enumerationOptionsDelegate = enumerationOptions;
 
-            _enumerationOptions = enumerationOptions();
+            _enumerationOptions = enumerationOptions?.Invoke();
 
         }
 

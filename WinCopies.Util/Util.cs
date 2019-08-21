@@ -1662,7 +1662,7 @@ namespace WinCopies.Util
 
         }
 
-        private static void ThrowIfNotTypeInternal<T>(object obj, string argumentName) => throw (obj is null ? new ArgumentNullException(argumentName) : new ArgumentException($"{argumentName} must be {typeof(T).ToString()}. {argumentName} is {obj.GetType().ToString()}", argumentName));
+        private static void ThrowIfNotTypeInternal<T>(object obj, string argumentName) => throw (obj is null ? new ArgumentNullException(argumentName) : new ArgumentException($"{argumentName} must be an instance of {typeof(T).ToString()}. {argumentName} is an instance of {obj.GetType().ToString()}", argumentName));
 
         public static void ThrowIfNotType<T>(object obj, string argumentName)
 

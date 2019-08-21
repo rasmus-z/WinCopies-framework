@@ -228,9 +228,10 @@ namespace WinCopies.Util
 
             //Exception error = null;
 
-            _Thread = new Thread(() => ThreadStart(new DoWorkEventArgs(argument)));
-
-            _Thread.IsBackground = true;
+            _Thread = new Thread(() => ThreadStart(new DoWorkEventArgs(argument)))
+            {
+                IsBackground = true
+            };
 
             _Thread.SetApartmentState(_ApartmentState);
 
@@ -248,7 +249,7 @@ namespace WinCopies.Util
 
 
 
-            // Dim cancelled As Boolean = False
+            bool isCancelled = false;
 
             Exception error = null;
 
@@ -270,9 +271,13 @@ namespace WinCopies.Util
 
                 error = ex;
 
+                if (ex is ThreadAbortException)
+
+                    isCancelled = true;
+
             }
 
-            bool isCancelled = IsCancelled || CancellationPending || e.Cancel;
+            isCancelled = isCancelled || IsCancelled || CancellationPending || e.Cancel;
 
             Reset(isCancelled);
 
@@ -308,15 +313,15 @@ namespace WinCopies.Util
         /// <summary>
         /// Cancels the working asynchronously.
         /// </summary>
-        public void CancelAsync() => Cancel(false);
+        public void CancelAsync(object stateInfo) => Cancel(false, stateInfo);
 
         ///// <para>FR: Annule le traitement en cours.</para>
         /// <summary>
         /// Cancels the working.
         /// </summary>
-        public void Cancel() => Cancel(true);
+        public void Cancel(object stateInfo) => Cancel(true, stateInfo);
 
-        private void Cancel(bool abort)
+        private void Cancel(bool abort, object stateInfo)
         {
 
             if (!WorkerSupportsCancellation)
@@ -337,7 +342,7 @@ namespace WinCopies.Util
 
             if (abort)
 
-                _Thread.Abort();
+                _Thread.Abort(stateInfo);
 
             //ThreadCompleted(new ValueTuple<object, Exception, bool>(null, null, true));
 
@@ -425,7 +430,7 @@ namespace WinCopies.Util
         /// Releases resources used by the <see cref="BackgroundWorker"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
-        public new void Dispose() => base. Dispose();
+        public new void Dispose() => base.Dispose();
 
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="BackgroundWorker"/> and optionally releases the managed resources.
@@ -440,7 +445,7 @@ namespace WinCopies.Util
 
                 //    throw new InvalidOperationException(BackgroundWorkerIsBusy);
 
-                Cancel(true);
+                Cancel(true, null);
 
             base.Dispose(disposing);
 

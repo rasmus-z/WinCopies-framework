@@ -20,8 +20,6 @@ namespace WinCopies.IO
 
         {
 
-            ((IDisposable)this).ThrowIfDisposingOrDisposed();
-
             FileSystemObjectComparer<T> fileSystemObjectComparer = DeepCloneOverride(preserveIds);
 
             OnDeepClone(fileSystemObjectComparer, preserveIds);

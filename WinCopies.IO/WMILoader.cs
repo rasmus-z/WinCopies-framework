@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Management;
+using System.Threading;
 using WinCopies.Util;
 
 namespace WinCopies.IO
@@ -23,7 +24,7 @@ namespace WinCopies.IO
     public class WMILoader : BrowsableObjectInfoLoader<WMIItemInfo>, IWMILoader<WMIItemInfo>
     {
 
-        protected override BrowsableObjectInfoLoader<WMIItemInfo> DeepCloneOverride(bool preserveIds) => new WMILoader(null, WMIItemTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IWMIItemInfo>)FileSystemObjectComparer.DeepClone(preserveIds));
+        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool preserveIds) => new WMILoader(null, WMIItemTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds));
 
         private readonly WMIItemTypes _wmiItemTypes;
 
@@ -39,7 +40,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(WMIItemInfo path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, wmiItemTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IWMIItemInfo>()) { }
+        public WMILoader(WMIItemInfo path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, wmiItemTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class using a custom comparer.
@@ -48,7 +49,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(WMIItemInfo path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IWMIItemInfo> fileSystemObjectComparer) : base(path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
+        public WMILoader(WMIItemInfo path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base(path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
 
         //public override bool CheckFilter(string path) => throw new NotImplementedException();
 
@@ -120,7 +121,7 @@ namespace WinCopies.IO
                                 }
 
 #pragma warning disable CA1031 // Do not catch general exception types
-                                catch (Exception) { }
+                                catch (Exception ex) when (!(ex is ThreadAbortException)) { }
 #pragma warning restore CA1031 // Do not catch general exception types
 
                         }
@@ -128,11 +129,7 @@ namespace WinCopies.IO
                     }
 
 #pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception)
-
-                    {
-                        // MessageBox.Show(ex.Message);
-                    }
+                    catch (Exception ex) when (!(ex is ThreadAbortException)) { }
 #pragma warning restore CA1031 // Do not catch general exception types
 
                 if (WMIItemTypes.HasFlag(WMIItemTypes.Class))
@@ -179,7 +176,7 @@ namespace WinCopies.IO
                                 }
 
 #pragma warning disable CA1031 // Do not catch general exception types
-                                catch (Exception) { }
+                                catch (Exception ex) when (!(ex is ThreadAbortException)) { }
 #pragma warning restore CA1031 // Do not catch general exception types
 
                         }
@@ -187,7 +184,7 @@ namespace WinCopies.IO
                     }
 
 #pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception) { }
+                    catch (Exception ex) when (!(ex is ThreadAbortException)) { }
 #pragma warning restore CA1031 // Do not catch general exception types
 
             }
@@ -228,17 +225,13 @@ namespace WinCopies.IO
                             }
 
 #pragma warning disable CA1031 // Do not catch general exception types
-                            catch (Exception) { }
+                            catch (Exception ex) when (!(ex is ThreadAbortException)) { }
 #pragma warning restore CA1031 // Do not catch general exception types
 
                 }
 
 #pragma warning disable CA1031 // Do not catch general exception types
-                catch (Exception)
-
-                {
-                    // MessageBox.Show(ex.Message);
-                }
+                catch (Exception ex) when (!(ex is ThreadAbortException)) { }
 #pragma warning restore CA1031 // Do not catch general exception types
 
                 if (dispose)
@@ -300,7 +293,7 @@ namespace WinCopies.IO
                     }
 
 #pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception) { }
+                    catch (Exception ex) when (!(ex is ThreadAbortException)) { }
 #pragma warning restore CA1031 // Do not catch general exception types
 
         }

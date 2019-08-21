@@ -176,7 +176,9 @@ namespace WinCopies.IO
 
                     var temp = (BrowsableObjectInfo)newValue.DeepClone(false);
 
-                    browsableObjectInfo.ItemsLoader.Dispose(true);
+                    browsableObjectInfo.ItemsLoader.Dispose();
+
+                    browsableObjectInfo.Dispose();
 
                     return temp;
 

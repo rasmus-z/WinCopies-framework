@@ -27,41 +27,37 @@ namespace WinCopies.IO
     /// Provides a background process that can be used to load items of a folder. See the Remarks section.
     /// </summary>
     /// <remarks>
-    /// This loader is not designed for <see cref="ShellObjectInfo"/> that have their <see cref="BrowsableObjectInfo.FileType"/> property set up with an other value than <see cref="FileType.Folder"/>, <see cref="FileType.Drive"/> or <see cref="FileType.SpecialFolder"/>, even if they can be browsable (e.g. <see cref="FileType.Archive"/>). If the file type of the given <see cref="BrowsableObjectInfoLoader{TPath}.Path"/> is not supported by this loader, you'll have to use a specific loader or to inherit from this loader.
+    /// This loader is not designed for <see cref="ShellObjectInfo"/> that have their <see cref="FileSystemObject.FileType"/> property set up with an other value than <see cref="FileType.Folder"/>, <see cref="FileType.Drive"/> or <see cref="FileType.SpecialFolder"/>, even if they can be browsable (e.g. <see cref="FileType.Archive"/>). If the file type of the given <see cref="BrowsableObjectInfoLoader{TPath}.Path"/> is not supported by this loader, you'll have to use a specific loader or to inherit from this loader.
     /// </remarks>
     public class FolderLoader : FileSystemObjectLoader<ShellObjectInfo>, IFolderLoader<ShellObjectInfo>
     {
 
         public override bool NeedsObjectsReconstruction => true;
 
-        protected override BrowsableObjectInfoLoader<ShellObjectInfo> DeepCloneOverride(bool preserveIds) => new FolderLoader(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IShellObjectInfo>)FileSystemObjectComparer.DeepClone(preserveIds));
+        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool preserveIds) => new FolderLoader(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds));
 
         // todo: to turn on ShellObjectWatcher for better compatibility
 
 #pragma warning disable CS0649 // Set up using reflection
-        private readonly FolderLoaderFileSystemWatcher _fileSystemWatcher;
+        private FolderLoaderFileSystemWatcher _fileSystemWatcher;
 #pragma warning restore CS0649
 
         public FolderLoaderFileSystemWatcher FileSystemWatcher
         {
-            get => _fileSystemWatcher; private set
+            get => _fileSystemWatcher ?? (FileSystemWatcher = GetFolderLoaderFileSystemWatcher()); private set
             {
 
-                _fileSystemWatcher.Created += FileSystemWatcher_Created;
+                if (IsBusy)
 
-                _fileSystemWatcher.Renamed += FileSystemWatcher_Renamed;
-
-                _fileSystemWatcher.Deleted += FileSystemWatcher_Deleted;
-
-                _ = this.SetBackgroundWorkerProperty(nameof(FileSystemWatcher), nameof(_fileSystemWatcher), typeof(FolderLoader), true);
-
-                if (value is null) return;
+                    throw new InvalidOperationException("The items loader is busy.");
 
                 value.Created += FileSystemWatcher_Created;
 
                 value.Renamed += FileSystemWatcher_Renamed;
 
                 value.Deleted += FileSystemWatcher_Deleted;
+
+                _fileSystemWatcher = value;
 
             }
         }
@@ -72,7 +68,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public FolderLoader(ShellObjectInfo path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IArchiveItemInfoProvider>()) { }
+        public FolderLoader(ShellObjectInfo path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FolderLoader"/> class using a custom comparer.
@@ -81,10 +77,14 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public FolderLoader(ShellObjectInfo path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IShellObjectInfo> fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) { }
+        public FolderLoader(ShellObjectInfo path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
 
         protected override void OnPathChanging(ShellObjectInfo path)
         {
+
+            if (path is null)
+
+                return;
 
             FileSystemWatcher.EnableRaisingEvents = false;
 
@@ -96,28 +96,20 @@ namespace WinCopies.IO
 
                 throw new ArgumentException("'Path' isn't a folder, a drive or a special folder. 'Path': " + path.ToString());
 
-            if ((Path.FileType == FileType.Folder || Path.FileType == FileType.SpecialFolder) && Path.ShellObject.IsFileSystemObject && FileSystemWatcher == null)
+            if ((Path.FileType == FileType.Drive && new DriveInfo(Path.Path).IsReady) || Path.ShellObject.IsFileSystemObject)
 
             {
 
-                FileSystemWatcher = GetFolderLoaderFileSystemWatcher();
+                FileSystemWatcher.Path = Path.Path;
 
-                if ((Path.FileType == FileType.Drive && new DriveInfo(Path.Path).IsReady) || (Path.FileType != FileType.Drive && Path.ShellObject.IsFileSystemObject))
-
-                {
-
-                    FileSystemWatcher.Path = Path.Path;
-
-                    FileSystemWatcher.EnableRaisingEvents = true;
-
-                }
+                FileSystemWatcher.EnableRaisingEvents = true;
 
             }
 
         }
 
         /// <summary>
-        /// <para>Gets the <see cref="FolderLoaderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoLoader.Path"/> property.</para>
+        /// <para>Gets the <see cref="FolderLoaderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoLoader{T}.Path"/> property.</para>
         /// <para>When overridden in a derived class, provides a custom <see cref="FolderLoaderFileSystemWatcher"/>.</para>
         /// </summary>
         /// <returns>An instance of the <see cref="FolderLoaderFileSystemWatcher"/> class.</returns>
@@ -257,7 +249,7 @@ namespace WinCopies.IO
 
 #endif
 
-            var paths = new ArrayAndListBuilder<IFileSystemObject>();
+            var paths = new ArrayAndListBuilder<PathInfo>();
 
             void AddPath(ref string path, FileType fileType, ShellObject _shellObject)
 
@@ -520,7 +512,7 @@ namespace WinCopies.IO
 
         }
 
-        protected class PathInfo : IO. PathInfo
+        protected class PathInfo : IO.PathInfo
 
         {
 

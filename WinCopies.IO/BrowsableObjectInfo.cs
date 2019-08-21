@@ -83,16 +83,16 @@ namespace WinCopies.IO
         /// </summary>
         public bool AreItemsLoaded { get; internal set; }
 
-        IBrowsableObjectInfoLoader<IBrowsableObjectInfo> IBrowsableObjectInfo.ItemsLoader => (IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)ItemsLoader;
+        // IBrowsableObjectInfoLoader<IBrowsableObjectInfo> IBrowsableObjectInfo.ItemsLoader => (IBrowsableObjectInfoLoader)ItemsLoader;
 
         // internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
 
         /// <summary>
         /// Gets the items loader for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        public BrowsableObjectInfoLoader<BrowsableObjectInfo> ItemsLoader { get; internal set; }
+        public IBrowsableObjectInfoLoader ItemsLoader { get; internal set; }
 
-        internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
+        // internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
 
         internal ObservableCollection<IBrowsableObjectInfo> items;
 
@@ -129,7 +129,11 @@ namespace WinCopies.IO
 
         {
 
-            Factory = factory;
+            ThrowOnInvalidFactoryUpdateOperation(factory, nameof(factory));
+
+            factory.Path = this;
+
+            _factory = factory;
 
             items = new ObservableCollection<IBrowsableObjectInfo>();
 
@@ -192,7 +196,7 @@ namespace WinCopies.IO
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        public virtual void LoadItems(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader)
+        public virtual void LoadItems(BrowsableObjectInfoLoader itemsLoader)
 
         {
 
@@ -200,7 +204,7 @@ namespace WinCopies.IO
 
                 throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, FileType.ToString(), ToString()));
 
-            ItemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoLoader<BrowsableObjectInfo>>(itemsLoader, nameof(itemsLoader));
+            ItemsLoader = itemsLoader;
 
             ItemsLoader.LoadItems();
 
@@ -234,7 +238,7 @@ namespace WinCopies.IO
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        public virtual void LoadItemsAsync(IBrowsableObjectInfoLoader<IBrowsableObjectInfo> itemsLoader)
+        public virtual void LoadItemsAsync(BrowsableObjectInfoLoader itemsLoader)
 
         {
 
@@ -242,7 +246,7 @@ namespace WinCopies.IO
 
                 throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, FileType.ToString(), ToString()));
 
-            ItemsLoader = GetOrThrowIfNotType<BrowsableObjectInfoLoader<BrowsableObjectInfo>>(itemsLoader, nameof(itemsLoader));
+            ItemsLoader = itemsLoader;
 
             ItemsLoader.LoadItemsAsync();
 
@@ -277,7 +281,9 @@ namespace WinCopies.IO
 
             // browsableObjectInfo.AreItemsLoaded = false;
 
-            browsableObjectInfo.ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)ItemsLoader.DeepClone(preserveIds);
+            if (!(ItemsLoader is null))
+
+                browsableObjectInfo.ItemsLoader = (IBrowsableObjectInfoLoader)ItemsLoader.DeepClone(preserveIds);
 
             // browsableObjectInfo.SetItemsProperty();
 
@@ -336,7 +342,7 @@ namespace WinCopies.IO
         /// Disposes the current <see cref="BrowsableObjectInfo"/> and its parent and items recursively.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
-        public void Dispose() => Dispose(true, true, true, true);
+        public void Dispose() => Dispose(false, false, false, false);
 
         /// <summary>
         /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
@@ -361,25 +367,21 @@ namespace WinCopies.IO
 
                 if (disposeItemsLoader)
 
-                {
+                    // todo: if disposing == false, this call is from the finalizer, so ItemsLoader.Dispose should also be able to be called with the false value for the disposing parameter
 
-                    ItemsLoader.Dispose(false);
+                    ItemsLoader.Dispose();
 
-                    ItemsLoader.Path = null;
-
-                }
+                // ItemsLoader.Path = null;
 
             }
 
             if (disposeParent && Parent != null)
 
-            {
-
                 Parent.Dispose(disposeItemsLoader && recursively, recursively, disposeItems && recursively, recursively);
 
-                Parent = null;
+            if (disposing)
 
-            }
+                Parent = null;
 
             if (disposeItems)
 
@@ -391,6 +393,10 @@ namespace WinCopies.IO
                     items.RemoveAt(0);
 
                 }
+
+            else if (disposing)
+
+                items.Clear();
 
         }
 

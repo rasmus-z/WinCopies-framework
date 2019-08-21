@@ -467,6 +467,8 @@ namespace WinCopies.IO
 
             ThrowIfNullEmptyOrWhiteSpace(name, nameof(name));
 
+            string originalName = name;
+
             string registryKeyName;
 
             if (name.Contains(IO.Path.PathSeparator, out int result))
@@ -509,7 +511,7 @@ namespace WinCopies.IO
 
                 return name.Length > 0 ? registryKey.OpenSubKey(name, registryKeyPermissionCheck, registryRights) : registryKey;
 
-            else throw new RegistryException(string.Format(Generic.RegistryKeyNotExists, name), name);
+            else throw new RegistryException(string.Format(Generic.RegistryKeyNotExists, originalName), originalName);
 
         }
 

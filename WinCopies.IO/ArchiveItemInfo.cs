@@ -197,14 +197,14 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((BrowsableObjectInfoLoader)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
         /// <summary>
         /// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader<IBrowsableObjectInfo>)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((BrowsableObjectInfoLoader)new ArchiveLoader(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
         /// <summary>
         /// When overridden in a derived class, returns the parent of this <see cref="ArchiveItemInfo"/>.

@@ -18,7 +18,7 @@ namespace WinCopies.IO
     public class ArchiveLoader : FileSystemObjectLoader<ArchiveItemInfoProvider>
     {
 
-        protected override BrowsableObjectInfoLoader<ArchiveItemInfoProvider> DeepCloneOverride(bool preserveIds) => new ArchiveLoader(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IArchiveItemInfo>)FileSystemObjectComparer.DeepClone(preserveIds));
+        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool preserveIds) => new ArchiveLoader(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveLoader"/> class.
@@ -26,7 +26,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IArchiveItemInfo>()) { }
+        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveLoader"/> class using a custom comparer.
@@ -35,7 +35,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IArchiveItemInfo> fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
+        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
 
         protected override void OnPathChanging(ArchiveItemInfoProvider path)
 
@@ -52,7 +52,7 @@ namespace WinCopies.IO
             // }
 
             /*else*/
-            if (path.FileType != FileType.Archive)
+            if (!(path is null) && path.FileType != FileType.Archive)
 
                 throw new ArgumentException("'Path' is not an Archive or a Folder.");
 
@@ -68,9 +68,9 @@ namespace WinCopies.IO
 
             if (FileTypes == FileTypes.None) return;
 
-            else if (FileTypes.HasFlag(GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
+            //else if (FileTypes.HasFlag(GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
 
-                throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
+            //    throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
 
 #if DEBUG
 
@@ -104,7 +104,7 @@ namespace WinCopies.IO
 
             //List<FolderLoader.IPathInfo> files = new List<FolderLoader.IPathInfo>();
 
-            var paths = new ArrayAndListBuilder<IFileSystemObject>();
+            var paths = new ArrayAndListBuilder<PathInfo>();
 
 #if DEBUG
 
@@ -379,7 +379,7 @@ namespace WinCopies.IO
 
 #else
 
-                ReportProgress(0, ((IArchiveItemInfoProvider)Path).Factory.GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + IO.Path.PathSeparator + path.Path, path.FileType));
+                            ReportProgress(0, ((IArchiveItemInfoProvider)Path).Factory.GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + IO.Path.PathSeparator + path.Path, path.FileType));
 
 #endif
 
