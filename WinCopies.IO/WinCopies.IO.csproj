@@ -129,6 +129,7 @@
     <Compile Include="BrowsableObjectInfo.cs" />
     <Compile Include="BrowsableObjectInfoFactory.cs" />
     <Compile Include="BrowsableObjectInfoLoader.cs" />
+    <Compile Include="BrowsableObjeectInfoCollection.cs" />
     <Compile Include="DesktopAppInfo.cs" />
     <Compile Include="FileSystemObject.cs" />
     <Compile Include="FileSystemObjectComparer.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="IFileSystemObject.cs" />
     <Compile Include="IFileSystemObjectComparer.cs" />
     <Compile Include="IOException.cs" />
+    <Compile Include="PathModifier.cs" />
     <Compile Include="IRegistryItemInfo.cs" />
     <Compile Include="IRegistryItemInfoFactory.cs" />
     <Compile Include="IShellObjectInfo.cs" />

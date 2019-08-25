@@ -41,9 +41,9 @@ namespace WinCopies.IO
         bool IsBrowsable { get; }
 
         /// <summary>
-        /// Gets or sets the factory for this <see cref="BrowsableObjectInfo"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo"/>.
+        /// Gets or sets the factory for this <see cref="BrowsableObjectInfo{T}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{T}"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{T}"/>.</exception>
         /// <exception cref="ArgumentNullException">value is null.</exception>
         IBrowsableObjectInfoFactory Factory { get; }
 
@@ -55,9 +55,9 @@ namespace WinCopies.IO
         bool AreItemsLoaded { get; }
 
         /// <summary>
-        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
+        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo{T}"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{T}"/>.</exception>
         IBrowsableObjectInfoLoader ItemsLoader { get; }
 
         /// <summary>
@@ -102,6 +102,10 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation);
 
+        IPathModifier RegisterLoader(IBrowsableObjectInfoLoader browsableObjectInfoLoader);
+
+        void UnregisterLoader();
+
         ///// <summary>
         ///// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
         ///// </summary>
@@ -133,6 +137,14 @@ namespace WinCopies.IO
         /// <param name="recursively">Whether to dispose recursively.</param>
         /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
         void Dispose(bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively);
+
+    }
+
+    public interface IBrowsableObjectInfo<T> : IBrowsableObjectInfo where T : IBrowsableObjectInfoFactory
+
+    {
+
+        new T Factory { get; set; }
 
     }
 

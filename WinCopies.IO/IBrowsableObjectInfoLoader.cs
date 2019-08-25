@@ -9,7 +9,7 @@ using IDisposable = WinCopies.Util.IDisposable;
 namespace WinCopies.IO
 {
 
-    public interface IBrowsableObjectInfoLoader :    IBackgroundWorker, IDeepCloneable, IDisposable
+    public interface IBrowsableObjectInfoLoader :    IBackgroundWorker2, IDeepCloneable, IDisposable
 
     {
 

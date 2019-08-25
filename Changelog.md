@@ -25,7 +25,7 @@ First release
 WinCopies.Util (2.0)
 --------------------
 
-- Major updates:
+- Existing items behavior updates:
 	- WinCopies.Util.BackgroundWorker class:
 		- The BackgroundWorker class now resets its properties in background.
 		- If a ThreadAbortException is thrown, and is not caught, in the background thread, the BackgroundWorker will consider that a cancellation has occurred.
@@ -41,6 +41,21 @@ WinCopies.Util (2.0)
 		- EnumComparer
 		- ArrayAndListBuilder class to build arrays, lists and observable collections like the .Net's StringBuilder does.
 		- Comparer classes and interfaces for sorting support.
+		- An advanced ObservableCollection.
+	- Interfaces:
+		- IDeepCloneable
+		- IDisposable
+		- IObservableCollection
+		- IReadOnlyObservableCollection
+	- Delegates:
+		- EqualityComparison
+		- FieldValidateValueCallback*
+		- FieldValueChangedCallback*
+		- PropertyValidateCallback*
+		- PropertyValueChangedCallback*
+		- ActionParams
+		- Func
+		- FuncParams
 	- Methods:
 		- Static methods:
 			- 'SetField' static method.
@@ -53,23 +68,11 @@ WinCopies.Util (2.0)
 			- Extension methods for LinkedLists
 			- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
 			- Extension method for throwing if an object that implements IDisposable is disposing or disposed.
-		- Delegates:
-			- EqualityComparison
-			- FieldValidateValueCallback*
-			- FieldValueChangedCallback*
-			- PropertyValidateCallback*
-			- PropertyValueChangedCallback*
-			- ActionParams
-			- Func
-			- FuncParams
 		- Misc:
 			- The view model classes now have an OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
 			- The ReadOnlyObservableCollection has now an OnCollectionChanging protected virtual method.
 	- Parameters:
 		- The WinCopies.Util.Extensions.SetProperty/Field now have multiple new optional parameters to extend the capabilities of these methods.
-	- Interfaces:
-		- IDeepCloneable
-		- IDisposable
 
 - Bug fixes:
 	- BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.

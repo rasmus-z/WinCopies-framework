@@ -8,7 +8,7 @@ namespace WinCopies.IO
 {
 
     /// <summary>
-    /// Provides a base class for <see cref="BrowsableObjectInfo"/> factories.
+    /// Provides a base class for <see cref="BrowsableObjectInfo{T}"/> factories.
     /// </summary>
     public abstract class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
 
@@ -17,7 +17,30 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> associated to this <see cref="BrowsableObjectInfoFactory"/>.
         /// </summary>
-        public IBrowsableObjectInfo Path { get; internal set; }
+        public IBrowsableObjectInfo Path { get; private set; }
+
+        void IBrowsableObjectInfoFactory.RegisterPath(IBrowsableObjectInfo path)
+        {
+
+            if (object.ReferenceEquals(Path, path))
+
+                throw new InvalidOperationException("This path is already registered.");
+
+            Path = object.ReferenceEquals(path.Factory, this) ? path : throw new InvalidOperationException("Can not make a reference to the given path; the given path has to have registered the current factory before calling the RegisterPath method.");
+
+        }
+
+        void IBrowsableObjectInfoFactory.UnregisterPath()
+
+        {
+
+            if (object.ReferenceEquals(Path.Factory, this))
+
+                throw new InvalidOperationException("Can not unregister the current path because it still references the current factory. You need to unregister the current factory from the current path before calling the UnregisterPath method.");
+
+            Path = null;
+
+        }
 
         private bool _useRecursively;
 
@@ -59,11 +82,11 @@ namespace WinCopies.IO
         /// <param name="useRecursively">Whether to add a clone of the new <see cref="BrowsableObjectInfoFactory"/> to all the new objects created from the new <see cref="BrowsableObjectInfoFactory"/>.</param>
         protected BrowsableObjectInfoFactory(bool useRecursively) => UseRecursively = useRecursively;
 
-        protected virtual void OnDeepClone(BrowsableObjectInfoFactory factory, bool preserveIds) { }
+        protected virtual void OnDeepClone(BrowsableObjectInfoFactory factory, bool? preserveIds) { }
 
-        protected abstract BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds);
+        protected abstract BrowsableObjectInfoFactory DeepCloneOverride(bool? preserveIds);
 
-        public virtual object DeepClone(bool preserveIds)
+        public virtual object DeepClone(bool? preserveIds)
 
         {
 

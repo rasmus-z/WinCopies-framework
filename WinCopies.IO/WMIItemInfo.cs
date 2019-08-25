@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Drawing;
 using System.Globalization;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
@@ -63,7 +64,7 @@ namespace WinCopies.IO
 
     }
 
-    public class WMIItemInfo : BrowsableObjectInfo, IWMIItemInfo
+    public class WMIItemInfo<T> : BrowsableObjectInfo<T>, IWMIItemInfo, IBrowsableObjectInfo<T> where T : IWMIItemInfoFactory
     {
 
         public static WMIItemInfoComparer<IWMIItemInfo> GetDefaultWMIItemInfoComparer() => new WMIItemInfoComparer<IWMIItemInfo>();
@@ -75,10 +76,10 @@ namespace WinCopies.IO
         private const string NameConst = "Name";
         private const string RootNamespace = "root:__namespace";
         private const string ROOT = "ROOT";
-        private readonly Func<ManagementBaseObject> _managementObjectDelegate;
+        private readonly DeepClone<ManagementBaseObject> _managementObjectDelegate;
 
         /// <summary>
-        /// Gets the <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents.
+        /// Gets the <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo{T}"/> represents.
         /// </summary>
         public ManagementBaseObject ManagementObject { get; private set; }
 
@@ -125,33 +126,33 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the root WMI item.
+        /// Initializes a new instance of the <see cref="WMIItemInfo{T}"/> class as the root WMI item.
         /// </summary>
-        public WMIItemInfo() : this(null) { }
+        public WMIItemInfo() : this(default) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WMIItemInfo"/> class as the root WMI item using a custom factory.
+        /// Initializes a new instance of the <see cref="WMIItemInfo{T}"/> class as the root WMI item using a custom factory.
         /// </summary>
-        public WMIItemInfo(WMIItemInfoFactory factory) : this(RootPath, WMIItemType.Namespace, () => new ManagementClass(RootPath), null, factory) => IsRootNode = true;
+        public WMIItemInfo( T factory) : this(RootPath, WMIItemType.Namespace, (bool? preserveIds) => new ManagementClass(RootPath), null, factory) => IsRootNode = true;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WMIItemInfo"/> class. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
+        /// Initializes a new instance of the <see cref="WMIItemInfo{T}"/> class. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
         /// </summary>
-        /// <param name="path">The path of this <see cref="WMIItemInfo"/></param>.
-        /// <param name="wmiItemType">The type of this <see cref="WMIItemInfo"/>.</param>
-        /// <param name="managementObjectDelegate">The delegate that will be used to get a new <see cref="ManagementBaseObject"/> and, if <paramref name="managementObject"/> is null, to initialize this instance of <see cref="WMIItemInfo"/> (see <paramref name="managementObject"/>).</param>
-        /// <param name="managementObject">The <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents. Leave this parameter null for initializing this instance with a value provided by <paramref name="managementObjectDelegate"/>.</param>
-        public WMIItemInfo(string path, WMIItemType wmiItemType, Func<ManagementBaseObject> managementObjectDelegate, ManagementBaseObject managementObject) : this(path, wmiItemType, managementObjectDelegate, managementObject, null) { }
+        /// <param name="path">The path of this <see cref="WMIItemInfo{T}"/></param>.
+        /// <param name="wmiItemType">The type of this <see cref="WMIItemInfo{T}"/>.</param>
+        /// <param name="managementObjectDelegate">The delegate that will be used to get a new <see cref="ManagementBaseObject"/> and, if <paramref name="managementObject"/> is null, to initialize this instance of <see cref="WMIItemInfo{T}"/> (see <paramref name="managementObject"/>).</param>
+        /// <param name="managementObject">The <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo{T}"/> represents. Leave this parameter null for initializing this instance with a value provided by <paramref name="managementObjectDelegate"/>.</param>
+        public WMIItemInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementBaseObject> managementObjectDelegate, ManagementBaseObject managementObject) : this(path, wmiItemType, managementObjectDelegate, managementObject, default) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WMIItemInfo"/> class using a custom <see cref="WMIItemInfoFactory"/>. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
+        /// Initializes a new instance of the <see cref="WMIItemInfo{T}"/> class using a custom <see cref="IWMIItemInfoFactory"/>. If you want to initialize this class in order to represent the root WMI item, you can also use the <see cref="WMIItemInfo()"/> constructor.
         /// </summary>
-        /// <param name="path">The path of this <see cref="WMIItemInfo"/></param>.
-        /// <param name="wmiItemType">The type of this <see cref="WMIItemInfo"/>.</param>
-        /// <param name="managementObjectDelegate">The delegate that will be used to get a new <see cref="ManagementBaseObject"/> and, if <paramref name="managementObject"/> is null, to initialize this instance of <see cref="WMIItemInfo"/> (see <paramref name="managementObject"/>).</param>
-        /// <param name="managementObject">The <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents. Leave this parameter null for initializing this instance with a value provided by <paramref name="managementObjectDelegate"/>.</param>
-        /// <param name="factory">The factory this <see cref="WMIItemInfo"/> and associated <see cref="WMILoader"/> use to create new instances of the <see cref="WMIItemInfo"/> class.</param>
-        public WMIItemInfo(string path, WMIItemType wmiItemType, Func<ManagementBaseObject> managementObjectDelegate, ManagementBaseObject managementObject, WMIItemInfoFactory factory) : base(path, FileType.SpecialFolder, factory ?? new WMIItemInfoFactory())
+        /// <param name="path">The path of this <see cref="WMIItemInfo{T}"/></param>.
+        /// <param name="wmiItemType">The type of this <see cref="WMIItemInfo{T}"/>.</param>
+        /// <param name="managementObjectDelegate">The delegate that will be used to get a new <see cref="ManagementBaseObject"/> and, if <paramref name="managementObject"/> is null, to initialize this instance of <see cref="WMIItemInfo{T}"/> (see <paramref name="managementObject"/>).</param>
+        /// <param name="managementObject">The <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo{T}"/> represents. Leave this parameter null for initializing this instance with a value provided by <paramref name="managementObjectDelegate"/>.</param>
+        /// <param name="factory">The factory this <see cref="WMIItemInfo{T}"/> and associated <see cref="WMILoader{T}"/> use to create new instances of the <see cref="WMIItemInfo{T}"/> class.</param>
+        public WMIItemInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementBaseObject> managementObjectDelegate, ManagementBaseObject managementObject, T factory) : base(path, FileType.SpecialFolder, object.Equals(factory, null) ? (T) (IWMIItemInfoFactory) new WMIItemInfoFactory() : factory)
 
         {
 
@@ -159,7 +160,7 @@ namespace WinCopies.IO
 
             _managementObjectDelegate = managementObjectDelegate;
 
-            ManagementObject = managementObject ?? managementObjectDelegate();
+            ManagementObject = managementObject ?? managementObjectDelegate(null);
 
             if (wmiItemType != WMIItemType.Instance)
 
@@ -174,25 +175,25 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Gets a new <see cref="WMIItemInfo"/> that corresponds to the given server name and relative path.
+        /// Gets a new <see cref="WMIItemInfo{T}"/> that corresponds to the given server name and relative path.
         /// </summary>
         /// <param name="serverName">The server name.</param>
         /// <param name="serverRelativePath">The server relative path.</param>
-        /// <returns>A new <see cref="WMIItemInfo"/> that corresponds to the given server name and relative path.</returns>
+        /// <returns>A new <see cref="WMIItemInfo{T}"/> that corresponds to the given server name and relative path.</returns>
         /// <seealso cref="WMIItemInfo()"/>
-        /// <seealso cref="WMIItemInfo(string, WMIItemType, Func{ManagementBaseObject}, ManagementBaseObject)"/>
-        public static WMIItemInfo GetWMIItemInfo(string serverName, string serverRelativePath) => GetWMIItemInfo(serverName, serverRelativePath, new WMIItemInfoFactory());
+        /// <seealso cref="WMIItemInfo(string, WMIItemType, DeepClone{ManagementBaseObject}, ManagementBaseObject)"/>
+        public static WMIItemInfo<T> GetWMIItemInfo(string serverName, string serverRelativePath) => GetWMIItemInfo(serverName, serverRelativePath, (T) (IWMIItemInfoFactory) new WMIItemInfoFactory());
 
         /// <summary>
-        /// Gets a new <see cref="WMIItemInfo"/> that corresponds to the given server name and relative path using a custom <see cref="WMIItemInfoFactory"/>.
+        /// Gets a new <see cref="WMIItemInfo{T}"/> that corresponds to the given server name and relative path using a custom <see cref="WMIItemInfoFactory"/>.
         /// </summary>
         /// <param name="serverName">The server name.</param>
         /// <param name="serverRelativePath">The server relative path.</param>
         /// <param name="factory">A custom factory.</param>
-        /// <returns>A new <see cref="WMIItemInfo"/> that corresponds to the given server name and relative path.</returns>
+        /// <returns>A new <see cref="WMIItemInfo{T}"/> that corresponds to the given server name and relative path.</returns>
         /// <seealso cref="WMIItemInfo()"/>
-        /// <seealso cref="WMIItemInfo(string, WMIItemType, Func{ManagementBaseObject}, ManagementBaseObject, WMIItemInfoFactory)"/>
-        public static WMIItemInfo GetWMIItemInfo(string serverName, string serverRelativePath, WMIItemInfoFactory factory)
+        /// <seealso cref="WMIItemInfo(string, WMIItemType, DeepClone{ManagementBaseObject}, ManagementBaseObject, T)"/>
+        public static WMIItemInfo<T> GetWMIItemInfo(string serverName, string serverRelativePath, T factory)
 
         {
 
@@ -212,7 +213,7 @@ namespace WinCopies.IO
 
             string path = stringBuilder.ToString();
 
-            return new WMIItemInfo(path, WMIItemType.Namespace, () => new ManagementClass(path), null, factory);
+            return new WMIItemInfo<T>(path, WMIItemType.Namespace, (bool? preserveIds) => new ManagementClass(path), null, factory);
 
         }
 
@@ -259,50 +260,50 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> represents a root node.
+        /// Gets a value that indicates whether this <see cref="WMIItemInfo{T}"/> represents a root node.
         /// </summary>
         public bool IsRootNode { get; }
 
         /// <summary>
-        /// Gets the localized path of this <see cref="WMIItemInfo"/>.
+        /// Gets the localized path of this <see cref="WMIItemInfo{T}"/>.
         /// </summary>
         public override string LocalizedName => Name;
 
         /// <summary>
-        /// Gets the name of this <see cref="WMIItemInfo"/>.
+        /// Gets the name of this <see cref="WMIItemInfo{T}"/>.
         /// </summary>
         public override string Name { get; }
 
         /// <summary>
-        /// Gets the small <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+        /// Gets the small <see cref="BitmapSource"/> of this <see cref="WMIItemInfo{T}"/>.
         /// </summary>
         public override BitmapSource SmallBitmapSource => TryGetBitmapSource(new System.Drawing.Size(16, 16));
 
         /// <summary>
-        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="WMIItemInfo{T}"/>.
         /// </summary>
         public override BitmapSource MediumBitmapSource => TryGetBitmapSource(new System.Drawing.Size(48, 48));
 
         /// <summary>
-        /// Gets the large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+        /// Gets the large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo{T}"/>.
         /// </summary>
         public override BitmapSource LargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(128, 128));
 
         /// <summary>
-        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo"/>.
+        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="WMIItemInfo{T}"/>.
         /// </summary>
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(256, 256));
 
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> is browsable.
+        /// Gets a value that indicates whether this <see cref="WMIItemInfo{T}"/> is browsable.
         /// </summary>
         public override bool IsBrowsable => WMIItemType == WMIItemType.Namespace || WMIItemType == WMIItemType.Class;
 
         public WMIItemType WMIItemType { get; }
 
-        public new WMIItemInfoFactory Factory { get => (WMIItemInfoFactory)base.Factory; set => base.Factory = value; }
+        //public new WMIItemInfoFactory Factory { get => (WMIItemInfoFactory)base.Factory; set => base.Factory = value; }
 
-        protected override BrowsableObjectInfo DeepCloneOverride(bool preserveIds) => IsRootNode ? new WMIItemInfo() : new WMIItemInfo(Path, WMIItemType, _managementObjectDelegate, null, (WMIItemInfoFactory)Factory.DeepClone(preserveIds));
+        protected override BrowsableObjectInfo<T> DeepCloneOverride(bool? preserveIds) => IsRootNode ? new WMIItemInfo<T>() : new WMIItemInfo<T>(Path, WMIItemType, _managementObjectDelegate, null, (T)Factory.DeepClone(preserveIds));
 
         public override bool NeedsObjectsReconstruction => true;
 
@@ -347,12 +348,12 @@ namespace WinCopies.IO
 
         }
 
-        private WMILoader GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => (new WMILoader(this, GetAllEnumFlags<WMIItemTypes>(), workerReportsProgress, workerSupportsCancellation) { Path = this });
+        private WMILoader<IWMIItemInfo<IWMIItemInfoFactory>> GetDefaultWMIItemsLoader(bool workerReportsProgress, bool workerSupportsCancellation) => new WMILoader<IWMIItemInfo<IWMIItemInfoFactory>>( (IWMIItemInfo < IWMIItemInfoFactory >) this, GetAllEnumFlags<WMIItemTypes>(), workerReportsProgress, workerSupportsCancellation);
 
 #pragma warning disable IDE0067 // Dispose objects before losing scope
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems( GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation) ) ; 
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems(GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation));
 
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync( GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation) ) ; 
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync(GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation));
 #pragma warning restore IDE0067 // Dispose objects before losing scope
 
         ///// <summary>
@@ -375,15 +376,15 @@ namespace WinCopies.IO
         public bool Equals(IWMIItemInfo wmiItemInfo) => Equals(wmiItemInfo as object);
 
         /// <summary>
-        /// Gets an hash code for this <see cref="WMIItemInfo"/>.
+        /// Gets an hash code for this <see cref="WMIItemInfo{T}"/>.
         /// </summary>
         /// <returns>The hash code returned by the <see cref="FileSystemObject.GetHashCode"/> and the hash code of the <see cref="WMIItemType"/>.</returns>
         public override int GetHashCode() => base.GetHashCode() ^ WMIItemType.GetHashCode();
 
         /// <summary>
-        /// Disposes the current <see cref="WMIItemInfo"/> and its parent and items recursively.
+        /// Disposes the current <see cref="WMIItemInfo{T}"/> and its parent and items recursively.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy and does not support cancellation.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo{T}.ItemsLoader"/> is busy and does not support cancellation.</exception>
         protected override void DisposeOverride(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
         {
 

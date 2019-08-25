@@ -9,10 +9,19 @@ namespace WinCopies.IO
         ManagementBaseObject ManagementObject { get; }
 
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> represents a root node.
+        /// Gets a value that indicates whether this <see cref="WMIItemInfo{T}"/> represents a root node.
         /// </summary>
         bool IsRootNode { get; }
 
         WMIItemType WMIItemType { get; }
+
+    }
+
+    public interface IWMIItemInfo<T> : IWMIItemInfo, IBrowsableObjectInfo<T> where T : IWMIItemInfoFactory
+
+    {
+
+
+
     }
 }

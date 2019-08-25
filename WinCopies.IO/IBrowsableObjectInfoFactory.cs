@@ -25,6 +25,17 @@ namespace WinCopies.IO
         /// </summary>
         bool UseRecursively { get; set; }
 
+        /// <summary>
+        /// This method should only be used for registering a reference to <paramref name="path"/> in this <see cref="IBrowsableObjectInfoFactory"/> and should NOT be called directly, except in interface implementation.
+        /// </summary>
+        /// <param name="path">The <see cref="IBrowsableObjectInfo"/> to register.</param>
+        void RegisterPath(IBrowsableObjectInfo path);
+
+        /// <summary>
+        /// This method should only be used for unregistering the reference made by the <see cref="RegisterPath(IBrowsableObjectInfo)"/> method to the path associated to this <see cref="IBrowsableObjectInfoFactory"/> and should NOT be called directly, except in interface implementation.
+        /// </summary>
+        void UnregisterPath();
+
     }
 
 }

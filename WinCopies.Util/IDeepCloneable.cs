@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace WinCopies.Util
 {
+    public delegate T DeepClone<T>(bool? preserveIds);
+
     public interface IDeepCloneable
     {
 
         bool NeedsObjectsReconstruction { get; }
 
-        object DeepClone(bool preserveIds);
+        object DeepClone(bool? preserveIds);
 
     }
 }

@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WinCopies.IO
+{
+    public interface IPathModifier
+    {
+
+        bool AreItemsLoaded { set; }
+
+        // IBrowsableObjectInfo Parent { set; }
+
+        ObservableCollection<IBrowsableObjectInfo> Items { get; }
+
+    }
+
+    internal class PathModifier<T> : IPathModifier where T : IBrowsableObjectInfoFactory
+
+    {
+
+        private readonly BrowsableObjectInfo<T> _path;
+
+        public bool AreItemsLoaded { set => _path.AreItemsLoaded = value; }
+
+        // public IBrowsableObjectInfo Parent { set => _path.Parent = value; }
+
+        public ObservableCollection<IBrowsableObjectInfo> Items => _path.items;
+
+        public PathModifier(BrowsableObjectInfo<T> path) => _path = path;
+
+    }
+}

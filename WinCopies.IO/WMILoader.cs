@@ -7,13 +7,13 @@ using WinCopies.Util;
 
 namespace WinCopies.IO
 {
-    public interface IWMILoader<TPath> : IBrowsableObjectInfoLoader<TPath> where TPath : IWMIItemInfo
+    public interface IWMILoader<T> : IBrowsableObjectInfoLoader<T> where T : IWMIItemInfo
     {
 
         /// <summary>
         /// Gets or sets the WMI item types to load.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMILoader"/> is busy.</exception>
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IWMILoader{TPath}"/> is busy.</exception>
         WMIItemTypes WMIItemTypes { get; set; }
 
     }
@@ -21,18 +21,18 @@ namespace WinCopies.IO
     /// <summary>
     /// A class for easier <see cref="ManagementBaseObject"/> items loading.
     /// </summary>
-    public class WMILoader : BrowsableObjectInfoLoader<WMIItemInfo>, IWMILoader<WMIItemInfo>
+    public class WMILoader<T> : BrowsableObjectInfoLoader<T>, IWMILoader<T> where T : class, IWMIItemInfo<IWMIItemInfoFactory>
     {
 
-        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool preserveIds) => new WMILoader(null, WMIItemTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds));
+        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool? preserveIds) => new WMILoader<T>(null, WMIItemTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds));
 
         private readonly WMIItemTypes _wmiItemTypes;
 
         /// <summary>
         /// Gets or sets the WMI item types to load.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMILoader"/> is busy.</exception>
-        public WMIItemTypes WMIItemTypes { get => _wmiItemTypes; set => this.SetBackgroundWorkerProperty(nameof(WMIItemTypes), nameof(_wmiItemTypes), value, typeof(WMILoader), true); }
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMILoader{T}"/> is busy.</exception>
+        public WMIItemTypes WMIItemTypes { get => _wmiItemTypes; set => this.SetBackgroundWorkerProperty(nameof(WMIItemTypes), nameof(_wmiItemTypes), value, typeof(WMILoader<T>), true); }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class.
@@ -40,7 +40,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(WMIItemInfo path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, wmiItemTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+        public WMILoader(T path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, wmiItemTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class using a custom comparer.
@@ -49,7 +49,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(WMIItemInfo path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base(path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
+        public WMILoader(T path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base( (T) path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
 
         //public override bool CheckFilter(string path) => throw new NotImplementedException();
 
@@ -73,7 +73,7 @@ namespace WinCopies.IO
                 dispose = true;
 
 #pragma warning disable IDE0067 // Dispose objects before losing scope
-                managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
+                managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory.Options?.ObjectGetOptions);
 #pragma warning restore IDE0067 // Dispose objects before losing scope
 
             }
@@ -91,7 +91,7 @@ namespace WinCopies.IO
 
                         managementClass.Get();
 
-                        using (ManagementObjectCollection.ManagementObjectEnumerator instances = (Path.Factory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(Path.Factory?.Options?.EnumerationOptions)).GetEnumerator())
+                        using (ManagementObjectCollection.ManagementObjectEnumerator instances = (Path.Factory.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(Path.Factory.Options?.EnumerationOptions)).GetEnumerator())
                         {
 
                             ManagementBaseObject instance;
@@ -108,11 +108,11 @@ namespace WinCopies.IO
 
                                         instance = instances.Current;
 
-                                        _path = WMIItemInfo.GetPath(instance, WMIItemType.Namespace);
+                                        _path = WMIItemInfo<IWMIItemInfoFactory>.GetPath(instance, WMIItemType.Namespace);
 
                                         if (CheckFilter(_path))
 
-                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Namespace), FileType.SpecialFolder, instance, WMIItemType.Namespace));
+                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo<IWMIItemInfoFactory>.GetName(instance, WMIItemType.Namespace), FileType.SpecialFolder, instance, WMIItemType.Namespace));
 
                                     }
 
@@ -165,11 +165,11 @@ namespace WinCopies.IO
 
                                         instance = instances.Current;
 
-                                        _path = WMIItemInfo.GetPath(instance, WMIItemType.Class);
+                                        _path = WMIItemInfo<IWMIItemInfoFactory>.GetPath(instance, WMIItemType.Class);
 
                                         if (CheckFilter(_path))
 
-                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Class), FileType.SpecialFolder, instance, WMIItemType.Class) { });
+                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo<IWMIItemInfoFactory>.GetName(instance, WMIItemType.Class), FileType.SpecialFolder, instance, WMIItemType.Class) { });
 
                                     } while (instances.MoveNext());
 
@@ -214,11 +214,11 @@ namespace WinCopies.IO
 
                                     instance = instances.Current;
 
-                                    _path = WMIItemInfo.GetPath(instance, WMIItemType.Instance);
+                                    _path = WMIItemInfo<IWMIItemInfoFactory>.GetPath(instance, WMIItemType.Instance);
 
                                     if (CheckFilter(_path))
 
-                                        _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Instance), FileType.Other, instance, WMIItemType.Instance));
+                                        _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo<IWMIItemInfoFactory>.GetName(instance, WMIItemType.Instance), FileType.Other, instance, WMIItemType.Instance));
 
                                 } while (instances.MoveNext());
 
@@ -286,7 +286,7 @@ namespace WinCopies.IO
 
                             // new_Path.LoadThumbnail();
 
-                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.WMIItemType, () => path_.ManagementObject));
+                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.WMIItemType, (bool? preserveIds) => path_.ManagementObject));
 
                         } while (_paths.MoveNext());
 

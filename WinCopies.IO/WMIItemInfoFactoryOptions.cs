@@ -28,7 +28,7 @@ namespace WinCopies.IO
 
         private ConnectionOptions _connectionOptions;
 
-        private readonly Func<ConnectionOptions> _connectionOptionsDelegate;
+        private readonly DeepClone<ConnectionOptions> _connectionOptionsDelegate;
 
         /// <summary>
         /// Gets or sets options for the WMI connections.
@@ -56,7 +56,7 @@ namespace WinCopies.IO
 
         private ObjectGetOptions _objectGetOptions;
 
-        private readonly Func<ObjectGetOptions> _objectGetOptionsDelegate;
+        private readonly DeepClone<ObjectGetOptions> _objectGetOptionsDelegate;
 
         /// <summary>
         /// Gets or sets options for getting management objects.
@@ -99,7 +99,7 @@ namespace WinCopies.IO
 
         private EnumerationOptions _enumerationOptions;
 
-        private readonly Func<EnumerationOptions> _enumerationOptionsDelegate;
+        private readonly DeepClone<EnumerationOptions> _enumerationOptionsDelegate;
 
         /// <summary>
         /// Gets or sets options for management objects.
@@ -129,29 +129,29 @@ namespace WinCopies.IO
 
         public WMIItemInfoFactoryOptions() : this(null, null, null) { }
 
-        public WMIItemInfoFactoryOptions(Func<ConnectionOptions> connectionOptions, Func<ObjectGetOptions> objectGetOptions, Func<EnumerationOptions> enumerationOptions)
+        public WMIItemInfoFactoryOptions(DeepClone<ConnectionOptions> connectionOptions, DeepClone<ObjectGetOptions> objectGetOptions, DeepClone<EnumerationOptions> enumerationOptions)
 
         {
 
             _connectionOptionsDelegate = connectionOptions;
 
-            _connectionOptions = connectionOptions?.Invoke();
+            _connectionOptions = connectionOptions?.Invoke(null);
 
             _objectGetOptionsDelegate = objectGetOptions;
 
-            _objectGetOptions = objectGetOptions?.Invoke();
+            _objectGetOptions = objectGetOptions?.Invoke(null);
 
             _enumerationOptionsDelegate = enumerationOptions;
 
-            _enumerationOptions = enumerationOptions?.Invoke();
+            _enumerationOptions = enumerationOptions?.Invoke(null);
 
         }
 
-        protected virtual void OnDeepClone(WMIItemInfoFactoryOptions wMIItemInfoFactoryOptions, bool preserveIds) { }
+        protected virtual void OnDeepClone(WMIItemInfoFactoryOptions wMIItemInfoFactoryOptions, bool? preserveIds) { }
 
-        protected virtual WMIItemInfoFactoryOptions DeepCloneOverride(bool preserveIds) => new WMIItemInfoFactoryOptions(_connectionOptionsDelegate, _objectGetOptionsDelegate, _enumerationOptionsDelegate);
+        protected virtual WMIItemInfoFactoryOptions DeepCloneOverride(bool? preserveIds) => new WMIItemInfoFactoryOptions(_connectionOptionsDelegate, _objectGetOptionsDelegate, _enumerationOptionsDelegate);
 
-        public object DeepClone(bool preserveIds)
+        public object DeepClone(bool? preserveIds)
 
         {
 

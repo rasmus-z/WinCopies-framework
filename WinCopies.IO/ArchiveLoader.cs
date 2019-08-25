@@ -15,10 +15,10 @@ namespace WinCopies.IO
 
     // todo: does not work with encrypted archives
 
-    public class ArchiveLoader : FileSystemObjectLoader<ArchiveItemInfoProvider>
+    public class ArchiveLoader<T> : FileSystemObjectLoader<T> where T : class, IArchiveItemInfoProvider
     {
 
-        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool preserveIds) => new ArchiveLoader(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds));
+        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool? preserveIds) => new ArchiveLoader<T>(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveLoader"/> class.
@@ -26,7 +26,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+        public ArchiveLoader( T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveLoader"/> class using a custom comparer.
@@ -35,9 +35,9 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(ArchiveItemInfoProvider path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
+        public ArchiveLoader( T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base( (T) path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
 
-        protected override void OnPathChanging(ArchiveItemInfoProvider path)
+        protected override void OnPathChanging( T path)
 
         {
 
@@ -85,7 +85,7 @@ namespace WinCopies.IO
 
                 Debug.WriteLine("Path.Path: " + Path?.Path);
 
-                Debug.WriteLine("Path.ShellObject: " + (Path as ShellObjectInfo)?.ShellObject.ToString());
+                Debug.WriteLine("Path.ShellObject: " + (Path as IShellObjectInfo)?.ShellObject.ToString());
 
             }
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -112,13 +112,13 @@ namespace WinCopies.IO
 
             Debug.WriteLine("Path.Path: " + Path.Path);
 
-            if (Path is ShellObjectInfo) Debug.WriteLine("Path.ShellObject: " + ((ShellObjectInfo)Path).ShellObject.ToString());
+            if (Path is IShellObjectInfo) Debug.WriteLine("Path.ShellObject: " + ((IShellObjectInfo)Path).ShellObject.ToString());
 
 #endif
 
             // ShellObjectInfo archiveShellObject = Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject;
 
-            string archiveFileName = (Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject).Path;
+            string archiveFileName = (Path is IShellObjectInfo ? (IShellObjectInfo)Path : ((IArchiveItemInfo)Path).ArchiveShellObject).Path;
 
             try
 
@@ -165,7 +165,7 @@ namespace WinCopies.IO
 
                         string fileName = "";
 
-                        string relativePath = Path is ShellObjectInfo ? "" : Path.Path.Substring(archiveFileName.Length + 1);
+                        string relativePath = Path is IShellObjectInfo ? "" : Path.Path.Substring(archiveFileName.Length + 1);
 
                         PathInfo path;
 
@@ -339,7 +339,7 @@ namespace WinCopies.IO
                 // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;
                 // new_Path.LoadThumbnail();
 
-                ReportProgress(0, Path.ArchiveItemInfoFactory.GetBrowsableObjectInfo(Path.Path + IO.Path.PathSeparator + path.Path, path.FileType, Path.ArchiveShellObject, () => path.ArchiveFileInfo));
+                ReportProgress(0, Path.ArchiveItemInfoFactory.GetBrowsableObjectInfo(Path.Path + IO.Path.PathSeparator + path.Path, path.FileType, Path.ArchiveShellObject, (bool? preserveIds) => path.ArchiveFileInfo));
 
                 // #if DEBUG
 

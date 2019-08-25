@@ -32,10 +32,10 @@ namespace WinCopies.IO
 
     }
 
-    public class RegistryKeyLoader : BrowsableObjectInfoLoader<RegistryItemInfo>, IRegistryKeyLoader<RegistryItemInfo>
+    public class RegistryKeyLoader<T> : BrowsableObjectInfoLoader<T>, IRegistryKeyLoader<T> where T : class, IRegistryItemInfo, IBrowsableObjectInfo<IRegistryItemInfoFactory>
     {
 
-        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool preserveIds) => new RegistryKeyLoader(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds), RegistryItemTypes);
+        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool? preserveIds) => new RegistryKeyLoader<T>(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds), RegistryItemTypes);
 
         private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
 
@@ -44,26 +44,26 @@ namespace WinCopies.IO
 
             get => _registryItemTypes;
 
-            set => _ = this.SetBackgroundWorkerProperty(nameof(RegistryItemTypes), nameof(_registryItemTypes), value, typeof(RegistryKeyLoader), true);
+            set => _ = this.SetBackgroundWorkerProperty(nameof(RegistryItemTypes), nameof(_registryItemTypes), value, typeof(RegistryKeyLoader<T>), true);
 
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryKeyLoader"/> class.
+        /// Initializes a new instance of the <see cref="RegistryKeyLoader{T}"/> class.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader(RegistryItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
+        public RegistryKeyLoader( T path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryKeyLoader"/> class using a custom comparer.
+        /// Initializes a new instance of the <see cref="RegistryKeyLoader{T}"/> class using a custom comparer.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader(RegistryItemInfo path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base(path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
+        public RegistryKeyLoader( T path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base( (T) path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
 
         //public override bool CheckFilter(string path)
 
@@ -112,9 +112,11 @@ namespace WinCopies.IO
 
                 return;
 
-            if (Path is RegistryItemInfo registryItemInfo)
+            // todo: 'if' to remove if not necessary:
 
-            {
+            // if (Path is IRegistryItemInfo registryItemInfo)
+
+            // {
 
                 var paths = new ArrayAndListBuilder<PathInfo>();
 
@@ -132,7 +134,7 @@ namespace WinCopies.IO
 
                 }
 
-                switch (registryItemInfo.RegistryItemType)
+                switch (Path.RegistryItemType)
 
                 {
 
@@ -170,7 +172,7 @@ namespace WinCopies.IO
 
                             {
 
-                                items = registryItemInfo.RegistryKey.GetSubKeyNames();
+                                items = Path.RegistryKey.GetSubKeyNames();
 
                                 foreach (string item in items)
 
@@ -186,11 +188,11 @@ namespace WinCopies.IO
 
                             {
 
-                                items = registryItemInfo.RegistryKey.GetValueNames();
+                                items = Path.RegistryKey.GetValueNames();
 
                                 foreach (string item in items)
 
-                                    checkAndAppend(registryItemInfo.RegistryKey.Name, item, true);
+                                    checkAndAppend(Path.RegistryKey.Name, item, true);
 
                             }
 
@@ -236,7 +238,7 @@ namespace WinCopies.IO
 
                             do
 
-                                ReportProgress( 0, pathsEnum.Current.IsValue ? registryItemInfo.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path.Substring(0, pathsEnum.Current.Path.Length - pathsEnum.Current.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), pathsEnum.Current.Name) : registryItemInfo.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path) ) ; 
+                                ReportProgress( 0, pathsEnum.Current.IsValue ? ((IRegistryItemInfoFactory) Path.Factory).GetBrowsableObjectInfo(pathsEnum.Current.Path.Substring(0, pathsEnum.Current.Path.Length - pathsEnum.Current.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), pathsEnum.Current.Name) : Path.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path) ) ; 
 
                             while (pathsEnum.MoveNext());
 
@@ -246,7 +248,7 @@ namespace WinCopies.IO
 
 
 
-            }
+            // }
 
         }
 

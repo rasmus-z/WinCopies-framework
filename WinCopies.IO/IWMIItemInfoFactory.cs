@@ -4,6 +4,7 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using System.Threading.Tasks;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
@@ -19,11 +20,19 @@ namespace WinCopies.IO
         /// <returns>A new instance of the <see cref="IBrowsableObjectInfo"/> class.</returns>
         IBrowsableObjectInfo GetBrowsableObjectInfo();
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, Func<ManagementBaseObject> managementObject);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(IWMIItemInfoFactory factory);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, Func<ManagementScope> managementScope, Func<ManagementPath> managementPath);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementBaseObject> managementObject);
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementBaseObject> managementObject, IWMIItemInfoFactory factory);
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementScope> managementScope, DeepClone<ManagementPath> managementPath);
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementScope> managementScope, DeepClone<ManagementPath> managementPath, IWMIItemInfoFactory factory);
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType);
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, IWMIItemInfoFactory factory);
 
     }
 

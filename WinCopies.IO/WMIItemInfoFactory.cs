@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Management;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
@@ -12,7 +13,7 @@ namespace WinCopies.IO
         /// </summary>
         public override bool NeedsObjectsReconstruction => !(Options is null);
 
-        protected override BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds) => new WMIItemInfoFactory((WMIItemInfoFactoryOptions)Options?.DeepClone(false), UseRecursively);
+        protected override BrowsableObjectInfoFactory DeepCloneOverride(bool? preserveIds) => new WMIItemInfoFactory((WMIItemInfoFactoryOptions)Options?.DeepClone(null), UseRecursively);
 
         private WMIItemInfoFactoryOptions _options;
 
@@ -60,28 +61,28 @@ namespace WinCopies.IO
         public WMIItemInfoFactory(WMIItemInfoFactoryOptions options, bool useRecursively) : base(useRecursively) => _options = options;
 
         /// <summary>
-        /// Gets a new instance of the <see cref="WMIItemInfo"/> class.
+        /// Gets a new instance of the <see cref="WMIItemInfo{T}"/> class.
         /// </summary>
-        /// <returns>A new instance of the <see cref="WMIItemInfo"/> class.</returns>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => GetBrowsableObjectInfo(UseRecursively ? (WMIItemInfoFactory)DeepClone(false) : null);
+        /// <returns>A new instance of the <see cref="WMIItemInfo{T}"/> class.</returns>
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => GetBrowsableObjectInfo(UseRecursively ? (WMIItemInfoFactory)DeepClone(null) : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, Func<ManagementBaseObject> managementObject) => GetBrowsableObjectInfo(path, wmiItemType, managementObject, UseRecursively ? (WMIItemInfoFactory)DeepClone(false) : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementBaseObject> managementObject) => GetBrowsableObjectInfo(path, wmiItemType, managementObject, UseRecursively ? (WMIItemInfoFactory)DeepClone(null) : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, Func<ManagementScope> managementScope, Func<ManagementPath> managementPath) => GetBrowsableObjectInfo(path, wmiItemType, managementScope, managementPath, UseRecursively ? (WMIItemInfoFactory)DeepClone(false) : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementScope> managementScope, DeepClone<ManagementPath> managementPath) => GetBrowsableObjectInfo(path, wmiItemType, managementScope, managementPath, UseRecursively ? (WMIItemInfoFactory)DeepClone(null) : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(path, wmiItemType, UseRecursively ? (WMIItemInfoFactory)DeepClone(false) : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(path, wmiItemType, UseRecursively ? (WMIItemInfoFactory)DeepClone(null) : null);
 
         /// <summary>
-        /// Gets a new instance of the <see cref="WMIItemInfo"/> class using a custom <see cref="WMIItemInfoFactory"/>.
+        /// Gets a new instance of the <see cref="WMIItemInfo{T}"/> class using a custom <see cref="IWMIItemInfoFactory"/>.
         /// </summary>
-        /// <returns>A new instance of the <see cref="WMIItemInfo"/> class.</returns>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(WMIItemInfoFactory factory) => new WMIItemInfo(factory);
+        /// <returns>A new instance of the <see cref="WMIItemInfo{T}"/> class.</returns>
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IWMIItemInfoFactory factory) => new WMIItemInfo<IWMIItemInfoFactory>(factory);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, Func<ManagementBaseObject> managementObject, WMIItemInfoFactory factory) => new WMIItemInfo(path, wmiItemType, managementObject, null, factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementBaseObject> managementObject, IWMIItemInfoFactory factory) => new WMIItemInfo<IWMIItemInfoFactory>(path, wmiItemType, managementObject, null, factory);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, Func<ManagementScope> managementScope, Func<ManagementPath> managementPath, WMIItemInfoFactory factory) => GetBrowsableObjectInfo(path, wmiItemType, () => new ManagementObject(managementScope(), managementPath(), _options?.ObjectGetOptions), factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementScope> managementScope, DeepClone<ManagementPath> managementPath, IWMIItemInfoFactory factory) => GetBrowsableObjectInfo(path, wmiItemType, (bool? preserveIds) => new ManagementObject(managementScope(null), managementPath(null), _options?.ObjectGetOptions), factory);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, WMIItemInfoFactory factory) => GetBrowsableObjectInfo(path, wmiItemType, () => new ManagementObject(new ManagementScope(path, _options?.ConnectionOptions), new ManagementPath(path), _options?.ObjectGetOptions), factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, IWMIItemInfoFactory factory) => GetBrowsableObjectInfo(path, wmiItemType, (bool? preserveIds) => new ManagementObject(new ManagementScope(path, _options?.ConnectionOptions), new ManagementPath(path), _options?.ObjectGetOptions), factory);
 
     }
 }

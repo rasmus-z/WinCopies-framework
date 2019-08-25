@@ -12,11 +12,11 @@ namespace WinCopies.IO
 
         public virtual bool NeedsObjectsReconstruction => true; // True because of the StirngComparer property.
 
-        protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer, bool preserveIds) { }
+        protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer, bool? preserveIds) { }
 
-        protected virtual FileSystemObjectComparer<T> DeepCloneOverride(bool preserveIds) => new FileSystemObjectComparer<T>(_stringComparerDelegate);
+        protected virtual FileSystemObjectComparer<T> DeepCloneOverride(bool? preserveIds) => new FileSystemObjectComparer<T>(_stringComparerDelegate);
 
-        public object DeepClone(bool preserveIds)
+        public object DeepClone(bool? preserveIds)
 
         {
 
@@ -28,18 +28,18 @@ namespace WinCopies.IO
 
         }
 
-        private readonly Func<StringComparer> _stringComparerDelegate;
+        private readonly DeepClone<StringComparer> _stringComparerDelegate;
 
         public StringComparer StringComparer { get; }
 
-        public FileSystemObjectComparer() : this(() => StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
+        public FileSystemObjectComparer() : this((bool? preserveIds) => StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
 
-        public FileSystemObjectComparer(Func<StringComparer> stringComparerDelegate)
+        public FileSystemObjectComparer(DeepClone<StringComparer> stringComparerDelegate)
         {
 
             _stringComparerDelegate = stringComparerDelegate;
 
-            StringComparer = stringComparerDelegate();
+            StringComparer = stringComparerDelegate(null);
 
         }
 

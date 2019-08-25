@@ -12,13 +12,23 @@ namespace WinCopies.IO
 
         IBrowsableObjectInfo GetBrowsableObjectInfo();
 
+        IBrowsableObjectInfo GetBrowsableObjectInfo(IRegistryItemInfoFactory factory);
+
         IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey);
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, IRegistryItemInfoFactory factory);
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath);
 
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, IRegistryItemInfoFactory factory);
+
         IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, string valueName);
 
+        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, string valueName, IRegistryItemInfoFactory factory);
+
         IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName);
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName, IRegistryItemInfoFactory factory);
 
     }
 }

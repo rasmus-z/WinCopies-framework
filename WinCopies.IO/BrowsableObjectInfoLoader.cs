@@ -12,7 +12,7 @@ using IDisposable = WinCopies.Util.IDisposable;
 namespace WinCopies.IO
 {
 
-    public abstract class BrowsableObjectInfoLoader : IBrowsableObjectInfoLoader, IBackgroundWorker
+    public abstract class BrowsableObjectInfoLoader : IBrowsableObjectInfoLoader/*, IBackgroundWorker2*/
 
     {
 
@@ -151,15 +151,15 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="browsableObjectInfoLoader">The cloned <see cref="BrowsableObjectInfoLoader"/>.</param>
         /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        protected virtual void OnDeepClone(BrowsableObjectInfoLoader browsableObjectInfoLoader, bool preserveIds) { }
+        protected virtual void OnDeepClone(BrowsableObjectInfoLoader browsableObjectInfoLoader, bool? preserveIds) { }
 
         /// <summary>
         /// When overridden in a derived class, gets a deep clone of this <see cref="BrowsableObjectInfoLoader"/>. The <see cref="OnDeepClone(BrowsableObjectInfoLoader, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
         /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        protected abstract BrowsableObjectInfoLoader DeepCloneOverride(bool preserveIds);
+        protected abstract BrowsableObjectInfoLoader DeepCloneOverride(bool? preserveIds);
 
-        public object DeepClone(bool preserveIds)
+        public object DeepClone(bool? preserveIds)
 
         {
 
@@ -279,12 +279,16 @@ namespace WinCopies.IO
         /// <summary>
         /// Cancels the working asynchronously.
         /// </summary>
-        public void CancelAsync() => backgroundWorker.CancelAsync();
+        public void CancelAsync(object stateInfo) => backgroundWorker.CancelAsync(stateInfo);
+
+        public void CancelAsync() => CancelAsync(null);
 
         /// <summary>
         /// Cancels the working.
         /// </summary>
-        public void Cancel() => backgroundWorker.Cancel();
+        public void Cancel(object stateInfo) => backgroundWorker.Cancel(stateInfo);
+
+        public void Cancel() => Cancel(null);
 
         /// <summary>
         /// Suspends the current thread.
@@ -343,7 +347,7 @@ namespace WinCopies.IO
 
     }
 
-    public abstract class BrowsableObjectInfoLoader<TPath> : BrowsableObjectInfoLoader, IBrowsableObjectInfoLoader<TPath> where TPath : BrowsableObjectInfo
+    public abstract class BrowsableObjectInfoLoader<TPath> : BrowsableObjectInfoLoader, IBrowsableObjectInfoLoader<TPath> where TPath : class, IBrowsableObjectInfo
 
     {
 
@@ -370,6 +374,8 @@ namespace WinCopies.IO
 
         protected override IBrowsableObjectInfo PathOverride => Path;
 
+        protected IPathModifier PathModifier { get; private set; }
+
         /// <summary>
         /// Gets the path from which to load the items.
         /// </summary>
@@ -389,13 +395,13 @@ namespace WinCopies.IO
 
                 OnPathChanging(value);
 
-                if (!(_path is null))
+                if (!object.Equals(_path, null))
 
-                    _path.ItemsLoader = null;
+                    _path.UnregisterLoader();
 
-                if (!(value is null))
+                if (!object.Equals(value, null))
 
-                    value.ItemsLoader = this;
+                    PathModifier = value.RegisterLoader(this);
 
                 _path = value;
 
@@ -408,7 +414,7 @@ namespace WinCopies.IO
 
         {
 
-            if (_path is null) return;
+            if (object.Equals(_path, null)) return;
 
             if (!_path.IsBrowsable)
 
@@ -418,13 +424,13 @@ namespace WinCopies.IO
 
                 Cancel();
 
-            Path.items.Clear();
+            PathModifier.Items.Clear();
 
         }
 
-        protected override void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => Path.AreItemsLoaded = true;
+        protected override void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => PathModifier.AreItemsLoaded = true;
 
-        protected override void OnAddingPath(IBrowsableObjectInfo path) => Path.items.Add(path);
+        protected override void OnAddingPath(IBrowsableObjectInfo path) => PathModifier.Items.Add(path);
 
         protected override void OnProgressChanged(ProgressChangedEventArgs e) => OnAddingPath(e.UserState as IBrowsableObjectInfo);
 
@@ -482,30 +488,7 @@ namespace WinCopies.IO
         protected virtual void OnPathChanged(TPath path)
         {
 
-            if (!(_path is null))
-
-                ((INotifyCollectionChanging)_path.Items).CollectionChanging -= ItemsChanging;
-
-            if (!(path is null))
-
-                ((INotifyCollectionChanging)path.Items).CollectionChanging += ItemsChanging;
-
         }
-
-        protected virtual void OnItemsChanging(NotifyCollectionChangedEventArgs e)
-        {
-
-            if (e.NewItems != null)
-
-                foreach (object item in e.NewItems)
-
-                    if (item is BrowsableObjectInfo _browsableObjectInfo)
-
-                        _browsableObjectInfo.Parent = Path;
-
-        }
-
-        private void ItemsChanging(object sender, NotifyCollectionChangedEventArgs e) => OnItemsChanging(e);
 
         public void Dispose(bool disposePath)
 

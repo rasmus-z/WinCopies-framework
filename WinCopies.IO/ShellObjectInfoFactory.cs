@@ -6,7 +6,7 @@ namespace WinCopies.IO
 {
 
     /// <summary>
-    /// A factory to create new <see cref="ShellObjectInfo"/>s.
+    /// A factory to create new <see cref="ShellObjectInfo{T}"/>s.
     /// </summary>
     public class ShellObjectInfoFactory : BrowsableObjectInfoFactory, IShellObjectInfoFactory
     {
@@ -35,32 +35,32 @@ namespace WinCopies.IO
         public ShellObjectInfoFactory(ArchiveItemInfoFactory archiveItemInfoFactory, bool useRecursively) : base(useRecursively) => _archiveItemInfoFactory = archiveItemInfoFactory;
 
         /// <summary>
-        /// Gets a new <see cref="ShellObjectInfo"/> that represents the given <see cref="ShellObject"/>, path, <see cref="FileType"/> and <see cref="SpecialFolder"/>.
+        /// Gets a new <see cref="ShellObjectInfo{T}"/> that represents the given <see cref="ShellObject"/>, path, <see cref="FileType"/> and <see cref="SpecialFolder"/>.
         /// </summary>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
+        /// <param name="path">The path of this <see cref="ShellObjectInfo{T}"/>.</param>
         /// <param name="fileType">The file type of the new item.</param>
         /// <param name="specialFolder">The special folder type of the new item.</param>
-        /// <param name="shellObjectDelegate">The delegate that will be used by this factory and the new item's <see cref="IDeepCloneable.DeepClone(bool)"/> method for creating new items.</param>
-        /// <param name="shellObject">The <see cref="ShellObject"/> that this <see cref="ShellObjectInfo"/> represents. Leave this parameter <see langword="null"/> to use <paramref name="shellObjectDelegate"/> instead.</param>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject) => UseRecursively ? GetBrowsableObjectInfo(path, fileType, specialFolder, shellObjectDelegate, shellObject, (ShellObjectInfoFactory)this.DeepClone(false), Path is ShellObjectInfo shellObjectInfo && shellObjectInfo.ArchiveItemInfoFactory.UseRecursively == true
-                ? (ArchiveItemInfoFactory)shellObjectInfo.ArchiveItemInfoFactory.DeepClone(false)
-                : (ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(false) ?? new ArchiveItemInfoFactory()) : new ShellObjectInfo(path, fileType, specialFolder, shellObjectDelegate, shellObject, new ShellObjectInfoFactory(), Path is ShellObjectInfo _shellObjectInfo && _shellObjectInfo.ArchiveItemInfoFactory.UseRecursively == true
-                ? (ArchiveItemInfoFactory)_shellObjectInfo.ArchiveItemInfoFactory.DeepClone(false)
-                : (ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(false) ?? new ArchiveItemInfoFactory());
+        /// <param name="shellObjectDelegate">The delegate that will be used by this factory and the new item's <see cref="IDeepCloneable.DeepClone(bool?)"/> method for creating new items.</param>
+        /// <param name="shellObject">The <see cref="ShellObject"/> that this <see cref="ShellObjectInfo{T}"/> represents. Leave this parameter <see langword="null"/> to use <paramref name="shellObjectDelegate"/> instead.</param>
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, DeepClone<ShellObject> shellObjectDelegate, ShellObject shellObject) => UseRecursively ? GetBrowsableObjectInfo(path, fileType, specialFolder, shellObjectDelegate, shellObject, (ShellObjectInfoFactory)this.DeepClone(null), Path is IShellObjectInfo shellObjectInfo && shellObjectInfo.ArchiveItemInfoFactory.UseRecursively == true
+                ? (ArchiveItemInfoFactory)shellObjectInfo.ArchiveItemInfoFactory.DeepClone(null)
+                : (ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(null) ?? new ArchiveItemInfoFactory()) : new ShellObjectInfo<IShellObjectInfoFactory>(path, fileType, specialFolder, shellObjectDelegate, shellObject, new ShellObjectInfoFactory(), Path is IShellObjectInfo _shellObjectInfo && _shellObjectInfo.ArchiveItemInfoFactory.UseRecursively == true
+                ? (ArchiveItemInfoFactory)_shellObjectInfo.ArchiveItemInfoFactory.DeepClone(null)
+                : (ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(null) ?? new ArchiveItemInfoFactory());
 
         /// <summary>
-        /// Gets a new <see cref="ShellObjectInfo"/> that represents the given <see cref="ShellObject"/>, path, <see cref="FileType"/> and <see cref="SpecialFolder"/>.
+        /// Gets a new <see cref="ShellObjectInfo{T}"/> that represents the given <see cref="ShellObject"/>, path, <see cref="FileType"/> and <see cref="SpecialFolder"/>.
         /// </summary>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
+        /// <param name="path">The path of this <see cref="ShellObjectInfo{T}"/>.</param>
         /// <param name="fileType">The file type of the new item.</param>
         /// <param name="specialFolder">The special folder type of the new item.</param>
-        /// <param name="shellObjectDelegate">The delegate that will be used by this factory and the new item's <see cref="IDeepCloneable.DeepClone(bool)"/> method for creating new items.</param>
-        /// <param name="shellObject">The <see cref="ShellObject"/> that this <see cref="ShellObjectInfo"/> represents. Leave this parameter <see langword="null"/> to use <paramref name="shellObjectDelegate"/> instead.</param>
+        /// <param name="shellObjectDelegate">The delegate that will be used by this factory and the new item's <see cref="IDeepCloneable.DeepClone(bool?)"/> method for creating new items.</param>
+        /// <param name="shellObject">The <see cref="ShellObject"/> that this <see cref="ShellObjectInfo{T}"/> represents. Leave this parameter <see langword="null"/> to use <paramref name="shellObjectDelegate"/> instead.</param>
         /// <param name="factory">A custom factory.</param>
         /// <param name="archiveItemInfoFactory">A custom factory for creating new <see cref="IArchiveItemInfo"/> items.</param>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, Func<ShellObject> shellObjectDelegate, ShellObject shellObject, ShellObjectInfoFactory factory, ArchiveItemInfoFactory archiveItemInfoFactory) => new ShellObjectInfo(path, fileType, specialFolder, shellObjectDelegate, shellObject, factory, archiveItemInfoFactory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, DeepClone<ShellObject> shellObjectDelegate, ShellObject shellObject, IShellObjectInfoFactory factory, IArchiveItemInfoFactory archiveItemInfoFactory) => new ShellObjectInfo<IShellObjectInfoFactory>(path, fileType, specialFolder, shellObjectDelegate, shellObject, factory, archiveItemInfoFactory);
 
-        protected override BrowsableObjectInfoFactory DeepCloneOverride(bool preserveIds) => new ShellObjectInfoFactory((ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(preserveIds), UseRecursively);
+        protected override BrowsableObjectInfoFactory DeepCloneOverride(bool? preserveIds) => new ShellObjectInfoFactory((ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone(preserveIds), UseRecursively);
 
     }
 

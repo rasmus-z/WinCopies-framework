@@ -11,4 +11,12 @@ namespace WinCopies.IO
         RegistryKey RegistryKey { get; }
 
     }
+
+    public interface IRegistryItemInfo<T> : IRegistryItemInfo, IBrowsableObjectInfo<T> where T : IRegistryItemInfoFactory
+
+    {
+
+
+
+    }
 }

@@ -3,7 +3,8 @@ using System.IO;
 
 namespace WinCopies.IO
 {
-    public interface IShellObjectInfo : IBrowsableObjectInfo, IArchiveItemInfoProvider
+
+    public interface IShellObjectInfo : IArchiveItemInfoProvider
     {
 
         /// <summary>
@@ -42,4 +43,13 @@ namespace WinCopies.IO
         SpecialFolder SpecialFolder { get; }
 
     }
+
+    public interface IShellObjectInfo<T> : IShellObjectInfo, IBrowsableObjectInfo<T> where T : IShellObjectInfoFactory
+
+    {
+
+
+
+    }
+
 }
