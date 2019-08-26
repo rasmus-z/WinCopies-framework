@@ -34,7 +34,9 @@ WinCopies.Util (2.0)
 	- The 'If' methods now set up the out 'key' parameter with the second value and predicate pair that was checked, if any, instead of the default value for the key type when performing a 'xor' comparison.
 	- The ApartmentState, WorkerReportsProgress and WorkerSupportsCancellation properties of the IBackgroundWorker interface are now settable.
 	- The IsNullConverter class now uses the 'is' operator instead of '=='.
-	- The ObservableCollection now calls base methods for avoinding reentrancy.
+	- WinCopies.Util.Collections.ObservableCollection class:
+		- Now calls base methods for avoinding reentrancy.
+		- Now have the Serializable attribute
 
 - Added:
 	- Classes:

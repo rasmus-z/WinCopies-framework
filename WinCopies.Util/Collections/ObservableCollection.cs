@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Controls;
 
 using static WinCopies.Util.Util;
 
@@ -53,26 +54,62 @@ namespace WinCopies.Collections
 
     public delegate void NotifyCollectionChangingEventHandler(object sender, NotifyCollectionChangedEventArgs e);
 
+    /// <summary>
+    /// Represents a dynamic data collection that provides notifications when items get added, removed, or when the whole list is refreshed.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the collection.</typeparam>
+    /// <remarks>
+    /// <para>In many cases the data that you work with is a collection of objects. For example, a common scenario in data binding is to use an <see cref="ItemsControl"/> such as a <see cref="ListBox"/>, <see cref="ListView"/>, or <see cref="TreeView"/> to display a collection of records.</para>
+    /// <para>You can enumerate over any collection that implements the <see cref="IEnumerable"/> interface. However, to set up dynamic bindings so that insertions or deletions in the collection update the UI automatically, the collection must implement the <see cref="INotifyCollectionChanged"/> interface. This interface exposes the <see cref="System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event, an event that should be raised whenever the underlying collection changes.</para>
+    /// <para>WPF provides the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> class, which is a built-in implementation of a data collection that implements the <see cref="INotifyCollectionChanged"/> interface.</para>
+    /// <para>Before implementing your own collection, consider using <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> or one of the existing collection classes, such as <see cref="List{T}"/>, <see cref="Collection{T}"/>, and <see cref="BindingList{T}"/>, among many others. If you have an advanced scenario and want to implement your own collection, consider using <see cref="IList"/>, which provides a non-generic collection of objects that can be individually accessed by index. Implementing <see cref="IList"/> provides the best performance with the data binding engine.</para>
+    /// <para>Notes: To fully support transferring data values from binding source objects to binding targets, each object in your collection that supports bindable properties must implement an appropriate property changed notification mechanism such as the <see cref="INotifyPropertyChanged"/> interface.</para>
+    /// <para>For more information, see "Binding to Collections" in the Data Binding Overview article at: https://docs.microsoft.com/fr-fr/dotnet/framework/wpf/data/data-binding-overview?view=netframework-4.8</para>
+    /// <para>For notes on XAML usage, see the following article: https://docs.microsoft.com/fr-fr/dotnet/api/system.collections.objectmodel.observablecollection-1?view=netframework-4.8</para>
+    /// </remarks>
+    [Serializable]
     public class ObservableCollection<T> : System.Collections.ObjectModel.ObservableCollection<T>, IObservableCollection<T>
     {
 
         public virtual event NotifyCollectionChangingEventHandler CollectionChanging;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableCollection{T}"/> class.
+        /// </summary>
         public ObservableCollection() : base()
         {
 
         }
 
-        public ObservableCollection(IList<T> list) : base(list)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableCollection{T}"/> class that contains elements copied from the specified list.
+        /// </summary>
+        /// <param name="list">The list from which the elements are copied.</param>
+        /// <remarks>The elements are copied onto the <see cref="ObservableCollection{T}"/> in the same order they are read by the enumerator of the list.</remarks>
+        /// <exception cref="ArgumentNullException">The <paramref name="list"/> parameter cannot be <see langword="null"/>.</exception>
+        public ObservableCollection(List<T> list) : base(list)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObservableCollection{T}"/> class that contains elements copied from the specified collection.
+        /// </summary>
+        /// <param name="collection">The collection from which the elements are copied.</param>
+        /// <remarks>The elements are copied onto the <see cref="ObservableCollection{T}"/> in the same order they are read by the enumerator of the collection.</remarks>
+        /// <exception cref="ArgumentNullException">The <paramref name="collection"/> parameter cannot be <see langword="null"/>.</exception>
         public ObservableCollection(IEnumerable<T> collection) : base(collection)
         {
 
         }
 
+        /// <summary>
+        /// Inserts an item into the collection at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+        /// <param name="item">The object to insert.</param>
+        /// <remarks><para>The base class calls this method when an item is added to the collection. This implementation raises the <see cref="INotifyCollectionChanging.CollectionChanging"/> and the <see cref="System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> events.</para>
+        /// <para>For more information, see the <see cref="Collection{T}.InsertItem(int, T)"/> method of the <see cref="Collection{T}"/> base class.</para></remarks>
         protected override void InsertItem(int index, T item)
         {
 
@@ -120,6 +157,11 @@ namespace WinCopies.Collections
 
         }
 
+        /// <summary>
+        /// Removes all items from the collection.
+        /// </summary>
+        /// <remarks><para>The base class calls this method when the list is being cleared. This implementation raises the <see cref="INotifyCollectionChanging.CollectionChanging"/> and the <see cref="System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> events.</para>
+        /// <para>For more information, see the <see cref="Collection{T}.ClearItems"/> method of the <see cref="Collection{T}"/> base class.</para></remarks>
         protected override void ClearItems()
 
         {
@@ -145,6 +187,7 @@ namespace WinCopies.Collections
                     CollectionChanging(this, e);
 
         }
+
     }
 
     public interface IObservableCollection<T> : IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable, IList, ICollection, IReadOnlyList<T>, IReadOnlyCollection<T>, INotifyCollectionChanged, INotifyPropertyChanged, INotifyCollectionChanging
@@ -176,6 +219,7 @@ namespace WinCopies.Collections
 
         }
 
+        [Serializable]
         public class ObservableCollection<T> : IObservableCollection<T>
 
         {
