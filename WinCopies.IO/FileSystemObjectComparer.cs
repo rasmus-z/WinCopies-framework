@@ -10,7 +10,7 @@ namespace WinCopies.IO
 
     {
 
-        public virtual bool NeedsObjectsReconstruction => true; // True because of the StirngComparer property.
+        public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
 
         protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer, bool? preserveIds) { }
 

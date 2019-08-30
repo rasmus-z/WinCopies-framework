@@ -18,11 +18,11 @@ namespace WinCopies.IO
 
     }
 
-    internal class PathModifier<T> : IPathModifier where T : IBrowsableObjectInfoFactory
+    internal class PathModifier<TParent, TItems, TFactory> : IPathModifier where TParent : class, IBrowsableObjectInfo where TItems : class, IBrowsableObjectInfo    where TFactory : IBrowsableObjectInfoFactory
 
     {
 
-        private readonly BrowsableObjectInfo<T> _path;
+        private readonly BrowsableObjectInfo<TParent, TItems, TFactory> _path;
 
         public bool AreItemsLoaded { set => _path.AreItemsLoaded = value; }
 
@@ -30,7 +30,7 @@ namespace WinCopies.IO
 
         public ObservableCollection<IBrowsableObjectInfo> Items => _path.items;
 
-        public PathModifier(BrowsableObjectInfo<T> path) => _path = path;
+        public PathModifier(BrowsableObjectInfo<TParent, TItems, TFactory> path) => _path = path;
 
     }
 }

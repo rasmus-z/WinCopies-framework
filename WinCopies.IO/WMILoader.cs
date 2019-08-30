@@ -24,7 +24,7 @@ namespace WinCopies.IO
     public class WMILoader<T> : BrowsableObjectInfoLoader<T>, IWMILoader<T> where T : class, IWMIItemInfo<IWMIItemInfoFactory>
     {
 
-        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool? preserveIds) => new WMILoader<T>(null, WMIItemTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds));
+        protected override BrowsableObjectInfoLoader<T> DeepCloneOverride() => new WMILoader<T>(null, WMIItemTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
 
         private readonly WMIItemTypes _wmiItemTypes;
 
@@ -49,7 +49,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(T path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base( (T) path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
+        public WMILoader(T path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((T)path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
 
         //public override bool CheckFilter(string path) => throw new NotImplementedException();
 
@@ -62,9 +62,9 @@ namespace WinCopies.IO
 
             bool dispose = false;
 
-#pragma warning disable IDE0019 // Pattern Matching
+// #pragma warning disable IDE0019 // Pattern Matching
             var managementClass = Path.ManagementObject as ManagementClass;
-#pragma warning restore IDE0019 // Pattern Matching
+// #pragma warning restore IDE0019 // Pattern Matching
 
             if (managementClass == null)
 
@@ -72,9 +72,9 @@ namespace WinCopies.IO
 
                 dispose = true;
 
-#pragma warning disable IDE0067 // Dispose objects before losing scope
+// #pragma warning disable IDE0067 // Dispose objects before losing scope
                 managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory.Options?.ObjectGetOptions);
-#pragma warning restore IDE0067 // Dispose objects before losing scope
+// #pragma warning restore IDE0067 // Dispose objects before losing scope
 
             }
 
@@ -108,11 +108,11 @@ namespace WinCopies.IO
 
                                         instance = instances.Current;
 
-                                        _path = WMIItemInfo<IWMIItemInfoFactory>.GetPath(instance, WMIItemType.Namespace);
+                                        _path = WMIItemInfo.GetPath(instance, WMIItemType.Namespace);
 
                                         if (CheckFilter(_path))
 
-                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo<IWMIItemInfoFactory>.GetName(instance, WMIItemType.Namespace), FileType.SpecialFolder, instance, WMIItemType.Namespace));
+                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Namespace), FileType.SpecialFolder,  instance, WMIItemType.Namespace));
 
                                     }
 
@@ -120,17 +120,17 @@ namespace WinCopies.IO
 
                                 }
 
-#pragma warning disable CA1031 // Do not catch general exception types
+// #pragma warning disable CA1031 // Do not catch general exception types
                                 catch (Exception ex) when (!(ex is ThreadAbortException)) { }
-#pragma warning restore CA1031 // Do not catch general exception types
+// #pragma warning restore CA1031 // Do not catch general exception types
 
                         }
 
                     }
 
-#pragma warning disable CA1031 // Do not catch general exception types
+// #pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception ex) when (!(ex is ThreadAbortException)) { }
-#pragma warning restore CA1031 // Do not catch general exception types
+// #pragma warning restore CA1031 // Do not catch general exception types
 
                 if (WMIItemTypes.HasFlag(WMIItemTypes.Class))
 
@@ -165,11 +165,11 @@ namespace WinCopies.IO
 
                                         instance = instances.Current;
 
-                                        _path = WMIItemInfo<IWMIItemInfoFactory>.GetPath(instance, WMIItemType.Class);
+                                        _path = WMIItemInfo.GetPath(instance, WMIItemType.Class);
 
                                         if (CheckFilter(_path))
 
-                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo<IWMIItemInfoFactory>.GetName(instance, WMIItemType.Class), FileType.SpecialFolder, instance, WMIItemType.Class) { });
+                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Class), FileType.SpecialFolder, instance, WMIItemType.Class) { });
 
                                     } while (instances.MoveNext());
 
@@ -214,11 +214,11 @@ namespace WinCopies.IO
 
                                     instance = instances.Current;
 
-                                    _path = WMIItemInfo<IWMIItemInfoFactory>.GetPath(instance, WMIItemType.Instance);
+                                    _path = WMIItemInfo.GetPath(instance, WMIItemType.Instance);
 
                                     if (CheckFilter(_path))
 
-                                        _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo<IWMIItemInfoFactory>.GetName(instance, WMIItemType.Instance), FileType.Other, instance, WMIItemType.Instance));
+                                        _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Instance), FileType.Other, managementObject => WMIItemInfo.DefaultManagementObjectDeepClone( (ManagementObject) managementObject, null), instance, WMIItemType.Instance));
 
                                 } while (instances.MoveNext());
 
@@ -286,7 +286,7 @@ namespace WinCopies.IO
 
                             // new_Path.LoadThumbnail();
 
-                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.WMIItemType, (bool? preserveIds) => path_.ManagementObject));
+                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.WMIItemType, path_.ManagementObjectDelegate /*managementObject => WMIItemInfo.DefaultManagementObjectDeepClone( (ManagementObject) path_.ManagementObject, null )*/, path_.ManagementObject));
 
                         } while (_paths.MoveNext());
 
@@ -311,14 +311,18 @@ namespace WinCopies.IO
             /// </summary>
             public override string Name { get; }
 
+            public DeepClone<ManagementBaseObject> ManagementObjectDelegate { get; }
+
             public ManagementBaseObject ManagementObject { get; }
 
             public WMIItemType WMIItemType { get; }
 
-            public PathInfo(string path, string normalizedPath, string name, FileType fileType, ManagementBaseObject managementObject, WMIItemType wmiItemType) : base(path, normalizedPath, fileType)
+            public PathInfo(string path, string normalizedPath, string name, FileType fileType, DeepClone<ManagementBaseObject> managementObjectDelegate, ManagementBaseObject managementObject, WMIItemType wmiItemType) : base(path, normalizedPath, fileType)
             {
 
                 Name = name;
+
+                ManagementObjectDelegate = managementObjectDelegate;
 
                 ManagementObject = managementObject;
 

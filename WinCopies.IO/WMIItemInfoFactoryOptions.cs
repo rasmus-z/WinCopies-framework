@@ -125,7 +125,7 @@ namespace WinCopies.IO
             }
         }
 
-        public bool NeedsObjectsReconstruction => true;
+        public bool NeedsObjectsOrValuesReconstruction => true;
 
         public WMIItemInfoFactoryOptions() : this(null, null, null) { }
 
@@ -147,17 +147,17 @@ namespace WinCopies.IO
 
         }
 
-        protected virtual void OnDeepClone(WMIItemInfoFactoryOptions wMIItemInfoFactoryOptions, bool? preserveIds) { }
+        protected virtual void OnDeepClone(WMIItemInfoFactoryOptions wMIItemInfoFactoryOptions) { }
 
-        protected virtual WMIItemInfoFactoryOptions DeepCloneOverride(bool? preserveIds) => new WMIItemInfoFactoryOptions(_connectionOptionsDelegate, _objectGetOptionsDelegate, _enumerationOptionsDelegate);
+        protected virtual WMIItemInfoFactoryOptions DeepCloneOverride() => new WMIItemInfoFactoryOptions(_connectionOptionsDelegate, _objectGetOptionsDelegate, _enumerationOptionsDelegate);
 
-        public object DeepClone(bool? preserveIds)
+        public object DeepClone()
 
         {
 
-            WMIItemInfoFactoryOptions options = DeepCloneOverride(preserveIds);
+            WMIItemInfoFactoryOptions options = DeepCloneOverride();
 
-            OnDeepClone(options, preserveIds);
+            OnDeepClone(options);
 
             return options;
 

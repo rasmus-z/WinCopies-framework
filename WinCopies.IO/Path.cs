@@ -152,11 +152,9 @@ namespace WinCopies.IO
 
             ShellObject shellObject = shellObjectDelegate(null);
 
-#pragma warning disable IDE0068 // Dispose objects before losing scope
             IBrowsableObjectInfo browsableObjectInfo = shellObject.IsFileSystemObject
-                ? new ShellObjectInfo<IShellObjectInfoFactory>(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObjectDelegate, shellObject)
-                                : new ShellObjectInfo<IShellObjectInfoFactory>(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObjectDelegate, shellObject);
-#pragma warning restore IDE0068 // Dispose objects before losing scope
+                ? new ShellObjectInfo< IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObjectDelegate, shellObject)
+                                : new ShellObjectInfo<IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObjectDelegate, shellObject);
 
             if (paths.Length == 1)
 
@@ -174,7 +172,7 @@ namespace WinCopies.IO
 
                 {
 
-                    var temp = (IBrowsableObjectInfo)newValue.DeepClone(null);
+                    var temp = (IBrowsableObjectInfo)newValue.DeepClone();
 
                     browsableObjectInfo.ItemsLoader.Dispose();
 
@@ -265,7 +263,7 @@ namespace WinCopies.IO
                     //#endif
 
 #pragma warning disable IDE0068 // Disposed manually when needed
-                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo<IShellObjectInfoFactory>(s, fileType, specialFolder, func, null));
+                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo< IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(s, fileType, specialFolder, func, null));
 #pragma warning restore IDE0068
 
 #if DEBUG

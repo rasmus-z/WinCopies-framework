@@ -8,7 +8,7 @@ namespace WinCopies.IO
 {
 
     /// <summary>
-    /// Provides a base class for <see cref="BrowsableObjectInfo{T}"/> factories.
+    /// Provides a base class for <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> factories.
     /// </summary>
     public abstract class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
 
@@ -82,17 +82,17 @@ namespace WinCopies.IO
         /// <param name="useRecursively">Whether to add a clone of the new <see cref="BrowsableObjectInfoFactory"/> to all the new objects created from the new <see cref="BrowsableObjectInfoFactory"/>.</param>
         protected BrowsableObjectInfoFactory(bool useRecursively) => UseRecursively = useRecursively;
 
-        protected virtual void OnDeepClone(BrowsableObjectInfoFactory factory, bool? preserveIds) { }
+        protected virtual void OnDeepClone(BrowsableObjectInfoFactory factory) { }
 
-        protected abstract BrowsableObjectInfoFactory DeepCloneOverride(bool? preserveIds);
+        protected abstract BrowsableObjectInfoFactory DeepCloneOverride();
 
-        public virtual object DeepClone(bool? preserveIds)
+        public virtual object DeepClone()
 
         {
 
-            BrowsableObjectInfoFactory browsableObjectInfoFactory = DeepCloneOverride(preserveIds);
+            BrowsableObjectInfoFactory browsableObjectInfoFactory = DeepCloneOverride();
 
-            OnDeepClone(browsableObjectInfoFactory, preserveIds);
+            OnDeepClone(browsableObjectInfoFactory);
 
             return browsableObjectInfoFactory;
 
@@ -101,7 +101,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
         /// </summary>
-        public virtual bool NeedsObjectsReconstruction => false;
+        public virtual bool NeedsObjectsOrValuesReconstruction => false;
 
     }
 

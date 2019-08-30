@@ -35,7 +35,7 @@ namespace WinCopies.IO
     public class RegistryKeyLoader<T> : BrowsableObjectInfoLoader<T>, IRegistryKeyLoader<T> where T : class, IRegistryItemInfo, IBrowsableObjectInfo<IRegistryItemInfoFactory>
     {
 
-        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool? preserveIds) => new RegistryKeyLoader<T>(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds), RegistryItemTypes);
+        protected override BrowsableObjectInfoLoader<T> DeepCloneOverride() => new RegistryKeyLoader<T>(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), RegistryItemTypes);
 
         private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
 

@@ -29,6 +29,13 @@ namespace WinCopies.IO
         /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
         new void Dispose();
 
+        /// <summary>
+        /// Disposes the current <see cref="IBrowsableObjectInfoLoader{T}"/> and optionally disposes the related <see cref="Path"/>.
+        /// </summary>
+        /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
+        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
+        void Dispose(bool disposePath);
+
         IBrowsableObjectInfo Path { get; }
 
     }
@@ -37,14 +44,7 @@ namespace WinCopies.IO
 
     {
 
-        TPath Path { get; set; }
-
-        /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfoLoader{T}"/> and optionally disposes the related <see cref="Path"/>.
-        /// </summary>
-        /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
-        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
-        void Dispose(bool disposePath);
+        new TPath Path { get; set; }
 
     }
 

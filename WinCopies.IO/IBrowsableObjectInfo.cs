@@ -41,13 +41,11 @@ namespace WinCopies.IO
         bool IsBrowsable { get; }
 
         /// <summary>
-        /// Gets or sets the factory for this <see cref="BrowsableObjectInfo{T}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{T}"/>.
+        /// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{T}"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
         /// <exception cref="ArgumentNullException">value is null.</exception>
         IBrowsableObjectInfoFactory Factory { get; }
-
-        // todo: really needed? :
 
         /// <summary>
         /// Gets a value that indicates whether the items of this <see cref="IBrowsableObjectInfo"/> are currently loaded.
@@ -55,15 +53,15 @@ namespace WinCopies.IO
         bool AreItemsLoaded { get; }
 
         /// <summary>
-        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo{T}"/>.
+        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{T}"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
         IBrowsableObjectInfoLoader ItemsLoader { get; }
 
         /// <summary>
         /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
-        ReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; }
+        IReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; }
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -140,11 +138,27 @@ namespace WinCopies.IO
 
     }
 
-    public interface IBrowsableObjectInfo<T> : IBrowsableObjectInfo where T : IBrowsableObjectInfoFactory
+    public interface IBrowsableObjectInfo<TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
 
     {
 
-        new T Factory { get; set; }
+        new TFactory Factory { get; set; }
+
+    }
+
+    public interface IBrowsableObjectInfo<TParent, TItems, TFactory> : IBrowsableObjectInfo<TFactory> where TParent : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory where TItems : IBrowsableObjectInfo
+
+    {
+
+        /// <summary>
+        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+        /// </summary>
+        new TParent Parent { get; }
+
+        /// <summary>
+        /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        new IReadOnlyObservableCollection<TItems> Items { get; }
 
     }
 
