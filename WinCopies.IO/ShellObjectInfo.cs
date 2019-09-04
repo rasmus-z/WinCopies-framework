@@ -12,22 +12,31 @@ using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
 using WinCopies.Util;
+using static WinCopies.IO.Path;
+using static WinCopies.IO.ShellObjectInfo;
 
 namespace WinCopies.IO
 {
 
+    public static class ShellObjectInfo
+    {
+
+        public static DeepClone<ShellObject> DefaultShellObjectDeepClone { get; } = shellObject => ShellObject.FromParsingName(shellObject.ParsingName);
+
+    }
+
     /// <summary>
     /// Represents a file system item that can be used with interoperability with the other <see cref="IBrowsableObjectInfo"/> objects.
     /// </summary>
-    public class ShellObjectInfo<T> : ArchiveItemInfoProvider<T>, IShellObjectInfo, IBrowsableObjectInfo<T> where T : IShellObjectInfoFactory
+    public class ShellObjectInfo<TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory> : ArchiveItemInfoProvider<TParent, TItems, TFactory>, IShellObjectInfo where TParent : class, IShellObjectInfo where TItems : class, IFileSystemObjectInfo where TParentArchiveItemInfo : class, IArchiveItemInfoProvider where TArchiveItemInfoItems : class, IArchiveItemInfo where TFactory : IShellObjectInfoFactory
     {
 
         private IArchiveItemInfoFactory _archiveItemInfoFactory;
 
         /// <summary>
-        /// Gets or sets the factory this <see cref="ShellObjectInfo{T}"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader{T}"/>'s use to create new objects that represent archive items.
+        /// Gets or sets the factory this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader{T}"/>'s use to create new objects that represent archive items.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo{T}.ItemsLoader"/> is busy.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/> is busy.</exception>
         /// <exception cref="ArgumentNullException">The given value is null.</exception>
         public override IArchiveItemInfoFactory ArchiveItemInfoFactory
         {
@@ -46,79 +55,81 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// The parent <see cref="IShellObjectInfo"/> of the current archive item. If the current <see cref="ShellObjectInfo{T}"/> represents an archive file, this property returns the current <see cref="ShellObjectInfo{T}"/>, or <see langword="null"/> otherwise.
+        /// The parent <see cref="IShellObjectInfo"/> of the current archive item. If the current <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> represents an archive file, this property returns the current <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>, or <see langword="null"/> otherwise.
         /// </summary>
         public override IShellObjectInfo ArchiveShellObject => FileType == FileType.Archive ? this : null;
 
         /// <summary>
-        /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="ShellObjectInfo{T}"/>.
+        /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.
         /// </summary>
         public ShellObject ShellObject { get; private set; } = null;
 
         /// <summary>
-        /// Gets the localized name of this <see cref="ShellObjectInfo{T}"/> depending the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
+        /// Gets the localized name of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> depending the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
         /// </summary>
         public override string LocalizedName => ShellObject.GetDisplayName(DisplayNameType.Default);
 
         /// <summary>
-        /// Gets the name of this <see cref="ShellObjectInfo{T}"/> depending of the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
+        /// Gets the name of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> depending of the associated <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> (see the <see cref="ShellObject"/> property for more details.
         /// </summary>
         public override string Name => ShellObject.Name;
 
         /// <summary>
-        /// Gets the small <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo{T}"/>.
+        /// Gets the small <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.
         /// </summary>
         public override BitmapSource SmallBitmapSource => ShellObject.Thumbnail.SmallBitmapSource;
 
         /// <summary>
-        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo{T}"/>.
+        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.
         /// </summary>
         public override BitmapSource MediumBitmapSource => ShellObject.Thumbnail.MediumBitmapSource;
 
         /// <summary>
-        /// Gets the large <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo{T}"/>.
+        /// Gets the large <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.
         /// </summary>
         public override BitmapSource LargeBitmapSource => ShellObject.Thumbnail.LargeBitmapSource;
 
         /// <summary>
-        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo{T}"/>.
+        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.
         /// </summary>
         public override BitmapSource ExtraLargeBitmapSource => ShellObject.Thumbnail.ExtraLargeBitmapSource;
 
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="ShellObjectInfo{T}"/> is browsable.
+        /// Gets a value that indicates whether this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> is browsable.
         /// </summary>
         public override bool IsBrowsable => (ShellObject is IEnumerable<ShellObject> || FileType == FileType.Archive) && FileType != FileType.File && FileType != FileType.Link; // FileType == FileTypes.Folder || FileType == FileTypes.Drive || (FileType == FileTypes.SpecialFolder && SpecialFolder != SpecialFolders.Computer) || FileType == FileTypes.Archive;
 
         /// <summary>
-        /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo{T}"/> is not a folder, drive or file. See the <see cref="FileSystemObject.FileType"/> property for more details.
+        /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> is not a folder, drive or file. See the <see cref="FileSystemObject.FileType"/> property for more details.
         /// </summary>
         public FileSystemInfo FileSystemInfoProperties { get; private set; } = null;
 
         /// <summary>
-        /// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo{T}"/> is not a drive. See the <see cref="FileSystemObject.FileType"/> property for more details.
+        /// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> is not a drive. See the <see cref="FileSystemObject.FileType"/> property for more details.
         /// </summary>
         public DriveInfo DriveInfoProperties { get; private set; } = null;
 
         /// <summary>
-        /// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo{T}"/> is not a system known folder. See the <see cref="FileSystemObject.FileType"/> property for more details.
+        /// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> is not a system known folder. See the <see cref="FileSystemObject.FileType"/> property for more details.
         /// </summary>
         public IKnownFolder KnownFolderInfo { get; private set; } = null;
 
         //private FileStream _archiveFileStream = null;
 
         ///// <summary>
-        ///// The <see cref="FileStream"/> for this <see cref="ShellObjectInfo{T}"/> when it represents an archive file system item. See the remarks section.
+        ///// The <see cref="FileStream"/> for this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> when it represents an archive file system item. See the remarks section.
         ///// </summary>
         ///// <remarks>
-        ///// This field is only used by the <see cref="ShellObjectInfo{T}"/>, <see cref="FolderLoader"/> and the <see cref="ArchiveLoader"/> classes in order to lock the file that the <see cref="ShellObjectInfo{T}"/> represents when the items of the archive are loaded.
+        ///// This field is only used by the <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>, <see cref="FolderLoader"/> and the <see cref="ArchiveLoader{T}"/> classes in order to lock the file that the <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> represents when the items of the archive are loaded.
         ///// </remarks>
         //public FileStream ArchiveFileStream { get => _archiveFileStream; internal set => OnPropertyChanged(nameof(ArchiveFileStream), nameof(_archiveFileStream), value, typeof(ShellObjectInfo)); }
 
         /// <summary>
-        /// Gets the special folder type of this <see cref="ShellObjectInfo{T}"/>. <see cref="SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo{T}"/> is a casual file system item.
+        /// Gets the special folder type of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>. <see cref="SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> is a casual file system item.
         /// </summary>
         public SpecialFolder SpecialFolder { get; private set; } = SpecialFolder.OtherFolderOrFile;
+
+        private readonly DeepClone<ShellObject> _shellObjectDelegate;
 
         ///// <summary>
         ///// Gets the <see cref="IO.FileType"/> and <see cref="IO.SpecialFolder"/> for a given path and <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
@@ -215,50 +226,48 @@ namespace WinCopies.IO
         //}
 
         ///// <summary>
-        ///// Initializes a new instance of the <see cref="ShellObjectInfo{T}"/> class.
+        ///// Initializes a new instance of the <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> class.
         ///// </summary>
-        ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo{T}"/> represents.</param>
-        ///// <param name="path">The path of this <see cref="ShellObjectInfo{T}"/>.</param>
+        ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> represents.</param>
+        ///// <param name="path">The path of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.</param>
         //public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder) : this(shellObject, path, fileType, specialFolder, new ShellObjectInfoFactory(), new ArchiveItemInfoFactory()) { }
 
         ///// <summary>
-        ///// Initializes a new instance of the <see cref="ShellObjectInfo{T}"/> class using custom factories for <see cref="ShellObjectInfo{T}"/> and <see cref="ArchiveItemInfo{T}"/>.
+        ///// Initializes a new instance of the <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> class using custom factories for <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> and <see cref="ArchiveItemInfo{TParent, TItems, TFactory}"/>.
         ///// </summary>
-        ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo{T}"/> represents.</param>
-        ///// <param name="path">The path of this <see cref="ShellObjectInfo{T}"/>.</param>
-        ///// <param name="shellObjectInfoFactory">The factory this <see cref="ShellObjectInfo{T}"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent casual file system items.</param>
-        ///// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo{T}"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
+        ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> represents.</param>
+        ///// <param name="path">The path of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.</param>
+        ///// <param name="shellObjectInfoFactory">The factory this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader{T}"/>'s use to create new objects that represent casual file system items.</param>
+        ///// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader{T}"/>'s use to create new objects that represent archive items.</param>
         //public ShellObjectInfo(ShellObject shellObject, string path, FileType fileType, SpecialFolder specialFolder, ShellObjectInfoFactory shellObjectInfoFactory, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, archiveItemInfoFactory) =>
 
         //    Init(shellObject, nameof(FileType), specialFolder, shellObjectInfoFactory);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ShellObjectInfo{T}"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/>.
+        /// Initializes a new instance of the <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/>.
         /// </summary>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo{T}"/>.</param>
-        /// <param name="fileType">The file type of this <see cref="ShellObjectInfo{T}"/>.</param>
-        /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo{T}"/>. <see cref="IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo{T}"/> is a casual file system item.</param>
-        /// <param name="shellObjectDelegate">A delegate that will be used by the <see cref="BrowsableObjectInfo{T}.DeepClone(bool?)"/> method.</param>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo{T}"/> represents, or <see langword="null"/> to use <paramref name="shellObjectDelegate"/> in this constructor.</param>
-        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, DeepClone<ShellObject> shellObjectDelegate, ShellObject shellObject) : this(path, fileType, specialFolder, shellObjectDelegate, shellObject, null, null) { }
+        /// <param name="path">The path of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.</param>
+        /// <param name="fileType">The file type of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.</param>
+        /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>. <see cref="IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> is a casual file system item.</param>
+        /// <param name="shellObjectDelegate">The delegate that will be used by the <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.DeepClone()"/> method to get a new <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</param>
+        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> represents.</param>
+        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, ShellObject shellObject, DeepClone<ShellObject> shellObjectDelegate) : this(path, fileType, specialFolder, shellObject, shellObjectDelegate, null, null) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ShellObjectInfo{T}"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo{T}"/>s and <see cref="ArchiveItemInfo{T}"/>s.
+        /// Initializes a new instance of the <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>s and <see cref="ArchiveItemInfo{TParent, TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="path">The path of this <see cref="ShellObjectInfo{T}"/>.</param>
-        /// <param name="fileType">The file type of this <see cref="ShellObjectInfo{T}"/>.</param>
-        /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo{T}"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo{T}"/> is a casual file system item.</param>
-        /// <param name="shellObjectDelegate">A delegate that will be used by the <see cref="BrowsableObjectInfo{T}.DeepClone(bool?)"/> method.</param>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo{T}"/> represents, or <see langword="null"/> to use <paramref name="shellObjectDelegate"/> in this constructor.</param>
-        /// <param name="factory">The factory this <see cref="ShellObjectInfo{T}"/> and associated <see cref="FolderLoader"/>s and <see cref="ArchiveLoader"/>s use to create new objects that represent casual file system items.</param>
-        /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo{T}"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader"/>'s use to create new objects that represent archive items.</param>
-        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, DeepClone<ShellObject> shellObjectDelegate, ShellObject shellObject, IShellObjectInfoFactory factory, IArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, (T)(factory ?? new ShellObjectInfoFactory())) =>
+        /// <param name="path">The path of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.</param>
+        /// <param name="fileType">The file type of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.</param>
+        /// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>. <see cref="WinCopies.IO.SpecialFolder.OtherFolderOrFile"/> if this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> is a casual file system item.</param>
+        /// <param name="shellObjectDelegate">The delegate that will be used by the <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.DeepClone()"/> method to get a new <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</param>
+        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> represents.</param>
+        /// <param name="factory">The factory this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> and associated <see cref="FolderLoader"/>s and <see cref="ArchiveLoader{T}"/>s use to create new objects that represent casual file system items.</param>
+        /// <param name="archiveItemInfoFactory">The factory this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> and associated <see cref="FolderLoader"/>'s and <see cref="ArchiveLoader{T}"/>'s use to create new objects that represent archive items.</param>
+        public ShellObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, ShellObject shellObject, DeepClone<ShellObject> shellObjectDelegate, IShellObjectInfoFactory factory, IArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, (TFactory)(factory ?? new ShellObjectInfoFactory<TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems>())) // =>
 
-            Init(specialFolder, shellObjectDelegate, shellObject, nameof(fileType), archiveItemInfoFactory); // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
+        // Init(specialFolder, shellObjectDelegate, shellObject, nameof(fileType), archiveItemInfoFactory); // string _path = ((Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder)shellObject.Parent).ParsingName;// PathInfo pathInfo = new PathInfo() { Path = _path, Normalized_Path = null, Shell_Object = so };
 
-        private DeepClone<ShellObject> _shellObjectDelegate;
-
-        private void Init(SpecialFolder specialFolder, DeepClone<ShellObject> shellObjectDelegate, ShellObject shellObject, string fileTypeParameterName, IArchiveItemInfoFactory archiveItemInfoFactory)
+        // private void Init(SpecialFolder specialFolder, DeepClone<ShellObject> shellObjectDelegate, ShellObject shellObject, string fileTypeParameterName, IArchiveItemInfoFactory archiveItemInfoFactory)
 
         {
 
@@ -278,15 +287,19 @@ namespace WinCopies.IO
 
             if ((FileType == FileType.SpecialFolder && specialFolder == SpecialFolder.OtherFolderOrFile) || (FileType != FileType.SpecialFolder && specialFolder != SpecialFolder.OtherFolderOrFile))
 
-                throw new ArgumentException(string.Format(Generic.FileTypeAndSpecialFolderNotCorrespond, fileTypeParameterName, nameof(specialFolder), FileType, specialFolder));
+                throw new ArgumentException(string.Format(Generic.FileTypeAndSpecialFolderNotCorrespond, nameof(fileType), nameof(specialFolder), FileType, specialFolder));
+
+
 
             if (archiveItemInfoFactory is null)
 
-                archiveItemInfoFactory = new ArchiveItemInfoFactory();
+                archiveItemInfoFactory = new ArchiveItemInfoFactory<IArchiveItemInfoProvider, IArchiveItemInfo>();
 
             else
 
                 ThrowOnInvalidFactoryUpdateOperation(archiveItemInfoFactory, nameof(archiveItemInfoFactory));
+
+
 
             archiveItemInfoFactory.Path = this;
 
@@ -344,10 +357,10 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Returns the parent of this <see cref="ShellObjectInfo{T}"/>.
+        /// Returns the parent of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.
         /// </summary>
-        /// <returns>The parent of this <see cref="ShellObjectInfo{T}"/>.</returns>
-        protected override IBrowsableObjectInfo GetParent()
+        /// <returns>The parent of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.</returns>
+        protected override TParent GetParent()
         {
 
             (FileType, SpecialFolder) getFileType(ShellObject _shellObject)
@@ -370,37 +383,33 @@ namespace WinCopies.IO
 
                 string parent = parentDirectoryInfo.FullName;
 
-                ShellObject shellObjectDelegate(bool? preserveIds) => ShellObject.FromParsingName(parent);
-
-                ShellObject shellObject = shellObjectDelegate(null);
+                var shellObject = ShellObject.FromParsingName(parent);
 
                 (FileType fileType, SpecialFolder specialFolder) = getFileType(shellObject);
 
-                return Factory.GetBrowsableObjectInfo(parent, fileType, specialFolder, shellObjectDelegate, shellObject);
+                return (TParent)Factory.GetBrowsableObjectInfo(parent, fileType, specialFolder, shellObject, DefaultShellObjectDeepClone);
 
             }
 
             else if (FileType == FileType.Drive)
 
-                return Factory.GetBrowsableObjectInfo(KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolder.Computer, (bool? preserveIds) => ShellObject.Parent, null);
+                return (TParent)Factory.GetBrowsableObjectInfo(KnownFolders.Computer.Path, FileType.SpecialFolder, SpecialFolder.Computer, ShellObject.FromParsingName(KnownFolders.Computer.ParsingName), DefaultShellObjectDeepClone);
 
             else if (FileType == FileType.SpecialFolder && SpecialFolder != SpecialFolder.Computer)
 
             {
 
-                ShellObject shellObjectDelegate(bool? preserveIds) => ShellObject.Parent;
-
-                ShellObject shellObject = shellObjectDelegate(null);
+                ShellObject shellObject = ShellObject.Parent;
 
                 string path = Path;
 
-                if (path.EndsWith(IO.Path.PathSeparator.ToString()))
+                if (path.EndsWith(PathSeparator.ToString()))
 
                     path = path.Remove(path.Length - 1);
 
                 (FileType fileType, SpecialFolder specialFolder) = getFileType(shellObject);
 
-                return Factory.GetBrowsableObjectInfo(path.Remove(path.LastIndexOf(IO.Path.PathSeparator)), fileType, specialFolder, shellObjectDelegate, shellObject);
+                return (TParent)Factory.GetBrowsableObjectInfo(path.Remove(path.LastIndexOf(PathSeparator)), fileType, specialFolder, shellObject, DefaultShellObjectDeepClone);
 
             }
 
@@ -409,7 +418,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Loads the items of this <see cref="ShellObjectInfo{T}"/> asynchronously.
+        /// Loads the items of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> asynchronously.
         /// </summary>
         /// <param name="workerReportsProgress">A value that indicates whether the <see cref="BrowsableObjectInfoLoader{T}"/> will report progress.</param>
         /// <param name="workerSupportsCancellation">A value that indicates whether the <see cref="BrowsableObjectInfoLoader{T}"/> will supports cancellation.</param>
@@ -426,17 +435,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItems((BrowsableObjectInfoLoader)new FolderLoader<IShellObjectInfo<IShellObjectInfoFactory>>((IShellObjectInfo<IShellObjectInfoFactory>)this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                    LoadItems((IBrowsableObjectInfoLoader)new FolderLoader<IShellObjectInfo<IShellObjectInfoFactory>>((IShellObjectInfo<IShellObjectInfoFactory>)this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItems((BrowsableObjectInfoLoader)new ArchiveLoader<IArchiveItemInfoProvider>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                    LoadItems((IBrowsableObjectInfoLoader)new ArchiveLoader<IArchiveItemInfoProvider>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             }
 
             else
 
-                LoadItems((BrowsableObjectInfoLoader)new FolderLoader<IShellObjectInfo<IShellObjectInfoFactory>>((IShellObjectInfo<IShellObjectInfoFactory>)this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                LoadItems((IBrowsableObjectInfoLoader)new FolderLoader<IShellObjectInfo<IShellObjectInfoFactory>>((IShellObjectInfo<IShellObjectInfoFactory>)this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             //else
 
@@ -457,7 +466,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Loads the items of this <see cref="ShellObjectInfo{T}"/> asynchronously.
+        /// Loads the items of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> asynchronously.
         /// </summary>
         /// <param name="workerReportsProgress">A value that indicates whether the <see cref="BrowsableObjectInfoLoader{T}"/> will report progress.</param>
         /// <param name="workerSupportsCancellation">A value that indicates whether the <see cref="BrowsableObjectInfoLoader{T}"/> will supports cancellation.</param>
@@ -474,17 +483,17 @@ namespace WinCopies.IO
 
                 if (FileType == FileType.Folder || FileType == FileType.Drive || FileType == FileType.SpecialFolder)
 
-                    LoadItemsAsync((BrowsableObjectInfoLoader)new FolderLoader<IShellObjectInfo<IShellObjectInfoFactory>>((IShellObjectInfo<IShellObjectInfoFactory>)this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                    LoadItemsAsync((IBrowsableObjectInfoLoader)new FolderLoader<IShellObjectInfo<IShellObjectInfoFactory>>((IShellObjectInfo<IShellObjectInfoFactory>)this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
                 else if (FileType == FileType.Archive)
 
-                    LoadItemsAsync((BrowsableObjectInfoLoader)new ArchiveLoader<IArchiveItemInfoProvider>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                    LoadItemsAsync((IBrowsableObjectInfoLoader)new ArchiveLoader<IArchiveItemInfoProvider>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             }
 
             else
 
-                LoadItemsAsync((BrowsableObjectInfoLoader)new FolderLoader<IShellObjectInfo<IShellObjectInfoFactory>>((IShellObjectInfo<IShellObjectInfoFactory>)this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+                LoadItemsAsync((IBrowsableObjectInfoLoader)new FolderLoader<IShellObjectInfo<IShellObjectInfoFactory>>((IShellObjectInfo<IShellObjectInfoFactory>)this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
             //else
 
@@ -505,7 +514,7 @@ namespace WinCopies.IO
         }
 
         // /// <summary>
-        // /// Frees the <see cref="ArchiveFileStream"/> property to unlock the archive referenced by it and makes it <see langword="null"/>. Calling this method will erase all the <see cref="Items"/> of this <see cref="ShellObjectInfo{T}"/> in memory.
+        // /// Frees the <see cref="ArchiveFileStream"/> property to unlock the archive referenced by it and makes it <see langword="null"/>. Calling this method will erase all the <see cref="Items"/> of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> in memory.
         // /// </summary>
 
         /// <summary>
@@ -516,11 +525,11 @@ namespace WinCopies.IO
         /// <param name="disposeParent">Whether to dispose the parent of the current path.</param>
         /// <param name="disposeItems">Whether to dispose the items of the current path.</param>
         /// <param name="recursively">Whether to dispose recursively.</param>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo{T}.ItemsLoader"/> is busy and does not support cancellation.</exception>
-        protected override void DisposeOverride(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
+        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/> is busy and does not support cancellation.</exception>
+        protected override void Dispose(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
         {
 
-            base.DisposeOverride(disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
+            base.Dispose(disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
 
             ShellObject.Dispose();
 
@@ -537,24 +546,24 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Gets a string representation of this <see cref="ShellObjectInfo{T}"/>.
+        /// Gets a string representation of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.
         /// </summary>
-        /// <returns>The <see cref="LocalizedName"/> of this <see cref="ShellObjectInfo{T}"/>.</returns>
+        /// <returns>The <see cref="LocalizedName"/> of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.</returns>
         public override string ToString() => string.IsNullOrEmpty(Path) ? ShellObject.GetDisplayName(DisplayNameType.Default) : System.IO.Path.GetFileName(Path);
 
         ///// <summary>
-        ///// Gets or sets the factory for this <see cref="ShellObjectInfo{T}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="ShellObjectInfo{T}"/> and its associated <see cref="BrowsableObjectInfo{T}.ItemsLoader"/>.
+        ///// Gets or sets the factory for this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> and its associated <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/>.
         ///// </summary>
-        ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfo{T}.ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{T}"/>.</exception>
+        ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
         ///// <exception cref="ArgumentNullException">value is null.</exception>
         //public new ShellObjectInfoFactory Factory { get => (ShellObjectInfoFactory)base.Factory; set => base.Factory = value; }
 
         // public override bool IsRenamingSupported => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.File, FileType.Drive, FileType.Archive, FileType.Link);
 
         ///// <summary>
-        ///// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo{T}"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.
+        ///// Renames or move to a relative path, or both, the current <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> with the specified name. See the doc of the <see cref="Directory.Move(string, string)"/>, <see cref="File.Move(string, string)"/> and <see cref="DriveInfo.VolumeLabel"/> for the possible exceptions.
         ///// </summary>
-        ///// <param name="newValue">The new name or relative path for this <see cref="ShellObjectInfo{T}"/>.</param>
+        ///// <param name="newValue">The new name or relative path for this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>.</param>
         //public override void Rename(string newValue)
 
         //{
@@ -593,29 +602,27 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
         /// </summary>
-        public override bool NeedsObjectsReconstruction => true;
+        public override bool NeedsObjectsOrValuesReconstruction => true;
 
         /// <summary>
-        /// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool?)"/>, you'll have to override this method if your class has to reinitialize members.
+        /// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
-        /// <param name="browsableObjectInfo">The cloned <see cref="BrowsableObjectInfo{T}"/>.</param>
-        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        protected override void OnDeepClone(BrowsableObjectInfo<T> browsableObjectInfo, bool? preserveIds)
+        /// <param name="browsableObjectInfo">The cloned <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</param>
+        protected override void OnDeepClone(BrowsableObjectInfo<TParent, TItems, TFactory> browsableObjectInfo)
         {
 
-            base.OnDeepClone(browsableObjectInfo, preserveIds);
+            base.OnDeepClone(browsableObjectInfo);
 
             if (ArchiveItemInfoFactory.UseRecursively)
 
-                ((ShellObjectInfo<T>)browsableObjectInfo).ArchiveItemInfoFactory = (ArchiveItemInfoFactory)ArchiveItemInfoFactory.DeepClone(preserveIds);
+                ((ShellObjectInfo<TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory>)browsableObjectInfo).ArchiveItemInfoFactory = (ArchiveItemInfoFactory<TParentArchiveItemInfo, TArchiveItemInfoItems>)ArchiveItemInfoFactory.DeepClone();
 
         }
 
         /// <summary>
-        /// Gets a deep clone of this <see cref="BrowsableObjectInfo{T}"/>. The <see cref="OnDeepClone(BrowsableObjectInfo{T}, bool?)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool?)"/>, you'll have to override this method if your class has to reinitialize members.
+        /// Gets a deep clone of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. The <see cref="OnDeepClone(BrowsableObjectInfo{TParent, TItems, TFactory})"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
-        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        protected override BrowsableObjectInfo<T> DeepCloneOverride(bool? preserveIds) => new ShellObjectInfo<T>(Path, FileType, SpecialFolder, _shellObjectDelegate, null, (ShellObjectInfoFactory)Factory.DeepClone(preserveIds), (ArchiveItemInfoFactory)ArchiveItemInfoFactory.DeepClone(preserveIds));
+        protected override BrowsableObjectInfo<TParent, TItems, TFactory> DeepCloneOverride() => new ShellObjectInfo<TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory>(Path, FileType, SpecialFolder, _shellObjectDelegate(ShellObject), _shellObjectDelegate, (ShellObjectInfoFactory<TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems>)Factory.DeepClone(), (ArchiveItemInfoFactory<TParentArchiveItemInfo, TArchiveItemInfoItems>)ArchiveItemInfoFactory.DeepClone());
 
     }
 

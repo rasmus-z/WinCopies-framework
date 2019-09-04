@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
@@ -14,7 +15,7 @@ namespace WinCopies.IO
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(IRegistryItemInfoFactory factory);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate);
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, IRegistryItemInfoFactory factory);
 
@@ -22,9 +23,9 @@ namespace WinCopies.IO
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, IRegistryItemInfoFactory factory);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, string valueName);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, string valueName);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, string valueName, IRegistryItemInfoFactory factory);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, string valueName, IRegistryItemInfoFactory factory);
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName);
 

@@ -1,10 +1,11 @@
 ﻿using Microsoft.Win32;
 using System;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
 
-    public class RegistryItemInfoFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory
+    public class RegistryItemInfoFactory<TParent, TItems> : BrowsableObjectInfoFactory, IRegistryItemInfoFactory where TParent : class, IRegistryItemInfo where TItems : class, IRegistryItemInfo
     {
 
         /// <summary>
@@ -18,27 +19,27 @@ namespace WinCopies.IO
         /// <param name="useRecursively">Whether to add a clone of the new <see cref="RegistryItemInfoFactory"/> to all the new objects created from the new <see cref="RegistryItemInfoFactory"/>.</param>
         public RegistryItemInfoFactory(bool useRecursively) : base(useRecursively) { }
 
-        protected override BrowsableObjectInfoFactory DeepCloneOverride(bool? preserveIds) => new RegistryItemInfoFactory(UseRecursively);
+        protected override BrowsableObjectInfoFactory DeepCloneOverride() => new RegistryItemInfoFactory<TParent, TItems>(UseRecursively);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => GetBrowsableObjectInfo(UseRecursively ? (RegistryItemInfoFactory)DeepClone(null) : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => GetBrowsableObjectInfo(UseRecursively ? (RegistryItemInfoFactory<TParent, TItems>)DeepClone() : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey) => GetBrowsableObjectInfo(registryKey, UseRecursively ? (RegistryItemInfoFactory)DeepClone(null) : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate) => GetBrowsableObjectInfo(registryKey, registryKeyDelegate, UseRecursively ? (RegistryItemInfoFactory<TParent, TItems>)DeepClone() : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath) => GetBrowsableObjectInfo(registryKeyPath, UseRecursively ? (RegistryItemInfoFactory)DeepClone(null) : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath) => GetBrowsableObjectInfo(registryKeyPath, UseRecursively ? (RegistryItemInfoFactory<TParent, TItems>)DeepClone() : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, string valueName) => GetBrowsableObjectInfo(registryKey, valueName, UseRecursively ? (RegistryItemInfoFactory)DeepClone(null) : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, string valueName) => GetBrowsableObjectInfo(registryKey, registryKeyDelegate, valueName, UseRecursively ? (RegistryItemInfoFactory<TParent, TItems>)DeepClone() : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName) => GetBrowsableObjectInfo(registryKeyPath, valueName, UseRecursively ? (RegistryItemInfoFactory)DeepClone(null) : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName) => GetBrowsableObjectInfo(registryKeyPath, valueName, UseRecursively ? (RegistryItemInfoFactory<TParent, TItems>)DeepClone() : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IRegistryItemInfoFactory factory) => new RegistryItemInfo<IRegistryItemInfoFactory>(factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IRegistryItemInfoFactory factory) => new RegistryItemInfo< TParent, TItems,    IRegistryItemInfoFactory>(factory);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, IRegistryItemInfoFactory factory) => new RegistryItemInfo<IRegistryItemInfoFactory>(registryKey, factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, IRegistryItemInfoFactory factory) => new RegistryItemInfo< TParent, TItems, IRegistryItemInfoFactory>(registryKey, registryKeyDelegate, factory);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, IRegistryItemInfoFactory factory) => new RegistryItemInfo<IRegistryItemInfoFactory>(registryKeyPath, factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, IRegistryItemInfoFactory factory) => new RegistryItemInfo< TParent, TItems, IRegistryItemInfoFactory>(registryKeyPath, factory);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, string valueName, IRegistryItemInfoFactory factory) => new RegistryItemInfo<IRegistryItemInfoFactory>(registryKey, valueName, factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, string valueName, IRegistryItemInfoFactory factory) => new RegistryItemInfo< TParent, TItems, IRegistryItemInfoFactory>(registryKey, registryKeyDelegate, valueName, factory);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName, IRegistryItemInfoFactory factory) => new RegistryItemInfo<IRegistryItemInfoFactory>(registryKeyPath, valueName, factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName, IRegistryItemInfoFactory factory) => new RegistryItemInfo< TParent, TItems, IRegistryItemInfoFactory>(registryKeyPath, valueName, factory);
 
     }
 

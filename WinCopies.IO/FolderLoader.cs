@@ -36,14 +36,14 @@ namespace WinCopies.IO
     /// Provides a background process that can be used to load items of a folder. See the Remarks section.
     /// </summary>
     /// <remarks>
-    /// This loader is not designed for <see cref="ShellObjectInfo{T}"/> that have their <see cref="FileSystemObject.FileType"/> property set up with an other value than <see cref="FileType.Folder"/>, <see cref="FileType.Drive"/> or <see cref="FileType.SpecialFolder"/>, even if they can be browsable (e.g. <see cref="FileType.Archive"/>). If the file type of the given <see cref="BrowsableObjectInfoLoader{TPath}.Path"/> is not supported by this loader, you'll have to use a specific loader or to inherit from this loader.
+    /// This loader is not designed for <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> that have their <see cref="FileSystemObject.FileType"/> property set up with an other value than <see cref="FileType.Folder"/>, <see cref="FileType.Drive"/> or <see cref="FileType.SpecialFolder"/>, even if they can be browsable (e.g. <see cref="FileType.Archive"/>). If the file type of the given <see cref="BrowsableObjectInfoLoader{TPath}.Path"/> is not supported by this loader, you'll have to use a specific loader or to inherit from this loader.
     /// </remarks>
     public class FolderLoader<T> : FileSystemObjectLoader<T>, IFolderLoader<T> where T : class, IShellObjectInfo, IBrowsableObjectInfo<IShellObjectInfoFactory>
     {
 
-        public override bool NeedsObjectsReconstruction => true;
+        public override bool NeedsObjectsOrValuesReconstruction => true;
 
-        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool? preserveIds) => new FolderLoader<T>(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds));
+        protected override BrowsableObjectInfoLoader<T> DeepCloneOverride() => new FolderLoader<T>(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
 
         // todo: to turn on ShellObjectWatcher for better compatibility
 
@@ -77,7 +77,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public FolderLoader( T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+        public FolderLoader(T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FolderLoader"/> class using a custom comparer.
@@ -86,7 +86,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public FolderLoader( T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((T)path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
+        public FolderLoader(T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((T)path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
 
         protected override void OnPathChanging(T path)
         {
@@ -127,11 +127,11 @@ namespace WinCopies.IO
         /// <summary>
         /// Frees all resources used by this <see cref="FolderLoader"/>.
         /// </summary>
-        protected override void DisposeOverride(bool disposing, bool disposePath)
+        protected override void Dispose(bool disposing, bool disposePath)
 
         {
 
-            base.DisposeOverride(disposing, disposePath);
+            base.Dispose(disposing, disposePath);
 
             if (FileSystemWatcher != null)
 
@@ -525,6 +525,8 @@ namespace WinCopies.IO
 
             public ShellObject ShellObject { get; }
 
+            public DeepClone<ShellObject> ShellObjectDelegate { get; }
+
             /// <summary>
             /// Gets the localized name of this <see cref="PathInfo"/>.
             /// </summary>
@@ -535,7 +537,14 @@ namespace WinCopies.IO
             /// </summary>
             public override string Name => ShellObject.GetDisplayName(DisplayNameType.Default);
 
-            public PathInfo(string path, string normalizedPath, FileType fileType, ShellObject shellObject) : base(path, normalizedPath, fileType) => ShellObject = shellObject;
+            public PathInfo(string path, string normalizedPath, FileType fileType, ShellObject shellObject, DeepClone<ShellObject> shellObjectDelegate) : base(path, normalizedPath, fileType)
+            {
+
+                ShellObject = shellObject;
+
+                ShellObjectDelegate = shellObjectDelegate;
+
+            }
 
             //public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
             //        ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()

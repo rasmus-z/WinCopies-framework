@@ -35,7 +35,7 @@ namespace WinCopies.IO
     public class RegistryKeyLoader<T> : BrowsableObjectInfoLoader<T>, IRegistryKeyLoader<T> where T : class, IRegistryItemInfo, IBrowsableObjectInfo<IRegistryItemInfoFactory>
     {
 
-        protected override BrowsableObjectInfoLoader DeepCloneOverride(bool? preserveIds) => new RegistryKeyLoader<T>(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(preserveIds), RegistryItemTypes);
+        protected override BrowsableObjectInfoLoader<T> DeepCloneOverride() => new RegistryKeyLoader<T>(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), RegistryItemTypes);
 
         private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
 
@@ -54,7 +54,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader( T path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(T path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryKeyLoader{T}"/> class using a custom comparer.
@@ -63,7 +63,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader( T path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base( (T) path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>) fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(T path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base((T)path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
 
         //public override bool CheckFilter(string path)
 
@@ -118,133 +118,133 @@ namespace WinCopies.IO
 
             // {
 
-                var paths = new ArrayAndListBuilder<PathInfo>();
+            var paths = new ArrayAndListBuilder<PathInfo>();
 
-                PathInfo pathInfo;
+            PathInfo pathInfo;
 
-                void checkAndAppend(string pathWithoutName, string name, bool isValue)
+            void checkAndAppend(string pathWithoutName, string name, bool isValue)
 
-                {
+            {
 
-                    string path = pathWithoutName + IO.Path.PathSeparator + name;
+                string path = pathWithoutName + IO.Path.PathSeparator + name;
 
-                    if (CheckFilter(path))
+                if (CheckFilter(path))
 
-                        _ = paths.AddLast(pathInfo = new PathInfo(path, path.RemoveAccents(), name, isValue ? FileType.SpecialFolder : FileType.Other, isValue));
+                    _ = paths.AddLast(pathInfo = new PathInfo(path, path.RemoveAccents(), name, isValue ? FileType.SpecialFolder : FileType.Other, isValue));
 
-                }
+            }
 
-                switch (Path.RegistryItemType)
+            switch (Path.RegistryItemType)
 
-                {
+            {
 
-                    case RegistryItemType.RegistryRoot:
+                case RegistryItemType.RegistryRoot:
 
-                        if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryKey))
+                    if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryKey))
+
+                    {
+
+                        FieldInfo[] _registryKeyFields = typeof(Microsoft.Win32.Registry).GetFields();
+
+                        string name;
+
+                        foreach (FieldInfo fieldInfo in _registryKeyFields)
 
                         {
 
-                            FieldInfo[] _registryKeyFields = typeof(Microsoft.Win32.Registry).GetFields();
+                            name = ((RegistryKey)fieldInfo.GetValue(null)).Name;
 
-                            string name;
-
-                            foreach (FieldInfo fieldInfo in _registryKeyFields)
-
-                            {
-
-                                name = ((RegistryKey)fieldInfo.GetValue(null)).Name;
-
-                                checkAndAppend(name, name, false);
-
-                            }
+                            checkAndAppend(name, name, false);
 
                         }
 
-                        break;
+                    }
 
-                    case RegistryItemType.RegistryKey:
+                    break;
 
-                        string[] items;
+                case RegistryItemType.RegistryKey:
 
-                        if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryKey))
+                    string[] items;
 
-                            try
-
-                            {
-
-                                items = Path.RegistryKey.GetSubKeyNames();
-
-                                foreach (string item in items)
-
-                                    checkAndAppend(item.Substring(0, item.LastIndexOf(IO.Path.PathSeparator)), item.Substring(item.LastIndexOf(IO.Path.PathSeparator) + 1), false);
-
-                            }
-
-                            catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
-
-                        if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryValue))
-
-                            try
-
-                            {
-
-                                items = Path.RegistryKey.GetValueNames();
-
-                                foreach (string item in items)
-
-                                    checkAndAppend(Path.RegistryKey.Name, item, true);
-
-                            }
-
-                            catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
-
-                        break;
-
-                }
-
-
-
-                IEnumerable<PathInfo> pathInfos;
-
-
-
-                if (FileSystemObjectComparer == null)
-
-                    pathInfos = (IEnumerable<PathInfo>)paths;
-
-                else
-
-                {
-
-                    var _paths = paths.ToList();
-
-                    _paths.Sort(FileSystemObjectComparer);
-
-                    pathInfos = (IEnumerable<PathInfo>)_paths;
-
-                }
-
-
-
-                using (IEnumerator<PathInfo> pathsEnum = pathInfos.GetEnumerator())
-
-
-
-                    while (pathsEnum.MoveNext())
+                    if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryKey))
 
                         try
 
                         {
 
-                            do
+                            items = Path.RegistryKey.GetSubKeyNames();
 
-                                ReportProgress( 0, pathsEnum.Current.IsValue ? ((IRegistryItemInfoFactory) Path.Factory).GetBrowsableObjectInfo(pathsEnum.Current.Path.Substring(0, pathsEnum.Current.Path.Length - pathsEnum.Current.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), pathsEnum.Current.Name) : Path.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path) ) ; 
+                            foreach (string item in items)
 
-                            while (pathsEnum.MoveNext());
+                                checkAndAppend(item.Substring(0, item.LastIndexOf(IO.Path.PathSeparator)), item.Substring(item.LastIndexOf(IO.Path.PathSeparator) + 1), false);
 
                         }
 
                         catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
+
+                    if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryValue))
+
+                        try
+
+                        {
+
+                            items = Path.RegistryKey.GetValueNames();
+
+                            foreach (string item in items)
+
+                                checkAndAppend(Path.RegistryKey.Name, item, true);
+
+                        }
+
+                        catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
+
+                    break;
+
+            }
+
+
+
+            IEnumerable<PathInfo> pathInfos;
+
+
+
+            if (FileSystemObjectComparer == null)
+
+                pathInfos = (IEnumerable<PathInfo>)paths;
+
+            else
+
+            {
+
+                var _paths = paths.ToList();
+
+                _paths.Sort(FileSystemObjectComparer);
+
+                pathInfos = (IEnumerable<PathInfo>)_paths;
+
+            }
+
+
+
+            using (IEnumerator<PathInfo> pathsEnum = pathInfos.GetEnumerator())
+
+
+
+                while (pathsEnum.MoveNext())
+
+                    try
+
+                    {
+
+                        do
+
+                            ReportProgress(0, pathsEnum.Current.IsValue ? ((IRegistryItemInfoFactory)Path.Factory).GetBrowsableObjectInfo(pathsEnum.Current.Path.Substring(0, pathsEnum.Current.Path.Length - pathsEnum.Current.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), pathsEnum.Current.Name) : Path.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path));
+
+                        while (pathsEnum.MoveNext());
+
+                    }
+
+                    catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
 
 
 
@@ -261,10 +261,18 @@ namespace WinCopies.IO
 
             public bool IsValue { get; }
 
-            public PathInfo(string path, string normalizedPath, string name, FileType fileType, bool isValue) : base(path, normalizedPath, fileType)
+            public RegistryKey RegistryKey { get; }
+
+            public DeepClone<RegistryKey> RegistryKeyDelegate { get; }
+
+            public PathInfo(string path, string normalizedPath, string name, FileType fileType, RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, bool isValue) : base(path, normalizedPath, fileType)
             {
 
                 Name = name;
+
+                RegistryKey = registryKey;
+
+                RegistryKeyDelegate = registryKeyDelegate;
 
                 IsValue = isValue;
 

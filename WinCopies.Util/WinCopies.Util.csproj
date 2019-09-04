@@ -112,6 +112,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Collections\Comparers.cs" />
+    <Compile Include="Collections\ICollection.cs" />
     <Compile Include="Data\CheckableObject.cs" />
     <Compile Include="Commands\CommandAction.cs" />
     <Compile Include="Commands\Commands.cs" />

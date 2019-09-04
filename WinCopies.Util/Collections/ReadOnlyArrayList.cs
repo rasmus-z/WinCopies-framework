@@ -3,14 +3,14 @@ using System.Collections;
 
 namespace WinCopies.Collections
 {
-    public interface IReadOnlyList : ICollection
+    public interface IReadOnlyList : ICollection, IEnumerable
     {
 
         object this[int index] { get; }
 
     }
 
-    public class ReadOnlyArrayList : IEnumerable, ICollection, IReadOnlyList
+    public class ReadOnlyArrayList : IReadOnlyList
     {
 
         private IList innerList = null;

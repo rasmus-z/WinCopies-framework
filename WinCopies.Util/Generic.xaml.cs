@@ -122,6 +122,11 @@ namespace WinCopies.Util
         /// </summary>
         public static string InvalidEnumValue => GetResource<string>(nameof(InvalidEnumValue));
 
+        /// <summary>
+        /// Gets the ReadOnlyCollection resource.
+        /// </summary>
+        public static string ReadOnlyCollection => GetResource<string>(nameof(ReadOnlyCollection));
+
         #endregion
 
         public static System.Windows.ResourceDictionary ResourceDictionary { get; } = null;
@@ -138,7 +143,7 @@ namespace WinCopies.Util
 
                 key = Assembly.GetCallingAssembly().GetName().Name;
 
-            System.Windows.ResourceDictionary resourceDictionary = new System.Windows.ResourceDictionary
+            var resourceDictionary = new System.Windows.ResourceDictionary
             {
                 Source = new Uri(dictionaryUri, UriKind.RelativeOrAbsolute)
             };

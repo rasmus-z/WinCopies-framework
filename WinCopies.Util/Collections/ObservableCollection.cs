@@ -190,7 +190,7 @@ namespace WinCopies.Collections
 
     }
 
-    public interface IObservableCollection<T> : IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable, IList, ICollection, IReadOnlyList<T>, IReadOnlyCollection<T>, INotifyCollectionChanged, INotifyPropertyChanged, INotifyCollectionChanging
+    public interface IObservableCollection<T> : System.Collections.Generic.IList<T>, IList<T>, IEnumerable<T>, IEnumerable, IList, ICollection, System.Collections.Generic.IReadOnlyList<T>, IReadOnlyList<T>, INotifyCollectionChanged, INotifyPropertyChanged, INotifyCollectionChanging
     {
 
         void Move(int oldIndex, int newIndex);
@@ -278,13 +278,13 @@ namespace WinCopies.Collections
 
             public ObservableCollection(IEnumerable<T> collection) => SetItems(new ObservableCollectionInternal<T>(collection));
 
-            T IList<T>.this[int index] { get => GetItem(index); set => Update(index, value); }
+            T System.Collections.Generic.IList<T>.this[int index] { get => GetItem(index); set => Update(index, value); }
 
             object IList.this[int index] { get => this[index]; set => Update(index, GetOrThrowIfNotType<T>(value, nameof(value))); }
 
             public T this[int index] => GetItem(index);
 
-            T IReadOnlyList<T>.this[int index] => this[index];
+            T System.Collections.Generic.IReadOnlyList<T>.this[int index] => this[index];
 
             public bool Update(int index, T item) => SetItem(index, item);
 
@@ -294,7 +294,7 @@ namespace WinCopies.Collections
 
             protected virtual bool IsReadOnly => false;
 
-            bool ICollection<T>.IsReadOnly => IsReadOnly;
+            bool IList<T>.IsReadOnly => IsReadOnly;
 
             bool IList.IsReadOnly => IsReadOnly;
 
@@ -320,7 +320,7 @@ namespace WinCopies.Collections
 
             public bool Add(T item) => InsertItem(Count, item);
 
-            void ICollection<T>.Add(T item) => Add(item);
+            void IList<T>.Add(T item) => Add(item);
 
             int IList.Add(object value) => InsertItem(Count, GetOrThrowIfNotType<T>(value, nameof(value))) ? Count - 1 : -1;
 
@@ -328,7 +328,7 @@ namespace WinCopies.Collections
 
             void IList.Clear() => ClearItems();
 
-            void ICollection<T>.Clear() => ClearItems();
+            void IList<T>.Clear() => ClearItems();
 
             public bool Contains(T item) => ContainsItem(item);
 
@@ -372,7 +372,7 @@ namespace WinCopies.Collections
 
             int IList.IndexOf(object value) => value is T browsableObjectInfo ? IndexOf(browsableObjectInfo) : -1;
 
-            void IList<T>.Insert(int index, T item) => InsertItem(index, item);
+            void System.Collections.Generic.IList<T>.Insert(int index, T item) => InsertItem(index, item);
 
             /// <summary>
             /// Inserts an element into the <see cref="ObservableCollection{T}"/> at the specified index. See the Remarks section.
@@ -428,7 +428,7 @@ namespace WinCopies.Collections
 
             void IList.RemoveAt(int index) => RemoveItem(index);
 
-            void IList<T>.RemoveAt(int index) => RemoveItem(index);
+            void System.Collections.Generic.IList<T>.RemoveAt(int index) => RemoveItem(index);
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

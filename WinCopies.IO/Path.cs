@@ -148,15 +148,11 @@ namespace WinCopies.IO
 
             string[] paths = path.Split(PathSeparator);
 
-            ShellObject shellObjectDelegate(bool? preserveIds) => ShellObject.FromParsingName(paths[0]);
+            var shellObject = ShellObject.FromParsingName(paths[0]);
 
-            ShellObject shellObject = shellObjectDelegate(null);
-
-#pragma warning disable IDE0068 // Dispose objects before losing scope
             IBrowsableObjectInfo browsableObjectInfo = shellObject.IsFileSystemObject
-                ? new ShellObjectInfo<IShellObjectInfoFactory>(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObjectDelegate, shellObject)
-                                : new ShellObjectInfo<IShellObjectInfoFactory>(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObjectDelegate, shellObject);
-#pragma warning restore IDE0068 // Dispose objects before losing scope
+                ? new ShellObjectInfo< IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone)
+                                : new ShellObjectInfo<IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObject, ShellObjectInfo.DefaultShellObjectDeepClone);
 
             if (paths.Length == 1)
 
@@ -174,7 +170,7 @@ namespace WinCopies.IO
 
                 {
 
-                    var temp = (IBrowsableObjectInfo)newValue.DeepClone(null);
+                    var temp = (IBrowsableObjectInfo)newValue.DeepClone();
 
                     browsableObjectInfo.ItemsLoader.Dispose();
 
@@ -242,13 +238,11 @@ namespace WinCopies.IO
 
                     // string _s = s.Replace(IO.Path.PathSeparator, "\\\\");
 
-                    ShellObject func(bool? preserveIds) => ((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo);
-
-                    shellObject = func(null);
+                    shellObject = ((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo);
 
                     SpecialFolder specialFolder = GetSpecialFolder(shellObject);
 
-                    FileType fileType = specialFolder == SpecialFolder.OtherFolderOrFile ? shellObject.IsLink ? FileType.Link : shellObject is ShellFile shellFile ? IO.Path.IsSupportedArchiveFormat(System.IO.Path.GetExtension(s)) ? FileType.Archive : FileType.File : FileType.Drive : FileType.SpecialFolder;
+                    FileType fileType = specialFolder == SpecialFolder.OtherFolderOrFile ? shellObject.IsLink ? FileType.Link : shellObject is ShellFile shellFile ? IsSupportedArchiveFormat(System.IO.Path.GetExtension(s)) ? FileType.Archive : FileType.File : FileType.Drive : FileType.SpecialFolder;
 
                     //if (shellObject.IsFileSystemObject)
 
@@ -265,7 +259,7 @@ namespace WinCopies.IO
                     //#endif
 
 #pragma warning disable IDE0068 // Disposed manually when needed
-                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo<IShellObjectInfoFactory>(s, fileType, specialFolder, func, null));
+                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo< IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(s, fileType, specialFolder, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone));
 #pragma warning restore IDE0068
 
 #if DEBUG

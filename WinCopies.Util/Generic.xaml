@@ -27,4 +27,5 @@
     <sys:String x:Key="StringParameterEmptyOrWhiteSpaces" >'{0}' is empty or white spaces.</sys:String>
     <sys:String x:Key="BackgroundWorkerIsBusy" >The BackgroundWorker is busy.</sys:String>
     <sys:String x:Key="InvalidEnumValue" >The enum value is not in the enum values range. The enum value is {0}.</sys:String>
+    <sys:String x:Key="ReadOnlyCollection">This collection is read-only.</sys:String>
 </ResourceDictionary>

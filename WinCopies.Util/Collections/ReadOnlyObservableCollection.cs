@@ -6,7 +6,7 @@ using WinCopies.Util;
 namespace WinCopies.Collections
 {
 
-    public interface IReadOnlyObservableCollection<T> : IReadOnlyCollection<T>, INotifyCollectionChanged, INotifyPropertyChanged, INotifyCollectionChanging
+    public interface IReadOnlyObservableCollection<T> : IReadOnlyList<T>, INotifyCollectionChanged, INotifyPropertyChanged, INotifyCollectionChanging
 
     {
 

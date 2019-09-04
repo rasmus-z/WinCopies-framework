@@ -22,13 +22,9 @@ namespace WinCopies.IO
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(IWMIItemInfoFactory factory);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementBaseObject> managementObject);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementBaseObject> managementObject, IWMIItemInfoFactory factory);
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementScope> managementScope, DeepClone<ManagementPath> managementPath);
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, DeepClone<ManagementScope> managementScope, DeepClone<ManagementPath> managementPath, IWMIItemInfoFactory factory);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate, IWMIItemInfoFactory factory);
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType);
 

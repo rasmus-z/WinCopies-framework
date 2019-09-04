@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WinCopies.Collections;
 using static WinCopies.Util.Generic;
+using IList = System.Collections.IList;
 
 namespace WinCopies.Util
 {
@@ -210,22 +211,22 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Tries to add multiple values to an <see cref="ICollection{T}"/> if it does not contain them already.
+        /// Tries to add multiple values to an <see cref="System.Collections.ICollection"/> if it does not contain them already.
         /// </summary>
         /// <typeparam name="T">The value type</typeparam>
         /// <param name="collection">The collection to which try to add the value</param>
         /// <param name="values">The values to try to add to the collection</param>
         /// <returns><see langword="true"/> if the value has been added to the collection, otherwise <see langword="false"/>.</returns>
-        public static object[] AddRangeIfNotContains(this IList collection, params object[] values) => collection.AddRangeIfNotContains((IEnumerable)values);
+        public static object[] AddRangeIfNotContains(this System.Collections.ICollection collection, params object[] values) => collection.AddRangeIfNotContains((IEnumerable)values);
 
         /// <summary>
-        /// Tries to add multiple values to an <see cref="ICollection{T}"/> if it does not contain them already.
+        /// Tries to add multiple values to an <see cref="System.Collections.IList"/> if it does not contain them already.
         /// </summary>
         /// <typeparam name="T">The value type</typeparam>
         /// <param name="collection">The collection to which try to add the value</param>
         /// <param name="values">The values to try to add to the collection</param>
         /// <returns><see langword="true"/> if the value has been added to the collection, otherwise <see langword="false"/>.</returns>
-        public static object[] AddRangeIfNotContains(this IList collection, IEnumerable values)
+        public static object[] AddRangeIfNotContains(this System.Collections.IList collection, IEnumerable values)
 
         {
 
@@ -348,7 +349,7 @@ namespace WinCopies.Util
 
 
 
-        public static bool InsertIfNotContains<T>(this IList<T> collection, int index, T value)
+        public static bool InsertIfNotContains<T>(this System.Collections.Generic.IList<T> collection, int index, T value)
 
         {
 
@@ -360,9 +361,9 @@ namespace WinCopies.Util
 
         }
 
-        public static T[] InsertRangeIfNotContains<T>(this IList<T> collection, int index, params T[] values) => collection.InsertRangeIfNotContains(index, (IEnumerable<T>)values);
+        public static T[] InsertRangeIfNotContains<T>(this System.Collections.Generic.IList<T> collection, int index, params T[] values) => collection.InsertRangeIfNotContains(index, (IEnumerable<T>)values);
 
-        public static T[] InsertRangeIfNotContains<T>(this IList<T> collection, int index, IEnumerable<T> values)
+        public static T[] InsertRangeIfNotContains<T>(this System.Collections.Generic.IList<T> collection, int index, IEnumerable<T> values)
 
         {
 
@@ -542,7 +543,7 @@ namespace WinCopies.Util
 
         }
 
-        public static void AddRange<T>(this ICollection<T> collection, IList<T> values, int start, int length)
+        public static void AddRange<T>(this ICollection<T> collection, System.Collections.Generic.IList<T> values, int start, int length)
 
         {
 
@@ -1043,7 +1044,7 @@ namespace WinCopies.Util
 
         }
 
-        public static T[] ToArray<T>(this IList<T> arrayList, int startIndex, int length)
+        public static T[] ToArray<T>(this System.Collections.Generic.IList<T> arrayList, int startIndex, int length)
 
         {
 
@@ -1096,15 +1097,15 @@ namespace WinCopies.Util
         public static object[] AppendLong(this Array array, params Array[] arrays) => Util.ConcatenateLong((object[])array, arrays);
 
         /// <summary>
-        /// Sorts an <see cref="System.Collections.ObjectModel.System.Collections.ObjectModel.ObservableCollection{T}"/>.
+        /// Sorts an <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.
         /// </summary>
-        /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
-        /// <param name="oc">The <see cref="System.Collections.ObjectModel.System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
+        /// <typeparam name="T">The type of the values in the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>.</typeparam>
+        /// <param name="oc">The <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> to sort.</param>
         public static void Sort<T>(this System.Collections.ObjectModel.ObservableCollection<T> oc)
 
         {
 
-            IList<T> sorted = oc.OrderBy(x => x).ToList<T>();
+            System.Collections.Generic.IList<T> sorted = oc.OrderBy(x => x).ToList<T>();
 
             for (int i = 0; i < sorted.Count; i++)
 
@@ -1122,7 +1123,7 @@ namespace WinCopies.Util
 
         {
 
-            IList<T> sorted = oc.OrderBy(x => x, comparer).ToList<T>();
+            System.Collections.Generic.IList<T> sorted = oc.OrderBy(x => x, comparer).ToList<T>();
 
             for (int i = 0; i < sorted.Count; i++)
 
@@ -2948,13 +2949,7 @@ namespace WinCopies.Util
 
             if (enumType.GetCustomAttribute<FlagsAttribute>() == null)
 
-                if (throwIfNotFlagsEnum)
-
-                    throw new ArgumentException("The given enum does not have the FlagsAttribute.", nameof(@enum));
-
-                else
-
-                    return false;
+                return throwIfNotFlagsEnum ? throw new ArgumentException("The given enum does not have the FlagsAttribute.", nameof(@enum)) : false;
 
             // Now, we have to check if the given value is directly defined in the enum.
 
@@ -3012,7 +3007,9 @@ namespace WinCopies.Util
 
         {
 
-            if (!@enum.IsValidFlagsEnumValue(throwIfNotFlagsEnum, throwIfZero)) throw new InvalidOperationException(string.Format(InvalidEnumValue, @enum.ToString()));
+            if (!@enum.IsValidFlagsEnumValue(throwIfNotFlagsEnum, throwIfZero))
+
+                throw new InvalidOperationException(string.Format(InvalidEnumValue, @enum.ToString()));
 
         }
 
@@ -3031,7 +3028,9 @@ namespace WinCopies.Util
 
         {
 
-            if (!@enum.IsValidFlagsEnumValue(throwIfNotFlagsEnum, throwIfZero)) throw new InvalidEnumArgumentException(argumentName, (int)Convert.ChangeType(@enum, TypeCode.Int32), @enum.GetType());
+            if (!@enum.IsValidFlagsEnumValue(throwIfNotFlagsEnum, throwIfZero))
+
+                throw new InvalidEnumArgumentException(argumentName, (int)Convert.ChangeType(@enum, TypeCode.Int32), @enum.GetType());
 
         }
 
@@ -3148,7 +3147,7 @@ namespace WinCopies.Util
         /// <param name="s">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this short s, short x, short y) => s >= x && s <= y;
 
         /// <summary>
@@ -3157,7 +3156,7 @@ namespace WinCopies.Util
         /// <param name="s">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this ushort s, ushort x, ushort y) => s >= x && s <= y;
 
         /// <summary>
@@ -3166,7 +3165,7 @@ namespace WinCopies.Util
         /// <param name="i">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="i"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this int i, int x, int y) => i >= x && i <= y;
 
         /// <summary>
@@ -3175,7 +3174,7 @@ namespace WinCopies.Util
         /// <param name="i">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="i"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this uint i, uint x, uint y) => i >= x && i <= y;
 
         /// <summary>
@@ -3184,7 +3183,7 @@ namespace WinCopies.Util
         /// <param name="l">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="l"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this long l, long x, long y) => l >= x && l <= y;
 
         /// <summary>
@@ -3193,7 +3192,7 @@ namespace WinCopies.Util
         /// <param name="l">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="l"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this ulong l, ulong x, ulong y) => l >= x && l <= y;
 
         /// <summary>
@@ -3202,7 +3201,7 @@ namespace WinCopies.Util
         /// <param name="f">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="f"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this float f, float x, float y) => f >= x && f <= y;
 
         /// <summary>
@@ -3211,7 +3210,7 @@ namespace WinCopies.Util
         /// <param name="d">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="d"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this double d, double x, double y) => d >= x && d <= y;
 
         /// <summary>
@@ -3220,7 +3219,7 @@ namespace WinCopies.Util
         /// <param name="d">The number to check.</param>
         /// <param name="x">The left operand.</param>
         /// <param name="y">The right operand.</param>
-        /// <returns><see langword="true"/> if <paramref name="b"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="d"/> is between <paramref name="x"/> and <paramref name="y"/>, otherwise <see langword="false"/>.</returns>
         public static bool Between(this decimal d, decimal x, decimal y) => d >= x && d <= y;
 
         public static void Execute(this ICommand command, object commandParameter, IInputElement commandTarget)

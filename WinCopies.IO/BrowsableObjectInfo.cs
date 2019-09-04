@@ -15,73 +15,180 @@ using IDisposable = WinCopies.Util.IDisposable;
 namespace WinCopies.IO
 {
 
-    public interface IBrowsableObjectInfoModifier
-
+    public interface IBrowsableObjectInfoAccessor
     {
 
-        IBrowsableObjectInfo Item { get; }
+        IBrowsableObjectInfo Owner { get; }
 
-        IBrowsableObjectInfo Parent { set; }
+        IBrowsableObjectInfoCollection ItemCollection { get; }
 
     }
 
-    internal class BrowsableObjectInfoModifier : IBrowsableObjectInfoModifier
+    internal class BrowsableObjectInfoAccessor<TParent, TItems, TFactory> : IBrowsableObjectInfoAccessor where TParent : class, IBrowsableObjectInfo where TItems : class, IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
 
     {
 
-        IBrowsableObjectInfo IBrowsableObjectInfoModifier.Item => Item;
+        IBrowsableObjectInfo IBrowsableObjectInfoAccessor.Owner => Owner;
 
-        BrowsableObjectInfo<IBrowsableObjectInfoFactory> Item { get; }
+        public BrowsableObjectInfo<TParent, TItems, TFactory> Owner { get; }
 
-        public IBrowsableObjectInfo Parent { set => Item.Parent = value; }
+        public IBrowsableObjectInfoCollection ItemCollection => Owner.ItemCollection;
 
-        public BrowsableObjectInfoModifier(BrowsableObjectInfo<IBrowsableObjectInfoFactory> item) => Item = item;
+        public BrowsableObjectInfoAccessor(BrowsableObjectInfo<TParent, TItems, TFactory> owner) => Owner = owner;
+
+    }
+
+    public interface IBrowsableObjectInfoModifier<TItem> : System.IDisposable where TItem : class, IBrowsableObjectInfo
+
+    {
+
+        /// <summary>
+        /// The item of this wrapper.
+        /// </summary>
+        TItem Item { get; }
+
+        /// <summary>
+        /// Sets the parent of <see cref="Item"/>.
+        /// </summary>
+        /// <param name="parent">An <see cref="IBrowsableObjectInfoAccessor"/> that represents the parent of <see cref="Item"/>.</param>
+        /// <param name="index">The index of this item in <paramref name="parent"/>'s item collection.</param>
+        /// <exception cref="InvalidOperationException">The current object is dispsoed.</exception>
+        /// <exception cref="ArgumentException">The owner collection is invalid.</exception>
+        void SetParent(IBrowsableObjectInfoAccessor parent, int index);
+
+        /// <summary>
+        /// Resets the parent of <see cref="Item"/> and disposes the current <see cref="IBrowsableObjectInfoModifier{TItem}"/>.
+        /// </summary>
+        /// <param name="parent"><see cref="Item"/>'s parent.</param>
+        /// <exception cref="InvalidOperationException">The current object is dispsoed.</exception>
+        /// <exception cref="ArgumentException">The owner collection is invalid.</exception>
+        void Reset(IBrowsableObjectInfoAccessor parent);
+
+    }
+
+    internal class BrowsableObjectInfoModifier<TParent, TItems, TFactory> : IBrowsableObjectInfoModifier<IBrowsableObjectInfo> where TParent : class, IBrowsableObjectInfo where TItems : class, IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
+
+    {
+
+        IBrowsableObjectInfo IBrowsableObjectInfoModifier<IBrowsableObjectInfo>.Item => (IBrowsableObjectInfo) Item;
+
+        public BrowsableObjectInfo<TParent, TItems, TFactory> Item { get; internal set; }
+
+        public BrowsableObjectInfoModifier(BrowsableObjectInfo<TParent, TItems, TFactory> item) => Item = item;
+
+        bool _disposed;
+
+        public void SetParent(IBrowsableObjectInfoAccessor parent, int index)
+
+        {
+
+            if (_disposed)
+
+                throw new InvalidOperationException("The current object is disposed.");
+
+            if (object.ReferenceEquals(((System.Collections.Generic.IReadOnlyList<IBrowsableObjectInfo>)parent.ItemCollection)[index], Item))
+
+            {
+
+                Item.Parent = parent.Owner;
+
+                Item.HasParent = true;
+
+            }
+
+            else throw new ArgumentException("Invalid owner collection.");
+
+        }
+
+        public void Reset(IBrowsableObjectInfoAccessor parent)
+
+        {
+
+            if (_disposed)
+
+                throw new InvalidOperationException("The current object is disposed.");
+
+            if (object.ReferenceEquals(parent.Owner, Item.Parent))
+
+            {
+
+                Item.Parent = default;
+
+                Item.HasParent = false;
+
+                Dispose();
+
+            }
+
+            else throw new ArgumentException("Invalid owner collection.");
+
+        }
+
+        public void Dispose() => Dispose(true);
+
+        protected void Dispose(bool disposing)
+
+        {
+
+            if (disposing)
+
+            {
+
+                Item = default;
+
+                _disposed = true;
+
+            }
+
+        }
+
+        ~BrowsableObjectInfoModifier() => Dispose(false);
 
     }
 
     /// <summary>
     /// The base class for all browsable items of the WinCopies framework.
     /// </summary>
-    public abstract class BrowsableObjectInfo<T> : FileSystemObject, IBrowsableObjectInfo<T> where T : IBrowsableObjectInfoFactory
+    public abstract class BrowsableObjectInfo<TParent, TItems, TFactory> : FileSystemObject, IBrowsableObjectInfo<TParent, TItems, TFactory> where TParent : class, IBrowsableObjectInfo where TItems : class, IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
     {
 
         internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
 
         /// <summary>
-        /// When overridden in a derived class, gets the small <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo{T}"/>.
+        /// When overridden in a derived class, gets the small <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
         public abstract BitmapSource SmallBitmapSource { get; }
 
         /// <summary>
-        /// When overridden in a derived class, gets the medium <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo{T}"/>.
+        /// When overridden in a derived class, gets the medium <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
         public abstract BitmapSource MediumBitmapSource { get; }
 
         /// <summary>
-        /// When overridden in a derived class, gets the large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo{T}"/>.
+        /// When overridden in a derived class, gets the large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
         public abstract BitmapSource LargeBitmapSource { get; }
 
         /// <summary>
-        /// When overridden in a derived class, gets the extra large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo{T}"/>.
+        /// When overridden in a derived class, gets the extra large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
         public abstract BitmapSource ExtraLargeBitmapSource { get; }
 
         /// <summary>
-        /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo{T}"/> is browsable.
+        /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> is browsable.
         /// </summary>
         public abstract bool IsBrowsable { get; }
 
         IBrowsableObjectInfoFactory IBrowsableObjectInfo.Factory => _factory;
 
-        private T _factory;
+        private TFactory _factory;
 
         /// <summary>
-        /// Gets or sets the factory for this <see cref="BrowsableObjectInfo{T}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{T}"/> and its associated <see cref="ItemsLoader"/>.
+        /// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> and its associated <see cref="ItemsLoader"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="ItemsLoader"/> is running. OR The given factory has already been added to a <see cref="BrowsableObjectInfo{T}"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="ItemsLoader"/> is running. OR The given factory has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
         /// <exception cref="ArgumentNullException">value is null.</exception>
-        public T Factory
+        public TFactory Factory
         {
 
             get => _factory;
@@ -92,7 +199,7 @@ namespace WinCopies.IO
 
                 ThrowOnInvalidFactoryUpdateOperation(value, nameof(value));
 
-                T oldFactory = _factory;
+                TFactory oldFactory = _factory;
 
                 value.RegisterPath(this);
 
@@ -105,7 +212,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Gets a value that indicates if the items of this <see cref="BrowsableObjectInfo{T}"/> are currently loaded.
+        /// Gets a value that indicates if the items of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> are currently loaded.
         /// </summary>
         public bool AreItemsLoaded { get; internal set; }
 
@@ -114,7 +221,7 @@ namespace WinCopies.IO
         // internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
 
         /// <summary>
-        /// Gets the items loader for this <see cref="BrowsableObjectInfo{T}"/>.
+        /// Gets the items loader for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
         public IBrowsableObjectInfoLoader ItemsLoader { get; internal set; }
 
@@ -127,7 +234,7 @@ namespace WinCopies.IO
 
             ItemsLoader = object.ReferenceEquals(itemsLoader.Path, this) ? itemsLoader : throw new InvalidOperationException("Can not make a reference to the given items loader; the given items loader has to have registered the current path before calling the RegisterLoader method.");
 
-            return new PathModifier<T>(this);
+            return new PathModifier<TParent, TItems, TFactory>(new BrowsableObjectInfoAccessor<TParent, TItems, TFactory>(this));
 
         }
 
@@ -145,36 +252,44 @@ namespace WinCopies.IO
 
         // internal IBrowsableObjectInfoLoader<IBrowsableObjectInfo> ItemsLoaderInternal { set => ItemsLoader = (BrowsableObjectInfoLoader<BrowsableObjectInfo>)value; }
 
-        internal ObservableCollection<IBrowsableObjectInfo> items;
+        protected internal IBrowsableObjectInfoCollection<TItems> ItemCollection { get; }
 
         /// <summary>
-        /// Gets the items of this <see cref="BrowsableObjectInfo{T}"/>.
+        /// Gets the items of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
-        public virtual IReadOnlyObservableCollection<IBrowsableObjectInfo> Items { get; internal set; }
+        public IReadOnlyBrowsableObjectInfoCollection<TItems> Items { get; }
 
-        protected virtual void OnItemsChanging(NotifyCollectionChangedEventArgs e)
-        {
+        IReadOnlyBrowsableObjectInfoCollection<IBrowsableObjectInfo> IBrowsableObjectInfo.Items => (IReadOnlyBrowsableObjectInfoCollection<IBrowsableObjectInfo>)Items;
 
-            if (e.NewItems != null)
+        public bool HasParent { get; internal set; }
 
-                foreach (object item in e.NewItems)
+        // protected virtual IReadOnlyBrowsableObjectInfoCollection<IBrowsableObjectInfo> ItemsOverride { get; }
 
-                    if (item is IBrowsableObjectInfo _browsableObjectInfo)
+        //protected virtual void OnItemsChanging(NotifyCollectionChangedEventArgs e)
+        //{
 
-                        _browsableObjectInfo.Parent = Path;
+        //    if (e.NewItems != null)
 
-        }
+        //        foreach (object item in e.NewItems)
 
-        private void ItemsChanging(object sender, NotifyCollectionChangedEventArgs e) => OnItemsChanging(e);
+        //            if (item is TItems _browsableObjectInfo)
 
-        private IBrowsableObjectInfo _parent = null;
+        //                _browsableObjectInfo.Parent = Path;
+
+        //}
+
+        //private void ItemsChanging(object sender, NotifyCollectionChangedEventArgs e) => OnItemsChanging(e);
+
+        private TParent _parent = default;
 
         /// <summary>
-        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo{T}"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
         /// </summary>
-        public virtual IBrowsableObjectInfo Parent { get => _parent ?? (_parent = GetParent()); internal set => _parent = value; }
+        public TParent Parent { get => _parent ?? (_parent = GetParent()); internal set => _parent = value; }
 
-        protected virtual BrowsableObjectInfoCollection
+        IBrowsableObjectInfo IBrowsableObjectInfo.Parent => Parent;
+
+        // protected virtual WinCopies.Collections.ICollection<TItems> ItemsInternal { get; }
 
         /// <summary>
         /// Gets a value that indicates whether the current object is disposing.
@@ -186,14 +301,14 @@ namespace WinCopies.IO
         // public bool ConsiderAsPathRoot { get => _considerAsPathRoot; set => OnPropertyChanged(nameof(ConsiderAsPathRoot), nameof(_considerAsPathRoot), value, typeof(BrowsableObjectInfo)); }
 
         /// <summary>
-        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{T}"/> class.
+        /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> class.
         /// </summary>
-        /// <param name="path">The path of this <see cref="BrowsableObjectInfo{T}"/>.</param>
-        /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo{T}"/>.</param>
-        /// <param name="factory">The factory for this <see cref="BrowsableObjectInfo{T}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{T}"/> and its associated <see cref="ItemsLoader"/>.</param>
-        /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo{T}"/>.</exception>
+        /// <param name="path">The path of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</param>
+        /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</param>
+        /// <param name="factory">The factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> and its associated <see cref="ItemsLoader"/>.</param>
+        /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="factory"/> is null.</exception>
-        protected BrowsableObjectInfo(string path, FileType fileType, T factory) : base(path, fileType)
+        protected BrowsableObjectInfo(string path, FileType fileType, TFactory factory) : base(path, fileType)
 
         {
 
@@ -203,22 +318,22 @@ namespace WinCopies.IO
 
             _factory = factory;
 
-            items = new ObservableCollection<IBrowsableObjectInfo>();
+            ItemCollection = GetNewItemCollection();
 
-            Items = new ReadOnlyObservableCollection<IBrowsableObjectInfo>(items);
+            ItemCollection.RegisterOwner(new PathModifier<TParent, TItems, TFactory>(new BrowsableObjectInfoAccessor<TParent, TItems, TFactory>(this)));
 
-            ((INotifyCollectionChanging)Items).CollectionChanging -= ItemsChanging;
-
-            ((INotifyCollectionChanging)Items).CollectionChanging += ItemsChanging;
+            Items = new ReadOnlyBrowsableObjectInfoCollection<TItems>(ItemCollection);
 
         }
 
+        protected virtual IBrowsableObjectInfoCollection<TItems> GetNewItemCollection() => (IBrowsableObjectInfoCollection<TItems>)new BrowsableObjectInfoCollection<TItems>();
+
         /// <summary>
-        /// Checks if an <see cref="IBrowsableObjectInfoFactory"/> can be added to this <see cref="BrowsableObjectInfo{T}"/> and throw an exception if the validation failed.
+        /// Checks if an <see cref="IBrowsableObjectInfoFactory"/> can be added to this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> and throw an exception if the validation failed.
         /// </summary>
-        /// <param name="newFactory">The new factory to use in this <see cref="BrowsableObjectInfo{T}"/> and in its associated <see cref="ItemsLoader"/>.</param>
+        /// <param name="newFactory">The new factory to use in this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> and in its associated <see cref="ItemsLoader"/>.</param>
         /// <param name="paramName">The parameter name to include in error messages.</param>
-        /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy. OR The given factory has already been added to a <see cref="BrowsableObjectInfo{T}"/>.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy. OR The given factory has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="newFactory"/> is null.</exception>
         protected virtual void ThrowOnInvalidFactoryUpdateOperation(IBrowsableObjectInfoFactory newFactory, string paramName)
 
@@ -241,7 +356,7 @@ namespace WinCopies.IO
         // protected abstract IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileTypes fileType);
 
         /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo{T}"/>.
+        /// Loads the items of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
         public virtual void LoadItems()
 
@@ -258,17 +373,17 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// When overridden in a derived class, loads the items of this <see cref="BrowsableObjectInfo{T}"/> using custom worker behavior options.
+        /// When overridden in a derived class, loads the items of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> using custom worker behavior options.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         public abstract void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation);
 
         /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo{T}"/> asynchronously using a given items loader.
+        /// Loads the items of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        public virtual void LoadItems(BrowsableObjectInfoLoader itemsLoader)
+        public virtual void LoadItems(IBrowsableObjectInfoLoader itemsLoader)
 
         {
 
@@ -283,7 +398,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo{T}"/> asynchronously.
+        /// Loads the items of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> asynchronously.
         /// </summary>
         public virtual void LoadItemsAsync()
 
@@ -300,17 +415,17 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// When overridden in a derived class, loads the items of this <see cref="BrowsableObjectInfo{T}"/> asynchronously using custom worker behavior options.
+        /// When overridden in a derived class, loads the items of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> asynchronously using custom worker behavior options.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         public abstract void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation);
 
         /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo{T}"/> asynchronously using a given items loader.
+        /// Loads the items of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> asynchronously using a given items loader.
         /// </summary>
         /// <param name="itemsLoader">A custom items loader.</param>
-        public virtual void LoadItemsAsync(BrowsableObjectInfoLoader itemsLoader)
+        public virtual void LoadItemsAsync(IBrowsableObjectInfoLoader itemsLoader)
 
         {
 
@@ -325,29 +440,28 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// When overridden in a derived class, returns the parent of this <see cref="BrowsableObjectInfo{T}"/>.
+        /// When overridden in a derived class, returns the parent of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
-        /// <returns>The parent of this <see cref="BrowsableObjectInfo{T}"/>.</returns>
-        protected abstract IBrowsableObjectInfo GetParent();
+        /// <returns>The parent of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</returns>
+        protected abstract TParent GetParent();
 
         // /// <summary>
-        // /// Frees the <see cref="ArchiveFileStream"/> property to unlock the archive referenced by it and makes it <see langword="null"/>. Calling this method will erase all the <see cref="Items"/> of this <see cref="ShellObjectInfo{T}"/> in memory.
+        // /// Frees the <see cref="ArchiveFileStream"/> property to unlock the archive referenced by it and makes it <see langword="null"/>. Calling this method will erase all the <see cref="Items"/> of this <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> in memory.
         // /// </summary>
 
         // public abstract bool IsRenamingSupported { get; }
 
         ///// <summary>
-        ///// When overridden in a derived class, renames or move to a relative path, or both, the current <see cref="BrowsableObjectInfo{T}"/> with the specified name.
+        ///// When overridden in a derived class, renames or move to a relative path, or both, the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> with the specified name.
         ///// </summary>
-        ///// <param name="newValue">The new name or relative path for this <see cref="BrowsableObjectInfo{T}"/>.</param>
+        ///// <param name="newValue">The new name or relative path for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</param>
         //public abstract void Rename(string newValue);
 
         /// <summary>
-        /// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool?)"/>, you'll have to override this method if your class has to reinitialize members.
+        /// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
-        /// <param name="browsableObjectInfo">The cloned <see cref="BrowsableObjectInfo{T}"/>.</param>
-        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        protected virtual void OnDeepClone(BrowsableObjectInfo<T> browsableObjectInfo, bool? preserveIds)
+        /// <param name="browsableObjectInfo">The cloned <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</param>
+        protected virtual void OnDeepClone(BrowsableObjectInfo<TParent, TItems, TFactory> browsableObjectInfo)
 
         {
 
@@ -355,13 +469,13 @@ namespace WinCopies.IO
 
             if (!(ItemsLoader is null))
 
-                browsableObjectInfo.ItemsLoader = (IBrowsableObjectInfoLoader)ItemsLoader.DeepClone(preserveIds);
+                browsableObjectInfo.ItemsLoader = (IBrowsableObjectInfoLoader)ItemsLoader.DeepClone();
 
             // browsableObjectInfo.SetItemsProperty();
 
             //if (Factory.UseRecursively)
 
-            browsableObjectInfo.Factory = (T)(IBrowsableObjectInfoFactory)browsableObjectInfo.Factory.DeepClone(preserveIds);
+            browsableObjectInfo.Factory = (TFactory)(IBrowsableObjectInfoFactory)browsableObjectInfo.Factory.DeepClone();
 
             // else
 
@@ -372,17 +486,15 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// When overridden in a derived class, gets a deep clone of this <see cref="BrowsableObjectInfo{T}"/>. The <see cref="OnDeepClone(BrowsableObjectInfo{T}, bool?)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool?)"/>, you'll have to override this method if your class has to reinitialize members.
+        /// When overridden in a derived class, gets a deep clone of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. The <see cref="OnDeepClone(BrowsableObjectInfo{TParent, TItems, TFactory})"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
-        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        protected abstract BrowsableObjectInfo<T> DeepCloneOverride(bool? preserveIds);
+        protected abstract BrowsableObjectInfo<TParent, TItems, TFactory> DeepCloneOverride();
 
         /// <summary>
-        /// Gets a deep clone of this <see cref="BrowsableObjectInfo{T}"/>.
+        /// Gets a deep clone of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
-        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
-        /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo{T}"/>.</returns>
-        public object DeepClone(bool? preserveIds)
+        /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</returns>
+        public object DeepClone()
 
         {
 
@@ -396,9 +508,9 @@ namespace WinCopies.IO
 
             ((IDisposable)this).ThrowIfDisposingOrDisposed();
 
-            BrowsableObjectInfo<T> browsableObjectInfo = DeepCloneOverride(preserveIds);
+            BrowsableObjectInfo<TParent, TItems, TFactory> browsableObjectInfo = DeepCloneOverride();
 
-            OnDeepClone(browsableObjectInfo, preserveIds);
+            OnDeepClone(browsableObjectInfo);
 
             return browsableObjectInfo;
 
@@ -411,7 +523,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Disposes the current <see cref="BrowsableObjectInfo{T}"/> and its parent and items recursively.
+        /// Disposes the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> and its parent and items recursively.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
         public void Dispose() => Dispose(false, false, false, false);
@@ -425,7 +537,7 @@ namespace WinCopies.IO
         /// <param name="disposeItems">Whether to dispose the items of the current path.</param>
         /// <param name="recursively">Whether to dispose recursively.</param>
         /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
-        protected virtual void DisposeOverride(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
+        protected virtual void Dispose(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
 
         {
 
@@ -457,18 +569,18 @@ namespace WinCopies.IO
 
             if (disposeItems)
 
-                while (items.Count > 0)
+                while (ItemCollection.Count > 0)
                 {
 
                     Items[0].Dispose(disposeItemsLoader && recursively, false, recursively, recursively);
 
-                    items.RemoveAt(0);
+                    ItemCollection.RemoveAt(0);
 
                 }
 
             else if (disposing)
 
-                items.Clear();
+                ItemCollection.Clear();
 
         }
 
@@ -486,7 +598,7 @@ namespace WinCopies.IO
 
             IsDisposing = true;
 
-            DisposeOverride(true, disposeItemsLoader, disposeParent, disposeItems, recursively);
+            Dispose(true, disposeItemsLoader, disposeParent, disposeItems, recursively);
 
             GC.SuppressFinalize(this);
 
@@ -496,13 +608,13 @@ namespace WinCopies.IO
 
         }
 
-#pragma warning disable CS1591
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         ~BrowsableObjectInfo()
-#pragma warning restore CS1591
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         {
 
-            DisposeOverride(false, false, false, false, false);
+            Dispose(false, false, false, false, false);
 
         }
 
@@ -514,7 +626,14 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
         /// </summary>
-        public virtual bool NeedsObjectsReconstruction => (!(ItemsLoader is null) && ItemsLoader.NeedsObjectsReconstruction) || Factory.NeedsObjectsReconstruction;
+        public virtual bool NeedsObjectsOrValuesReconstruction => (!(ItemsLoader is null) && ItemsLoader.NeedsObjectsOrValuesReconstruction) || Factory.NeedsObjectsOrValuesReconstruction;
+
+        public void AddTo(IBrowsableObjectInfoCollection<TItems> collection) => ItemCollection.Add(new BrowsableObjectInfoModifier<TParent, TItems, TFactory>(this));
+
+        void InsertTo(IBrowsableObjectInfoCollection<IBrowsableObjectInfo> collection, int index);
+
+        void RemoveFrom(IBrowsableObjectInfoCollection<IBrowsableObjectInfo> collection);
+
     }
 
 }

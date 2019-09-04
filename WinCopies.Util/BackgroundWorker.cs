@@ -10,7 +10,7 @@ namespace WinCopies.Util
     /// <summary>
     /// Represents a BackgroundWorker that runs in a MTA thread by default and automatically stops on background when reports progress.
     /// </summary>
-    public class BackgroundWorker : Component, IBackgroundWorker2
+    public class BackgroundWorker : Component, IBackgroundWorker
     {
 
         ///// <para>FR: Cet evènement se produit lorsque le thread d'arrière plan démarre. Placez votre code de traitement ici.</para>

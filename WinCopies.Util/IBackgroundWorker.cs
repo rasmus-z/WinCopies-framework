@@ -47,14 +47,24 @@ namespace WinCopies.Util
         bool WorkerSupportsCancellation { get; set; }
 
         /// <summary>
+        /// Cancels the working.
+        /// </summary>
+        void Cancel();
+
+        /// <summary>
+        /// Cancels the working.
+        /// </summary>
+        void Cancel(object stateInfo = null);
+
+        /// <summary>
         /// Cancels the working asynchronously.
         /// </summary>
         void CancelAsync();
 
         /// <summary>
-        /// Cancels the working.
+        /// Cancels the working asynchronously.
         /// </summary>
-        void Cancel();
+        void CancelAsync(object stateInfo = null);
 
         /// <summary>
         /// Notifies of the progress.
@@ -102,25 +112,6 @@ namespace WinCopies.Util
         /// <para>The event handler is running in the background thread.</para>
         /// </summary>
         event RunWorkerCompletedEventHandler RunWorkerCompleted;
-
-    }
-
-    /// <summary>
-    /// Represents a BackgroundWorker that runs in a MTA thread by default and automatically stops on background when reports progress. This interface is the successor of the <see cref="IBackgroundWorker"/> interface, but it still implement the <see cref="IBackgroundWorker"/> interface for compatibility.
-    /// </summary>
-    public interface IBackgroundWorker2 : IBackgroundWorker
-
-    {
-
-        /// <summary>
-        /// Cancels the working asynchronously.
-        /// </summary>
-        void CancelAsync(object stateInfo = null);
-
-        /// <summary>
-        /// Cancels the working.
-        /// </summary>
-        void Cancel(object stateInfo = null);
 
     }
 }

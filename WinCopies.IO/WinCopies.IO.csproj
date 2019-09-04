@@ -127,12 +127,13 @@
     <Compile Include="ArchiveItemInfoFactory.cs" />
     <Compile Include="ArchiveLoader.cs" />
     <Compile Include="BrowsableObjectInfo.cs" />
+    <Compile Include="BrowsableObjectInfoCollection.cs" />
     <Compile Include="BrowsableObjectInfoFactory.cs" />
     <Compile Include="BrowsableObjectInfoLoader.cs" />
-    <Compile Include="BrowsableObjeectInfoCollection.cs" />
     <Compile Include="DesktopAppInfo.cs" />
     <Compile Include="FileSystemObject.cs" />
     <Compile Include="FileSystemObjectComparer.cs" />
+    <Compile Include="FileSystemObjectInfo.cs" />
     <Compile Include="FileSystemObjectLoader.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="FolderLoader.cs" />
