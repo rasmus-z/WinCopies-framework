@@ -11,7 +11,7 @@ namespace WinCopies.IO
 
         public string NormalizedPath { get; }
 
-        protected PathInfo(string path, string normalizedPath, FileType fileType) : base(path, fileType) => NormalizedPath = normalizedPath;
+        protected PathInfo(string path, string normalizedPath) : base(path) => NormalizedPath = normalizedPath;
 
     }
 }

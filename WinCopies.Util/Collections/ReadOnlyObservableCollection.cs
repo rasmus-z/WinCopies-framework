@@ -29,5 +29,12 @@ namespace WinCopies.Collections
         public ReadOnlyObservableCollection(ObservableCollection<T> list) : base(list) => list.CollectionChanging += (object sender, NotifyCollectionChangedEventArgs e) => OnCollectionChanging(e);
 
         protected virtual void OnCollectionChanging(NotifyCollectionChangedEventArgs e) => CollectionChanging?.Invoke(this, e);
+
+        void IReadOnlyList<T>.Clear() => ((IReadOnlyList<T>)this).Clear();
+
+        void IReadOnlyList<T>.RemoveAt(int index) => ((IReadOnlyList<T>)this).RemoveAt(index);
+
+        T IReadOnlyList<T>.this[int index] { get => this[index]; set => ((IReadOnlyList<T>)this)[index] = value; }
+
     }
 }

@@ -59,17 +59,17 @@ namespace WinCopies.Collections
 
         public ReadOnlyCollection(System.Collections.Generic.IList<T> list) : base(list) { } 
 
-        T IReadOnlyList<T>.this[int index] { get => this[index]; set => throw new InvalidOperationException("This collection is read-only.") ; } 
+        T IReadOnlyList<T>.this[int index] { get => this[index]; set => throw new NotSupportedException("This collection is read-only.") ; } 
 
-        // int IReadOnlyCollection<T>.Count => Count;
+        // int IReadOnlyCollection<T>.Count => Count ; 
 
-        bool IReadOnlyList<T>.IsReadOnly => true ; 
+        // bool IReadOnlyList<T>.IsReadOnly => true ; 
 
-        void IReadOnlyList<T>.Clear() => throw new InvalidOperationException("This collection is read-only.") ; 
+        void IReadOnlyList<T>.Clear() => throw new NotSupportedException("This collection is read-only.") ; 
 
         // IEnumerator<T> IReadOnlyCollection<T>.GetEnumerator() => throw new NotImplementedException();
 
-        void IReadOnlyList<T>.RemoveAt(int index) => throw new InvalidOperationException("This collection is read-only.") ; 
+        void IReadOnlyList<T>.RemoveAt(int index) => throw new NotSupportedException("This collection is read-only.") ; 
 
     }
 

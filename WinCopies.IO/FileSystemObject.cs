@@ -31,22 +31,14 @@ namespace WinCopies.IO
         public abstract string Name { get; }
 
         /// <summary>
-        /// The file type of this <see cref="FileSystemObject"/>.
-        /// </summary>
-        public virtual FileType FileType { get; private set; } = FileType.Other;
-
-        /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="FileSystemObject"/> class.
         /// </summary>
         /// <param name="path">The path of this <see cref="FileSystemObject"/>.</param>
-        /// <param name="fileType">The <see cref="FileType"/> of this <see cref="FileSystemObject"/>.</param>
-        protected FileSystemObject(string path, FileType fileType)
+        protected FileSystemObject(string path)
 
         {
 
             Path = path;
-
-            FileType = fileType;
 
         }
 
@@ -58,19 +50,19 @@ namespace WinCopies.IO
         public virtual bool Equals(IFileSystemObject fileSystemObject) => Equals(fileSystemObject as object);
 
         /// <summary>
-        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether both objects's references are equal, <paramref name="obj"/> implements the <see cref="IFileSystemObject"/> interface and <see cref="FileType"/> and <see cref="Path"/> properties are equal.
+        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether both objects's references are equal, <paramref name="obj"/> implements the <see cref="IFileSystemObject"/> interface and <see cref="Path"/> properties are equal.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
         public override bool Equals(object obj) => obj is null ? false : ReferenceEquals(this, obj)
-                ? true : obj is IFileSystemObject _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower() // TODO: make better string comparison
+                ? true : obj is IFileSystemObject _obj ? Path.ToLower() == _obj.Path.ToLower() // TODO: make better string comparison
                 : false;
 
         /// <summary>
         /// Gets an hash code for this <see cref="FileSystemObject"/>.
         /// </summary>
-        /// <returns>The hash code of the <see cref="FileType"/> and the <see cref="Path"/> property.</returns>
-        public override int GetHashCode() => FileType.GetHashCode() ^ Path.ToLower().GetHashCode();
+        /// <returns>The hash code of the <see cref="Path"/> property.</returns>
+        public override int GetHashCode() => Path.ToLower().GetHashCode();
 
         /// <summary>
         /// Gets a string representation of this <see cref="FileSystemObject"/>.
@@ -99,7 +91,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is lesser than the <see cref="FileSystemObject"/> to compare with..</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is lesser than the <see cref="FileSystemObject"/> to compare with.</returns>
         public static bool operator <(FileSystemObject left, FileSystemObject right) => left is null ? right is object : left.CompareTo(right) < 0;
 
         /// <summary>
@@ -107,7 +99,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is lesser or equal to the <see cref="FileSystemObject"/> to compare with..</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is lesser or equal to the <see cref="FileSystemObject"/> to compare with.</returns>
         public static bool operator <=(FileSystemObject left, FileSystemObject right) => left is null || left.CompareTo(right) <= 0;
 
         /// <summary>
@@ -115,7 +107,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is greater than the <see cref="FileSystemObject"/> to compare with..</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is greater than the <see cref="FileSystemObject"/> to compare with.</returns>
         public static bool operator >(FileSystemObject left, FileSystemObject right) => left is object && left.CompareTo(right) > 0;
 
         /// <summary>
@@ -123,7 +115,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is greater or equal to the <see cref="FileSystemObject"/> to compare with..</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is greater or equal to the <see cref="FileSystemObject"/> to compare with.</returns>
         public static bool operator >=(FileSystemObject left, FileSystemObject right) => left is null ? right is null : left.CompareTo(right) >= 0;
 
         /// <summary>

@@ -40,12 +40,12 @@ namespace WinCopies.IO
         /// </summary>
         bool IsBrowsable { get; }
 
-        /// <summary>
-        /// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
-        /// <exception cref="ArgumentNullException">value is null.</exception>
-        IBrowsableObjectInfoFactory Factory { get; }
+        ///// <summary>
+        ///// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
+        ///// </summary>
+        ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
+        ///// <exception cref="ArgumentNullException">value is null.</exception>
+        //IBrowsableObjectInfoFactory Factory { get; }
 
         /// <summary>
         /// Gets a value that indicates whether the items of this <see cref="IBrowsableObjectInfo"/> are currently loaded.
@@ -53,15 +53,15 @@ namespace WinCopies.IO
         bool AreItemsLoaded { get; }
 
         /// <summary>
-        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
+        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{T}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
         IBrowsableObjectInfoLoader ItemsLoader { get; }
 
-        /// <summary>
-        /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        IReadOnlyBrowsableObjectInfoCollection<IBrowsableObjectInfo> Items { get; }
+        ///// <summary>
+        ///// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
+        ///// </summary>
+        //IReadOnlyBrowsableObjectInfoCollection<IBrowsableObjectInfo> Items { get; }
 
         bool HasParent { get; }
 
@@ -102,9 +102,9 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
         void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation);
 
-        IPathModifier RegisterLoader(IBrowsableObjectInfoLoader browsableObjectInfoLoader);
+        // IPathModifier<IBrowsableObjectInfo, IBrowsableObjectInfo> RegisterLoader(IBrowsableObjectInfoLoader browsableObjectInfoLoader);
 
-        void UnregisterLoader();
+        // void UnregisterLoader();
 
         ///// <summary>
         ///// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
@@ -128,51 +128,36 @@ namespace WinCopies.IO
         ///// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="IBrowsableObjectInfo"/>.</returns>
         //IBrowsableObjectInfo Clone();
 
-        /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
-        /// </summary>
-        /// <param name="disposeItemsLoader">Whether to dispose the items loader of the current path.</param>
-        /// <param name="disposeParent">Whether to dispose the parent of the current path.</param>
-        /// <param name="disposeItems">Whether to dispose the items of the current path.</param>
-        /// <param name="recursively">Whether to dispose recursively.</param>
-        /// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
-        void Dispose(bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively);
-
-        void AddTo(IBrowsableObjectInfoCollection<IBrowsableObjectInfo> collection);
-
-        void InsertTo(IBrowsableObjectInfoCollection<IBrowsableObjectInfo> collection, int index);
-
-        void RemoveFrom(IBrowsableObjectInfoCollection<IBrowsableObjectInfo> collection);
+        ///// <summary>
+        ///// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
+        ///// </summary>
+        ///// <param name="disposeItemsLoader">Whether to dispose the items loader of the current path.</param>
+        ///// <param name="disposeParent">Whether to dispose the parent of the current path.</param>
+        ///// <param name="disposeItems">Whether to dispose the items of the current path.</param>
+        ///// <param name="recursively">Whether to dispose recursively.</param>
+        ///// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
+        //void Dispose(bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively);
 
     }
 
-    public interface IBrowsableObjectInfo<TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
+    //public interface IBrowsableObjectInfo<TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
+
+    //{
+
+    //}
+
+    public interface IBrowsableObjectInfo<TItems, TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory where TItems : IBrowsableObjectInfo
 
     {
 
         new TFactory Factory { get; set; }
-
-    }
-
-    public interface IBrowsableObjectInfo<TParent, TItems, TFactory> : IBrowsableObjectInfo<TFactory> where TParent : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory where TItems : class, IBrowsableObjectInfo
-
-    {
-
-        /// <summary>
-        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
-        /// </summary>
-        new TParent Parent { get; }
 
         /// <summary>
         /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
         new IReadOnlyBrowsableObjectInfoCollection<TItems> Items { get; }
 
-        void AddTo(IBrowsableObjectInfoCollection<TItems> collection);
-
-        void InsertTo(IBrowsableObjectInfoCollection<TItems> collection, int index);
-
-        void RemoveFrom(IBrowsableObjectInfoCollection<TItems> collection);
+        // IPathModifier<IBrowsableObjectInfo<TItems, TFactory>, TItems> RegisterLoader(IBrowsableObjectInfoLoader browsableObjectInfoLoader);
 
     }
 

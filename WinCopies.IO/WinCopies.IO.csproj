@@ -87,7 +87,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Reactive, Version=4.2.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.4.2.0-preview.566\lib\net46\System.Reactive.dll</HintPath>
+      <HintPath>..\packages\System.Reactive.4.2.0-preview.625\lib\net46\System.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.4.3.1\lib\net462\System.Runtime.dll</HintPath>
@@ -95,7 +95,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.6.0-preview7.19362.9\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.6.0-preview9.19421.4\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -130,7 +130,6 @@
     <Compile Include="BrowsableObjectInfoCollection.cs" />
     <Compile Include="BrowsableObjectInfoFactory.cs" />
     <Compile Include="BrowsableObjectInfoLoader.cs" />
-    <Compile Include="DesktopAppInfo.cs" />
     <Compile Include="FileSystemObject.cs" />
     <Compile Include="FileSystemObjectComparer.cs" />
     <Compile Include="FileSystemObjectInfo.cs" />
@@ -146,7 +145,7 @@
     <Compile Include="IFileSystemObject.cs" />
     <Compile Include="IFileSystemObjectComparer.cs" />
     <Compile Include="IOException.cs" />
-    <Compile Include="PathModifier.cs" />
+    <Compile Include="Old.cs" />
     <Compile Include="IRegistryItemInfo.cs" />
     <Compile Include="IRegistryItemInfoFactory.cs" />
     <Compile Include="IShellObjectInfo.cs" />
@@ -169,8 +168,6 @@
     <Compile Include="ShellObjectInfo.cs" />
     <Compile Include="ShellObjectInfoFactory.cs" />
     <Compile Include="Size.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="WindowsStoreAppLauncherInterop.cs" />
     <Compile Include="WMIItemInfo.cs" />
     <Compile Include="WMIItemInfoFactoryOptions.cs" />
     <Compile Include="WMILoader.cs" />
@@ -221,6 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="ClassDiagram.cd" />
     <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>

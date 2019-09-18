@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:WinCopies.IO"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <sys:String x:Key="NotBrowsableObject" >Items can only be loaded from an items element (folder, drive, archive or special folder). The file type of this browsable object is {0} and the file system object of this browsable object is {1}</sys:String>
+    <sys:String x:Key="NotBrowsableObject" >Items can only be loaded from browsable object.</sys:String>
     <sys:String x:Key="FileTypeAndSpecialFolderNotCorrespond" >'{0}' and '{1}' are not corresponding. '{0}' is {2} and '{1}' is {3}</sys:String>
     <sys:String x:Key="BackgroundWorkerIsBusy" >The BackgroundWorker is currently busy.</sys:String>
     <sys:String x:Key="NotValidRegistryKey" >'{0}' is not a valid registry key.</sys:String>

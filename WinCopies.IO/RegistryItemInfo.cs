@@ -40,8 +40,13 @@ namespace WinCopies.IO
 
     }
 
-    public static class RegistryItemInfo
+    /// <summary>
+    /// Represents a Windows registry item.
+    /// </summary>
+    public class RegistryItemInfo/*<TItems, TFactory>*/ : BrowsableObjectInfo/*<TItems, TFactory>*/, IRegistryItemInfo // where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
     {
+
+        // public override bool IsRenamingSupported => false;
 
         /// <summary>
         /// Gets a default comparer for <see cref="FileSystemObject"/>s.
@@ -51,26 +56,16 @@ namespace WinCopies.IO
 
         public static DeepClone<RegistryKey> DefaultRegistryKeyDeepClone { get; } = registryKey => Registry.OpenRegistryKey(registryKey.Name);
 
-    }
-
-    /// <summary>
-    /// Represents a Windows registry item that can be used with interoperability with the other <see cref="IBrowsableObjectInfo"/> objects.
-    /// </summary>
-    public class RegistryItemInfo<TParent, TItems, TFactory> : BrowsableObjectInfo<TParent, TItems, TFactory>, IRegistryItemInfo where TParent : class, IRegistryItemInfo where TItems : class, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
-    {
-
-        // public override bool IsRenamingSupported => false;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
         public RegistryItemInfo() : this(default(TFactory)) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{T}"/> use to create new instances of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class.</param>
-        public RegistryItemInfo(TFactory factory) : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default), FileType.SpecialFolder, (TFactory)(object.Equals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TParent, TItems>() : factory))
+        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{TPath, TItems, TFactory}"/> use to create new instances of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class.</param>
+        public RegistryItemInfo(TFactory factory) : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default), (TFactory)(object.ReferenceEquals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TItems>() : factory))
         {
 
             Name = Path;
@@ -80,17 +75,17 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
+        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
         public RegistryItemInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate) : this(registryKey, registryKeyDelegate, default(TFactory)) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
-        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{T}"/> use to create new instances of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class.</param>
-        public RegistryItemInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, TFactory factory) : base(registryKey.Name, FileType.SpecialFolder, (TFactory)(object.Equals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TParent, TItems>() : factory))
+        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
+        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{TPath, TItems, TFactory}"/> use to create new instances of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class.</param>
+        public RegistryItemInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, TFactory factory) : base(registryKey.Name, (TFactory)(object.ReferenceEquals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TItems>() : factory))
         {
 
             string[] name = registryKey.Name.Split(IO.Path.PathSeparator);
@@ -106,17 +101,17 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
+        /// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
         public RegistryItemInfo(string path) : this(path, default(TFactory)) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
-        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{T}"/> use to create new instances of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class.</param>
-        public RegistryItemInfo(string path, TFactory factory) : base(path, FileType.SpecialFolder, (TFactory)(object.Equals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TParent, TItems>() : factory))
+        /// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
+        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{TPath, TItems, TFactory}"/> use to create new instances of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class.</param>
+        public RegistryItemInfo(string path, TFactory factory) : base(path, (TFactory)(object.ReferenceEquals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TItems>() : factory))
         {
 
             string[] name = path.Split(IO.Path.PathSeparator);
@@ -132,19 +127,19 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
-        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
+        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
+        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
         public RegistryItemInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, string valueName) : this(registryKey, registryKeyDelegate, valueName, default) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
-        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
-        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{T}"/> use to create new instances of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class.</param>
-        public RegistryItemInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, string valueName, TFactory factory) : base(registryKey.Name, FileType.Other, (TFactory)(object.Equals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TParent, TItems>() : factory))
+        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
+        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
+        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{TPath, TItems, TFactory}"/> use to create new instances of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class.</param>
+        public RegistryItemInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, string valueName, TFactory factory) : base(registryKey.Name, (TFactory)(object.ReferenceEquals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TItems>() : factory))
 
         {
 
@@ -159,19 +154,19 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
-        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
+        /// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
+        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
         public RegistryItemInfo(string registryKeyPath, string valueName) : this(Registry.OpenRegistryKey(registryKeyPath), DefaultRegistryKeyDeepClone, valueName, default) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="RegistryItemInfo{TItems, TFactory}"/>s.
         /// </summary>
-        /// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
-        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.</param>
-        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{T}"/> use to create new instances of the <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> class.</param>
-        public RegistryItemInfo(string registryKeyPath, string valueName, TFactory factory) : this(Registry.OpenRegistryKey(registryKeyPath), DefaultRegistryKeyDeepClone, valueName, (TFactory)(object.Equals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TParent, TItems>() : factory)) { }
+        /// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
+        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.</param>
+        /// <param name="factory">The factory this <see cref="RegistryItemInfo{TItems, TFactory}"/> and associated <see cref="RegistryKeyLoader{TPath, TItems, TFactory}"/> use to create new instances of the <see cref="RegistryItemInfo{TItems, TFactory}"/> class.</param>
+        public RegistryItemInfo(string registryKeyPath, string valueName, TFactory factory) : this(Registry.OpenRegistryKey(registryKeyPath), DefaultRegistryKeyDeepClone, valueName, (TFactory)(object.ReferenceEquals(factory, null) ? (IRegistryItemInfoFactory)new RegistryItemInfoFactory<TItems>() : factory)) { }
 
         private const int FileIcon = 0;
         private const int ComputerIcon = 15;
@@ -208,16 +203,16 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// The Windows registry item type of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.
+        /// The Windows registry item type of this <see cref="RegistryItemInfo{TItems, TFactory}"/>.
         /// </summary>
         public RegistryItemType RegistryItemType { get; }
 
         private RegistryKey _registryKey;
 
-        private readonly DeepClone<RegistryKey> _registryKeyDelegate;
+        private DeepClone<RegistryKey> _registryKeyDelegate;
 
         /// <summary>
-        /// The <see cref="Microsoft.Win32.RegistryKey"/> that this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.
+        /// The <see cref="Microsoft.Win32.RegistryKey"/> that this <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.
         /// </summary>
         public RegistryKey RegistryKey
 
@@ -238,7 +233,7 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Opens the <see cref="RegistryKey"/> that this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents.
+        /// Opens the <see cref="RegistryKey"/> that this <see cref="RegistryItemInfo{TItems, TFactory}"/> represents.
         /// </summary>
         public void OpenRegistryKey()
         {
@@ -252,55 +247,55 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Opens the <see cref="RegistryKey"/> that this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents using custom <see cref="RegistryKeyPermissionCheck"/> and <see cref="RegistryRights"/>.
+        /// Opens the <see cref="RegistryKey"/> that this <see cref="RegistryItemInfo{TItems, TFactory}"/> represents using custom <see cref="RegistryKeyPermissionCheck"/> and <see cref="RegistryRights"/>.
         /// </summary>
         /// <param name="registryKeyPermissionCheck">Specifies whether security checks are performed when opening the registry key and accessing its name/value pairs.</param>
         /// <param name="registryRights">Specifies the access control rights that can be applied to the registry objects in registry key's scope.</param>
         public void OpenRegistryKey(RegistryKeyPermissionCheck registryKeyPermissionCheck, RegistryRights registryRights) => _registryKey = Registry.OpenRegistryKey(Path, registryKeyPermissionCheck, registryRights);
 
         /// <summary>
-        /// Opens the <see cref="RegistryKey"/> that this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> represents with a <see cref="bool"/> value that indicates whether the registry key has to be opened with write-rights.
+        /// Opens the <see cref="RegistryKey"/> that this <see cref="RegistryItemInfo{TItems, TFactory}"/> represents with a <see cref="bool"/> value that indicates whether the registry key has to be opened with write-rights.
         /// </summary>
         /// <param name="writable">A <see cref="bool"/> value that indicates whether the registry key has to be opened with write-rights</param>
         public void OpenRegistryKey(bool writable) => _registryKey = Registry.OpenRegistryKey(Path, writable);
 
         /// <summary>
-        /// Gets the localized path of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.
+        /// Gets the localized path of this <see cref="RegistryItemInfo{TItems, TFactory}"/>.
         /// </summary>
         public override string LocalizedName => Name;
 
         /// <summary>
-        /// Gets the name of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.
+        /// Gets the name of this <see cref="RegistryItemInfo{TItems, TFactory}"/>.
         /// </summary>
         public override string Name { get; }
 
         /// <summary>
-        /// Gets the small <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.
+        /// Gets the small <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo{TItems, TFactory}"/>.
         /// </summary>
         public override BitmapSource SmallBitmapSource => TryGetBitmapSource(new System.Drawing.Size(16, 16));
 
         /// <summary>
-        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.
+        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo{TItems, TFactory}"/>.
         /// </summary>
         public override BitmapSource MediumBitmapSource => TryGetBitmapSource(new System.Drawing.Size(48, 48));
 
         /// <summary>
-        /// Gets the large <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.
+        /// Gets the large <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo{TItems, TFactory}"/>.
         /// </summary>
         public override BitmapSource LargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(128, 128));
 
         /// <summary>
-        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.
+        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo{TItems, TFactory}"/>.
         /// </summary>
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(256, 256));
 
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> is browsable.
+        /// Gets a value that indicates whether this <see cref="RegistryItemInfo{TItems, TFactory}"/> is browsable.
         /// </summary>
         public override bool IsBrowsable => RegistryItemType == RegistryItemType.RegistryRoot || RegistryItemType == RegistryItemType.RegistryKey;
 
         ///// <summary>
-        ///// Gets or sets the factory for this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> and its associated <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/>.
+        ///// Gets or sets the factory for this <see cref="RegistryItemInfo{TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="RegistryItemInfo{TItems, TFactory}"/> and its associated <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/>.
         ///// </summary>
         ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
         ///// <exception cref="ArgumentNullException">value is null.</exception>
@@ -310,7 +305,7 @@ namespace WinCopies.IO
         /// Gets a deep clone of this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         /// </summary>
         /// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</returns>
-        protected override BrowsableObjectInfo<TParent, TItems, TFactory> DeepCloneOverride()
+        protected override BrowsableObjectInfo DeepCloneOverride()
         {
 
             switch (RegistryItemType)
@@ -320,11 +315,11 @@ namespace WinCopies.IO
                 case RegistryItemType.RegistryRoot:
                 case RegistryItemType.RegistryKey:
 
-                    return new RegistryItemInfo<TParent, TItems, TFactory>(_registryKeyDelegate(_registryKey), _registryKeyDelegate, (TFactory)Factory.DeepClone());
+                    return new RegistryItemInfo<TItems, TFactory>(_registryKeyDelegate(_registryKey), _registryKeyDelegate, (TFactory)Factory.DeepClone());
 
                 case RegistryItemType.RegistryValue:
 
-                    return new RegistryItemInfo<TParent, TItems, TFactory>(_registryKeyDelegate(_registryKey) /*Path.Substring(0, Path.LastIndexOf(IO.Path.PathSeparator))*/, _registryKeyDelegate, Path.Substring(Path.LastIndexOf(IO.Path.PathSeparator) + 1), (TFactory)Factory.DeepClone());
+                    return new RegistryItemInfo<TItems, TFactory>(_registryKeyDelegate(_registryKey) /*Path.Substring(0, Path.LastIndexOf(IO.Path.PathSeparator))*/, _registryKeyDelegate, Path.Substring(Path.LastIndexOf(IO.Path.PathSeparator) + 1), (TFactory)Factory.DeepClone());
 
                 default:
 
@@ -340,10 +335,10 @@ namespace WinCopies.IO
         public override bool NeedsObjectsOrValuesReconstruction => base.NeedsObjectsOrValuesReconstruction || !(_registryKey is null); // If _registryKey is null, reconstructing registry does not make sense, so we return false.
 
         /// <summary>
-        /// Returns the parent of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.
+        /// Returns the parent of this <see cref="RegistryItemInfo{TItems, TFactory}"/>.
         /// </summary>
-        /// <returns>The parent of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.</returns>
-        protected override TParent GetParent()
+        /// <returns>The parent of this <see cref="RegistryItemInfo{TItems, TFactory}"/>.</returns>
+        protected override IBrowsableObjectInfo GetParent()
         {
 
             switch (RegistryItemType)
@@ -356,7 +351,7 @@ namespace WinCopies.IO
 
                     if (path.Length == 1)
 
-                        return (TParent)Factory.GetBrowsableObjectInfo();
+                        return Factory.GetBrowsableObjectInfo();
 
                     var stringBuilder = new StringBuilder();
 
@@ -364,11 +359,11 @@ namespace WinCopies.IO
 
                         _ = stringBuilder.Append(path);
 
-                    return (TParent)Factory.GetBrowsableObjectInfo(stringBuilder.ToString());
+                    return Factory.GetBrowsableObjectInfo(stringBuilder.ToString());
 
                 case RegistryItemType.RegistryValue:
 
-                    return (TParent)Factory.GetBrowsableObjectInfo(RegistryKey, DefaultRegistryKeyDeepClone);
+                    return Factory.GetBrowsableObjectInfo(RegistryKey, DefaultRegistryKeyDeepClone);
 
                 default:
 
@@ -379,34 +374,44 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Disposes the current <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> and its parent and items recursively.
+        /// Disposes the current <see cref="RegistryItemInfo{TItems, TFactory}"/> and its parent and items recursively.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/> is busy and does not support cancellation.</exception>
-        protected override void Dispose(bool disposing, bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively)
+        /// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy and does not support cancellation.</exception>
+        protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing, disposeItemsLoader, disposeParent, disposeItems, recursively);
+            base.Dispose(disposing);
 
             _registryKey?.Dispose();
+
+            if (disposing)
+
+            {
+
+                _registryKey = null;
+
+                _registryKeyDelegate = null;
+
+            }
         }
 
         /// <summary>
-        /// Loads the items of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> using custom worker behavior options.
+        /// Loads the items of this <see cref="RegistryItemInfo{TItems, TFactory}"/> using custom worker behavior options.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader)new RegistryKeyLoader<IRegistryItemInfo<IRegistryItemInfoFactory>>((IRegistryItemInfo<IRegistryItemInfoFactory>)this, workerReportsProgress, workerSupportsCancellation, RegistryItemType == RegistryItemType.RegistryRoot ? RegistryItemTypes.RegistryKey : RegistryItemTypes.RegistryKey | RegistryItemTypes.RegistryValue));
+        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader)new RegistryKeyLoader<RegistryItemInfo<TItems, TFactory>, TItems, TFactory>(this, workerReportsProgress, workerSupportsCancellation, RegistryItemType == RegistryItemType.RegistryRoot ? RegistryItemTypes.RegistryKey : RegistryItemTypes.RegistryKey | RegistryItemTypes.RegistryValue));
 
         /// <summary>
-        /// Loads the items of this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> asynchronously using custom worker behavior options.
+        /// Loads the items of this <see cref="RegistryItemInfo{TItems, TFactory}"/> asynchronously using custom worker behavior options.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the worker reports progress</param>
         /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader)new RegistryKeyLoader<IRegistryItemInfo<IRegistryItemInfoFactory>>((IRegistryItemInfo<IRegistryItemInfoFactory>)this, workerReportsProgress, workerSupportsCancellation, RegistryItemType == RegistryItemType.RegistryRoot ? RegistryItemTypes.RegistryKey : RegistryItemTypes.RegistryKey | RegistryItemTypes.RegistryValue));
+        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader)new RegistryKeyLoader<RegistryItemInfo<TItems, TFactory>, TItems, TFactory>(this, workerReportsProgress, workerSupportsCancellation, RegistryItemType == RegistryItemType.RegistryRoot ? RegistryItemTypes.RegistryKey : RegistryItemTypes.RegistryKey | RegistryItemTypes.RegistryValue));
 
         ///// <summary>
-        ///// Renames or move to a relative path, or both, the current <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/> with the specified name.
+        ///// Renames or move to a relative path, or both, the current <see cref="RegistryItemInfo{TItems, TFactory}"/> with the specified name.
         ///// </summary>
-        ///// <param name="newValue">The new name or relative path for this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.</param>
+        ///// <param name="newValue">The new name or relative path for this <see cref="RegistryItemInfo{TItems, TFactory}"/>.</param>
         //public override void Rename(string newValue)
 
         //{
@@ -469,7 +474,7 @@ namespace WinCopies.IO
         public bool Equals(IRegistryItemInfo registryItemInfo) => Equals(registryItemInfo as object);
 
         /// <summary>
-        /// Gets an hash code for this <see cref="RegistryItemInfo{TParent, TItems, TFactory}"/>.
+        /// Gets an hash code for this <see cref="RegistryItemInfo{TItems, TFactory}"/>.
         /// </summary>
         /// <returns>The hash code returned by the <see cref="FileSystemObject.GetHashCode"/> and the hash code of the <see cref="RegistryItemType"/>.</returns>
         public override int GetHashCode() => base.GetHashCode() ^ RegistryItemType.GetHashCode();

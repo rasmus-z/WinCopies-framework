@@ -5,7 +5,7 @@ using WinCopies.Util;
 namespace WinCopies.IO
 {
 
-    public class WMIItemInfoFactory<TParent, TItems> : BrowsableObjectInfoFactory, IWMIItemInfoFactory where TParent : class, IWMIItemInfo where TItems : class, IWMIItemInfo
+    public class WMIItemInfoFactory<TItems> : BrowsableObjectInfoFactory, IWMIItemInfoFactory where TItems : BrowsableObjectInfo, IWMIItemInfo
     {
 
         /// <summary>
@@ -13,7 +13,7 @@ namespace WinCopies.IO
         /// </summary>
         public override bool NeedsObjectsOrValuesReconstruction => !(Options is null);
 
-        protected override BrowsableObjectInfoFactory DeepCloneOverride() => new WMIItemInfoFactory<TParent, TItems>((WMIItemInfoFactoryOptions)Options?.DeepClone(), UseRecursively);
+        protected override BrowsableObjectInfoFactory DeepCloneOverride() => new WMIItemInfoFactory<TItems>((WMIItemInfoFactoryOptions)Options?.DeepClone(), UseRecursively);
 
         private WMIItemInfoFactoryOptions _options;
 
@@ -61,22 +61,22 @@ namespace WinCopies.IO
         public WMIItemInfoFactory(WMIItemInfoFactoryOptions options, bool useRecursively) : base(useRecursively) => _options = options;
 
         /// <summary>
-        /// Gets a new instance of the <see cref="WMIItemInfo{TParent, TItems, TFactory}"/> class.
+        /// Gets a new instance of the <see cref="WMIItemInfo{TItems, TFactory}"/> class.
         /// </summary>
-        /// <returns>A new instance of the <see cref="WMIItemInfo{TParent, TItems, TFactory}"/> class.</returns>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => GetBrowsableObjectInfo(UseRecursively ? (WMIItemInfoFactory<TParent, TItems>)DeepClone() : null);
+        /// <returns>A new instance of the <see cref="WMIItemInfo{TItems, TFactory}"/> class.</returns>
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => GetBrowsableObjectInfo(UseRecursively ? (WMIItemInfoFactory<TItems>)DeepClone() : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate) => GetBrowsableObjectInfo(path, wmiItemType, managementObject, managementObjectDelegate, UseRecursively ? (WMIItemInfoFactory<TParent, TItems>)DeepClone() : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate) => GetBrowsableObjectInfo(path, wmiItemType, managementObject, managementObjectDelegate, UseRecursively ? (WMIItemInfoFactory<TItems>)DeepClone() : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(path, wmiItemType, UseRecursively ? (WMIItemInfoFactory<TParent, TItems>)DeepClone() : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(path, wmiItemType, UseRecursively ? (WMIItemInfoFactory<TItems>)DeepClone() : null);
 
         /// <summary>
-        /// Gets a new instance of the <see cref="WMIItemInfo{TParent, TItems, TFactory}"/> class using a custom <see cref="IWMIItemInfoFactory"/>.
+        /// Gets a new instance of the <see cref="WMIItemInfo{TItems, TFactory}"/> class using a custom <see cref="IWMIItemInfoFactory"/>.
         /// </summary>
-        /// <returns>A new instance of the <see cref="WMIItemInfo{TParent, TItems, TFactory}"/> class.</returns>
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IWMIItemInfoFactory factory) => new WMIItemInfo<TParent, TItems, IWMIItemInfoFactory>(factory);
+        /// <returns>A new instance of the <see cref="WMIItemInfo{TItems, TFactory}"/> class.</returns>
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IWMIItemInfoFactory factory) => new WMIItemInfo<TItems, IWMIItemInfoFactory>(factory);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate, IWMIItemInfoFactory factory) => new WMIItemInfo<TParent, TItems, IWMIItemInfoFactory>(path, wmiItemType, managementObject, managementObjectDelegate, factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate, IWMIItemInfoFactory factory) => new WMIItemInfo<TItems, IWMIItemInfoFactory>(path, wmiItemType, managementObject, managementObjectDelegate, factory);
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, IWMIItemInfoFactory factory) => GetBrowsableObjectInfo(path, wmiItemType, new ManagementObject(new ManagementScope(path, _options?.ConnectionOptions is null ? null : WMIItemInfo.DefaultConnectionOptionsDeepClone(_options?.ConnectionOptions, null)), new ManagementPath(path), _options?.ObjectGetOptions is null ? null : WMIItemInfo.DefaultObjectGetOptionsDeepClone(_options?.ObjectGetOptions)), _managementObject => _managementObject is ManagementClass managementClass ? WMIItemInfo.DefaultManagementClassDeepCloneDelegate(managementClass, null) : _managementObject is ManagementObject __managementObject ? WMIItemInfo.DefaultManagementObjectDeepClone(__managementObject, null) : throw new ArgumentException("The given object must be a ManagementClass or a ManagementObject.", "managementObject"), factory);
     }

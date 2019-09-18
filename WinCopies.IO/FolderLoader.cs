@@ -17,7 +17,7 @@ using static WinCopies.IO.FolderLoader;
 namespace WinCopies.IO
 {
 
-    public interface IFolderLoader<TPath> : IFileSystemObjectLoader<TPath> where TPath : IShellObjectInfo
+    public interface IFolderLoader : IFileSystemObjectLoader
     {
 
         FolderLoaderFileSystemWatcher FileSystemWatcher { get; }
@@ -36,14 +36,14 @@ namespace WinCopies.IO
     /// Provides a background process that can be used to load items of a folder. See the Remarks section.
     /// </summary>
     /// <remarks>
-    /// This loader is not designed for <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/> that have their <see cref="FileSystemObject.FileType"/> property set up with an other value than <see cref="FileType.Folder"/>, <see cref="FileType.Drive"/> or <see cref="FileType.SpecialFolder"/>, even if they can be browsable (e.g. <see cref="FileType.Archive"/>). If the file type of the given <see cref="BrowsableObjectInfoLoader{TPath}.Path"/> is not supported by this loader, you'll have to use a specific loader or to inherit from this loader.
+    /// This loader is not designed for <see cref="ShellObjectInfo{TItems, TArchiveItemInfoItems, TFactory}"/> that have their <see cref="FileSystemObject.FileType"/> property set up with an other value than <see cref="FileType.Folder"/>, <see cref="FileType.Drive"/> or <see cref="FileType.SpecialFolder"/>, even if they can be browsable (e.g. <see cref="FileType.Archive"/>). If the file type of the given <see cref="BrowsableObjectInfoLoader{TPath}.Path"/> is not supported by this loader, you'll have to use a specific loader or to inherit from this loader.
     /// </remarks>
-    public class FolderLoader<T> : FileSystemObjectLoader<T>, IFolderLoader<T> where T : class, IShellObjectInfo, IBrowsableObjectInfo<IShellObjectInfoFactory>
+    public class FolderLoader<TPath, TItems, TFactory> : FileSystemObjectLoader<TPath, TItems, TFactory>, IFolderLoader where TPath : BrowsableObjectInfo<TItems, TFactory>, IShellObjectInfo where TItems : BrowsableObjectInfo, IFileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory, IShellObjectInfoFactory
     {
 
         public override bool NeedsObjectsOrValuesReconstruction => true;
 
-        protected override BrowsableObjectInfoLoader<T> DeepCloneOverride() => new FolderLoader<T>(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TFactory> DeepCloneOverride() => new FolderLoader<TPath, TItems, TFactory>(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
 
         // todo: to turn on ShellObjectWatcher for better compatibility
 
@@ -77,7 +77,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public FolderLoader(T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+        public FolderLoader(TPath path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FolderLoader"/> class using a custom comparer.
@@ -86,9 +86,9 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public FolderLoader(T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((T)path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
+        public FolderLoader(TPath path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((TPath)path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
 
-        protected override void OnPathChanging(T path)
+        protected override void OnPathChanging(TPath path)
         {
 
             if (path is null)
@@ -127,11 +127,11 @@ namespace WinCopies.IO
         /// <summary>
         /// Frees all resources used by this <see cref="FolderLoader"/>.
         /// </summary>
-        protected override void Dispose(bool disposing, bool disposePath)
+        protected override void Dispose(bool disposing)
 
         {
 
-            base.Dispose(disposing, disposePath);
+            base.Dispose(disposing);
 
             if (FileSystemWatcher != null)
 
@@ -157,7 +157,7 @@ namespace WinCopies.IO
 
                     // todo: may not work with ShellObjectWatcher
 
-                    PathModifier.Items.Add(Path.Factory.GetBrowsableObjectInfo(path, FileType.File, SpecialFolder.OtherFolderOrFile, (bool? preserveIds) => ShellObject.FromParsingName(path), null));
+                    Path.ItemCollection.Add((TItems)Path.Factory.GetBrowsableObjectInfo(path, FileType.File, SpecialFolder.OtherFolderOrFile, ShellObject.FromParsingName(path), ShellObjectInfo.DefaultShellObjectDeepClone));
 
                 }
 #if DEBUG
@@ -170,7 +170,7 @@ namespace WinCopies.IO
 
                 if (FileSystemObjectComparer != null)
 
-                    PathModifier.Items.Sort(FileSystemObjectComparer);
+                    Path.ItemCollection.Sort( 0, Path.ItemCollection.Count,     FileSystemObjectComparer);
             }
 
         }
@@ -204,13 +204,13 @@ namespace WinCopies.IO
 
             else
 
-                for (int i = 0; i < PathModifier.Items.Count; i++)
+                for (int i = 0; i < Path.ItemCollection.Count; i++)
 
-                    if (PathModifier.Items[i].Path == path)
+                    if (Path.ItemCollection[i].Path == path)
 
                     {
 
-                        PathModifier.Items.RemoveAt(i);
+                        Path.ItemCollection.RemoveAt(i);
 
                         return;
 
@@ -353,7 +353,7 @@ namespace WinCopies.IO
 
                 //    }
 
-                paths.AddLast(new PathInfo(path, path.RemoveAccents(), fileType, _shellObject));
+                paths.AddLast(new PathInfo(path, path.RemoveAccents(), fileType, _shellObject, ShellObjectInfo.DefaultShellObjectDeepClone));
 
             }
 
@@ -510,7 +510,7 @@ namespace WinCopies.IO
 
                             // new_Path.LoadThumbnail();
 
-                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.FileType, IO.Path.GetSpecialFolder(path_.ShellObject), (bool? preserveIds) => path_.ShellObject, null));
+                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.FileType, IO.Path.GetSpecialFolder(path_.ShellObject), path_.ShellObject, ShellObjectInfo.DefaultShellObjectDeepClone));
 
                         } while (_paths.MoveNext());
 
@@ -522,6 +522,8 @@ namespace WinCopies.IO
         protected class PathInfo : IO.PathInfo
 
         {
+
+            public FileType FileType { get; }
 
             public ShellObject ShellObject { get; }
 
@@ -537,12 +539,14 @@ namespace WinCopies.IO
             /// </summary>
             public override string Name => ShellObject.GetDisplayName(DisplayNameType.Default);
 
-            public PathInfo(string path, string normalizedPath, FileType fileType, ShellObject shellObject, DeepClone<ShellObject> shellObjectDelegate) : base(path, normalizedPath, fileType)
+            public PathInfo(string path, string normalizedPath, FileType fileType, ShellObject shellObject, DeepClone<ShellObject> shellObjectDelegate) : base(path, normalizedPath)
             {
 
                 ShellObject = shellObject;
 
                 ShellObjectDelegate = shellObjectDelegate;
+
+                FileType = fileType;
 
             }
 

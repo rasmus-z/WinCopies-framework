@@ -44,7 +44,7 @@ namespace WinCopies.IO
     }
 
     /// <summary>
-    /// File types to load in the <see cref="FolderLoader"/> and <see cref="ArchiveLoader{T}"/> classes.
+    /// File types to load in the <see cref="FolderLoader"/> and <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> classes.
     /// </summary>
     [Flags]
     public enum FileTypes

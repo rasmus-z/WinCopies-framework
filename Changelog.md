@@ -37,18 +37,27 @@ WinCopies.Util (2.0)
 	- WinCopies.Util.Collections.ObservableCollection class:
 		- Now calls base methods for avoinding reentrancy.
 		- Now have the Serializable attribute
+	- WinCopies.Util.Data.IValueObject generic and non-generic:
+		- are now obsoletes and have been replaced by the WinCopies.Util.IValueObject interfaces**;
+		- now inherits from the WinCopies.Util.IValueObject interfaces.**
+	- The WinCopies.Util.Data.ValueObject now implements the WinCopies.Util.IValueObject generic interface.**
 
 - Added:
 	- Classes:
 		- EnumComparer
 		- ArrayAndListBuilder class to build arrays, lists and observable collections like the .Net's StringBuilder does.
 		- Comparer classes and interfaces for sorting support.
-		- An advanced ObservableCollection.
+		- ValueObjectEqualityComparer
+		- TreeNode
+		- ReadOnlyTreeNode
 	- Interfaces:
 		- IDeepCloneable
 		- IDisposable
 		- IObservableCollection
 		- IReadOnlyObservableCollection
+		- WinCopies.Util.IValueObject
+		- ITreeNode
+		- IReadOnlyTreeNode
 	- Delegates:
 		- EqualityComparison
 		- FieldValidateValueCallback*
@@ -60,11 +69,12 @@ WinCopies.Util (2.0)
 		- FuncParams
 	- Methods:
 		- Static methods:
-			- 'SetField' static method.
-			- 'Between' static methods for the other numeric types.
-			- 'ThrowIfNull' static method.
-			- 'GetOrThrowIfNotType' static method.
-			- 'GetIf' methods.
+			- 'SetField' static method
+			- 'Between' static methods for the other numeric types
+			- 'ThrowIfNull' static method
+			- 'GetOrThrowIfNotType' static method
+			- 'GetIf' methods
+			- ThrowOnInvalidCopyToArrayOperation method
 		- Extension methods:
 			- ToStringWithoutAccents string extension method
 			- Extension methods for LinkedLists
@@ -75,6 +85,8 @@ WinCopies.Util (2.0)
 			- The ReadOnlyObservableCollection has now an OnCollectionChanging protected virtual method.
 	- Parameters:
 		- The WinCopies.Util.Extensions.SetProperty/Field now have multiple new optional parameters to extend the capabilities of these methods.
+	- Misc:
+		- ValueObjectEnumerator structure
 
 - Bug fixes:
 	- BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.
@@ -90,6 +102,7 @@ WinCopies.Util (2.0)
 	- Updated doc.
 
 \* See WinCopies.Util.Extensions.SetProperty/Field
+\*\* This also applies to the other already existing classes and interfaces, in the previous versions, that inherits from or implements these classes and interfaces.
 
 Project link
 ------------

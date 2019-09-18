@@ -1212,7 +1212,7 @@ namespace WinCopies.Util
         /// <param name="containsMoreThanOneValue"><see langword="true"/> if more than one value has been found, otherwise <see langword="false"/></param>
         /// <param name="values">The values to compare</param>
         /// <returns><see langword="true"/> if <i>exactly</i> one value has been found, otherwise <see langword="false"/>.</returns>
-        [Obsolete("This method has been replaced by the overload with the comparison parameter from WinCopies.Util.Comparison.")]
+        [Obsolete("This method has been replaced by the overload with the comparison parameter from WinCopies.Collections.Comparison.")]
         public static bool ContainsOneValue(this IEnumerable array, Comparison<object> comparison, out bool containsMoreThanOneValue, params object[] values) => ContainsOneValue(array, new Comparison((object x, object y) => comparison(x, y)), out containsMoreThanOneValue, values);
 
         /// <summary>
@@ -3572,11 +3572,11 @@ namespace WinCopies.Util
 
             if (obj.IsDisposing)
 
-                throw new InvalidOperationException("The current BrowsableObjectInfo is disposing.");
+                throw new InvalidOperationException("The current object or value is disposing.");
 
             if (obj.IsDisposed)
 
-                throw new ObjectDisposedException("The current BrowsableObjectInfo is disposed.");
+                throw new InvalidOperationException("The current object or value is disposed.");
 
         }
 

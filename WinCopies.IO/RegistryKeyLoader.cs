@@ -25,17 +25,17 @@ namespace WinCopies.IO
 
     }
 
-    public interface IRegistryKeyLoader<TPath> : IBrowsableObjectInfoLoader<TPath> where TPath : IRegistryItemInfo
+    public interface IRegistryKeyLoader : IBrowsableObjectInfoLoader
     {
 
         RegistryItemTypes RegistryItemTypes { get; set; }
 
     }
 
-    public class RegistryKeyLoader<T> : BrowsableObjectInfoLoader<T>, IRegistryKeyLoader<T> where T : class, IRegistryItemInfo, IBrowsableObjectInfo<IRegistryItemInfoFactory>
+    public class RegistryKeyLoader<TPath, TItems, TFactory> : BrowsableObjectInfoLoader<TPath, TItems, TFactory>, IRegistryKeyLoader where TPath : BrowsableObjectInfo<TItems, TFactory>, IRegistryItemInfo where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
     {
 
-        protected override BrowsableObjectInfoLoader<T> DeepCloneOverride() => new RegistryKeyLoader<T>(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), RegistryItemTypes);
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TFactory> DeepCloneOverride() => new RegistryKeyLoader<TPath, TItems, TFactory>(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), RegistryItemTypes);
 
         private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
 
@@ -44,26 +44,26 @@ namespace WinCopies.IO
 
             get => _registryItemTypes;
 
-            set => _ = this.SetBackgroundWorkerProperty(nameof(RegistryItemTypes), nameof(_registryItemTypes), value, typeof(RegistryKeyLoader<T>), true);
+            set => _ = this.SetBackgroundWorkerProperty(nameof(RegistryItemTypes), nameof(_registryItemTypes), value, typeof(RegistryKeyLoader<TPath, TItems, TFactory>), true);
 
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryKeyLoader{T}"/> class.
+        /// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TFactory}"/> class.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader(T path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryKeyLoader{T}"/> class using a custom comparer.
+        /// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TFactory}"/> class using a custom comparer.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader(T path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base((T)path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base((TPath)path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
 
         //public override bool CheckFilter(string path)
 

@@ -21,35 +21,35 @@ namespace WinCopies.IO
     /// <summary>
     /// A class for easier <see cref="ManagementBaseObject"/> items loading.
     /// </summary>
-    public class WMILoader<T> : BrowsableObjectInfoLoader<T>, IWMILoader<T> where T : class, IWMIItemInfo<IWMIItemInfoFactory>
+    public class WMILoader<TPath, TItems, TFactory> : BrowsableObjectInfoLoader<TPath, TItems, TFactory>, IWMILoader<TPath> where TPath : BrowsableObjectInfo<TItems, TFactory>, IWMIItemInfo where TItems : BrowsableObjectInfo<TItems, TFactory>, IWMIItemInfo where TFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
     {
 
-        protected override BrowsableObjectInfoLoader<T> DeepCloneOverride() => new WMILoader<T>(null, WMIItemTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TFactory> DeepCloneOverride() => new WMILoader<TPath, TItems, TFactory>(null, WMIItemTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
 
         private readonly WMIItemTypes _wmiItemTypes;
 
         /// <summary>
         /// Gets or sets the WMI item types to load.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMILoader{T}"/> is busy.</exception>
-        public WMIItemTypes WMIItemTypes { get => _wmiItemTypes; set => this.SetBackgroundWorkerProperty(nameof(WMIItemTypes), nameof(_wmiItemTypes), value, typeof(WMILoader<T>), true); }
+        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMILoader{TPath, TItems, TFactory}"/> is busy.</exception>
+        public WMIItemTypes WMIItemTypes { get => _wmiItemTypes; set => this.SetBackgroundWorkerProperty(nameof(WMIItemTypes), nameof(_wmiItemTypes), value, typeof(WMILoader<TPath, TItems, TFactory>), true); }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{TPath, TItems, TFactory}"/> class.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(T path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, wmiItemTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+        public WMILoader(TPath path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, wmiItemTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{T}"/> class using a custom comparer.
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{TPath, TItems, TFactory}"/> class using a custom comparer.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(T path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((T)path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
+        public WMILoader(TPath path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((TPath)path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
 
         //public override bool CheckFilter(string path) => throw new NotImplementedException();
 
@@ -112,7 +112,7 @@ namespace WinCopies.IO
 
                                         if (CheckFilter(_path))
 
-                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Namespace), FileType.SpecialFolder,  instance, WMIItemType.Namespace));
+                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Namespace), instance, WMIItemType.Namespace));
 
                                     }
 
@@ -169,7 +169,7 @@ namespace WinCopies.IO
 
                                         if (CheckFilter(_path))
 
-                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Class), FileType.SpecialFolder, instance, WMIItemType.Class) { });
+                                            _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Class), instance, WMIItemType.Class) { });
 
                                     } while (instances.MoveNext());
 
@@ -317,7 +317,7 @@ namespace WinCopies.IO
 
             public WMIItemType WMIItemType { get; }
 
-            public PathInfo(string path, string normalizedPath, string name, FileType fileType, DeepClone<ManagementBaseObject> managementObjectDelegate, ManagementBaseObject managementObject, WMIItemType wmiItemType) : base(path, normalizedPath, fileType)
+            public PathInfo(string path, string normalizedPath, string name, DeepClone<ManagementBaseObject> managementObjectDelegate, ManagementBaseObject managementObject, WMIItemType wmiItemType) : base(path, normalizedPath)
             {
 
                 Name = name;

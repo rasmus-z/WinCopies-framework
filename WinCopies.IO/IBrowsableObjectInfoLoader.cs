@@ -9,7 +9,10 @@ using IDisposable = WinCopies.Util.IDisposable;
 namespace WinCopies.IO
 {
 
-    public interface IBrowsableObjectInfoLoader :    IBackgroundWorker, IDeepCloneable, IDisposable
+    /// <summary>
+    /// Represents a loader that can be used to load <see cref="IBrowsableObjectInfo"/>. Note: An <see cref="InvalidOperationException"/> is thrown when the <see cref="System.IDisposable.Dispose"/> method is called if this <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.
+    /// </summary>
+    public interface IBrowsableObjectInfoLoader : IBackgroundWorker, IDeepCloneable, IDisposable
 
     {
 
@@ -22,19 +25,6 @@ namespace WinCopies.IO
         void LoadItems();
 
         void LoadItemsAsync();
-
-        /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfoLoader{T}"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
-        new void Dispose();
-
-        /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfoLoader{T}"/> and optionally disposes the related <see cref="Path"/>.
-        /// </summary>
-        /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
-        /// <exception cref="InvalidOperationException">This <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.</exception>
-        void Dispose(bool disposePath);
 
         IBrowsableObjectInfo Path { get; }
 

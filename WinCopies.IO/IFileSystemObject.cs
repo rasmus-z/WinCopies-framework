@@ -28,10 +28,5 @@ namespace WinCopies.IO
         /// </summary>
         string Name { get; }
 
-        /// <summary>
-        /// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="IFileSystemObject"/>.
-        /// </summary>
-        FileType FileType { get; }
-
     }
 }

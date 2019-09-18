@@ -6,9 +6,9 @@ namespace WinCopies.IO
 {
 
     /// <summary>
-    /// A factory to create new <see cref="ArchiveItemInfo{TParent, TItems, TFactory}"/>s.
+    /// A factory to create new <see cref="ArchiveItemInfo{TItems, TFactory}"/>s.
     /// </summary>
-    public interface IArchiveItemInfoFactory : IFileSystemObjectInfoFactory
+    public interface IArchiveItemInfoFactory : IBrowsableObjectInfoFactory
     {
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate);
@@ -18,27 +18,27 @@ namespace WinCopies.IO
     }
 
     /// <summary>
-    /// A factory for creating new <see cref="ShellObjectInfo{TParent, TItems, TParentArchiveItemInfo, TArchiveItemInfoItems, TFactory}"/>s.
+    /// A factory for creating new <see cref="ShellObjectInfo{TItems, TArchiveItemInfoItems, TFactory}"/>s.
     /// </summary>
-    public class ArchiveItemInfoFactory<TParent, TItems> : BrowsableObjectInfoFactory, IArchiveItemInfoFactory where TParent : class, IArchiveItemInfoProvider where TItems : class, IArchiveItemInfo
+    public class ArchiveItemInfoFactory<TItems> : BrowsableObjectInfoFactory, IArchiveItemInfoFactory where TItems : BrowsableObjectInfo , IArchiveItemInfo
     {
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveItemInfoFactory{TParent, TItems}"/> class and sets the <see cref="BrowsableObjectInfoFactory.UseRecursively"/> property to <see langword="true"/>.
+        /// Initializes a new instance of the <see cref="ArchiveItemInfoFactory{TItems}"/> class and sets the <see cref="BrowsableObjectInfoFactory.UseRecursively"/> property to <see langword="true"/>.
         /// </summary>
         public ArchiveItemInfoFactory() : base() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveItemInfo{TParent, TItems, TFactory}"/> class.
+        /// Initializes a new instance of the <see cref="ArchiveItemInfo{TItems, TFactory}"/> class.
         /// </summary>
-        /// <param name="useRecursively">Whether to add a clone of the new <see cref="ArchiveItemInfo{TParent, TItems, TFactory}"/> to all the new objects created from the new <see cref="ArchiveItemInfoFactory{TParent, TItems}"/>.</param>
+        /// <param name="useRecursively">Whether to add a clone of the new <see cref="ArchiveItemInfo{TItems, TFactory}"/> to all the new objects created from the new <see cref="ArchiveItemInfoFactory{TItems}"/>.</param>
         public ArchiveItemInfoFactory(bool useRecursively) : base(useRecursively) { }
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) => GetBrowsableObjectInfo(path, fileType, archiveShellObject, archiveFileInfo, archiveFileInfoDelegate, UseRecursively ? (ArchiveItemInfoFactory<TParent, TItems>)DeepClone() : null);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) => GetBrowsableObjectInfo(path, fileType, archiveShellObject, archiveFileInfo, archiveFileInfoDelegate, UseRecursively ? (ArchiveItemInfoFactory<TItems>)DeepClone() : null);
 
-        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate, IArchiveItemInfoFactory factory) => new ArchiveItemInfo<TParent, TItems, IArchiveItemInfoFactory>(path, fileType, archiveShellObject, archiveFileInfo, archiveFileInfoDelegate, factory);
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate, IArchiveItemInfoFactory factory) => new ArchiveItemInfo<TItems, IArchiveItemInfoFactory>(path, fileType, archiveShellObject, archiveFileInfo, archiveFileInfoDelegate, factory);
 
-        protected override BrowsableObjectInfoFactory DeepCloneOverride() => new ArchiveItemInfoFactory<TParent, TItems>(UseRecursively);
+        protected override BrowsableObjectInfoFactory DeepCloneOverride() => new ArchiveItemInfoFactory<TItems>(UseRecursively);
 
     }
 

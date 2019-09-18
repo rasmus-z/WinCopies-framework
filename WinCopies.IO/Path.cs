@@ -151,7 +151,7 @@ namespace WinCopies.IO
             var shellObject = ShellObject.FromParsingName(paths[0]);
 
             IBrowsableObjectInfo browsableObjectInfo = shellObject.IsFileSystemObject
-                ? new ShellObjectInfo< IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone)
+                ? new ShellObjectInfo<FileSystemObjectInfo, IArchiveItemInfo, IShellObjectInfoFactory>(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone)
                                 : new ShellObjectInfo<IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObject, ShellObjectInfo.DefaultShellObjectDeepClone);
 
             if (paths.Length == 1)

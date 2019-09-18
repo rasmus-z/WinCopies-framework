@@ -15,29 +15,29 @@ namespace WinCopies.IO
 
     // todo: does not work with encrypted archives
 
-    public class ArchiveLoader<T> : FileSystemObjectLoader<T> where T : class, IArchiveItemInfoProvider
+    public class ArchiveLoader<TPath, TItems, TFactory> : FileSystemObjectLoader<TPath, TItems, TFactory> where TPath : BrowsableObjectInfo<TItems, TFactory>, IArchiveItemInfoProvider where TItems : BrowsableObjectInfo, IFileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory
     {
 
-        protected override BrowsableObjectInfoLoader<T> DeepCloneOverride() => new ArchiveLoader<T>(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TFactory> DeepCloneOverride() => new ArchiveLoader<TPath, TItems, TFactory>(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveLoader{T}"/> class.
+        /// Initializes a new instance of the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> class.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+        public ArchiveLoader(TPath path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveLoader{T}"/> class using a custom comparer.
+        /// Initializes a new instance of the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> class using a custom comparer.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(T path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((T)path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
+        public ArchiveLoader(TPath path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((TPath)path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
 
-        protected override void OnPathChanging(T path)
+        protected override void OnPathChanging( TPath path )
 
         {
 
@@ -143,7 +143,9 @@ namespace WinCopies.IO
 
                             // We only make a normalized path if we add the path to the paths to load.
 
-                            paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), fileType, archiveFileInfo));
+                            string __path = string.Copy(_path) ; 
+
+                            paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), fileType, archiveFileInfo, _archiveFileInfo =>     ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(_archiveFileInfo, __path)));
 
                         }
 
@@ -398,20 +400,24 @@ namespace WinCopies.IO
 
         {
 
+            public FileType FileType { get; }
+
             public ArchiveFileInfo? ArchiveFileInfo { get; }
 
-            public DeepClone<ArchiveFileInfo?> ArchiveFileInfoDelegate { get; } 
+            public DeepClone<ArchiveFileInfo?> ArchiveFileInfoDelegate { get; }
 
             public override string LocalizedName => Name;
 
             public override string Name => System.IO.Path.GetFileName(Path);
 
-            public PathInfo(string path, string normalizedPath, FileType fileType, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) : base(path, normalizedPath, fileType)
+            public PathInfo(string path, string normalizedPath, FileType fileType, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) : base(path, normalizedPath)
             {
 
                 ArchiveFileInfo = archiveFileInfo;
 
                 ArchiveFileInfoDelegate = archiveFileInfoDelegate;
+
+                FileType = fileType;
 
             }
 

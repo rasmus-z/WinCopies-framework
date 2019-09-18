@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
+using WinCopies.Util;
 
 namespace WinCopies.Util.Data
 {
@@ -7,28 +10,20 @@ namespace WinCopies.Util.Data
     /// <summary>
     /// Provides an object that defines a value and notifies of the value change.
     /// </summary>
-    public interface IValueObject : INotifyPropertyChanged
+    [Obsolete("This interface has been replaced by the WinCopies.Util.IValueObject interface and will be removed in later versions.")]
+    public interface IValueObject : WinCopies.Util.IValueObject, INotifyPropertyChanged
 
     {
-
-        /// <summary>
-        /// Gets or sets the value of the object.
-        /// </summary>
-        object Value { get; set; }
 
     }
 
     /// <summary>
     /// Provides an object that defines a value and notifies of the value change.
     /// </summary>
-    public interface IValueObject<T> : INotifyPropertyChanged
+    [Obsolete("This interface has been replaced by the WinCopies.Util.IValueObject interface and will be removed in later versions.")]
+    public interface IValueObject<T> : WinCopies.Util.IValueObject<T>, IValueObject
 
     {
-
-        /// <summary>
-        /// Gets or sets the value of the object.
-        /// </summary>
-        T Value { get; set; }
 
     }
 
@@ -39,12 +34,24 @@ namespace WinCopies.Util.Data
     public class ValueObject : IValueObject
     {
 
+        /// <summary>
+        /// Gets a value that indicates whether this object is read-only.
+        /// </summary>
+        public bool IsReadOnly => false;
+
         private readonly object _value = null;
 
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
         public object Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(ValueObject)); }
+
+        /// <summary>
+        /// Determines whether this object is equal to a given object.
+        /// </summary>
+        /// <param name="obj">Object to compare to the current object.</param>
+        /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
+        public bool Equals(WinCopies.Util.IValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
 
         /// <summary>
         /// Occurs when a property value changes.
@@ -95,22 +102,51 @@ namespace WinCopies.Util.Data
     /// </summary>
     /// <typeparam name="T">The type of the value of this object.</typeparam>
     [Obsolete("This class has been replaced by the ViewModelBase class and will be removed in laters versions.")]
-    public class ValueObject<T> : IValueObject
+    public class ValueObject<T> : IValueObject<T>
     {
+
+        /// <summary>
+        /// Gets a value that indicates whether this object is read-only.
+        /// </summary>
+        public bool IsReadOnly => false;
 
         private readonly T _value = default;
 
+        /// <summary>
+        /// Gets or sets the value of the object.
+        /// </summary>
         public T Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(ValueObject<T>)); }
 
-        object IValueObject.Value { get => Value; set => Value = (T)value; }
+        object WinCopies.Util.IValueObject.Value { get => Value; set => Value = (T)value; }
+
+        /// <summary>
+        /// Determines whether this object is equal to a given object.
+        /// </summary>
+        /// <param name="obj">Object to compare to the current object.</param>
+        /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
+        public bool Equals(WinCopies.Util.IValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+
+        /// <summary>
+        /// Determines whether this object is equal to a given object.
+        /// </summary>
+        /// <param name="obj">Object to compare to the current object.</param>
+        /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
+        public bool Equals(WinCopies.Util.IValueObject<T> obj) => new ValueObjectEqualityComparer<T>().Equals(this, obj);
 
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValueObject"/> class.
+        /// </summary>
         public ValueObject() { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValueObject"/> class using a custom value.
+        /// </summary>
+        /// <param name="value">The value with which to initialize this object.</param>
         public ValueObject(T value) => _value = value;
 
         /// <summary>

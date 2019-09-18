@@ -43,6 +43,47 @@ namespace WinCopies.IO
 
         }
 
+        protected override int CompareOverride(T x, T y) => StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents());
+
+    }
+
+    public class FileSystemObjectInfoComparer<T> : FileSystemObjectComparer<T>, IFileSystemObjectComparer<T> where T : IFileSystemObjectInfo
+
+    {
+
+        public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
+
+        protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer) { }
+
+        protected virtual FileSystemObjectComparer<T> DeepCloneOverride() => new FileSystemObjectComparer<T>(_stringComparerDelegate);
+
+        public object DeepClone()
+
+        {
+
+            FileSystemObjectComparer<T> fileSystemObjectComparer = DeepCloneOverride();
+
+            OnDeepClone(fileSystemObjectComparer);
+
+            return fileSystemObjectComparer;
+
+        }
+
+        private readonly DeepClone<StringComparer> _stringComparerDelegate;
+
+        public StringComparer StringComparer { get; }
+
+        public FileSystemObjectInfoComparer() : this(stringComparer => StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
+
+        public FileSystemObjectInfoComparer(DeepClone<StringComparer> stringComparerDelegate)
+        {
+
+            _stringComparerDelegate = stringComparerDelegate;
+
+            StringComparer = stringComparerDelegate(null);
+
+        }
+
         protected override int CompareOverride(T x, T y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
                 ? StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents())
                 : (x.FileType == FileType.Folder || x.FileType == FileType.Drive) && (y.FileType == FileType.File || y.FileType == FileType.Archive || y.FileType == FileType.Link)

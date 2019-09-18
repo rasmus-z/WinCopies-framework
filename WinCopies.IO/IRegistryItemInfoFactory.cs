@@ -17,7 +17,7 @@ namespace WinCopies.IO
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, IRegistryItemInfoFactory factory);
+        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, IRegistryItemInfoFactory factory);
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath);
 

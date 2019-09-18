@@ -8,6 +8,30 @@ using System.Threading.Tasks;
 namespace WinCopies.Collections
 {
 
+    /// <summary>
+    /// Delegate for a non-generic comparison.
+    /// </summary>
+    /// <param name="x">First parameter to compare</param>
+    /// <param name="y">Second parameter to compare</param>
+    /// <returns>An <see cref="int"/> which is lesser than 0 if x is lesser than y, 0 if x is equal to y and greater than 0 if x is greater than y.</returns>
+    public delegate int Comparison(object x, object y);
+
+    /// <summary>
+    /// Delegate for a non-generic equality comparison.
+    /// </summary>
+    /// <param name="x">First parameter to compare</param>
+    /// <param name="y">Second parameter to compare</param>
+    /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
+    public delegate bool EqualityComparison(object x, object y);
+
+    /// <summary>
+    /// Delegate for a generic equality comparison.
+    /// </summary>
+    /// <param name="x">First parameter to compare</param>
+    /// <param name="y">Second parameter to compare</param>
+    /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
+    public delegate bool EqualityComparison<in T>(T x, T y);
+
     public enum SortingType
 
     {
@@ -77,7 +101,7 @@ namespace WinCopies.Collections
 
     }
 
-    public interface IComparer<T> : System.Collections.Generic.IComparer<T>
+    public interface IComparer< in T> : System.Collections.Generic.IComparer<T>
 
     {
 

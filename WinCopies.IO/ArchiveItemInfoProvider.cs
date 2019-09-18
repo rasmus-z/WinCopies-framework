@@ -34,9 +34,9 @@ namespace WinCopies.IO
     //}
 
     /// <summary>
-    /// The base class for <see cref="ArchiveItemInfoProvider{TParent, TItems, TFactory}"/>s objects.
+    /// The base class for <see cref="ArchiveItemInfoProvider"/>s objects.
     /// </summary>
-    public abstract class ArchiveItemInfoProvider<TParent, TITems, TFactory> : FileSystemObjectInfo<TParent, TITems, TFactory>, IArchiveItemInfoProvider where TParent : class, IFileSystemObjectInfo where TITems : class, IFileSystemObjectInfo    where TFactory : IFileSystemObjectInfoFactory
+    public abstract class ArchiveItemInfoProvider/*<TItems, TFactory>*/ : FileSystemObjectInfo/*<TItems, TFactory>*/, IArchiveItemInfoProvider // where TItems : BrowsableObjectInfo, IFileSystemObjectInfo    where TFactory : IBrowsableObjectInfoFactory
 
     {
 
@@ -59,14 +59,21 @@ namespace WinCopies.IO
         //    public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, ) { }
 
         /// <summary>
-        /// When called from a derived class, initializes a new instance of the <see cref="ArchiveItemInfoProvider{TParent, TItems, TFactory}"/> class.
+        /// When called from a derived class, initializes a new instance of the <see cref="ArchiveItemInfoProvider{TItems, TFactory}"/> class.
         /// </summary>
-        /// <param name="path">The path of this <see cref="ArchiveItemInfoProvider{TParent, TItems, TFactory}"/>.</param>
-        /// <param name="fileType">The <see cref="FileType"/> of this <see cref="ArchiveItemInfoProvider{TParent, TItems, TFactory}"/>.</param>
-        /// <param name="factory">The factory for this <see cref="ArchiveItemInfoProvider{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IArchiveItemInfoProvider"/>s from the current <see cref="ArchiveItemInfoProvider{TParent, TItems, TFactory}"/> and its associated <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/>.</param>
-        /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
+        /// <param name="path">The path of this <see cref="ArchiveItemInfoProvider{TItems, TFactory}"/>.</param>
+        /// <param name="fileType">The <see cref="FileType"/> of this <see cref="ArchiveItemInfoProvider{TItems, TFactory}"/>.</param>
+        /// <param name="factory">The factory for this <see cref="ArchiveItemInfoProvider{TItems, TFactory}"/>. This factory is used to create new <see cref="IArchiveItemInfoProvider"/>s from the current <see cref="ArchiveItemInfoProvider{TItems, TFactory}"/> and its associated <see cref="BrowsableObjectInfo.ItemsLoader"/>.</param>
+        /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo{TItems, TFactory}"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="factory"/> is null.</exception>
         protected ArchiveItemInfoProvider(string path, FileType fileType, TFactory factory) : base(path, fileType, factory) { }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            ArchiveShellObject.Dispose();
+        }
 
         //    protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)
         //    {

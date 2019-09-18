@@ -12,11 +12,11 @@ namespace WinCopies.IO
 
     }
 
-    public interface IRegistryItemInfo<T> : IRegistryItemInfo, IBrowsableObjectInfo<T> where T : IRegistryItemInfoFactory
+    //public interface IRegistryItemInfo<T> : IRegistryItemInfo, IBrowsableObjectInfo<T> where T : IRegistryItemInfoFactory
 
-    {
+    //{
 
 
 
-    }
+    //}
 }

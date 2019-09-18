@@ -7,23 +7,32 @@ using System.Threading.Tasks;
 
 namespace WinCopies.IO
 {
+    public interface IPathModifier
+    {
+
+        bool AreItemsLoaded { set; }
+
+        // IBrowsableObjectInfo Parent { set; }
+
+        IBrowsableObjectInfoCollection<IBrowsableObjectInfo> Items { get; }
+
+    }
+
     internal class PathModifier<TParent, TItems, TFactory> : IPathModifier where TParent : class, IBrowsableObjectInfo where TItems : class, IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory
 
     {
 
-        public bool AreItemsLoaded { set => Accessor.Owner.AreItemsLoaded = value; }
+        private readonly BrowsableObjectInfo<TParent, TItems, TFactory> _path;
 
-        public BrowsableObjectInfoAccessor<TParent, TItems, TFactory> Accessor { get; }
-
-        IBrowsableObjectInfoAccessor IPathModifier.Accessor => (IBrowsableObjectInfoAccessor)Accessor;
+        public bool AreItemsLoaded { set => _path.AreItemsLoaded = value; }
 
         // public IBrowsableObjectInfo Parent { set => _path.Parent = value; }
 
-        // public IBrowsableObjectInfoCollection<TItems> Items => _path.items;
+        public IBrowsableObjectInfoCollection<TItems> Items => _path.items;
 
-        // IBrowsableObjectInfoCollection<IBrowsableObjectInfo> IPathModifier.Items => (IBrowsableObjectInfoCollection<IBrowsableObjectInfo>) _path.items ; 
+        IBrowsableObjectInfoCollection<IBrowsableObjectInfo> IPathModifier.Items => (IBrowsableObjectInfoCollection<IBrowsableObjectInfo>) _path.items ; 
 
-        public PathModifier(BrowsableObjectInfoAccessor<TParent, TItems, TFactory> accessor) => Accessor = accessor;
+        public PathModifier(BrowsableObjectInfo<TParent, TItems, TFactory> path) => _path = path;
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,68 +9,52 @@ namespace WinCopies.IO
 {
 
     /// <summary>
-    /// Provides a base class for <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/> factories.
+    /// Provides a base class for <see cref="BrowsableObjectInfo{TItems, TFactory}"/> factories.
     /// </summary>
     public abstract class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
 
     {
 
-        /// <summary>
-        /// Gets the <see cref="IBrowsableObjectInfo"/> associated to this <see cref="BrowsableObjectInfoFactory"/>.
-        /// </summary>
-        public IBrowsableObjectInfo Path { get; private set; }
+        protected IList<IBrowsableObjectInfo> PathCollection { get; }
 
-        void IBrowsableObjectInfoFactory.RegisterPath(IBrowsableObjectInfo path)
-        {
-
-            if (object.ReferenceEquals(Path, path))
-
-                throw new InvalidOperationException("This path is already registered.");
-
-            Path = object.ReferenceEquals(path.Factory, this) ? path : throw new InvalidOperationException("Can not make a reference to the given path; the given path has to have registered the current factory before calling the RegisterPath method.");
-
-        }
-
-        void IBrowsableObjectInfoFactory.UnregisterPath()
-
-        {
-
-            if (object.ReferenceEquals(Path.Factory, this))
-
-                throw new InvalidOperationException("Can not unregister the current path because it still references the current factory. You need to unregister the current factory from the current path before calling the UnregisterPath method.");
-
-            Path = null;
-
-        }
+        public IReadOnlyList<IBrowsableObjectInfo> Paths { get; }
 
         private bool _useRecursively;
 
         /// <summary>
         /// Whether to add the current <see cref="BrowsableObjectInfoFactory"/> to all the new objects created from this <see cref="BrowsableObjectInfoFactory"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">On setting: The <see cref="Path"/>'s <see cref="IBrowsableObjectInfo.ItemsLoader"/> of the current <see cref="BrowsableObjectInfoFactory"/> is busy.</exception>
+        /// <exception cref="InvalidOperationException">On setting: At least one of the <see cref="Paths"/>'s <see cref="IBrowsableObjectInfo.ItemsLoader"/> of the current <see cref="BrowsableObjectInfoFactory"/> is busy.</exception>
         public bool UseRecursively
         {
-            get => _useRecursively; set
+            get => _useRecursively;
+
+            set
 
             {
 
-                ThrowOnInvalidPropertySet(Path);
+                ThrowOnInvalidPropertySet();
 
                 _useRecursively = value;
 
             }
         }
 
-        internal static void ThrowOnInvalidPropertySet(IBrowsableObjectInfo path)
+        internal void ThrowOnInvalidPropertySet()
 
         {
 
-            if (path?.ItemsLoader?.IsBusy == true)
+            foreach (IBrowsableObjectInfo path in Paths)
 
-                throw new InvalidOperationException($"The Path's ItemsLoader of the current {nameof(BrowsableObjectInfoFactory)} is busy.");
+                if (path?.ItemsLoader?.IsBusy == true)
+
+                    throw new InvalidOperationException($"The Path's ItemsLoader of the current {nameof(BrowsableObjectInfoFactory)} is busy.");
 
         }
+
+        protected virtual IList<IBrowsableObjectInfo> GetNewPathCollection() => new Collection<IBrowsableObjectInfo>();
+
+        protected virtual IReadOnlyList<IBrowsableObjectInfo> GetNewPathReadOnlyCollection() => new ReadOnlyCollection<IBrowsableObjectInfo>(PathCollection);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class and sets the <see cref="UseRecursively"/> property to <see langword="true"/>.
@@ -80,7 +65,16 @@ namespace WinCopies.IO
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
         /// </summary>
         /// <param name="useRecursively">Whether to add a clone of the new <see cref="BrowsableObjectInfoFactory"/> to all the new objects created from the new <see cref="BrowsableObjectInfoFactory"/>.</param>
-        protected BrowsableObjectInfoFactory(bool useRecursively) => UseRecursively = useRecursively;
+        protected BrowsableObjectInfoFactory(bool useRecursively)
+        {
+
+            UseRecursively = useRecursively;
+
+            PathCollection = GetNewPathCollection();
+
+            Paths = GetNewPathReadOnlyCollection();
+
+        }
 
         protected virtual void OnDeepClone(BrowsableObjectInfoFactory factory) { }
 

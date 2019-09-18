@@ -11,33 +11,11 @@ using static WinCopies.Util.Generic;
 using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
+using WinCopies.Collections;
+using IComparer = System.Collections.IComparer;
 
 namespace WinCopies.Util
 {
-
-    /// <summary>
-    /// Delegate for a non-generic comparison.
-    /// </summary>
-    /// <param name="x">First parameter to compare</param>
-    /// <param name="y">Second parameter to compare</param>
-    /// <returns>An <see cref="int"/> which is lesser than 0 if x is lesser than y, 0 if x is equal to y and greater than 0 if x is greater than y.</returns>
-    public delegate int Comparison(object x, object y);
-
-    /// <summary>
-    /// Delegate for a non-generic equality comparison.
-    /// </summary>
-    /// <param name="x">First parameter to compare</param>
-    /// <param name="y">Second parameter to compare</param>
-    /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
-    public delegate bool EqualityComparison(object x, object y);
-
-    /// <summary>
-    /// Delegate for a generic equality comparison.
-    /// </summary>
-    /// <param name="x">First parameter to compare</param>
-    /// <param name="y">Second parameter to compare</param>
-    /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
-    public delegate bool EqualityComparison<in T>(T x, T y);
 
     /// <summary>
     /// Delegate for a non-generic predicate.
@@ -1107,11 +1085,11 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, WinCopies.Util.Comparison, Predicate, object, params object[])")]
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Util.Comparison((object x, object y) => comparisonDelegate(x, y)), new Predicate(o => predicate(o)), value, values);
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, WinCopies.Collections.Comparison, Predicate, object, params object[])")]
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params object[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Collections.Comparison((object x, object y) => comparisonDelegate(x, y)), new Predicate(o => predicate(o)), value, values);
 
         /// <summary>
-        /// Performs a comparison by testing a value compared to an array of values using a custom <see cref="WinCopies.Util.Comparison"/> and <see cref="Predicate"/>.
+        /// Performs a comparison by testing a value compared to an array of values using a custom <see cref="WinCopies.Collections.Comparison"/> and <see cref="Predicate"/>.
         /// </summary>
         /// <param name="comparisonType">Whether to perform an 'and', 'or' or 'xor' comparison.</param>
         /// <param name="comparisonMode">Whether to perform a binary or a logical comparison.</param>
@@ -1121,7 +1099,7 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, WinCopies.Util.Comparison comparisonDelegate, Predicate predicate, object value, params object[] values)
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, WinCopies.Collections.Comparison comparisonDelegate, Predicate predicate, object value, params object[] values)
 
         {
 
@@ -1183,12 +1161,12 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, IComparer comparer, object value, params KeyValuePair<object, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Util.Comparison((object x, object y) => comparer.Compare(x, y)), value, values);
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, IComparer comparer, object value, params KeyValuePair<object, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Collections.Comparison((object x, object y) => comparer.Compare(x, y)), value, values);
 
-        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, WinCopies.Util.Comparison, object, params KeyValuePair<object, Func<bool>>[])")]
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Util.Comparison((object x, object y) => comparisonDelegate(x, y)), value, values);
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, WinCopies.Collections.Comparison, object, params KeyValuePair<object, Func<bool>>[])")]
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, new WinCopies.Collections.Comparison((object x, object y) => comparisonDelegate(x, y)), value, values);
 
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, WinCopies.Util.Comparison comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values)
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, WinCopies.Collections.Comparison comparisonDelegate, object value, params KeyValuePair<object, Func<bool>>[] values)
 
         {
 
@@ -1253,10 +1231,10 @@ namespace WinCopies.Util
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
         public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, IComparer comparer, Predicate predicate, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, (object x, object y) => comparer.Compare(x, y), predicate, value, values);
 
-        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, WinCopies.Util.Comparison, Predicate, object, params KeyValuePair<object, object>[])")]
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, new WinCopies.Util.Comparison((object x, object y) => comparisonDelegate(x, y)), new Predicate(o => predicate(o)), value, values);
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, WinCopies.Collections.Comparison, Predicate, object, params KeyValuePair<object, object>[])")]
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, Comparison<object> comparisonDelegate, Predicate<object> predicate, object value, params KeyValuePair<object, object>[] values) => If(comparisonType, comparisonMode, comparison, out key, new WinCopies.Collections.Comparison((object x, object y) => comparisonDelegate(x, y)), new Predicate(o => predicate(o)), value, values);
 
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, WinCopies.Util.Comparison comparisonDelegate, Predicate predicate, object value, params KeyValuePair<object, object>[] values)
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, WinCopies.Collections.Comparison comparisonDelegate, Predicate predicate, object value, params KeyValuePair<object, object>[] values)
 
         {
 
@@ -1283,12 +1261,12 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, IComparer comparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, new WinCopies.Util.Comparison((object x, object y) => comparer.Compare(x, y)), value, values);
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, IComparer comparer, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, new WinCopies.Collections.Comparison((object x, object y) => comparer.Compare(x, y)), value, values);
 
-        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, WinCopies.Util.Comparison, object, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[])")]
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, new WinCopies.Util.Comparison((object x, object y) => comparisonDelegate(x, y)), value, values);
+        [Obsolete("This method has been replaced by the following method: If(ComparisonType, ComparisonMode, Comparison, out object, WinCopies.Collections.Comparison, object, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[])")]
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, Comparison<object> comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, new WinCopies.Collections.Comparison((object x, object y) => comparisonDelegate(x, y)), value, values);
 
-        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, WinCopies.Util.Comparison comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
+        public static bool If(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out object key, WinCopies.Collections.Comparison comparisonDelegate, object value, params KeyValuePair<object, KeyValuePair<object, Func<bool>>>[] values)
 
         {
 
@@ -1340,7 +1318,7 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If<T>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, IComparer<T> comparer, Predicate<T> predicate, T value, params T[] values) => If(comparisonType, comparisonMode, comparison, (T x, T y) => comparer.Compare(x, y), predicate, value, values);
+        public static bool If<T>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, System.Collections.Generic.IComparer<T> comparer, Predicate<T> predicate, T value, params T[] values) => If(comparisonType, comparisonMode, comparison, (T x, T y) => comparer.Compare(x, y), predicate, value, values);
 
         public static bool If<T>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, Comparison<T> comparisonDelegate, Predicate<T> predicate, T value, params T[] values)
 
@@ -1366,7 +1344,7 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If<T>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, IComparer<T> comparer, T value, params KeyValuePair<T, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, (T x, T y) => comparer.Compare(x, y), value, values);
+        public static bool If<T>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, System.Collections.Generic.IComparer<T> comparer, T value, params KeyValuePair<T, Func<bool>>[] values) => If(comparisonType, comparisonMode, comparison, (T x, T y) => comparer.Compare(x, y), value, values);
 
         public static bool If<T>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, Comparison<T> comparisonDelegate, T value, params KeyValuePair<T, Func<bool>>[] values)
 
@@ -1416,7 +1394,7 @@ namespace WinCopies.Util
         /// <param name="values">The values to compare.</param>
         /// <param name="predicate">The comparison predicate</param>
         /// <returns><see langword="true"/> if the comparison has succeeded for all values, otherwise <see langword="false"/>.</returns>
-        public static bool If<TKey, TValue>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out TKey key, IComparer<TValue> comparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values) => If(comparisonType, comparisonMode, comparison, out key, (TValue x, TValue y) => comparer.Compare(x, y), predicate, value, values);
+        public static bool If<TKey, TValue>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out TKey key, System.Collections.Generic.IComparer<TValue> comparer, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values) => If(comparisonType, comparisonMode, comparison, out key, (TValue x, TValue y) => comparer.Compare(x, y), predicate, value, values);
 
         public static bool If<TKey, TValue>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out TKey key, Comparison<TValue> comparisonDelegate, Predicate<TValue> predicate, TValue value, params KeyValuePair<TKey, TValue>[] values)
 
@@ -1442,7 +1420,7 @@ namespace WinCopies.Util
 
         }
 
-        public static bool If<TKey, TValue>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out TKey key, IComparer<TValue> comparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, (TValue x, TValue y) => comparer.Compare(x, y), value, values);
+        public static bool If<TKey, TValue>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out TKey key, System.Collections.Generic.IComparer<TValue> comparer, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values) => If(comparisonType, comparisonMode, comparison, out key, (TValue x, TValue y) => comparer.Compare(x, y), value, values);
 
         public static bool If<TKey, TValue>(IfCT comparisonType, IfCM comparisonMode, IfComp comparison, out TKey key, Comparison<TValue> comparisonDelegate, TValue value, params KeyValuePair<TKey, KeyValuePair<TValue, Func<bool>>>[] values)
 
@@ -1696,11 +1674,11 @@ namespace WinCopies.Util
 
         }
 
-        public static object GetIf(object x, object y, WinCopies.Util.Comparison comparison, Func lower, Func greater, Func equals)
+        public static object GetIf(object x, object y, WinCopies.Collections.Comparison comparison, Func lower, Func greater, Func equals)
 
         {
 
-            if (If<string, Func>(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
+            if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
 
                 throw new ArgumentNullException(key);
 
@@ -1714,7 +1692,7 @@ namespace WinCopies.Util
 
         {
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
+            if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
 
                 throw new ArgumentNullException(key);
 
@@ -1728,7 +1706,7 @@ namespace WinCopies.Util
 
         {
 
-            if (If<string, Func>(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
+            if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
 
                 throw new ArgumentNullException(key);
 
@@ -1738,17 +1716,43 @@ namespace WinCopies.Util
 
         }
 
-        public static TResult GetIf<TValues, TResult>(TValues x, TValues y, WinCopies.Util.Comparison comparison, Func<TResult> lower, Func<TResult> greater, Func<TResult> equals)
+        public static TResult GetIf<TValues, TResult>(TValues x, TValues y, WinCopies.Collections.Comparison comparison, Func<TResult> lower, Func<TResult> greater, Func<TResult> equals)
 
         {
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
+            if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, out string key, null, GetKeyValuePair(nameof(lower), lower), GetKeyValuePair(nameof(greater), greater), GetKeyValuePair(nameof(equals), equals)))
 
                 throw new ArgumentNullException(key);
 
             int result = comparison(x, y);
 
             return result < 0 ? lower() : result > 0 ? greater() : equals();
+
+        }
+
+        public static void ThrowOnInvalidCopyToArrayOperation(Array array, int arrayIndex, int count, string arrayArgumentName, string arrayIndexArgumentName)
+
+        {
+
+            if (array is null)
+
+                throw new ArgumentNullException(arrayArgumentName);
+
+            if (array.Rank != 1)
+
+                throw new ArgumentException("Multidimensional arrays are not supported.", arrayArgumentName);
+
+            if (array.GetLowerBound(0) != 0)
+
+                throw new ArgumentException("The given array has a non-zero lower bound.", arrayArgumentName);
+
+            if (arrayIndex < 0)
+
+                throw new ArgumentOutOfRangeException(arrayIndexArgumentName);
+
+            if (array.Length - arrayIndex < count)
+
+                throw new ArgumentException("The given array has not enough space.", arrayArgumentName);
 
         }
 

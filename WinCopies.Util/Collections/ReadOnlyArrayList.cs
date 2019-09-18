@@ -3,7 +3,15 @@ using System.Collections;
 
 namespace WinCopies.Collections
 {
-    public interface IReadOnlyList : ICollection, IEnumerable
+
+    public interface IReadOnlyCollection : IEnumerable
+    {
+
+        int Count { get; }
+
+    }
+
+    public interface IReadOnlyList : IReadOnlyCollection
     {
 
         object this[int index] { get; }
