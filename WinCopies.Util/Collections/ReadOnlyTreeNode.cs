@@ -79,28 +79,28 @@ namespace WinCopies.Util.Collections
     {
 
         /// <summary>
-        /// Returns the default comparer for <see cref="TreeNode{TValue, TItems}"/> objects.
+        /// Returns the default comparer for <see cref="ReadOnlyTreeNode{TValue, TItems}"/> objects.
         /// </summary>
-        /// <returns>The default comparer for <see cref="TreeNode{TValue, TItems}"/> objects.</returns>
+        /// <returns>The default comparer for <see cref="ReadOnlyTreeNode{TValue, TItems}"/> objects.</returns>
         protected virtual IEqualityComparer<ReadOnlyTreeNode<TItems>> GetDefaultTreeNodeItemsComparer() => new ValueObjectEqualityComparer<TItems>();
 
         /// <summary>
-        /// Gets the inner <see cref="IList{T}"/> of this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Gets the inner <see cref="IList{T}"/> of this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.
         /// </summary>
         protected IList<ReadOnlyTreeNode<TItems>> Items { get; }
 
         // protected virtual ITreeCollection<TItems> GetDefaultItemCollection() => new TreeCollection<TItems>(this);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TreeNode{TValue, TItems}"/> class using a custom value.
+        /// Initializes a new instance of the <see cref="ReadOnlyTreeNode{TValue, TItems}"/> class using a custom value.
         /// </summary>
-        /// <param name="value">The value of the new <see cref="TreeNode{TValue, TItems}"/>.</param>
+        /// <param name="value">The value of the new <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.</param>
         public ReadOnlyTreeNode(TValue value) : this(value, new List<ReadOnlyTreeNode<TItems>>()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadOnlyTreeNode{TValue, TItems}"/> class using a custom value and inner <see cref="IList{T}"/>.
         /// </summary>
-        /// <param name="value">The value of the new <see cref="TreeNode{TValue, TItems}"/>.</param>
+        /// <param name="value">The value of the new <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.</param>
         /// <param name="items">A custom inner <see cref="IList{T}"/>.</param>
         public ReadOnlyTreeNode(TValue value, IList<ReadOnlyTreeNode<TItems>> items) : base(value)
         {
@@ -157,10 +157,10 @@ namespace WinCopies.Util.Collections
         int IList.Add(object value) => throw new NotSupportedException("The current node is read-only.");
 
         /// <summary>
-        /// Checks if this <see cref="TreeNode{TValue, TItems}"/> directly contains a given <see cref="TreeNode{T}"/>.
+        /// Checks if this <see cref="ReadOnlyTreeNode{TValue, TItems}"/> directly contains a given <see cref="ReadOnlyTreeNode{T}"/>.
         /// </summary>
-        /// <param name="item">The <see cref="TreeNode{T}"/> to look for.</param>
-        /// <returns><see langword="true"/> if this <see cref="TreeNode{TValue, TItems}"/> directly contains the given <see cref="TreeNode{T}"/>, otherwise <see langword="false"/>.</returns>
+        /// <param name="item">The <see cref="ReadOnlyTreeNode{T}"/> to look for.</param>
+        /// <returns><see langword="true"/> if this <see cref="ReadOnlyTreeNode{TValue, TItems}"/> directly contains the given <see cref="ReadOnlyTreeNode{T}"/>, otherwise <see langword="false"/>.</returns>
         public bool Contains(ReadOnlyTreeNode<TItems> item)
 
         {
@@ -182,10 +182,10 @@ namespace WinCopies.Util.Collections
         }
 
         /// <summary>
-        /// Checks if this <see cref="TreeNode{TValue, TItems}"/> directly contains a given item.
+        /// Checks if this <see cref="ReadOnlyTreeNode{TValue, TItems}"/> directly contains a given item.
         /// </summary>
         /// <param name="item">The item to look for.</param>
-        /// <returns><see langword="true"/> if this <see cref="TreeNode{TValue, TItems}"/> directly contains the given item, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if this <see cref="ReadOnlyTreeNode{TValue, TItems}"/> directly contains the given item, otherwise <see langword="false"/>.</returns>
         public bool Contains(TItems item)
 
         {
@@ -209,10 +209,10 @@ namespace WinCopies.Util.Collections
         bool IList.Contains(object value) => value is TItems item ? Contains(item) : value is ReadOnlyTreeNode<TItems> node ? Contains(node) : false;
 
         /// <summary>
-        /// Returns the idnex of a given item in this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Returns the idnex of a given item in this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.
         /// </summary>
         /// <param name="item">The item for which to find the index.</param>
-        /// <returns>The index of <paramref name="item"/> if this <see cref="TreeNode{TValue, TItems}"/> contains <paramref name="item"/>, otherwise -1.</returns>
+        /// <returns>The index of <paramref name="item"/> if this <see cref="ReadOnlyTreeNode{TValue, TItems}"/> contains <paramref name="item"/>, otherwise -1.</returns>
         public int IndexOf(ReadOnlyTreeNode<TItems> item)
 
         {
@@ -234,10 +234,10 @@ namespace WinCopies.Util.Collections
         }
 
         /// <summary>
-        /// Returns the idnex of a given item in this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Returns the idnex of a given item in this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.
         /// </summary>
         /// <param name="item">The item for which to find out the index.</param>
-        /// <returns>The index of <paramref name="item"/> if this <see cref="TreeNode{TValue, TItems}"/> contains <paramref name="item"/>, otherwise -1.</returns>
+        /// <returns>The index of <paramref name="item"/> if this <see cref="ReadOnlyTreeNode{TValue, TItems}"/> contains <paramref name="item"/>, otherwise -1.</returns>
         public int IndexOf(TItems item)
 
         {
@@ -273,9 +273,9 @@ namespace WinCopies.Util.Collections
         void IList.Insert(int index, object value) => throw new NotSupportedException("The current node is read-only.");
 
         /// <summary>
-        /// Performs a shallow copy of the items that the current <see cref="TreeNode{TValue, TItems}"/> directly contains starting at a given index of a given array of <see cref="TreeNode{T}"/>.
+        /// Performs a shallow copy of the items that the current <see cref="ReadOnlyTreeNode{TValue, TItems}"/> directly contains starting at a given index of a given array of <see cref="ReadOnlyTreeNode{T}"/>.
         /// </summary>
-        /// <param name="array">The array in which to store the shallow copies of the items that <see cref="TreeNode{TValue, TItems}"/> directly contains.</param>
+        /// <param name="array">The array in which to store the shallow copies of the items that <see cref="ReadOnlyTreeNode{TValue, TItems}"/> directly contains.</param>
         /// <param name="arrayIndex">The index from which to store the items in <paramref name="array"/>.</param>
         public void CopyTo(ReadOnlyTreeNode<TItems>[] array, int arrayIndex) => Items.CopyTo(array, arrayIndex);
 
@@ -358,10 +358,10 @@ namespace WinCopies.Util.Collections
         }
 
         /// <summary>
-        /// Inserts a given item at a specified index in this <see cref="TreeNode{TValue, TItems}"/>. Because it is impossible to have a read-only wrapper for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="TreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to insert new items in <see cref="Items"/>, you should use this method in order to insert new items properly.
+        /// Inserts a given item at a specified index in this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>. Because it is impossible to have a read-only wrapper for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="ReadOnlyTreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to insert new items in <see cref="Items"/>, you should use this method in order to insert new items properly.
         /// </summary>
         /// <param name="index">The index of the new item.</param>
-        /// <param name="item">The item to insert in this <see cref="TreeNode{TValue, TItems}"/>.</param>
+        /// <param name="item">The item to insert in this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.</param>
         protected virtual void InsertItem(int index, ReadOnlyTreeNode<TItems> item)
         {
 
@@ -380,7 +380,7 @@ namespace WinCopies.Util.Collections
         }
 
         /// <summary>
-        /// Removes all items of this <see cref="TreeNode{TValue, TItems}"/>. Because it is impossible to have read-only wrappers for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="TreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to clear all items in <see cref="Items"/>, you should use this method in order to remove the items properly.
+        /// Removes all items of this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>. Because it is impossible to have read-only wrappers for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="ReadOnlyTreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to clear all items in <see cref="Items"/>, you should use this method in order to remove the items properly.
         /// </summary>
         protected void ClearItems()
         {
@@ -392,7 +392,7 @@ namespace WinCopies.Util.Collections
         }
 
         /// <summary>
-        /// Removes the item at a given index. Because it is impossible to have read-only wrappers for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="TreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to remove items from <see cref="Items"/>, you should use this method in order to remove the items properly.
+        /// Removes the item at a given index. Because it is impossible to have read-only wrappers for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="ReadOnlyTreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to remove items from <see cref="Items"/>, you should use this method in order to remove the items properly.
         /// </summary>
         /// <param name="index">The index from which to remove the item.</param>
         protected void RemoveItem(int index)
@@ -403,7 +403,7 @@ namespace WinCopies.Util.Collections
         }
 
         /// <summary>
-        /// Sets a given item at a specified index of this <see cref="TreeNode{TValue, TItems}"/>. This method sets <paramref name="item"/> directly in the current <see cref="TreeNode{TValue, TItems}"/>. Because it is impossible to have read-only wrappers for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="TreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to alter existing items in <see cref="Items"/>, you should use this method in order to alter the items properly.
+        /// Sets a given item at a specified index of this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>. This method sets <paramref name="item"/> directly in the current <see cref="ReadOnlyTreeNode{TValue, TItems}"/>. Because it is impossible to have read-only wrappers for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="ReadOnlyTreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to alter existing items in <see cref="Items"/>, you should use this method in order to alter the items properly.
         /// </summary>
         /// <param name="index">The index at which to set <paramref name="item"/>.</param>
         /// <param name="item">The item to update with.</param>

@@ -72,7 +72,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="WinCopies.IO.FileSystemObjectComparer&lt;T&gt;" Collapsed="true">
-    <Position X="18.75" Y="1" Width="1.5" />
+    <Position X="17" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>IAAAAAAAIAAAAAAAAAAAAQAAAIAEAAAAAAAAAAgAAAI=</HashCode>
       <FileName>FileSystemObjectComparer.cs</FileName>
@@ -82,7 +82,7 @@
   <Class Name="WinCopies.IO.FileSystemObjectInfo" Collapsed="true">
     <Position X="1" Y="10.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAgAEAAAAAAQEgACAAgAAAAAAAIAAAAAAAAAAByA=</HashCode>
       <FileName>FileSystemObjectInfo.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -134,7 +134,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="WinCopies.IO.RegistryItemInfoComparer&lt;T&gt;" Collapsed="true">
-    <Position X="57.75" Y="4.5" Width="1.5" />
+    <Position X="57.75" Y="4.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEAI=</HashCode>
       <FileName>RegistryItemInfoComparer.cs</FileName>
@@ -157,7 +157,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="WinCopies.IO.ShellObjectInfo" Collapsed="true">
-    <Position X="58.5" Y="6" Width="1.5" />
+    <Position X="7.75" Y="17.75" Width="2.5" />
     <TypeIdentifier>
       <HashCode>IAAAAABAACAAAAAkCEAIIBQAACAEQgIAAAABBgwEEEA=</HashCode>
       <FileName>ShellObjectInfo.cs</FileName>
@@ -254,13 +254,6 @@
       <FileName>BrowsableObjectInfoCollection.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="WinCopies.IO.IFileSystemObjectInfoFactory" Collapsed="true">
-    <Position X="21.5" Y="3.5" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>FileSystemObjectInfo.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
   <Interface Name="WinCopies.IO.IFileSystemObjectInfo">
     <Position X="4.75" Y="15.5" Width="2" />
     <TypeIdentifier>
@@ -297,7 +290,7 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="WinCopies.IO.IBrowsableObjectInfoFactory" Collapsed="true">
-    <Position X="22.75" Y="8" Width="1.5" />
+    <Position X="21" Y="8.75" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
       <FileName>IBrowsableObjectInfoFactory.cs</FileName>
