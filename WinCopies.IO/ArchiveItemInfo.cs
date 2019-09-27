@@ -43,53 +43,59 @@ namespace WinCopies.IO
 
         // public override bool IsRenamingSupported => false;
 
+        #region Fields
+
+        private DeepClone<ArchiveFileInfo?> _archiveFileInfoDelegate;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
+        /// </summary>
+        public override bool NeedsObjectsOrValuesReconstruction => true; // True because of the ShellObjectInfo's ShellObject
+
         public static ArchiveFileInfoDeepClone DefaultArchiveFileInfoDeepClone { get; } = (ArchiveFileInfo? archiveFileInfo, string archivePath) => archiveFileInfo.HasValue
                 ? (ArchiveFileInfo?)new SevenZipExtractor(archivePath).ArchiveFileData.First(item => item.FileName.ToLower() == archiveFileInfo.Value.FileName)
                 : null;
 
         /// <summary>
-        /// Gets the localized path of this <see cref="ArchiveItemInfo{TItems, TFactory}"/>.
+        /// Gets the localized path of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
         public override string LocalizedName => ArchiveShellObject.LocalizedName;
 
         /// <summary>
-        /// Gets the name of this <see cref="ArchiveItemInfo{TItems, TFactory}"/>.
+        /// Gets the name of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
         public override string Name => System.IO.Path.GetFileName(Path);
 
         /// <summary>
-        /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo{TItems, TFactory}"/>.
+        /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
         public override BitmapSource SmallBitmapSource => TryGetBitmapSource(new System.Drawing.Size(16, 16));
 
         /// <summary>
-        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo{TItems, TFactory}"/>.
+        /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
         public override BitmapSource MediumBitmapSource => TryGetBitmapSource(new System.Drawing.Size(48, 48));
 
         /// <summary>
-        /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo{TItems, TFactory}"/>.
+        /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
         public override BitmapSource LargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(128, 128));
 
         /// <summary>
-        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo{TItems, TFactory}"/>.
+        /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(256, 256));
 
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="ArchiveItemInfo{TItems, TFactory}"/> is browsable.
+        /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
         /// </summary>
         public override bool IsBrowsable => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.Drive, FileType.Archive);
 
-        /// <summary>
-        /// The factory used to create the new <see cref="IArchiveItemInfo"/>s.
-        /// </summary>
-        public sealed override IArchiveItemInfoFactory ArchiveItemInfoFactory { get => Factory; set => Factory = (TFactory)value; }
-
         //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
-
-        private DeepClone<ArchiveFileInfo?> _archiveFileInfoDelegate;
 
         /// <summary>
         /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="IArchiveItemInfo"/> represents.
@@ -101,24 +107,16 @@ namespace WinCopies.IO
         /// </summary>
         public override IShellObjectInfo ArchiveShellObject { get; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveItemInfo{TItems, TFactory}"/> class.
-        /// </summary>
-        /// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
-        /// <param name="archiveFileInfoDelegate">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo{TItems, TFactory}"/> represents a folder that exists implicitly in the archive.</param>
-        /// <param name="path">The full path to this archive item</param>
-        /// <param name="fileType">The file type of this archive item</param>
-        public ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) : this(path, fileType, archiveShellObject, archiveFileInfo, archiveFileInfoDelegate, default) { }
+        #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveItemInfo{TItems, TFactory}"/> class using a custom factory for <see cref="ArchiveItemInfo{TItems, TFactory}"/>s.
+        /// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
         /// </summary>
         /// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
-        /// <param name="archiveFileInfoDelegate">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo{TItems, TFactory}"/> represents a folder that exists implicitly in the archive.</param>
+        /// <param name="archiveFileInfoDelegate">The <see cref="SevenZip.ArchiveFileInfo"/> that correspond to this archive item in the archive. Note: leave this parameter null if this <see cref="ArchiveItemInfo"/> represents a folder that exists implicitly in the archive.</param>
         /// <param name="path">The full path to this archive item</param>
         /// <param name="fileType">The file type of this archive item</param>
-        /// <param name="factory">The factory this <see cref="ArchiveItemInfo{TItems, TFactory}"/> and associated <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> use to create new instances of the <see cref="ArchiveItemInfo{TItems, TFactory}"/> class.</param>
-        public ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate, IArchiveItemInfoFactory factory) : base(path, fileType, (TFactory)(factory ?? new ArchiveItemInfoFactory<TItems>()))
+        public ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) : base(path, fileType)
 
         {
 
@@ -156,24 +154,26 @@ namespace WinCopies.IO
 
         }
 
-        /// <summary>
-        /// Loads the items of this <see cref="ArchiveItemInfo{TItems, TFactory}"/> using custom worker behavior options.
-        /// </summary>
-        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo<TItems, TFactory>, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+        ///// <summary>
+        ///// Loads the items of this <see cref="ArchiveItemInfo"/> using custom worker behavior options.
+        ///// </summary>
+        ///// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        ///// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
+        //public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+
+        ///// <summary>
+        ///// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
+        ///// </summary>
+        ///// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        ///// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
+        //public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+
+        #region Protected methods
 
         /// <summary>
-        /// Loads the items of this <see cref="BrowsableObjectInfo{TItems, TFactory}"/> asynchronously using custom worker behavior options.
+        /// When overridden in a derived class, returns the parent of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo<TItems, TFactory>, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
-
-        /// <summary>
-        /// When overridden in a derived class, returns the parent of this <see cref="ArchiveItemInfo{TItems, TFactory}"/>.
-        /// </summary>
-        /// <returns>the parent of this <see cref="ArchiveItemInfo{TItems, TFactory}"/>.</returns>
+        /// <returns>the parent of this <see cref="ArchiveItemInfo"/>.</returns>
         protected override IBrowsableObjectInfo GetParent()
         {
 
@@ -195,7 +195,7 @@ namespace WinCopies.IO
 
                             archiveFileInfo = item;
 
-                result = Factory.GetBrowsableObjectInfo(path, FileType.Folder, ArchiveShellObject, archiveFileInfo, _archiveFileInfo => ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(_archiveFileInfo, ArchiveShellObject.Path) /*archiveParentFileInfo.Value*/);
+                result = new ArchiveItemInfo(path, FileType.Folder, ArchiveShellObject, archiveFileInfo, _archiveFileInfo => ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(_archiveFileInfo, ArchiveShellObject.Path) /*archiveParentFileInfo.Value*/);
 
             }
 
@@ -208,9 +208,9 @@ namespace WinCopies.IO
         }
 
         /// <summary>
-        /// Gets a deep clone of this <see cref="ArchiveItemInfo{TItems, TFactory}"/>. The <see cref="BrowsableObjectInfo.OnDeepClone(BrowsableObjectInfo)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
+        /// Gets a deep clone of this <see cref="ArchiveItemInfo"/>. The <see cref="BrowsableObjectInfo.OnDeepClone(BrowsableObjectInfo)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
         /// </summary>
-        protected override BrowsableObjectInfo DeepCloneOverride() => new ArchiveItemInfo<TItems, TFactory>(Path, FileType, (IShellObjectInfo)ArchiveShellObject.DeepClone(), _archiveFileInfoDelegate(ArchiveFileInfo), _archiveFileInfoDelegate, (ArchiveItemInfoFactory<TItems>)Factory.DeepClone());
+        protected override BrowsableObjectInfo DeepCloneOverride() => new ArchiveItemInfo(Path, FileType, (IShellObjectInfo)ArchiveShellObject.DeepClone(), _archiveFileInfoDelegate(ArchiveFileInfo), _archiveFileInfoDelegate);
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 
@@ -234,7 +234,11 @@ namespace WinCopies.IO
 
         }
 
+        #endregion
+
         // public override string ToString() => System.IO.Path.GetFileName(Path);
+
+        #region Private methods
 
         private Icon TryGetIcon(System.Drawing.Size size) =>
 
@@ -252,10 +256,7 @@ namespace WinCopies.IO
 
         }
 
-        /// <summary>
-        /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
-        /// </summary>
-        public override bool NeedsObjectsOrValuesReconstruction => true; // True because of the ShellObjectInfo's ShellObject
+        #endregion
 
     }
 

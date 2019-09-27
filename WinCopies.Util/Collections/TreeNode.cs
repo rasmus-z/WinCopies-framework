@@ -6,9 +6,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WinCopies.Util.Data;
+using WinCopies.Util;
+using static WinCopies.Util.Util;
+// using WinCopies.Util.Data;
 
-namespace WinCopies.Util.Collections
+namespace WinCopies.Collections
 {
 
     // todo: make non-generic
@@ -43,14 +45,16 @@ namespace WinCopies.Util.Collections
         /// <summary>
         /// Gets the parent of the current node.
         /// </summary>
-        public ITreeNode Parent { get; internal set; }
+        public virtual ITreeNode Parent { get; protected internal set; }
 
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
-        public T Value { get; set; }
+        public virtual T Value { get; set; }
 
         object IValueObject.Value { get => Value; set => Value = (T)value; }
+
+        protected TreeNode() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TreeNode{T}"/> class.
@@ -71,6 +75,47 @@ namespace WinCopies.Util.Collections
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() => Value is object ? Value.GetHashCode() : base.GetHashCode();
 
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        /// <summary>
+        /// Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+
+            if (disposedValue)
+
+                return;
+
+            if (Value is System.IDisposable _value)
+
+                _value.Dispose();
+
+            this.Parent = null;
+
+            disposedValue = true;
+
+        }
+
+        ~TreeNode()
+        {
+
+            Dispose(false);
+
+        }
+
+        public void Dispose()
+        {
+
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+
+        }
+        #endregion
+
     }
 
     /// <summary>
@@ -80,7 +125,7 @@ namespace WinCopies.Util.Collections
     /// <typeparam name="TItems">The items type.</typeparam>
     [Serializable]
     [DebuggerDisplay("Value = {Value}, Count = {Count}")]
-    public class TreeNode<TValue, TItems> : TreeNode<TValue>, ITreeNode<TValue, TItems>, ICollection<TreeNode<TItems>>, IList<TreeNode<TItems>>, ICollection, IList, IReadOnlyCollection<TreeNode<TItems>>, IReadOnlyList<TreeNode<TItems>>, IReadOnlyCollection<TItems>, IReadOnlyList<TItems>
+    public class TreeNode<TValue, TItems> : TreeNode<TValue>, ITreeNode<TValue, TItems>, ICollection<TreeNode<TItems>>, System.Collections.Generic.IList<TreeNode<TItems>>, ICollection, System.Collections.IList, IReadOnlyCollection<TreeNode<TItems>>, System.Collections.Generic.IReadOnlyList<TreeNode<TItems>>, IReadOnlyCollection<TItems>, System.Collections.Generic.IReadOnlyList<TItems>
     {
 
         /// <summary>
@@ -90,11 +135,15 @@ namespace WinCopies.Util.Collections
         protected virtual IEqualityComparer<TreeNode<TItems>> GetDefaultTreeNodeItemsComparer() => new ValueObjectEqualityComparer<TItems>();
 
         /// <summary>
-        /// Gets the inner <see cref="IList{T}"/> of this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Gets the inner <see cref="System.Collections.Generic.IList{T}"/> of this <see cref="TreeNode{TValue, TItems}"/>.
         /// </summary>
-        protected IList<TreeNode<TItems>> Items { get; }
+        protected System.Collections.Generic.IList<TreeNode<TItems>> Items { get; }
 
         // protected virtual ITreeCollection<TItems> GetDefaultItemCollection() => new TreeCollection<TItems>(this);
+
+        public TreeNode() : this(value: default) { }
+
+        public TreeNode(System.Collections.Generic.IList<TreeNode<TItems>> items) : this(default, items) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TreeNode{TValue, TItems}"/> class using a custom value.
@@ -107,13 +156,26 @@ namespace WinCopies.Util.Collections
         /// </summary>
         /// <param name="value">The value of the new <see cref="TreeNode{TValue, TItems}"/>.</param>
         /// <param name="items">A custom inner <see cref="IList{T}"/>.</param>
-        public TreeNode(TValue value, IList<TreeNode<TItems>> items) : base(value)
+        public TreeNode(TValue value, System.Collections.Generic.IList<TreeNode<TItems>> items) : base(value)
         {
             if (items.IsReadOnly)
 
                 throw new ArgumentException("The item collection can not be read-only.");
 
             Items = items;
+        }
+
+        /// <summary>
+        /// Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
+        protected override void Dispose(bool disposing)
+        {
+
+            Clear();
+
+            base.Dispose(disposing);
+
         }
 
         [NonSerialized]
@@ -132,9 +194,9 @@ namespace WinCopies.Util.Collections
         /// <seealso cref="SetItem(int, TreeNode{TItems})"/>
         public TreeNode<TItems> this[int index] { get => Items[index]; set => SetItem(index, value); }
 
-        TItems IReadOnlyList<TItems>.this[int index] => this[index].Value;
+        TItems System.Collections.Generic.IReadOnlyList<TItems>.this[int index] => this[index].Value;
 
-        object IList.this[int index] { get => this[index]; set => this[index] = Util.GetOrThrowIfNotType<TreeNode<TItems>>(value, nameof(value)); }
+        object System.Collections.IList.this[int index] { get => this[index]; set => this[index] = GetOrThrowIfNotType<TreeNode<TItems>>(value, nameof(value)); }
 
         /// <summary>
         /// Gets the number of items that this <see cref="TreeNode{TValue, TItems}"/> directly contains.
@@ -165,14 +227,14 @@ namespace WinCopies.Util.Collections
         /// <seealso cref="InsertItem(int, TreeNode{TItems})"/>
         public void Add(TreeNode<TItems> item) => InsertItem(Count, item);
 
-        int IList.Add(object value)
+        int System.Collections.IList.Add(object value)
         {
-            Add(Util.GetOrThrowIfNotType<TreeNode<TItems>>(value, nameof(value)));
+            Add(GetOrThrowIfNotType<TreeNode<TItems>>(value, nameof(value)));
 
             return Count - 1;
         }
 
-        void ICollection<ITreeNode<TItems>>.Add(ITreeNode<TItems> item) => Add(Util.GetOrThrowIfNotType<TreeNode<TItems>>(item, nameof(item)));
+        void ICollection<ITreeNode<TItems>>.Add(ITreeNode<TItems> item) => Add(GetOrThrowIfNotType<TreeNode<TItems>>(item, nameof(item)));
 
         /// <summary>
         /// Checks if this <see cref="TreeNode{TValue, TItems}"/> directly contains a given <see cref="TreeNode{T}"/>.
@@ -224,7 +286,7 @@ namespace WinCopies.Util.Collections
 
         }
 
-        bool IList.Contains(object value) => value is TItems item ? Contains(item) : value is TreeNode<TItems> node ? Contains(node) : false;
+        bool System.Collections.IList.Contains(object value) => value is TItems item ? Contains(item) : value is TreeNode<TItems> node ? Contains(node) : false;
 
         bool ICollection<ITreeNode<TItems>>.Contains(ITreeNode<TItems> item) => item is TreeNode<TItems> _item ? Contains(_item) : false;
 
@@ -278,7 +340,7 @@ namespace WinCopies.Util.Collections
 
         }
 
-        int IList.IndexOf(object value) => value is TItems item ? IndexOf(item) : value is TreeNode<TItems> node ? IndexOf(node) : -1;
+        int System.Collections.IList.IndexOf(object value) => value is TItems item ? IndexOf(item) : value is TreeNode<TItems> node ? IndexOf(node) : -1;
 
         /// <summary>
         /// Removes the item at a given index.
@@ -349,7 +411,7 @@ namespace WinCopies.Util.Collections
 
         bool ICollection<ITreeNode<TItems>>.Remove(ITreeNode<TItems> item) => Remove(item as TreeNode<TItems> ?? throw new ArgumentException($"The given item is not a {typeof(TreeNode<TItems>).FullName}."));
 
-        void IList.Remove(object value)
+        void System.Collections.IList.Remove(object value)
         {
             if (value is TItems item)
 
@@ -368,7 +430,7 @@ namespace WinCopies.Util.Collections
         /// <seealso cref="InsertItem(int, TreeNode{TItems})"/>
         public void Insert(int index, TreeNode<TItems> item) => InsertItem(index, item);
 
-        void IList.Insert(int index, object value) => InsertItem(index, value as TreeNode<TItems> ?? throw new ArgumentException($"The given item is not a {typeof(TreeNode<TItems>).FullName}."));
+        void System.Collections.IList.Insert(int index, object value) => InsertItem(index, value as TreeNode<TItems> ?? throw new ArgumentException($"The given item is not a {typeof(TreeNode<TItems>).FullName}."));
 
         /// <summary>
         /// Performs a shallow copy of the items that the current <see cref="TreeNode{TValue, TItems}"/> directly contains starting at a given index of a given array of <see cref="TreeNode{T}"/>.
@@ -380,7 +442,7 @@ namespace WinCopies.Util.Collections
         void ICollection<ITreeNode<TItems>>.CopyTo(ITreeNode<TItems>[] array, int arrayIndex)
         {
 
-            Util.ThrowOnInvalidCopyToArrayOperation(array, arrayIndex, Count, nameof(array), nameof(arrayIndex));
+            ThrowOnInvalidCopyToArrayOperation(array, arrayIndex, Count, nameof(array), nameof(arrayIndex));
 
             if (array is TreeNode<TItems>[] _array)
 
@@ -428,7 +490,7 @@ namespace WinCopies.Util.Collections
         void ICollection.CopyTo(Array array, int arrayIndex)
         {
 
-            Util.ThrowOnInvalidCopyToArrayOperation(array, arrayIndex, Count, nameof(array), nameof(arrayIndex));
+            ThrowOnInvalidCopyToArrayOperation(array, arrayIndex, Count, nameof(array), nameof(arrayIndex));
 
             if (array is TreeNode<TItems>[] _array)
 
@@ -566,54 +628,5 @@ namespace WinCopies.Util.Collections
             Items[index] = item;
         }
 
-    }
-
-    [Serializable]
-    public struct ValueObjectEnumerator<T> : IEnumerator<T>, IEnumerator
-    {
-
-        private IEnumerator<IValueObject<T>> _enumerator;
-
-        public T Current { get; private set; }
-
-        object IEnumerator.Current => Current;
-
-        public ValueObjectEnumerator(IEnumerator<IValueObject<T>> enumerator)
-        {
-
-            _enumerator = enumerator;
-
-            Current = default;
-
-        }
-
-        public void Dispose()
-        {
-            Reset();
-
-            _enumerator = null;
-        }
-
-        public bool MoveNext()
-        {
-            if (_enumerator.MoveNext())
-
-            {
-
-                Current = _enumerator.Current.Value;
-
-                return true;
-
-            }
-
-            else return false;
-        }
-
-        public void Reset()
-        {
-            _enumerator.Reset();
-
-            Current = default;
-        }
     }
 }

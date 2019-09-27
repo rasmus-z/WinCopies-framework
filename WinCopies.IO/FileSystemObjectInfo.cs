@@ -23,9 +23,9 @@ namespace WinCopies.IO
     {
 
         /// <summary>
-        /// Gets a default comparer for <see cref="FileSystemObjectInfo{TItems, TFactory}"/>s.
+        /// Gets a default comparer for <see cref="FileSystemObjectInfo"/>s.
         /// </summary>
-        /// <returns>A default comparer for <see cref="FileSystemObjectInfo{TItems, TFactory}"/>s.</returns>
+        /// <returns>A default comparer for <see cref="FileSystemObjectInfo"/>s.</returns>
         public static FileSystemObjectInfoComparer<IFileSystemObjectInfo> GetDefaultComparer() => new FileSystemObjectInfoComparer<IFileSystemObjectInfo>();
 
         /// <summary>
@@ -64,51 +64,51 @@ namespace WinCopies.IO
         public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
 
         /// <summary>
-        /// Checks if two <see cref="FileSystemObjectInfo{TItems, TFactory}"/>s are equal.
+        /// Checks if two <see cref="FileSystemObjectInfo"/>s are equal.
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo{TItems, TFactory}"/>s are equal.</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo"/>s are equal.</returns>
         public static bool operator ==(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is null ? right is null : left.Equals(right);
 
         /// <summary>
-        /// Checks if two <see cref="FileSystemObjectInfo{TItems, TFactory}"/>s are different.
+        /// Checks if two <see cref="FileSystemObjectInfo"/>s are different.
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo{TItems, TFactory}"/>s are different.</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo"/>s are different.</returns>
         public static bool operator !=(FileSystemObjectInfo left, FileSystemObjectInfo right) => !(left == right);
 
         /// <summary>
-        /// Checks if a given <see cref="FileSystemObjectInfo{TItems, TFactory}"/> is lesser than an other <see cref="FileSystemObjectInfo{TItems, TFactory}"/>.
+        /// Checks if a given <see cref="FileSystemObjectInfo"/> is lesser than an other <see cref="FileSystemObjectInfo"/>.
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TItems, TFactory}"/> is lesser than the <see cref="FileSystemObjectInfo{TItems, TFactory}"/> to compare with.</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo"/> is lesser than the <see cref="FileSystemObjectInfo"/> to compare with.</returns>
         public static bool operator <(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is null ? right is object : left.CompareTo(right) < 0;
 
         /// <summary>
-        /// Checks if a given <see cref="FileSystemObjectInfo{TItems, TFactory}"/> is lesser or equal to an other <see cref="FileSystemObjectInfo{TItems, TFactory}"/>.
+        /// Checks if a given <see cref="FileSystemObjectInfo"/> is lesser or equal to an other <see cref="FileSystemObjectInfo"/>.
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TItems, TFactory}"/> is lesser or equal to the <see cref="FileSystemObjectInfo{TItems, TFactory}"/> to compare with.</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo"/> is lesser or equal to the <see cref="FileSystemObjectInfo"/> to compare with.</returns>
         public static bool operator <=(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is null || left.CompareTo(right) <= 0;
 
         /// <summary>
-        /// Checks if a given <see cref="FileSystemObjectInfo{TItems, TFactory}"/> is greater than an other <see cref="FileSystemObjectInfo{TItems, TFactory}"/>.
+        /// Checks if a given <see cref="FileSystemObjectInfo"/> is greater than an other <see cref="FileSystemObjectInfo"/>.
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TItems, TFactory}"/> is greater than the <see cref="FileSystemObjectInfo{TItems, TFactory}"/> to compare with.</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo"/> is greater than the <see cref="FileSystemObjectInfo"/> to compare with.</returns>
         public static bool operator >(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is object && left.CompareTo(right) > 0;
 
         /// <summary>
-        /// Checks if a given <see cref="FileSystemObjectInfo{TItems, TFactory}"/> is greater or equal to an other <see cref="FileSystemObjectInfo{TItems, TFactory}"/>.
+        /// Checks if a given <see cref="FileSystemObjectInfo"/> is greater or equal to an other <see cref="FileSystemObjectInfo"/>.
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo{TItems, TFactory}"/> is greater or equal to the <see cref="FileSystemObjectInfo{TItems, TFactory}"/> to compare with.</returns>
+        /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo"/> is greater or equal to the <see cref="FileSystemObjectInfo"/> to compare with.</returns>
         public static bool operator >=(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is null ? right is null : left.CompareTo(right) >= 0;
 
         /// <summary>
@@ -117,6 +117,6 @@ namespace WinCopies.IO
         public virtual FileType FileType { get; private set; } = FileType.Other;
 
         // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-        protected FileSystemObjectInfo(string path, FileType fileType, TFactory factory) : base(path, factory) => FileType = fileType;
+        protected FileSystemObjectInfo(string path, FileType fileType) : base(path) => FileType = fileType;
     }
 }

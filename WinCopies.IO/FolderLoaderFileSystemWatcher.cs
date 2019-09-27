@@ -36,7 +36,7 @@ namespace WinCopies.IO
 
         public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the FileSystemWatcher property.
 
-        protected virtual void OnDeepClone(FolderLoaderFileSystemWatcher folderLoaderFileSystemWatcher, bool? preserveIds) { }
+        protected virtual void OnDeepClone(FolderLoaderFileSystemWatcher folderLoaderFileSystemWatcher) { }
 
         protected virtual FolderLoaderFileSystemWatcher DeepCloneOverride() => new FolderLoaderFileSystemWatcher();
 

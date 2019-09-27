@@ -74,6 +74,45 @@ namespace WinCopies.Util.Data
             _value = value;
 
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        /// <summary>
+        /// Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+
+            if (disposedValue)
+
+                return;
+
+            if (Value is System.IDisposable _value)
+
+                _value.Dispose();
+
+            disposedValue = true;
+
+        }
+
+        ~NamedObject()
+        {
+
+            Dispose(false);
+
+        }
+
+        public void Dispose()
+        {
+
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+
+        }
+        #endregion
     }
 
     /// <summary>
@@ -150,6 +189,45 @@ namespace WinCopies.Util.Data
             _name = name;
 
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        /// <summary>
+        /// Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+
+            if (disposedValue)
+
+                return;
+
+            if (Value is System.IDisposable _value)
+
+                _value.Dispose();
+
+            disposedValue = true;
+
+        }
+
+        ~NamedObject()
+        {
+
+            Dispose(false);
+
+        }
+
+        public void Dispose()
+        {
+
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+
+        }
+        #endregion
     }
 
 }

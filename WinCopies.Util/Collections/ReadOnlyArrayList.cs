@@ -21,11 +21,11 @@ namespace WinCopies.Collections
     public class ReadOnlyArrayList : IReadOnlyList
     {
 
-        private IList innerList = null;
+        private readonly IList innerList = null;
 
         public ReadOnlyArrayList(IList list) => innerList = list;
 
-        public object this[int index] { get => innerList[index]; }
+        public object this[int index] => innerList[index];
 
         public int Count => innerList.Count;
 

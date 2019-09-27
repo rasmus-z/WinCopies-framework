@@ -41,6 +41,7 @@ WinCopies.Util (2.0)
 		- are now obsoletes and have been replaced by the WinCopies.Util.IValueObject interfaces**;
 		- now inherits from the WinCopies.Util.IValueObject interfaces.**
 	- The WinCopies.Util.Data.ValueObject now implements the WinCopies.Util.IValueObject generic interface.**
+	- The WinCopies.Util.IValueObject interface implements IDisposable, so all classes that implements the WinCopies.Util.IValueObject are also disposable.
 
 - Added:
 	- Classes:
@@ -102,7 +103,7 @@ WinCopies.Util (2.0)
 	- Updated doc.
 
 \* See WinCopies.Util.Extensions.SetProperty/Field
-\*\* This also applies to the other already existing classes and interfaces, in the previous versions, that inherits from or implements these classes and interfaces.
+\*\* This also applies to the other already existing classes and interfaces, in the previous versions, that inherit from or implement these classes and interfaces.
 
 Project link
 ------------

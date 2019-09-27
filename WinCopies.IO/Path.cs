@@ -134,13 +134,13 @@ namespace WinCopies.IO
 
         }
 
-        public static IBrowsableObjectInfo GetBrowsableObjectInfoFromPath(string path, bool parent/*, bool deepArchiveCheck*/)
+        public static ITreeNode< FileSystemObjectInfo > GetBrowsableObjectInfoFromPath(string path, bool parent/*, bool deepArchiveCheck*/)
 
         {
 
             path = path.Replace('/', PathSeparator);
 
-            if (path.EndsWith(IO.Path.PathSeparator.ToString()) && !path.EndsWith(":\\") && !path.EndsWith(":\\\\"))
+            if (path.EndsWith(PathSeparator.ToString()) && !path.EndsWith(":\\") && !path.EndsWith(":\\\\"))
 
                 path = path.Substring(0, path.LastIndexOf(PathSeparator));
 
@@ -150,9 +150,9 @@ namespace WinCopies.IO
 
             var shellObject = ShellObject.FromParsingName(paths[0]);
 
-            IBrowsableObjectInfo browsableObjectInfo = shellObject.IsFileSystemObject
-                ? new ShellObjectInfo<FileSystemObjectInfo, IArchiveItemInfo, IShellObjectInfoFactory>(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone)
-                                : new ShellObjectInfo<IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObject, ShellObjectInfo.DefaultShellObjectDeepClone);
+            var browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( shellObject.IsFileSystemObject
+                ? new ShellObjectInfo(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone)
+                                : new ShellObjectInfo(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObject, ShellObjectInfo.DefaultShellObjectDeepClone));
 
             if (paths.Length == 1)
 
@@ -162,7 +162,7 @@ namespace WinCopies.IO
 
             bool dispose = !parent;
 
-            IBrowsableObjectInfo getBrowsableObjectInfo(IBrowsableObjectInfo newValue)
+            FileSystemObjectInfo getBrowsableObjectInfo( FileSystemObjectInfo newValue )
 
             {
 
@@ -170,7 +170,7 @@ namespace WinCopies.IO
 
                 {
 
-                    var temp = (IBrowsableObjectInfo)newValue.DeepClone();
+                    var temp = ( FileSystemObjectInfo )newValue.DeepClone();
 
                     browsableObjectInfo.ItemsLoader.Dispose();
 
@@ -196,11 +196,11 @@ namespace WinCopies.IO
 
             {
 
-                if (!browsableObjectInfo.IsBrowsable && i < paths.Length - 1)
+                if (!browsableObjectInfo.Value.IsBrowsable && i < paths.Length - 1)
 
-                    throw new DirectoryNotFoundException("The path isn't valid.", browsableObjectInfo);
+                    throw new DirectoryNotFoundException("The path isn't valid.", browsableObjectInfo.Value);
 
-                if (If(IfCT.Xor, IfCM.Logical, IfComp.Equal, out bool key, true, GetKeyValuePair(false, browsableObjectInfo.FileType == FileType.Archive), GetKeyValuePair(true, browsableObjectInfo is IArchiveItemInfo)))
+                if (If(IfCT.Xor, IfCM.Logical, IfComp.Equal, out bool key, true, GetKeyValuePair(false, browsableObjectInfo.Value.FileType == FileType.Archive), GetKeyValuePair(true, browsableObjectInfo.Value is ArchiveItemInfo)))
 
                 {
 
@@ -208,19 +208,19 @@ namespace WinCopies.IO
 
                     // todo: re-use:
 
-                    using (var archiveLoader = new ArchiveLoader<IArchiveItemInfo>((IArchiveItemInfo)browsableObjectInfo, GetAllEnumFlags<FileTypes>(), true, false))
+                    using (var archiveLoader = new ArchiveLoader<ArchiveItemInfo, ArchiveItemInfo, ArchiveItemInfo, ArchiveItemInfoFactory, ArchiveItemInfoFactory>( new BrowsableObjectTreeNode<ArchiveItemInfo, ArchiveItemInfo, ArchiveItemInfoFactory>( (ArchiveItemInfo) browsableObjectInfo.Value ), GetAllEnumFlags<FileTypes>(), true, false))
 
                         archiveLoader.LoadItems();
 
                     string s = paths[i].ToLower();
 
-                    browsableObjectInfo = getBrowsableObjectInfo(browsableObjectInfo.Items.FirstOrDefault(item => item.Path.Substring(item.Path.LastIndexOf(IO.Path.PathSeparator) + 1).ToLower() == s) as IBrowsableObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo));
+                    browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo(browsableObjectInfo.Items.FirstOrDefault(item => item.Value.Path.Substring(item.Value.Path.LastIndexOf(IO.Path.PathSeparator) + 1).ToLower() == s).Value as FileSystemObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo.Value)));
 
                 }
 
                 else if (key && i < paths.Length - 1    /*&& deepArchiveCheck*/)
 
-                    throw new IOException("The 'Open from archive' feature is currently not supported by the WinCopies framework.", browsableObjectInfo);
+                    throw new IOException("The 'Open from archive' feature is currently not supported by the WinCopies framework.", browsableObjectInfo.Value);
 
                 else
 
@@ -238,7 +238,7 @@ namespace WinCopies.IO
 
                     // string _s = s.Replace(IO.Path.PathSeparator, "\\\\");
 
-                    shellObject = ((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo);
+                    shellObject = ((ShellContainer)shellObject).FirstOrDefault(item => If(IfCT.Or, IfCM.Logical, IfComp.Equal, paths[i], item.Name, item.GetDisplayName(DisplayNameType.RelativeToParent))) as ShellObject ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo.Value);
 
                     SpecialFolder specialFolder = GetSpecialFolder(shellObject);
 
@@ -259,7 +259,7 @@ namespace WinCopies.IO
                     //#endif
 
 #pragma warning disable IDE0068 // Disposed manually when needed
-                    browsableObjectInfo = getBrowsableObjectInfo(new ShellObjectInfo< IShellObjectInfo, IFileSystemObjectInfo, IArchiveItemInfoProvider, IArchiveItemInfo, IShellObjectInfoFactory>(s, fileType, specialFolder, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone));
+                    browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo(new ShellObjectInfo(s, fileType, specialFolder, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone)));
 #pragma warning restore IDE0068
 
 #if DEBUG
@@ -274,7 +274,7 @@ namespace WinCopies.IO
 
             }
 
-            return getBrowsableObjectInfo(browsableObjectInfo);
+            return new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo(browsableObjectInfo.Value));
 
         }
 

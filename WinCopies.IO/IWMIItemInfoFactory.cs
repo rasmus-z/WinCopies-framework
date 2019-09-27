@@ -20,15 +20,9 @@ namespace WinCopies.IO
         /// <returns>A new instance of the <see cref="IBrowsableObjectInfo"/> class.</returns>
         IBrowsableObjectInfo GetBrowsableObjectInfo();
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(IWMIItemInfoFactory factory);
-
         IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate);
 
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate, IWMIItemInfoFactory factory);
-
         IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType);
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, IWMIItemInfoFactory factory);
 
     }
 

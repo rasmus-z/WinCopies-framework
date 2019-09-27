@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace WinCopies.Util
     /// <summary>
     /// Represents a value container. See the <see cref="IValueObject{T}"/> for a generic version of this class.
     /// </summary>
-    public interface IValueObject : IEquatable<IValueObject>
+    public interface IValueObject : IEquatable<IValueObject>, System. IDisposable
     {
 
         /// <summary>
@@ -82,6 +83,55 @@ namespace WinCopies.Util
         /// <returns>The hash code of <paramref name="obj"/>'s <see cref="IValueObject{T}.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
         public int GetHashCode(IValueObject<T> obj) => obj.Value is object ? obj.Value.GetHashCode() : obj.GetHashCode();
 
+    }
+
+    [Serializable]
+    public struct ValueObjectEnumerator<T> : IEnumerator<T>, IEnumerator
+    {
+
+        private IEnumerator<IValueObject<T>> _enumerator;
+
+        public T Current { get; private set; }
+
+        object IEnumerator.Current => Current;
+
+        public ValueObjectEnumerator(IEnumerator<IValueObject<T>> enumerator)
+        {
+
+            _enumerator = enumerator;
+
+            Current = default;
+
+        }
+
+        public void Dispose()
+        {
+            Reset();
+
+            _enumerator = null;
+        }
+
+        public bool MoveNext()
+        {
+            if (_enumerator.MoveNext())
+
+            {
+
+                Current = _enumerator.Current.Value;
+
+                return true;
+
+            }
+
+            else return false;
+        }
+
+        public void Reset()
+        {
+            _enumerator.Reset();
+
+            Current = default;
+        }
     }
 
 }

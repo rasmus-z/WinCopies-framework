@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WinCopies.Collections;
 using WinCopies.Util;
 using IDisposable = WinCopies.Util.IDisposable;
 
@@ -26,15 +27,13 @@ namespace WinCopies.IO
 
         void LoadItemsAsync();
 
-        IBrowsableObjectInfo Path { get; }
-
     }
 
-    public interface IBrowsableObjectInfoLoader<T> : IBrowsableObjectInfoLoader where T : IBrowsableObjectInfo
+    public interface IBrowsableObjectInfoLoader<TPath, TItems> : IBrowsableObjectInfoLoader where TPath : IBrowsableObjectInfo where TItems : IBrowsableObjectInfo
 
     {
 
-        new T Path { get; set; }
+        IBrowsableObjectTreeNode<TPath, TItems> Path { get; }
 
     }
 

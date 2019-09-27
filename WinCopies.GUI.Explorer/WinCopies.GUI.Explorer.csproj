@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props" Condition="Exists('..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props')" />
+  <Import Project="..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props" Condition="Exists('..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props')" />
+  <Import Project="..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props" Condition="Exists('..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -14,6 +17,8 @@
     <WarningLevel>4</WarningLevel>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -64,20 +69,20 @@
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.2.0.0, Culture=neutral, PublicKeyToken=36e1beb1f73d5bc6, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinCopies.WindowsAPICodePack.1.2.0\lib\net48\Microsoft.WindowsAPICodePack.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.2.1.0, Culture=neutral, PublicKeyToken=36e1beb1f73d5bc6, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.1.2.1\lib\net48\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.2.1.0, Culture=neutral, PublicKeyToken=2b99ebdf8bdbb372, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinCopies.WindowsAPICodePack.Shell.1.2.1\lib\net48\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.2.2.0, Culture=neutral, PublicKeyToken=2b99ebdf8bdbb372, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.Shell.1.2.2\lib\net48\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinCopies.WindowsAPICodePack.ShellExtensions.1.1.1\lib\net48\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.ShellExtensions.1.2.1\lib\net48\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Win32Native, Version=1.2.0.0, Culture=neutral, PublicKeyToken=83ecd65d6ddba0f8, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinCopies.WindowsAPICodePack.Win32Native.1.2.0\lib\net48\Microsoft.WindowsAPICodePack.Win32Native.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack.Win32Native, Version=1.2.1.0, Culture=neutral, PublicKeyToken=83ecd65d6ddba0f8, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.Win32Native.1.2.1\lib\net48\Microsoft.WindowsAPICodePack.Win32Native.dll</HintPath>
     </Reference>
-    <Reference Include="SevenZipSharp, Version=1.2.184.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb, processorArchitecture=MSIL">
-      <HintPath>..\packages\Squid-Box.SevenZipSharp.1.2.184\lib\net45\SevenZipSharp.dll</HintPath>
+    <Reference Include="SevenZipSharp, Version=1.2.219.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb, processorArchitecture=MSIL">
+      <HintPath>..\packages\Squid-Box.SevenZipSharp.1.2.219\lib\net45\SevenZipSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
@@ -87,7 +92,7 @@
       <HintPath>..\packages\System.Reactive.4.2.0-preview.625\lib\net46\System.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.6.0-preview9.19421.4\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.6.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.0-preview.18571.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
@@ -228,4 +233,18 @@
     <None Include="Resources\page_paste.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Ce projet fait référence à des packages NuGet qui sont manquants sur cet ordinateur. Utilisez l'option de restauration des packages NuGet pour les télécharger. Pour plus d'informations, consultez http://go.microsoft.com/fwlink/?LinkID=322105. Le fichier manquant est : {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets" Condition="Exists('..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets')" />
+  <Import Project="..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets" Condition="Exists('..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets')" />
+  <Import Project="..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets" Condition="Exists('..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets')" />
 </Project>

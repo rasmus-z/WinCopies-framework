@@ -11,16 +11,16 @@ namespace WinCopies.IO
 
     }
 
-    public abstract class FileSystemObjectLoader<TPath, TItems, TFactory> : BrowsableObjectInfoLoader<TPath, TItems, TFactory>, IFileSystemObjectLoader where TPath : BrowsableObjectInfo<TItems, TFactory>, IFileSystemObjectInfo where TItems : BrowsableObjectInfo, IFileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory
+    public abstract class FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory> : BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory>, IFileSystemObjectLoader where TPath : FileSystemObjectInfo where TItems : FileSystemObjectInfo where TSubItems : FileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory
     {
 
         private readonly FileTypes _fileTypes = Util.Util.GetAllEnumFlags<FileTypes>();
 
-        public FileTypes FileTypes { get => _fileTypes; set => this.SetBackgroundWorkerProperty(nameof(FileTypes), nameof(_fileTypes), value, typeof(FileSystemObjectLoader<TPath, TItems, TFactory>), true); }
+        public FileTypes FileTypes { get => _fileTypes; set => this.SetBackgroundWorkerProperty(nameof(FileTypes), nameof(_fileTypes), value, typeof(FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory>), true); }
 
-        protected FileSystemObjectLoader(TPath path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+        protected FileSystemObjectLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
-        protected FileSystemObjectLoader(TPath path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> browsableObjectInfoComparer) : base(path, workerReportsProgress, workerSupportsCancellation, browsableObjectInfoComparer) => _fileTypes = fileTypes;
+        protected FileSystemObjectLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> browsableObjectInfoComparer) : base(path, workerReportsProgress, workerSupportsCancellation, browsableObjectInfoComparer) => _fileTypes = fileTypes;
 
     }
 }

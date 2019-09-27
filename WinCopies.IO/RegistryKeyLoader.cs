@@ -32,10 +32,10 @@ namespace WinCopies.IO
 
     }
 
-    public class RegistryKeyLoader<TPath, TItems, TFactory> : BrowsableObjectInfoLoader<TPath, TItems, TFactory>, IRegistryKeyLoader where TPath : BrowsableObjectInfo<TItems, TFactory>, IRegistryItemInfo where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
+    public class RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory>, IRegistryKeyLoader where TPath : RegistryItemInfo where TItems : RegistryItemInfo where TSubItems : RegistryItemInfo where TFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory where TItemsFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory
     {
 
-        protected override BrowsableObjectInfoLoader<TPath, TItems, TFactory> DeepCloneOverride() => new RegistryKeyLoader<TPath, TItems, TFactory>(null, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), RegistryItemTypes);
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), RegistryItemTypes);
 
         private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
 
@@ -44,26 +44,26 @@ namespace WinCopies.IO
 
             get => _registryItemTypes;
 
-            set => _ = this.SetBackgroundWorkerProperty(nameof(RegistryItemTypes), nameof(_registryItemTypes), value, typeof(RegistryKeyLoader<TPath, TItems, TFactory>), true);
+            set => _ = this.SetBackgroundWorkerProperty(nameof(RegistryItemTypes), nameof(_registryItemTypes), value, typeof(RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>), true);
 
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TFactory}"/> class.
+        /// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TSubItems, TFactory, TItemsFactory}"/> class.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TFactory}"/> class using a custom comparer.
+        /// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TSubItems, TFactory, TItemsFactory}"/> class using a custom comparer.
         /// </summary>
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader(TPath path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base((TPath)path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base(path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
 
         //public override bool CheckFilter(string path)
 
@@ -130,11 +130,11 @@ namespace WinCopies.IO
 
                 if (CheckFilter(path))
 
-                    _ = paths.AddLast(pathInfo = new PathInfo(path, path.RemoveAccents(), name, isValue ? FileType.SpecialFolder : FileType.Other, isValue));
+                    _ = paths.AddLast(pathInfo = new PathInfo(path, path.RemoveAccents(), name, null, RegistryItemInfo.DefaultRegistryKeyDeepClone, isValue));
 
             }
 
-            switch (Path.RegistryItemType)
+            switch (Path.Value.RegistryItemType)
 
             {
 
@@ -172,7 +172,7 @@ namespace WinCopies.IO
 
                         {
 
-                            items = Path.RegistryKey.GetSubKeyNames();
+                            items = Path.Value.RegistryKey.GetSubKeyNames();
 
                             foreach (string item in items)
 
@@ -188,11 +188,11 @@ namespace WinCopies.IO
 
                         {
 
-                            items = Path.RegistryKey.GetValueNames();
+                            items = Path.Value.RegistryKey.GetValueNames();
 
                             foreach (string item in items)
 
-                                checkAndAppend(Path.RegistryKey.Name, item, true);
+                                checkAndAppend(Path.Value.RegistryKey.Name, item, true);
 
                         }
 
@@ -238,7 +238,7 @@ namespace WinCopies.IO
 
                         do
 
-                            ReportProgress(0, pathsEnum.Current.IsValue ? ((IRegistryItemInfoFactory)Path.Factory).GetBrowsableObjectInfo(pathsEnum.Current.Path.Substring(0, pathsEnum.Current.Path.Length - pathsEnum.Current.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), pathsEnum.Current.Name) : Path.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path));
+                            ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>((TItems)(pathsEnum.Current.IsValue ? ((IRegistryItemInfoFactory)Path.Factory).GetBrowsableObjectInfo(pathsEnum.Current.Path.Substring(0, pathsEnum.Current.Path.Length - pathsEnum.Current.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), pathsEnum.Current.Name) : Path.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path))));
 
                         while (pathsEnum.MoveNext());
 
@@ -255,8 +255,14 @@ namespace WinCopies.IO
         protected class PathInfo : IO.PathInfo
         {
 
+            /// <summary>
+            /// Gets the localized name of this <see cref="PathInfo"/>.
+            /// </summary>
             public override string LocalizedName => Name;
 
+            /// <summary>
+            /// Gets the name of this <see cref="PathInfo"/>.
+            /// </summary>
             public override string Name { get; }
 
             public bool IsValue { get; }
@@ -265,7 +271,7 @@ namespace WinCopies.IO
 
             public DeepClone<RegistryKey> RegistryKeyDelegate { get; }
 
-            public PathInfo(string path, string normalizedPath, string name, FileType fileType, RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, bool isValue) : base(path, normalizedPath, fileType)
+            public PathInfo(string path, string normalizedPath, string name, RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, bool isValue) : base(path, normalizedPath)
             {
 
                 Name = name;

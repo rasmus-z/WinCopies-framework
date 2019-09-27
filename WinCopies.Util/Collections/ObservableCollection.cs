@@ -64,8 +64,8 @@ namespace WinCopies.Collections
     /// <para>WPF provides the <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> class, which is a built-in implementation of a data collection that implements the <see cref="INotifyCollectionChanged"/> interface.</para>
     /// <para>Before implementing your own collection, consider using <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/> or one of the existing collection classes, such as <see cref="List{T}"/>, <see cref="Collection{T}"/>, and <see cref="BindingList{T}"/>, among many others. If you have an advanced scenario and want to implement your own collection, consider using <see cref="IList"/>, which provides a non-generic collection of objects that can be individually accessed by index. Implementing <see cref="IList"/> provides the best performance with the data binding engine.</para>
     /// <para>Notes: To fully support transferring data values from binding source objects to binding targets, each object in your collection that supports bindable properties must implement an appropriate property changed notification mechanism such as the <see cref="INotifyPropertyChanged"/> interface.</para>
-    /// <para>For more information, see "Binding to Collections" in the Data Binding Overview article at: https://docs.microsoft.com/fr-fr/dotnet/framework/wpf/data/data-binding-overview?view=netframework-4.8</para>
-    /// <para>For notes on XAML usage, see the following article: https://docs.microsoft.com/fr-fr/dotnet/api/system.collections.objectmodel.observablecollection-1?view=netframework-4.8</para>
+    /// <para>For more information, see "Binding to Collections" in the Data Binding Overview article at: https://docs.microsoft.com/en-us/dotnet/framework/wpf/data/data-binding-overview?view=netframework-4.8</para>
+    /// <para>For notes on XAML usage, see the following article: https://docs.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.observablecollection-1?view=netframework-4.8</para>
     /// </remarks>
     [Serializable]
     public class ObservableCollection<T> : System.Collections.ObjectModel.ObservableCollection<T>, IObservableCollection<T>

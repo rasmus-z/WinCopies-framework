@@ -43,19 +43,14 @@ namespace WinCopies.IO
         ///// <summary>
         ///// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
         ///// </summary>
-        ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
+        ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
         ///// <exception cref="ArgumentNullException">value is null.</exception>
         //IBrowsableObjectInfoFactory Factory { get; }
 
         /// <summary>
-        /// Gets a value that indicates whether the items of this <see cref="IBrowsableObjectInfo"/> are currently loaded.
-        /// </summary>
-        bool AreItemsLoaded { get; }
-
-        /// <summary>
         /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
         IBrowsableObjectInfoLoader ItemsLoader { get; }
 
         ///// <summary>
@@ -63,44 +58,12 @@ namespace WinCopies.IO
         ///// </summary>
         //IReadOnlyBrowsableObjectInfoCollection<IBrowsableObjectInfo> Items { get; }
 
-        bool HasParent { get; }
-
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
         /// </summary>
         IBrowsableObjectInfo Parent { get; }
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
-
-        /// <summary>
-        /// Loads the items of this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        void LoadItems();
-
-        /// <summary>
-        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> using custom worker behavior options.
-        /// </summary>
-        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation);
-
-        ///// <summary>
-        ///// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using a given items loader.
-        ///// </summary>
-        ///// <param name="itemsLoader">A custom items loader.</param>
-        //void LoadItems(IBrowsableObjectInfoLoader itemsLoader);
-
-        /// <summary>
-        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously.
-        /// </summary>
-        void LoadItemsAsync();
-
-        /// <summary>
-        /// Loads the items of this <see cref="IBrowsableObjectInfo"/> asynchronously using custom worker behavior options.
-        /// </summary>
-        /// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        /// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation);
 
         // IPathModifier<IBrowsableObjectInfo, IBrowsableObjectInfo> RegisterLoader(IBrowsableObjectInfoLoader browsableObjectInfoLoader);
 
@@ -145,20 +108,5 @@ namespace WinCopies.IO
     //{
 
     //}
-
-    public interface IBrowsableObjectInfo<TItems, TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory where TItems : IBrowsableObjectInfo
-
-    {
-
-        new TFactory Factory { get; set; }
-
-        /// <summary>
-        /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        new IReadOnlyBrowsableObjectInfoCollection<TItems> Items { get; }
-
-        // IPathModifier<IBrowsableObjectInfo<TItems, TFactory>, TItems> RegisterLoader(IBrowsableObjectInfoLoader browsableObjectInfoLoader);
-
-    }
 
 }

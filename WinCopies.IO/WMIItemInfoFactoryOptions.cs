@@ -47,7 +47,7 @@ namespace WinCopies.IO
 
                 if (!(Factory is null))
 
-                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory.Path);
+                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory);
 
                 ConnectionOptionsOverride = value;
 
@@ -69,7 +69,7 @@ namespace WinCopies.IO
 
                 if (!(Factory is null))
 
-                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory.Path);
+                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory);
 
                 _objectGetOptions = value;
 
@@ -89,7 +89,7 @@ namespace WinCopies.IO
 
                 if (!(Factory is null))
 
-                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory.Path);
+                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory);
 
                 ObjectGetOptionsOverride = value;
 
@@ -118,7 +118,7 @@ namespace WinCopies.IO
 
                 if (!(Factory is null))
 
-                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory.Path);
+                    BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory);
 
                 EnumerationOptionsOverride = value;
 

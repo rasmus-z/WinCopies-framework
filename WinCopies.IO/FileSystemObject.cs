@@ -34,13 +34,7 @@ namespace WinCopies.IO
         /// When called from a derived class, initializes a new instance of the <see cref="FileSystemObject"/> class.
         /// </summary>
         /// <param name="path">The path of this <see cref="FileSystemObject"/>.</param>
-        protected FileSystemObject(string path)
-
-        {
-
-            Path = path;
-
-        }
+        protected FileSystemObject(string path) => Path = path;
 
         /// <summary>
         /// Determines whether the specified <see cref="IFileSystemObject"/> is equal to the current object by calling the <see cref="Equals(object)"/> method.

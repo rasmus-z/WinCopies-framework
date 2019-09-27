@@ -15,10 +15,10 @@ namespace WinCopies.IO
 
     // todo: does not work with encrypted archives
 
-    public class ArchiveLoader<TPath, TItems, TFactory> : FileSystemObjectLoader<TPath, TItems, TFactory> where TPath : BrowsableObjectInfo<TItems, TFactory>, IArchiveItemInfoProvider where TItems : BrowsableObjectInfo, IFileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory
+    public class ArchiveLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory> where TPath : ArchiveItemInfoProvider where TItems : ArchiveItemInfo where TSubItems : ArchiveItemInfo where TFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory where TItemsFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory
     {
 
-        protected override BrowsableObjectInfoLoader<TPath, TItems, TFactory> DeepCloneOverride() => new ArchiveLoader<TPath, TItems, TFactory>(null, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new ArchiveLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, FileTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> class.
@@ -26,7 +26,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(TPath path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+        public ArchiveLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> class using a custom comparer.
@@ -35,9 +35,9 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="fileTypes">The file types to load.</param>
-        public ArchiveLoader(TPath path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base((TPath)path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
+        public ArchiveLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base(path, fileTypes, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) { }
 
-        protected override void OnPathChanging( TPath path )
+        protected override void OnPathChanging( BrowsableObjectTreeNode< TPath, TItems, TFactory > path )
 
         {
 
@@ -52,7 +52,7 @@ namespace WinCopies.IO
             // }
 
             /*else*/
-            if (!(path is null) && path.FileType != FileType.Archive)
+            if (!(path is null) && path.Value.FileType != FileType.Archive)
 
                 throw new ArgumentException("'Path' is not an Archive or a Folder.");
 
@@ -83,7 +83,7 @@ namespace WinCopies.IO
 
                 Debug.WriteLine("Path == null: " + (Path == null).ToString());
 
-                Debug.WriteLine("Path.Path: " + Path?.Path);
+                Debug.WriteLine("Path.Path: " + Path?. Value. Path);
 
                 Debug.WriteLine("Path.ShellObject: " + (Path as IShellObjectInfo)?.ShellObject.ToString());
 
@@ -110,7 +110,7 @@ namespace WinCopies.IO
 
             Debug.WriteLine("Path == null: " + (Path == null).ToString());
 
-            Debug.WriteLine("Path.Path: " + Path.Path);
+            Debug.WriteLine("Path.Path: " + Path.Value.Path);
 
             if (Path is IShellObjectInfo) Debug.WriteLine("Path.ShellObject: " + ((IShellObjectInfo)Path).ShellObject.ToString());
 
@@ -167,7 +167,7 @@ namespace WinCopies.IO
 
                         string fileName = "";
 
-                        string relativePath = Path is IShellObjectInfo ? "" : Path.Path.Substring(archiveFileName.Length + 1);
+                        string relativePath = Path is IShellObjectInfo ? "" : Path.Value.Path.Substring(archiveFileName.Length + 1);
 
                         // PathInfo path;
 
@@ -341,7 +341,7 @@ namespace WinCopies.IO
                 // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;
                 // new_Path.LoadThumbnail();
 
-                ReportProgress(0, Path.ArchiveItemInfoFactory.GetBrowsableObjectInfo(Path.Path + IO.Path.PathSeparator + path.Path, path.FileType, Path.ArchiveShellObject, path.ArchiveFileInfo, archiveFileInfo => ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(archiveFileInfo, Path.ArchiveShellObject.Path)));
+                ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>(    (TItems)Path.Factory.GetBrowsableObjectInfo(Path.Value.Path + IO.Path.PathSeparator + path.Path, path.FileType, Path.Value.ArchiveShellObject, path.ArchiveFileInfo, archiveFileInfo => ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(archiveFileInfo, Path.Value.ArchiveShellObject.Path))));
 
                 // #if DEBUG
 
@@ -406,8 +406,14 @@ namespace WinCopies.IO
 
             public DeepClone<ArchiveFileInfo?> ArchiveFileInfoDelegate { get; }
 
+            /// <summary>
+            /// Gets the localized name of this <see cref="PathInfo"/>.
+            /// </summary>
             public override string LocalizedName => Name;
 
+            /// <summary>
+            /// Gets the name of this <see cref="PathInfo"/>.
+            /// </summary>
             public override string Name => System.IO.Path.GetFileName(Path);
 
             public PathInfo(string path, string normalizedPath, FileType fileType, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) : base(path, normalizedPath)

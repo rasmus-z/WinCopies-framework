@@ -15,12 +15,7 @@ namespace WinCopies.IO
 
     {
 
-        /// <summary>
-        /// Whether to add the current <see cref="IBrowsableObjectInfoFactory"/> to all the new objects created from this <see cref="IBrowsableObjectInfoFactory"/>.
-        /// </summary>
-        bool UseRecursively { get; }
-
-        IReadOnlyList< IBrowsableObjectInfo > Paths { get; }
+        IBrowsableObjectInfo Path { get; }
 
     }
 

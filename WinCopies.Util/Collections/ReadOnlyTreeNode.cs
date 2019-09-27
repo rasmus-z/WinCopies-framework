@@ -6,8 +6,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using WinCopies.Util;
+using static WinCopies.Util.Util;
 
-namespace WinCopies.Util.Collections
+namespace WinCopies.Collections
 {
 
     // todo: make non-generic
@@ -19,7 +21,7 @@ namespace WinCopies.Util.Collections
     public abstract class ReadOnlyTreeNode<T> : ITreeNode<T>
 
     {
-        private T _value;
+        private readonly T _value;
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="ReadOnlyTreeNode{T}"/> is read-only. This value is always <see langword="false"/> for this class.
@@ -43,12 +45,12 @@ namespace WinCopies.Util.Collections
         /// <summary>
         /// Gets the parent of the current node.
         /// </summary>
-        public ITreeNode Parent { get; internal set; }
+        public virtual ITreeNode Parent { get; protected internal set; }
 
         /// <summary>
         /// Gets the value of the object.
         /// </summary>
-        public T Value { get => _value; set => throw new NotSupportedException("The current node is read-only."); }
+        public virtual T Value { get => _value; set => throw new NotSupportedException("The current node is read-only."); }
 
         object IValueObject.Value { get => _value; set => throw new NotSupportedException("The current node is read-only."); }
 
@@ -71,12 +73,66 @@ namespace WinCopies.Util.Collections
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() => Value is object ? Value.GetHashCode() : base.GetHashCode();
 
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        /// <summary>
+        /// Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+
+            if (disposedValue)
+
+                return;
+
+            if (Value is System.IDisposable _value)
+
+                _value.Dispose();
+
+            this.Parent = null;
+
+            disposedValue = true;
+
+        }
+
+        ~ReadOnlyTreeNode()
+        {
+
+            Dispose(false);
+
+        }
+
+        public void Dispose()
+        {
+
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+
+        }
+        #endregion
+
     }
 
     [Serializable]
     [DebuggerDisplay("Value = {Value}, Count = {Count}")]
-    public class ReadOnlyTreeNode<TValue, TItems> : ReadOnlyTreeNode<TValue>, IReadOnlyTreeNode<TValue, TItems>, ICollection<ReadOnlyTreeNode<TItems>>, IList<ReadOnlyTreeNode<TItems>>, ICollection, IList, IReadOnlyCollection<ReadOnlyTreeNode<TItems>>, IReadOnlyList<ReadOnlyTreeNode<TItems>>, IReadOnlyCollection<TItems>, IReadOnlyList<TItems>
+    public class ReadOnlyTreeNode<TValue, TItems> : ReadOnlyTreeNode<TValue>, IReadOnlyTreeNode<TValue, TItems>, ICollection<ReadOnlyTreeNode<TItems>>, System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>>, ICollection, System.Collections.IList, IReadOnlyCollection<ReadOnlyTreeNode<TItems>>, System.Collections.Generic.IReadOnlyList<ReadOnlyTreeNode<TItems>>, IReadOnlyCollection<TItems>, System.Collections.Generic.IReadOnlyList<TItems>
     {
+
+        /// <summary>
+        /// Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
+        protected override void Dispose(bool disposing)
+        {
+
+            Items. Clear();
+
+            base.Dispose(disposing);
+
+        }
 
         /// <summary>
         /// Returns the default comparer for <see cref="ReadOnlyTreeNode{TValue, TItems}"/> objects.
@@ -87,7 +143,7 @@ namespace WinCopies.Util.Collections
         /// <summary>
         /// Gets the inner <see cref="IList{T}"/> of this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.
         /// </summary>
-        protected IList<ReadOnlyTreeNode<TItems>> Items { get; }
+        protected System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>> Items { get; }
 
         // protected virtual ITreeCollection<TItems> GetDefaultItemCollection() => new TreeCollection<TItems>(this);
 
@@ -102,7 +158,7 @@ namespace WinCopies.Util.Collections
         /// </summary>
         /// <param name="value">The value of the new <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.</param>
         /// <param name="items">A custom inner <see cref="IList{T}"/>.</param>
-        public ReadOnlyTreeNode(TValue value, IList<ReadOnlyTreeNode<TItems>> items) : base(value)
+        public ReadOnlyTreeNode(TValue value, System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>> items) : base(value)
         {
             if (!items.IsReadOnly)
 
@@ -126,9 +182,9 @@ namespace WinCopies.Util.Collections
         /// <exception cref="IndexOutOfRangeException">The given index is lesser than 0 or greater than <see cref="Count"/>.</exception>
         public ReadOnlyTreeNode<TItems> this[int index] { get => Items[index]; set => throw new NotSupportedException("The current node is read-only."); }
 
-        TItems IReadOnlyList<TItems>.this[int index] => this[index].Value;
+        TItems System.Collections.Generic.IReadOnlyList<TItems>.this[int index] => this[index].Value;
 
-        object IList.this[int index] { get => this[index]; set => throw new NotSupportedException("The current node is read-only."); }
+        object System.Collections.IList.this[int index] { get => this[index]; set => throw new NotSupportedException("The current node is read-only."); }
 
         /// <summary>
         /// Gets the number of items that this <see cref="ReadOnlyTreeNode{TValue, TItems}"/> directly contains.
@@ -154,7 +210,7 @@ namespace WinCopies.Util.Collections
 
         void ICollection<ReadOnlyTreeNode<TItems>>.Add(ReadOnlyTreeNode<TItems> item) => throw new NotSupportedException("The current node is read-only.");
 
-        int IList.Add(object value) => throw new NotSupportedException("The current node is read-only.");
+        int System.Collections.IList.Add(object value) => throw new NotSupportedException("The current node is read-only.");
 
         /// <summary>
         /// Checks if this <see cref="ReadOnlyTreeNode{TValue, TItems}"/> directly contains a given <see cref="ReadOnlyTreeNode{T}"/>.
@@ -206,7 +262,7 @@ namespace WinCopies.Util.Collections
 
         }
 
-        bool IList.Contains(object value) => value is TItems item ? Contains(item) : value is ReadOnlyTreeNode<TItems> node ? Contains(node) : false;
+        bool System.Collections.IList.Contains(object value) => value is TItems item ? Contains(item) : value is ReadOnlyTreeNode<TItems> node ? Contains(node) : false;
 
         /// <summary>
         /// Returns the idnex of a given item in this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.
@@ -258,19 +314,19 @@ namespace WinCopies.Util.Collections
 
         }
 
-        int IList.IndexOf(object value) => value is TItems item ? IndexOf(item) : value is ReadOnlyTreeNode<TItems> node ? IndexOf(node) : -1;
+        int System.Collections.IList.IndexOf(object value) => value is TItems item ? IndexOf(item) : value is ReadOnlyTreeNode<TItems> node ? IndexOf(node) : -1;
 
-        void IList.RemoveAt(int index) => RemoveItem(index);
+        void System.Collections.IList.RemoveAt(int index) => RemoveItem(index);
 
-        void IList<ReadOnlyTreeNode<TItems>>.RemoveAt(int index) => RemoveItem(index);
+        void System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>>.RemoveAt(int index) => RemoveItem(index);
 
         bool ICollection<ReadOnlyTreeNode<TItems>>.Remove(ReadOnlyTreeNode<TItems> item) => throw new NotSupportedException("The current node is read-only.");
 
-        void IList.Remove(object value) => throw new NotSupportedException("The current node is read-only.");
+        void System.Collections.IList.Remove(object value) => throw new NotSupportedException("The current node is read-only.");
 
-        void IList<ReadOnlyTreeNode<TItems>>.Insert(int index, ReadOnlyTreeNode<TItems> item) => throw new NotSupportedException("The current node is read-only.");
+        void System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>>.Insert(int index, ReadOnlyTreeNode<TItems> item) => throw new NotSupportedException("The current node is read-only.");
 
-        void IList.Insert(int index, object value) => throw new NotSupportedException("The current node is read-only.");
+        void System.Collections.IList.Insert(int index, object value) => throw new NotSupportedException("The current node is read-only.");
 
         /// <summary>
         /// Performs a shallow copy of the items that the current <see cref="ReadOnlyTreeNode{TValue, TItems}"/> directly contains starting at a given index of a given array of <see cref="ReadOnlyTreeNode{T}"/>.
@@ -282,7 +338,7 @@ namespace WinCopies.Util.Collections
         void ICollection.CopyTo(Array array, int arrayIndex)
         {
 
-            Util.ThrowOnInvalidCopyToArrayOperation(array, arrayIndex, Count, nameof(array), nameof(arrayIndex));
+            ThrowOnInvalidCopyToArrayOperation(array, arrayIndex, Count, nameof(array), nameof(arrayIndex));
 
             if (array is ReadOnlyTreeNode<TItems>[] _array)
 
@@ -343,9 +399,9 @@ namespace WinCopies.Util.Collections
 
         }
 
-        void IList.Clear() => throw new NotSupportedException("The current tree node is read-only.");
+        void System.Collections.IList.Clear() => throw new NotSupportedException("The current tree node is read-only.");
 
-        void ICollection<ReadOnlyTreeNode<TItems>>. Clear() => throw new NotSupportedException("The current tree node is read-only.");
+        void ICollection<ReadOnlyTreeNode<TItems>>.Clear() => throw new NotSupportedException("The current tree node is read-only.");
 
         private void ThrowOnInvalidItem(ReadOnlyTreeNode<TItems> item)
 
@@ -382,7 +438,7 @@ namespace WinCopies.Util.Collections
         /// <summary>
         /// Removes all items of this <see cref="ReadOnlyTreeNode{TValue, TItems}"/>. Because it is impossible to have read-only wrappers for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="ReadOnlyTreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to clear all items in <see cref="Items"/>, you should use this method in order to remove the items properly.
         /// </summary>
-        protected void ClearItems()
+        protected virtual void ClearItems()
         {
             foreach (ReadOnlyTreeNode<TItems> item in this)
 
@@ -395,7 +451,7 @@ namespace WinCopies.Util.Collections
         /// Removes the item at a given index. Because it is impossible to have read-only wrappers for <see cref="ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="ReadOnlyTreeNode{TValue, TItems}"/> class, but without the mutable methods. So, if you want to remove items from <see cref="Items"/>, you should use this method in order to remove the items properly.
         /// </summary>
         /// <param name="index">The index from which to remove the item.</param>
-        protected void RemoveItem(int index)
+        protected virtual void RemoveItem(int index)
         {
             this[index].Parent = null;
 
@@ -407,7 +463,7 @@ namespace WinCopies.Util.Collections
         /// </summary>
         /// <param name="index">The index at which to set <paramref name="item"/>.</param>
         /// <param name="item">The item to update with.</param>
-        protected void SetItem(int index, ReadOnlyTreeNode<TItems> item)
+        protected virtual void SetItem(int index, ReadOnlyTreeNode<TItems> item)
         {
             ThrowOnInvalidItem(item);
 
