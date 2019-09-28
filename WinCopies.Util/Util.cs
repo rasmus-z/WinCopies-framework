@@ -242,8 +242,11 @@ namespace WinCopies.Util
 
         #region 'Check comparison' methods
 
-        private static bool CheckIfComparison(IfComp comparison, bool predicateResult, int result)
+        private static bool CheckIfComparison(IfComp comparison, Func<bool> predicateResult, int result)
         {
+
+            if (comparison != IfComp.NotEqual && !predicateResult()) return false;
+
             switch (comparison)
 
             {
@@ -251,7 +254,7 @@ namespace WinCopies.Util
                 case IfComp.Equal:
                 case IfComp.ReferenceEqual:
 
-                    return predicateResult && result == 0;
+                    return result == 0;
 
                 case IfComp.LesserOrEqual:
 
@@ -263,27 +266,30 @@ namespace WinCopies.Util
 
                 case IfComp.Lesser:
 
-                    return !predicateResult && result < 0;
+                    return result < 0;
 
                 case IfComp.Greater:
 
-                    return !predicateResult && result > 0;
+                    return result > 0;
 
                 case IfComp.NotEqual:
 
-                    return !predicateResult && result != 0;
+                    return !predicateResult() ||    result != 0;
 
                 default:
 
                     return false;//: comparisonType == ComparisonType.Or ?//(result == 0 && (comparison == Comparison.Equals || comparison == Comparison.LesserOrEquals || comparison == Comparison.GreaterOrEquals)) ||//    (result < 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.LesserThan || comparison == Comparison.LesserOrEquals)) ||//    (result > 0 && (comparison == Comparison.DoesNotEqual || comparison == Comparison.GreaterThan || comparison == Comparison.GreaterOrEquals))
 
             }
+
         }
 
-        private static bool CheckEqualityComparison(IfComp comparison, object value, object valueToCompare, bool predicateResult, EqualityComparison comparisonDelegate)
+        private static bool CheckEqualityComparison(IfComp comparison, object value, object valueToCompare, Func< bool > predicateResult, EqualityComparison comparisonDelegate)
         {
 
             if (comparison == IfComp.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
+
+            if (comparison != IfComp.NotEqual && !predicateResult()) return false;
 
             switch (comparison)
 
@@ -291,11 +297,11 @@ namespace WinCopies.Util
 
                 case IfComp.Equal:
 
-                    return predicateResult && comparisonDelegate(value, valueToCompare);
+                    return comparisonDelegate(value, valueToCompare);
 
                 case IfComp.NotEqual:
 
-                    return !predicateResult && !comparisonDelegate(value, valueToCompare);
+                    return !predicateResult() || !comparisonDelegate(value, valueToCompare);
 
                 case IfComp.ReferenceEqual:
 
@@ -311,10 +317,14 @@ namespace WinCopies.Util
 
         }
 
-        private static bool CheckEqualityComparison<T>(IfComp comparison, T value, T valueToCompare, bool predicateResult, EqualityComparison<T> comparisonDelegate)
+        private static bool CheckEqualityComparison<T>(IfComp comparison, T value, T valueToCompare, Func< bool > predicateResult, EqualityComparison<T> comparisonDelegate)
         {
 
             // Because we've already checked that for the 'T' type in the 'If' method and assuming that 'T' is the base type of all the values to test, if 'T' is actually a class, we don't need to check here if the type of the current value is actually a class when comparison is set to ReferenceEqual.
+
+            if (comparison != IfComp.NotEqual && !predicateResult())
+
+                return false;
 
             switch (comparison)
 
@@ -322,11 +332,11 @@ namespace WinCopies.Util
 
                 case IfComp.Equal:
 
-                    return predicateResult && comparisonDelegate(value, valueToCompare);
+                    return comparisonDelegate(value, valueToCompare);
 
                 case IfComp.NotEqual:
 
-                    return !predicateResult && !comparisonDelegate(value, valueToCompare);
+                    return !predicateResult() || !comparisonDelegate(value, valueToCompare);
 
                 case IfComp.ReferenceEqual:
 
@@ -1107,7 +1117,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfValuesEnumerable(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate, comparisonDelegate(value, _value)), new IfValuesEnumerable(values, predicate));
 
         }
 
@@ -1157,7 +1167,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), new IfValuesEnumerable(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate, comparisonDelegate), new IfValuesEnumerable(values, predicate));
 
         }
 
@@ -1174,7 +1184,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfKeyValuePairEnumerable(values));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate, comparisonDelegate(value, _value)), new IfKeyValuePairEnumerable(values));
 
         }
 
@@ -1188,7 +1198,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), new IfKeyValuePairEnumerable(values));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate, comparisonDelegate), new IfKeyValuePairEnumerable(values));
 
         }
 
@@ -1242,7 +1252,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyValuesEnumerable(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate, comparisonDelegate(value, _value)), out key, new IfKeyValuesEnumerable(values, predicate));
 
         }
 
@@ -1257,7 +1267,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), out key, new IfKeyValuesEnumerable(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate, comparisonDelegate), out key, new IfKeyValuesEnumerable(values, predicate));
 
         }
 
@@ -1274,7 +1284,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyKeyValuePairEnumerable(values));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate, comparisonDelegate(value, _value)), out key, new IfKeyKeyValuePairEnumerable(values));
 
         }
 
@@ -1286,7 +1296,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, value.GetType(), comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), out key, new IfKeyKeyValuePairEnumerable(values));
+            return IfInternal(comparisonType, comparisonMode, (object _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate, comparisonDelegate), out key, new IfKeyKeyValuePairEnumerable(values));
 
         }
 
@@ -1328,7 +1338,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfValuesEnumerable<T>(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate, comparisonDelegate(value, _value)), new IfValuesEnumerable<T>(values, predicate));
 
         }
 
@@ -1340,7 +1350,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), new IfValuesEnumerable<T>(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate, comparisonDelegate), new IfValuesEnumerable<T>(values, predicate));
 
         }
 
@@ -1354,7 +1364,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), new IfKeyValuePairEnumerable<T>(values));
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate, comparisonDelegate(value, _value)), new IfKeyValuePairEnumerable<T>(values));
 
         }
 
@@ -1366,7 +1376,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), new IfKeyValuePairEnumerable<T>(values));
+            return IfInternal(comparisonType, comparisonMode, (T _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate, comparisonDelegate), new IfKeyValuePairEnumerable<T>(values));
 
         }
 
@@ -1404,7 +1414,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyValuesEnumerable<TKey, TValue>(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate, comparisonDelegate(value, _value)), out key, new IfKeyValuesEnumerable<TKey, TValue>(values, predicate));
 
         }
 
@@ -1416,7 +1426,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), out key, new IfKeyValuesEnumerable<TKey, TValue>(values, predicate));
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate, comparisonDelegate), out key, new IfKeyValuesEnumerable<TKey, TValue>(values, predicate));
 
         }
 
@@ -1428,7 +1438,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidIfMethodArg(comparisonType, comparisonMode, comparison);
 
-            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate(), comparisonDelegate(value, _value)), out key, new IfKeyKeyValuePairEnumerable<TKey, TValue>(values));
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckIfComparison(comparison, _predicate, comparisonDelegate(value, _value)), out key, new IfKeyKeyValuePairEnumerable<TKey, TValue>(values));
 
         }
 
@@ -1440,7 +1450,7 @@ namespace WinCopies.Util
 
             ThrowOnInvalidEqualityIfMethodArg(comparisonType, comparisonMode, comparison, comparisonDelegate);
 
-            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate(), comparisonDelegate), out key, new IfKeyKeyValuePairEnumerable<TKey, TValue>(values));
+            return IfInternal(comparisonType, comparisonMode, (TValue _value, Func<bool> _predicate) => CheckEqualityComparison(comparison, _value, value, _predicate, comparisonDelegate), out key, new IfKeyKeyValuePairEnumerable<TKey, TValue>(values));
 
         }
 
@@ -1674,7 +1684,7 @@ namespace WinCopies.Util
 
         }
 
-        public static object GetIf(object x, object y, WinCopies.Collections.Comparison comparison, Func lower, Func greater, Func equals)
+        public static object GetIf(object x, object y, WinCopies.Collections.Comparison comparison, Func lower, Func equals, Func greater)
 
         {
 
@@ -1688,7 +1698,7 @@ namespace WinCopies.Util
 
         }
 
-        public static TResult GetIf<TValues, TResult>(TValues x, TValues y, Comparison<TValues> comparison, Func<TResult> lower, Func<TResult> greater, Func<TResult> equals)
+        public static TResult GetIf<TValues, TResult>(TValues x, TValues y, Comparison<TValues> comparison, Func<TResult> lower, Func<TResult> equals, Func<TResult> greater)
 
         {
 
@@ -1702,7 +1712,7 @@ namespace WinCopies.Util
 
         }
 
-        public static object GetIf(object x, object y, IComparer comparer, Func lower, Func greater, Func equals)
+        public static object GetIf(object x, object y, IComparer comparer, Func lower, Func equals, Func greater)
 
         {
 
@@ -1716,7 +1726,7 @@ namespace WinCopies.Util
 
         }
 
-        public static TResult GetIf<TValues, TResult>(TValues x, TValues y, WinCopies.Collections.Comparison comparison, Func<TResult> lower, Func<TResult> greater, Func<TResult> equals)
+        public static TResult GetIf<TValues, TResult>(TValues x, TValues y, WinCopies.Collections.Comparison comparison, Func<TResult> lower, Func<TResult> equals, Func<TResult> greater)
 
         {
 
