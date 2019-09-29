@@ -3,12 +3,12 @@
   <Class Name="WinCopies.IO.ArchiveItemInfo">
     <Position X="7" Y="22.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAABABAACAAQAAkAEAIIBQAACAEQAAAAAAABAwAAEA=</HashCode>
+      <HashCode>AAAABABAACAAQAAEAEAIIBQAACAEAAAAAAAABAwAAEA=</HashCode>
       <FileName>ArchiveItemInfo.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="WinCopies.IO.ArchiveItemInfoFactory&lt;TItems&gt;" Collapsed="true">
+  <Class Name="WinCopies.IO.ArchiveItemInfoFactory" Collapsed="true">
     <Position X="14" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAgAAAA=</HashCode>
@@ -19,12 +19,12 @@
   <Class Name="WinCopies.IO.ArchiveItemInfoProvider" Collapsed="true">
     <Position X="1.75" Y="12" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAACAAAAAAAAAABAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
       <FileName>ArchiveItemInfoProvider.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="WinCopies.IO.ArchiveLoader&lt;TPath, TItems, TFactory&gt;" Collapsed="true">
+  <Class Name="WinCopies.IO.ArchiveLoader&lt;TPath, TItems, TSubItems, TFactory, TItemsFactory&gt;" Collapsed="true">
     <Position X="1" Y="9.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgAAAA=</HashCode>
@@ -34,12 +34,12 @@
   <Class Name="WinCopies.IO.BrowsableObjectInfo">
     <Position X="7" Y="5.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>IQAABIBAACAAAAAgAEAKQBAQAIAEQAgAAAAAAAwAAEA=</HashCode>
+      <HashCode>IAAABIBAACAAAAAAAEAIQBAQAIAEAAAAAAAAAAwAAEA=</HashCode>
       <FileName>BrowsableObjectInfo.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="WinCopies.IO.BrowsableObjectInfoLoader&lt;TPath, TItems, TFactory&gt;" Collapsed="true">
+  <Class Name="WinCopies.IO.BrowsableObjectInfoLoader&lt;TPath, TItems, TSubItems, TFactory&gt;" Collapsed="true">
     <Position X="9.75" Y="3.75" Width="3.5" />
     <TypeIdentifier>
       <HashCode>IAAAgIAEQCUCwAIgBQAAgBBAAJAkQKAEAgQQaQiCEAI=</HashCode>
@@ -71,7 +71,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="WinCopies.IO.FileSystemObjectLoader&lt;TPath, TItems, TFactory&gt;">
+  <Class Name="WinCopies.IO.FileSystemObjectLoader&lt;TPath, TItems, TSubItems, TFactory&gt;">
     <Position X="10.25" Y="14.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
@@ -86,7 +86,7 @@
       <FileName>FolderLoader.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="WinCopies.IO.FolderLoader&lt;TPath, TItems, TFactory&gt;" Collapsed="true">
+  <Class Name="WinCopies.IO.FolderLoader&lt;TPath, TItems, TSubItems, TFactory, TItemsFactory&gt;" Collapsed="true">
     <Position X="17.75" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAABAAEACAAAAAAAAAAAAAAAEAEAABBAAIACEgAEQA=</HashCode>
@@ -112,7 +112,7 @@
   <Class Name="WinCopies.IO.RegistryItemInfo">
     <Position X="7" Y="28.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAABAACAQAAQkgMAYIBQAAEAFQIAAAAAAAcwAAEA=</HashCode>
+      <HashCode>AAAAAABAACAQAAQEgMAYIBQAAEAFAIAAACAAAUwAAEA=</HashCode>
       <FileName>RegistryItemInfo.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -124,7 +124,7 @@
       <FileName>RegistryItemInfoComparer.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="WinCopies.IO.RegistryItemInfoFactory&lt;T&gt;" Collapsed="true">
+  <Class Name="WinCopies.IO.RegistryItemInfoFactory" Collapsed="true">
     <Position X="20.75" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAgAAAA=</HashCode>
@@ -132,7 +132,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="WinCopies.IO.RegistryKeyLoader&lt;TPath, TItems, TFactory&gt;" Collapsed="true">
+  <Class Name="WinCopies.IO.RegistryKeyLoader&lt;TPath, TItems, TSubItems, TFactory, TItemsFactory&gt;" Collapsed="true">
     <Position X="20.25" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAgAQAA=</HashCode>
@@ -143,12 +143,12 @@
   <Class Name="WinCopies.IO.ShellObjectInfo">
     <Position X="7" Y="15.75" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>IAAAAABAACAAAAAkCEAIIBQAACAEQgIAAAABBgwEEEA=</HashCode>
+      <HashCode>IAAAAABAACAAAAAECEAIIBQAAAAEQgIAAAABBAwEEEA=</HashCode>
       <FileName>ShellObjectInfo.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="WinCopies.IO.ShellObjectInfoFactory&lt;TItems, TArchiveItemInfoItems&gt;" Collapsed="true">
+  <Class Name="WinCopies.IO.ShellObjectInfoFactory" Collapsed="true">
     <Position X="13" Y="19" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAACAEAAAAAAAAAAgAAAA=</HashCode>
@@ -159,7 +159,7 @@
   <Class Name="WinCopies.IO.WMIItemInfo">
     <Position X="7" Y="36" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAAAEADAQCIFAAQkgENMIBQAAAgGQIAQEEAgAAwABkA=</HashCode>
+      <HashCode>QAAAEADAQCIFAAQEgENMIBQAAAgGAIAQAEAgAAwABkA=</HashCode>
       <FileName>WMIItemInfo.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -171,7 +171,7 @@
       <FileName>WMIItemInfoComparer.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="WinCopies.IO.WMIItemInfoFactory&lt;TItems&gt;" Collapsed="true">
+  <Class Name="WinCopies.IO.WMIItemInfoFactory" Collapsed="true">
     <Position X="12.5" Y="15.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAQAAEAAAAAAAAAgAAAAEAAAAAAAAAAhAAAA=</HashCode>
@@ -187,7 +187,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="WinCopies.IO.WMILoader&lt;TPath, TItems, TFactory&gt;" Collapsed="true">
+  <Class Name="WinCopies.IO.WMILoader&lt;TPath, TItems, TSubItems, TFactory, TItemsFactory&gt;" Collapsed="true">
     <Position X="10.75" Y="19.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAEAAIAAAAAAAAABAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
@@ -198,7 +198,7 @@
   <Class Name="WinCopies.IO.BrowsableObjectInfoFactory">
     <Position X="13.5" Y="0.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>ICAAAAAAAAAAAAEAAEAAAAAAAIAEAgAAEAAAAAgBAIA=</HashCode>
+      <HashCode>IAAAAAAAAAAAAAIAAAAAAAAAAIAEAAAAAAAAAAgAAAA=</HashCode>
       <FileName>BrowsableObjectInfoFactory.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -220,7 +220,7 @@
   <Interface Name="WinCopies.IO.IArchiveItemInfoProvider" Collapsed="true">
     <Position X="13.75" Y="8" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAABAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
       <FileName>ArchiveItemInfoProvider.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -248,32 +248,25 @@
   <Interface Name="WinCopies.IO.IBrowsableObjectInfo">
     <Position X="4.5" Y="5.25" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AQAAAABAAAAAAAAgAEAKQBAAAAAAQAgAAAAAAAAAAEA=</HashCode>
-      <FileName>IBrowsableObjectInfo.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
-  <Interface Name="WinCopies.IO.IBrowsableObjectInfo&lt;TItems, TFactory&gt;">
-    <Position X="4.5" Y="9.25" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAACAAAIAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAABAAAAAAAAAAEAIQBAAAAAAAAAAAAAAAAAAAEA=</HashCode>
       <FileName>IBrowsableObjectInfo.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="WinCopies.IO.IBrowsableObjectInfoFactory" Collapsed="true">
     <Position X="21" Y="8.75" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IBrowsableObjectInfoFactory.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="WinCopies.IO.IBrowsableObjectInfoLoader" Collapsed="true">
     <Position X="9.5" Y="2.25" Width="3.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgAAAAAAAAAIgAAAAAAAAABAAQAAAAAAQAAAAAAA=</HashCode>
+      <HashCode>AAAAgAAAAAAAAAAgAAAAAAAAABAAQAAAAAAQAAAAAAA=</HashCode>
       <FileName>IBrowsableObjectInfoLoader.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="WinCopies.IO.IBrowsableObjectInfoLoader&lt;T&gt;" Collapsed="true">
+  <Interface Name="WinCopies.IO.IBrowsableObjectInfoLoader&lt;TPath, TItems&gt;" Collapsed="true">
     <Position X="16.5" Y="8.75" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -343,7 +336,7 @@
       <FileName>WMIItemInfoFactoryOptions.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="WinCopies.IO.IWMILoader&lt;T&gt;" Collapsed="true">
+  <Interface Name="WinCopies.IO.IWMILoader" Collapsed="true">
     <Position X="12.25" Y="17.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -368,14 +361,14 @@
     <Position X="24.25" Y="8.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAIAAAQAAAAAAAAAA=</HashCode>
-      <FileName>WMIItemInfo.cs</FileName>
+      <FileName>WMIItemType.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="WinCopies.IO.WMIItemTypes" Collapsed="true">
     <Position X="63" Y="9.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAIAAAQAAAAAEAAAA=</HashCode>
-      <FileName>WMIItemInfo.cs</FileName>
+      <FileName>WMIItemType.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Delegate Name="WinCopies.IO.ArchiveFileInfoDeepClone">
