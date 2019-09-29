@@ -21,7 +21,7 @@ namespace WinCopies.Collections
     public abstract class ReadOnlyTreeNode<T> : ITreeNode<T>
 
     {
-        private readonly T _value;
+        private T _value;
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="ReadOnlyTreeNode{T}"/> is read-only. This value is always <see langword="false"/> for this class.
@@ -51,6 +51,8 @@ namespace WinCopies.Collections
         /// Gets the value of the object.
         /// </summary>
         public virtual T Value { get => _value; set => throw new NotSupportedException("The current node is read-only."); }
+
+        protected virtual void SetValue(T newValue) => _value = newValue ; 
 
         object IValueObject.Value { get => _value; set => throw new NotSupportedException("The current node is read-only."); }
 

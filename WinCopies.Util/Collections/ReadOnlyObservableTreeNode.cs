@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 namespace WinCopies.Collections
 {
     /// <summary>
-    /// Represents an observable <see cref="TreeNode{TValue, TItems}"/>.
+    /// Represents an observable <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.
     /// </summary>
     /// <typeparam name="TValue">The value type.</typeparam>
     /// <typeparam name="TItems">The items type.</typeparam>
     [Serializable]
     [DebuggerDisplay("Value = {Value}, Count = {Count}")]
-    public class ReadOnlyObservableTreeNode<TValue, TItems> : TreeNode<TValue, TItems>, IReadOnlyObservableTreeNode<TValue, TItems>
+    public class ReadOnlyObservableTreeNode<TValue, TItems> : ReadOnlyTreeNode<TValue, TItems>, IReadOnlyObservableTreeNode<TValue, TItems>
     {
 
         [Serializable]
@@ -47,20 +47,20 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="value">The value of the new tree node.</param>
         /// <param name="items">Items to copy to the new tree node.</param>
-        public ReadOnlyObservableTreeNode(TValue value, List<TreeNode<TItems>> items) : this(value, collection: items) { }
+        public ReadOnlyObservableTreeNode(TValue value, List<ReadOnlyTreeNode<TItems>> items) : this(value, collection: items) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableTreeNode{TValue, TItems}"/> class with a custom value and copy the items of <paramref name="collection"/>.
         /// </summary>
         /// <param name="value">The valeu of the new tree node.</param>
         /// <param name="collection">Items to copy to the new tree node.</param>
-        public ReadOnlyObservableTreeNode(TValue value, IEnumerable<TreeNode<TItems>> collection) : base(value: value) => CopyItems(collection);
+        public ReadOnlyObservableTreeNode(TValue value, IEnumerable<ReadOnlyTreeNode<TItems>> collection) : base(value: value) => CopyItems(collection);
 
-        private void CopyItems(IEnumerable<TreeNode<TItems>> collection)
+        private void CopyItems(IEnumerable<ReadOnlyTreeNode<TItems>> collection)
 
         {
 
-            foreach (TreeNode<TItems> node in collection)
+            foreach (ReadOnlyTreeNode<TItems> node in collection)
 
                 Items.Add(node);
 
@@ -113,7 +113,7 @@ namespace WinCopies.Collections
 
             CheckReentrancy();
 
-            TreeNode<TItems> removedItem = this[index];
+            ReadOnlyTreeNode<TItems> removedItem = this[index];
 
             base.RemoveItem(index);
 
@@ -123,7 +123,7 @@ namespace WinCopies.Collections
 
         }
 
-        protected override void InsertItem(int index, TreeNode<TItems> item)
+        protected override void InsertItem(int index, ReadOnlyTreeNode<TItems> item)
         {
 
             CheckReentrancy();
@@ -136,12 +136,12 @@ namespace WinCopies.Collections
 
         }
 
-        protected override void SetItem(int index, TreeNode<TItems> item)
+        protected override void SetItem(int index, ReadOnlyTreeNode<TItems> item)
         {
 
             CheckReentrancy();
 
-            TreeNode<TItems> originalItem = this[index];
+            ReadOnlyTreeNode<TItems> originalItem = this[index];
 
             base.SetItem(index, item);
 
@@ -157,7 +157,7 @@ namespace WinCopies.Collections
 
             CheckReentrancy();
 
-            TreeNode<TItems> removedItem = this[oldIndex];
+            ReadOnlyTreeNode<TItems> removedItem = this[oldIndex];
 
             base.RemoveItem(oldIndex);
 
@@ -174,7 +174,7 @@ namespace WinCopies.Collections
         #region Protected Methods
 
         /// <summary>
-        /// Calls <see cref="OnPropertyChanged(PropertyChangedEventArgs)"/> for the <see cref="TreeNode{TValue, TItems}.Count"/> property, then for the indexer property.
+        /// Calls <see cref="OnPropertyChanged(PropertyChangedEventArgs)"/> for the <see cref="ReadOnlyTreeNode{TValue, TItems}.Count"/> property, then for the indexer property.
         /// </summary>
         protected virtual void OnCountChanged()
 
