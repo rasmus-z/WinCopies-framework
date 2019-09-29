@@ -158,7 +158,7 @@ namespace WinCopies.IO
 
                     // todo: may not work with ShellObjectWatcher
 
-                    Path.Items.Add( new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>( (TItems)Path.Factory.GetBrowsableObjectInfo(path, FileType.File, SpecialFolder.OtherFolderOrFile, ShellObject.FromParsingName(path), ShellObjectInfo.DefaultShellObjectDeepClone)));
+                    Path.Insert( Path.Count, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>( (TItems)Path.Factory.GetBrowsableObjectInfo(path, FileType.File, SpecialFolder.OtherFolderOrFile, ShellObject.FromParsingName(path), ShellObjectInfo.DefaultShellObjectDeepClone), (TItemsFactory) Path.Factory.DeepClone()));
 
                 }
 #if DEBUG
@@ -208,13 +208,13 @@ namespace WinCopies.IO
 
             else
 
-                for (int i = 0; i < Path.Items.Count; i++)
+                for (int i = 0; i < Path.Count; i++)
 
-                    if (Path.Items[i].Value.Path == path)
+                    if (Path[i].Value.Path == path)
 
                     {
 
-                        Path.Items.RemoveAt(i);
+                        Path.RemoveAt(i);
 
                         return;
 
@@ -233,10 +233,6 @@ namespace WinCopies.IO
         {
 
             if (FileTypes == FileTypes.None) return;
-
-            else if (FileTypes.HasFlag(GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
-
-                throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
 
 #if DEBUG
 
@@ -398,7 +394,7 @@ namespace WinCopies.IO
 
                         if (CheckFilter(file))
 
-                            AddFile(file, (ShellFile)(shellObject = (ShellFile)ShellObject.FromParsingName(file)));
+                            AddFile(file, (shellObject = ShellObject.FromParsingName(file)));
 
                 }
 
@@ -461,6 +457,10 @@ namespace WinCopies.IO
 
 
 
+            Debug.WriteLine("cFileTypes: " + FileTypes.ToString());
+
+
+
             IEnumerable<PathInfo> pathInfos;
 
 
@@ -509,12 +509,15 @@ namespace WinCopies.IO
                             Debug.WriteLine("path_.Path: " + path_.Path);
                             Debug.WriteLine("path_.Normalized_Path: " + path_.NormalizedPath);
                             Debug.WriteLine("path_.Shell_Object: " + path_.ShellObject);
+                            Debug.WriteLine("Path.Factory is null: " + (Path.Factory is null).ToString());
 
 #endif
 
                             // new_Path.LoadThumbnail();
 
-                            ReportProgress(0, Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.FileType, IO.Path.GetSpecialFolder(path_.ShellObject), path_.ShellObject, ShellObjectInfo.DefaultShellObjectDeepClone));
+                            Debug.WriteLine("FileTypes: " + FileTypes.ToString());
+
+                            ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>( (TItems) Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.FileType, IO.Path.GetSpecialFolder(path_.ShellObject), path_.ShellObject, ShellObjectInfo.DefaultShellObjectDeepClone), (TItemsFactory) Path.Factory.DeepClone()));
 
                         } while (_paths.MoveNext());
 

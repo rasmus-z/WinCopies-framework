@@ -181,15 +181,21 @@ namespace WinCopies.IO
 
         {
 
-            IsDisposing = true;
+            if (!IsDisposed)
 
-            Dispose(true);
+            {
 
-            GC.SuppressFinalize(this);
+                IsDisposing = true;
 
-            IsDisposed = true;
+                Dispose(true);
 
-            IsDisposing = false;
+                GC.SuppressFinalize(this);
+
+                IsDisposed = true;
+
+                IsDisposing = false;
+
+            }
 
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 
 using WinCopies.Collections;
@@ -813,9 +814,21 @@ namespace WinCopies.IO
         protected virtual void OnProgressChanged(ProgressChangedEventArgs e)
         {
 
-            if (e.UserState is BrowsableObjectTreeNode< TItems , TSubItems, TFactory >     item)
+            Debug.WriteLine("e.UserState is BrowsableObjectTreeNode<TItems, TSubItems, TFactory>: " + (e.UserState is BrowsableObjectTreeNode<TItems, TSubItems, TFactory>).ToString());
 
-                Path.Items.Add(item);
+            Debug.WriteLine("e.UserState.GetType(): " + e.UserState.GetType().ToString());
+
+            try
+            {
+
+                if (e.UserState is ITreeNode item)
+
+                    Path.Insert( Path.Count, (ReadOnlyTreeNode<TItems>)item);
+
+                Debug.WriteLine("azerty: " + Path.Count) ; 
+
+            }
+            catch (Exception ex) { Debug.WriteLine("azerty: " + ex.Message); }
 
         }
 

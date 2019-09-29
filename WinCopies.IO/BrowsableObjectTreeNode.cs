@@ -54,36 +54,39 @@ namespace WinCopies.IO
     public class BrowsableObjectTreeNode<TValue, TItems, TFactory> : ReadOnlyTreeNode<TValue, TItems>, IBrowsableObjectTreeNode<TValue, TItems> where TValue : BrowsableObjectInfo where TItems : BrowsableObjectInfo where TFactory : BrowsableObjectInfoFactory
     {
 
-        protected internal new System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>> Items => base.Items;
+        internal void Insert(int index, ReadOnlyTreeNode<TItems> item) => InsertItem(index, item);
+
+        internal void RemoveAt(int index) => RemoveItem(index);
 
         public IBrowsableObjectInfoLoader<TValue, TItems> ItemsLoader { get; internal set; }
 
         private ITreeNode _parent;
 
-        private Func<ITreeNode> _getParentDelegate;
+        //private Func<ITreeNode> _getParentDelegate;
 
-        public override ITreeNode Parent
-        {
+        //public override ITreeNode Parent
+        //{
 
-            get
-            {
+        //    get
+        //    {
 
-                if (_parent is null)
+        //        if (_parent is null)
 
-                {
-                    _parent = _getParentDelegate();
+        //        {
 
-                    _getParentDelegate = null;
+        //            _parent = _getParentDelegate();
 
-                }
+        //            _getParentDelegate = null;
 
-                return _parent;
+        //        }
 
-            }
+        //        return _parent;
 
-            protected set => _parent = value;
+        //    }
 
-        }
+        //    protected set => _parent = value;
+
+        //}
 
         private TFactory _factory;
 
@@ -135,13 +138,9 @@ namespace WinCopies.IO
         /// </summary>
         public bool AreItemsLoaded { get; internal set; }
 
-        public BrowsableObjectTreeNode(TValue value) : base(value)
-        {
-        }
+        public BrowsableObjectTreeNode(TValue value, TFactory factory) : base(value) => Factory = factory;
 
-        public BrowsableObjectTreeNode(TValue value, System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>> items) : base(value, items)
-        {
-        }
+        public BrowsableObjectTreeNode(TValue value, System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>> items, TFactory factory) : base(value, items) => Factory = factory;
 
         ///// <summary>
         ///// Loads the items of this <see cref="BrowsableObjectInfo"/>.

@@ -15,6 +15,7 @@ using System.Security;
 using System.Reflection;
 using SevenZip;
 using System.Collections.ObjectModel;
+using System.Collections;
 
 namespace WinCopies.IO
 {
@@ -152,7 +153,7 @@ namespace WinCopies.IO
 
             var browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( shellObject.IsFileSystemObject
                 ? new ShellObjectInfo(paths[0], FileType.Drive, SpecialFolder.OtherFolderOrFile, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone)
-                                : new ShellObjectInfo(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObject, ShellObjectInfo.DefaultShellObjectDeepClone));
+                                : new ShellObjectInfo(paths[0], FileType.SpecialFolder, GetSpecialFolder(shellObject), shellObject, ShellObjectInfo.DefaultShellObjectDeepClone), new ShellObjectInfoFactory());
 
             if (paths.Length == 1)
 
@@ -210,13 +211,13 @@ namespace WinCopies.IO
 
                     // todo: re-use:
 
-                    using (var archiveLoader = new ArchiveLoader<ArchiveItemInfo, ArchiveItemInfo, ArchiveItemInfo, ArchiveItemInfoFactory, ArchiveItemInfoFactory>( new BrowsableObjectTreeNode<ArchiveItemInfo, ArchiveItemInfo, ArchiveItemInfoFactory>( (ArchiveItemInfo) browsableObjectInfo.Value ), GetAllEnumFlags<FileTypes>(), true, false))
+                    using (var archiveLoader = new ArchiveLoader<ArchiveItemInfo, ArchiveItemInfo, ArchiveItemInfo, ArchiveItemInfoFactory, ArchiveItemInfoFactory>( new BrowsableObjectTreeNode<ArchiveItemInfo, ArchiveItemInfo, ArchiveItemInfoFactory>( (ArchiveItemInfo) browsableObjectInfo.Value, new ArchiveItemInfoFactory() ), GetAllEnumFlags<FileTypes>(), true, false))
 
                         archiveLoader.LoadItems();
 
                     string s = paths[i].ToLower();
 
-                    browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo(browsableObjectInfo.Items.FirstOrDefault(item => item.Value.Path.Substring(item.Value.Path.LastIndexOf(IO.Path.PathSeparator) + 1).ToLower() == s).Value as FileSystemObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo.Value)));
+                    browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo( ((System.Collections.Generic.IList< TreeNode< FileSystemObjectInfo >>) browsableObjectInfo).FirstOrDefault(item => item.Value.Path.Substring(item.Value.Path.LastIndexOf(IO.Path.PathSeparator) + 1).ToLower() == s).Value as FileSystemObjectInfo ?? throw new FileNotFoundException("The path could not be found.", browsableObjectInfo.Value)), new ShellObjectInfoFactory());
 
                 }
 
@@ -261,7 +262,7 @@ namespace WinCopies.IO
                     //#endif
 
 #pragma warning disable IDE0068 // Disposed manually when needed
-                    browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo(new ShellObjectInfo(s, fileType, specialFolder, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone)));
+                    browsableObjectInfo = new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo(new ShellObjectInfo(s, fileType, specialFolder, shellObject, ShellObjectInfo.DefaultShellObjectDeepClone)), new ShellObjectInfoFactory());
 #pragma warning restore IDE0068
 
 #if DEBUG
@@ -276,7 +277,7 @@ namespace WinCopies.IO
 
             }
 
-            return new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo(browsableObjectInfo.Value));
+            return new BrowsableObjectTreeNode<FileSystemObjectInfo, FileSystemObjectInfo, BrowsableObjectInfoFactory>( getBrowsableObjectInfo(browsableObjectInfo.Value), new ShellObjectInfoFactory());
 
         }
 

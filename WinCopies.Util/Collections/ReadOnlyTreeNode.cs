@@ -75,6 +75,8 @@ namespace WinCopies.Collections
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() => Value is object ? Value.GetHashCode() : base.GetHashCode();
 
+        public override string ToString() => Value?.ToString() ?? base.ToString();
+
         #region IDisposable Support
         private bool disposedValue = false;
 
