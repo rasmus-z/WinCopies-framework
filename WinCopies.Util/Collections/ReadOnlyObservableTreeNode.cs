@@ -16,7 +16,7 @@ namespace WinCopies.Collections
     /// <typeparam name="TItems">The items type.</typeparam>
     [Serializable]
     [DebuggerDisplay("Value = {Value}, Count = {Count}")]
-    public class ReadOnlyObservableTreeNode<TValue, TItems> : TreeNode<TValue, TItems>, System.Collections.Specialized.INotifyCollectionChanged, INotifyPropertyChanged
+    public class ReadOnlyObservableTreeNode<TValue, TItems> : TreeNode<TValue, TItems>, IReadOnlyObservableTreeNode<TValue, TItems>
     {
 
         [Serializable]

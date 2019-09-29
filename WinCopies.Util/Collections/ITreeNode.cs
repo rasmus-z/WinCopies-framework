@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +48,20 @@ namespace WinCopies.Collections
     {
 
         bool Contains(TItems item);
+
+    }
+
+    public interface IObservableTreeNode<TValue, TItems> : ITreeNode<TValue, TItems>, System.Collections.Specialized.INotifyCollectionChanged, INotifyPropertyChanged
+    {
+
+
+
+    }
+
+    public interface IReadOnlyObservableTreeNode<TValue, TItems> : IReadOnlyTreeNode<TValue, TItems>, System.Collections.Specialized.INotifyCollectionChanged, INotifyPropertyChanged
+    {
+
+
 
     }
 
