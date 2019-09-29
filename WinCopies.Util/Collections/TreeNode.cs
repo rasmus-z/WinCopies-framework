@@ -47,10 +47,14 @@ namespace WinCopies.Collections
         /// </summary>
         public virtual ITreeNode Parent { get; protected internal set; }
 
+        private T _value;
+
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
-        public virtual T Value { get; set; }
+        public T Value { get => _value; set => SetValue(value); }
+
+        protected virtual void SetValue(T newValue) => _value = newValue;
 
         object IValueObject.Value { get => Value; set => Value = (T)value; }
 
@@ -156,7 +160,12 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="value">The value of the new <see cref="TreeNode{TValue, TItems}"/>.</param>
         /// <param name="items">A custom inner <see cref="IList{T}"/>.</param>
-        public TreeNode(TValue value, System.Collections.Generic.IList<TreeNode<TItems>> items) : base(value) => Items = items;
+        public TreeNode(TValue value, System.Collections.Generic.IList<TreeNode<TItems>> items) : base(value)
+        {
+            ThrowIfNull(items, nameof(items));
+
+            Items = items;
+        }
 
         /// <summary>
         /// Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
@@ -589,7 +598,7 @@ namespace WinCopies.Collections
         /// <summary>
         /// Removes all items of this <see cref="TreeNode{TValue, TItems}"/>. You can override this method in order to change the behavior of the <see cref="Clear"/> method.
         /// </summary>
-        protected void ClearItems()
+        protected virtual void ClearItems()
         {
             foreach (TreeNode<TItems> item in this)
 
@@ -602,7 +611,7 @@ namespace WinCopies.Collections
         /// Removes the item at a given index. You can override this method in order to change the behavior of the Remove methods.
         /// </summary>
         /// <param name="index">The index from which to remove the item.</param>
-        protected void RemoveItem(int index)
+        protected virtual void RemoveItem(int index)
         {
             this[index].Parent = null;
 
@@ -614,7 +623,7 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="index">The index at which to set <paramref name="item"/>.</param>
         /// <param name="item">The item to update with.</param>
-        protected void SetItem(int index, TreeNode<TItems> item)
+        protected virtual void SetItem(int index, TreeNode<TItems> item)
         {
             ThrowOnInvalidItem(item);
 

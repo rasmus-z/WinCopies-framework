@@ -158,7 +158,12 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="value">The value of the new <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.</param>
         /// <param name="items">A custom inner <see cref="IList{T}"/>.</param>
-        public ReadOnlyTreeNode(TValue value, System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>> items) : base(value) => Items = items;
+        public ReadOnlyTreeNode(TValue value, System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>> items) : base(value)
+        {
+            ThrowIfNull(items, nameof(items));
+
+            Items = items;
+        }
 
         [NonSerialized]
         private object _syncRoot;

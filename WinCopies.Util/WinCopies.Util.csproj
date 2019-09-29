@@ -117,6 +117,8 @@
     <Compile Include="Collections\Comparers.cs" />
     <Compile Include="Collections\ICollection.cs" />
     <Compile Include="Collections\ITreeNode.cs" />
+    <Compile Include="Collections\ObservableTreeNode.cs" />
+    <Compile Include="Collections\ReadOnlyObservableTreeNode.cs" />
     <Compile Include="Collections\ReadOnlyTreeNode.cs" />
     <Compile Include="Collections\TreeNode.cs" />
     <Compile Include="Data\CheckableObject.cs" />
