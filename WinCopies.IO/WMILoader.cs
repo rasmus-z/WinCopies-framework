@@ -24,7 +24,7 @@ namespace WinCopies.IO
     public class WMILoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory>, IWMILoader where TPath : WMIItemInfo where TItems : WMIItemInfo where TSubItems : WMIItemInfo where TFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory where TItemsFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
     {
 
-        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new WMILoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, WMIItemTypes, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone());
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new WMILoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, WMIItemTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
 
         private readonly WMIItemTypes _wmiItemTypes;
 
@@ -40,7 +40,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, wmiItemTypes, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+        public WMILoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, wmiItemTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> class using a custom comparer.
@@ -49,7 +49,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="wmiItemTypes">The WMI item types to load.</param>
-        public WMILoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer) : base(path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _wmiItemTypes = wmiItemTypes;
+        public WMILoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, WMIItemTypes wmiItemTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) => _wmiItemTypes = wmiItemTypes;
 
         //public override bool CheckFilter(string path) => throw new NotImplementedException();
 

@@ -58,7 +58,7 @@ namespace WinCopies.Collections
         /// Initializes a new instance of the <see cref="ReadOnlyTreeNode{T}"/> class.
         /// </summary>
         /// <param name="value">The value of the new <see cref="ReadOnlyTreeNode{T}"/>.</param>
-        protected ReadOnlyTreeNode(T value) => Value = value;
+        protected ReadOnlyTreeNode(T value) => _value = value;
 
         /// <summary>
         /// Determines whether this object is equal to a given object.
@@ -158,14 +158,7 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="value">The value of the new <see cref="ReadOnlyTreeNode{TValue, TItems}"/>.</param>
         /// <param name="items">A custom inner <see cref="IList{T}"/>.</param>
-        public ReadOnlyTreeNode(TValue value, System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>> items) : base(value)
-        {
-            if (!items.IsReadOnly)
-
-                throw new ArgumentException("The item collection must be read-only.");
-
-            Items = items;
-        }
+        public ReadOnlyTreeNode(TValue value, System.Collections.Generic.IList<ReadOnlyTreeNode<TItems>> items) : base(value) => Items = items;
 
         [NonSerialized]
         private object _syncRoot;
@@ -410,6 +403,10 @@ namespace WinCopies.Collections
             if (item.Parent is object)
 
                 throw new InvalidOperationException("The given item already has a parent node.");
+
+            if (!item.IsReadOnly)
+
+                throw new ArgumentException("The given item is not read-only.");
 
         }
 

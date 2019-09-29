@@ -15,17 +15,17 @@ namespace WinCopies.IO
 
     {
 
-        public static bool ValidatePropertySet(IBrowsableObjectInfoFactory factory) => factory.Path?.ItemsLoader?.IsBusy == false;
+        //public static bool ValidatePropertySet(IBrowsableObjectInfoFactory factory) => factory.Loader?.IsBusy == false;
 
-        public static void ThrowOnInvalidPropertySet(IBrowsableObjectInfoFactory factory)
+        //public static void ThrowOnInvalidPropertySet(IBrowsableObjectInfoFactory factory)
 
-        {
+        //{
 
-            if ( factory. Path?.ItemsLoader?.IsBusy == true)
+        //    if ( factory.Loader?.IsBusy == true)
 
-                throw new InvalidOperationException($"The Path's ItemsLoader of the current {nameof(BrowsableObjectInfoFactory)} is busy.");
+        //        throw new InvalidOperationException($"The Path's ItemsLoader of the current {nameof(BrowsableObjectInfoFactory)} is busy.");
 
-        }
+        //}
 
         public IBrowsableObjectInfo Path { get; }
 

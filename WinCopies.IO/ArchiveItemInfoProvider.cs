@@ -54,13 +54,6 @@ namespace WinCopies.IO
         /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
         protected ArchiveItemInfoProvider(string path, FileType fileType) : base(path, fileType) { }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            ArchiveShellObject.Dispose();
-        }
-
         //    protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)
         //    {
 

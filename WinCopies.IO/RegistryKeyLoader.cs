@@ -35,7 +35,7 @@ namespace WinCopies.IO
     public class RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory>, IRegistryKeyLoader where TPath : RegistryItemInfo where TItems : RegistryItemInfo where TSubItems : RegistryItemInfo where TFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory where TItemsFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory
     {
 
-        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, WorkerReportsProgress, WorkerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), RegistryItemTypes);
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, RegistryItemTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
 
         private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
 
@@ -54,7 +54,7 @@ namespace WinCopies.IO
         /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, bool workerReportsProgress, bool workerSupportsCancellation, RegistryItemTypes registryItemTypes) : this(path, workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>(), registryItemTypes) => RegistryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, RegistryItemTypes registryItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, registryItemTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) => RegistryItemTypes = registryItemTypes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TSubItems, TFactory, TItemsFactory}"/> class using a custom comparer.
@@ -63,7 +63,7 @@ namespace WinCopies.IO
         /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
         /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
         /// <param name="registryItemTypes">The registry item types to load.</param>
-        public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, RegistryItemTypes registryItemTypes) : base(path, workerReportsProgress, workerSupportsCancellation, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer) => _registryItemTypes = registryItemTypes;
+        public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, RegistryItemTypes registryItemTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) => _registryItemTypes = registryItemTypes;
 
         //public override bool CheckFilter(string path)
 

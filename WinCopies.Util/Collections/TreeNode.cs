@@ -156,14 +156,7 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="value">The value of the new <see cref="TreeNode{TValue, TItems}"/>.</param>
         /// <param name="items">A custom inner <see cref="IList{T}"/>.</param>
-        public TreeNode(TValue value, System.Collections.Generic.IList<TreeNode<TItems>> items) : base(value)
-        {
-            if (items.IsReadOnly)
-
-                throw new ArgumentException("The item collection can not be read-only.");
-
-            Items = items;
-        }
+        public TreeNode(TValue value, System.Collections.Generic.IList<TreeNode<TItems>> items) : base(value) => Items = items;
 
         /// <summary>
         /// Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
@@ -558,6 +551,10 @@ namespace WinCopies.Collections
             if (item.Parent is object)
 
                 throw new InvalidOperationException("The given item already has a parent node.");
+
+            if (item.IsReadOnly)
+
+                throw new ArgumentException("The given item is read-only.");
 
         }
 

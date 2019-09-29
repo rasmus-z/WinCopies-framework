@@ -35,9 +35,9 @@ namespace WinCopies.IO
 
             // browsableObjectInfo.AreItemsLoaded = false;
 
-            if (!(ItemsLoader is null))
+            //if (!(ItemsLoader is null))
 
-                browsableObjectInfo.ItemsLoader = (IBrowsableObjectInfoLoader)ItemsLoader.DeepClone();
+            //    browsableObjectInfo.ItemsLoader = (IBrowsableObjectInfoLoader)ItemsLoader.DeepClone();
 
             // browsableObjectInfo.SetItemsProperty();
 
@@ -96,17 +96,17 @@ namespace WinCopies.IO
 
         {
 
-            if (ItemsLoader != null)
+            //if (ItemsLoader != null)
 
-            {
+            //{
 
-                if (ItemsLoader.IsBusy)
+            //    if (ItemsLoader.IsBusy)
 
-                    ItemsLoader.Cancel();
+            //        ItemsLoader.Cancel();
 
-                // ItemsLoader.Path = null;
+            //    // ItemsLoader.Path = null;
 
-            }
+            //}
 
             if (disposing)
 
@@ -140,11 +140,6 @@ namespace WinCopies.IO
         /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
         /// </summary>
         public abstract bool IsBrowsable { get; }
-
-        /// <summary>
-        /// Gets the items loader for this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public IBrowsableObjectInfoLoader ItemsLoader { get; internal set; }
 
         /// <summary>
         /// Gets a value that indicates whether the current object is disposing.

@@ -15,7 +15,9 @@ namespace WinCopies.IO
 
     {
 
-        IBrowsableObjectInfo Path { get; }
+        // TODO:
+
+        // IBackgroundWorker Loader { get; }
 
     }
 

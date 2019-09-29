@@ -47,11 +47,11 @@ namespace WinCopies.IO
         ///// <exception cref="ArgumentNullException">value is null.</exception>
         //IBrowsableObjectInfoFactory Factory { get; }
 
-        /// <summary>
-        /// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-        IBrowsableObjectInfoLoader ItemsLoader { get; }
+        ///// <summary>
+        ///// Gets or sets the items loader for this <see cref="BrowsableObjectInfo"/>.
+        ///// </summary>
+        ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
+        //IBrowsableObjectInfoLoader ItemsLoader { get; }
 
         ///// <summary>
         ///// Gets the items of this <see cref="IBrowsableObjectInfo"/>.

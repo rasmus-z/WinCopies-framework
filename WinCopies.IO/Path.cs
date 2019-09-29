@@ -184,7 +184,9 @@ namespace WinCopies.IO
 
                 {
 
-                    newValue.ItemsLoader.Dispose();
+                    // todo: uncomment
+
+                    // newValue.ItemsLoader.Dispose();
 
                     return newValue;
 

@@ -23,7 +23,7 @@ namespace WinCopies.IO
             get => _options; set
             {
 
-                ThrowOnInvalidPropertySet(this);
+                // ThrowOnInvalidPropertySet(this);
 
                 _options.Factory = null;
 
