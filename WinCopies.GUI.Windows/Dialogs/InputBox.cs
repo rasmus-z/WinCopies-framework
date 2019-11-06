@@ -142,7 +142,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         }
 
-        protected override void OnCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        protected override void OnCommandExecuted(ExecutedRoutedEventArgs e)
 
         {
 
@@ -152,7 +152,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             else
 
-                base.OnCommandExecuted(sender, e);
+                base.OnCommandExecuted(e);
 
         }
     }

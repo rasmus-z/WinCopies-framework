@@ -1,17 +1,16 @@
-﻿using System.Resources;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // Les informations générales relatives à un assembly dépendent de
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("WinCopies.Data")]
-[assembly: AssemblyDescription("Provides some utilities to interact with data sources.")]
+[assembly: AssemblyTitle("WinCopies.GUI.ViewModels")]
+[assembly: AssemblyDescription("View models for the WinCopies framework")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("WinCopies framework")]
-[assembly: AssemblyCopyright("Copyright © 2019 Pierre Sprimont")]
+[assembly: AssemblyCopyright("Copyright © Pierre Sprimont 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -21,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Le GUID suivant est pour l'ID de la typelib si ce projet est exposé à COM
-[assembly: Guid("4178eaa3-ff93-4234-bf86-5e88d5b063b7")]
+[assembly: Guid("333ee919-8f76-48d7-b531-df15a2f08d3c")]
 
 // Les informations de version pour un assembly se composent des quatre valeurs suivantes :
 //
@@ -35,5 +34,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.0.0.0")]
 [assembly: AssemblyFileVersion("2.0.0.0")]
-[assembly: NeutralResourcesLanguage("")]
-
