@@ -8,46 +8,33 @@ using System.Windows.Controls;
 using WinCopies.GUI.Controls.Models;
 using static WinCopies.Util.Util;
 using WinCopies.Collections;
-using WinCopies.Models;
 using System.Collections;
-
-namespace WinCopies.Models
-{
-
-    public interface IIsReadOnly
-    {
-
-        bool IsReadOnly { get; }
-
-    }
-
-}
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Input;
 
 namespace WinCopies.GUI.Windows.Dialogs.Models
 {
 
     /// <summary>
-    /// Represents a base model for dialog windows.
+    /// Represents a base model that corresponds to a default view for dialog windows.
     /// </summary>
-    public interface IDialogModelBase : IIsReadOnly
+    public interface IDialogModelBase
     {
 
         /// <summary>
         /// Gets or sets the title of this <see cref="IDialogModelBase"/>.
         /// </summary>
-        /// <seealso cref="IIsReadOnly.IsReadOnly"/>
         string Title { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Dialogs.DialogButton"/> value of this <see cref="IDialogModelBase"/>.
         /// </summary>
-        /// <seealso cref="IIsReadOnly.IsReadOnly"/>
         DialogButton DialogButton { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Dialogs.DefaultButton"/> value of this <see cref="IDialogModelBase"/>.
         /// </summary>
-        /// <seealso cref="IIsReadOnly.IsReadOnly"/>
         DefaultButton DefaultButton { get; set; }
 
     }
@@ -58,22 +45,17 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
         /// <summary>
         /// Gets or sets the title of this <see cref="DialogModelBase"/>.
         /// </summary>
-        /// <seealso cref="IsReadOnly"/>
         public string Title { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Dialogs.DialogButton"/> value of this <see cref="DialogModelBase"/>.
         /// </summary>
-        /// <seealso cref="IsReadOnly"/>
         public DialogButton DialogButton { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Dialogs.DefaultButton"/> value of this <see cref="DialogModelBase"/>.
         /// </summary>
-        /// <seealso cref="IsReadOnly"/>
         public DefaultButton DefaultButton { get; set; }
-
-        public virtual bool IsReadOnly { get; }
 
     }
 
@@ -96,213 +78,243 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
 namespace WinCopies.GUI.Controls.Models
 {
 
-    public interface IContentControlModelBase : IIsReadOnly
+    public interface IContentControlModelBase
     {
 
         /// <summary>
         /// Gets or sets the content of this <see cref="IGroupBoxModelBase"/>.
         /// </summary>
-        /// <seealso cref="IIsReadOnly.IsReadOnly"/>
         object Content { get; set; }
 
     }
 
-    public interface IContentControlModelBase<T> : IIsReadOnly, IContentControlModelBase
+    public class ContentControlModelBase : IContentControlModelBase
+    {
+
+        public object Content { get; set; }
+
+    }
+
+    public interface IContentControlModelBase<T> : IContentControlModelBase
     {
 
         /// <summary>
         /// Gets or sets the content of this <see cref="IGroupBoxModelBase"/>.
         /// </summary>
-        /// <seealso cref="IIsReadOnly.IsReadOnly"/>
         new T Content { get; set; }
 
     }
 
-    public interface IHeaderedContentControlModelBase : IIsReadOnly, IContentControlModelBase
+    public class ContentControlModelBase<T> : IContentControlModelBase<T>
+
+    {
+
+        public T Content { get; set; }
+
+        object IContentControlModelBase.Content { get => Content; set => Content = GetOrThrowIfNotType<T>(value, nameof(value)); }
+
+    }
+
+    public interface IHeaderedControlModelBase
+
     {
 
         /// <summary>
         /// Gets or sets the header of this <see cref="IGroupBoxModelBase"/>.
         /// </summary>
-        /// <seealso cref="IIsReadOnly.IsReadOnly"/>
         object Header { get; set; }
 
     }
 
-    public interface IHeaderedContentControlModelBase<THeader, TContent> : IIsReadOnly, IContentControlModelBase<TContent>, IHeaderedContentControlModelBase
+    public interface IHeaderedContentControlModelBase : IContentControlModelBase, IHeaderedControlModelBase
+    {
+
+
+
+    }
+
+    public class HeaderedContentControlModelBase : ContentControlModelBase, IHeaderedContentControlModelBase
+
+    {
+
+        public object Header { get; set; }
+
+    }
+
+    public interface IHeaderedControlModelBase<T> : IHeaderedControlModelBase
+
     {
 
         /// <summary>
         /// Gets or sets the header of this <see cref="IGroupBoxModelBase"/>.
         /// </summary>
-        /// <seealso cref="IIsReadOnly.IsReadOnly"/>
-        new THeader Header { get; set; }
+        new T Header { get; set; }
 
     }
 
-    public interface IItemsControlModelBase : IIsReadOnly
+    public interface IHeaderedContentControlModelBase<THeader, TContent> : IContentControlModelBase<TContent>, IHeaderedControlModelBase<THeader>
+    {
+
+
+
+    }
+
+    public class HeaderedContentControlModelBase<THeader, TContent> : ContentControlModelBase<TContent>, IHeaderedControlModelBase<THeader>
+
+    {
+
+        public THeader Header { get; set; }
+
+        object IHeaderedControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
+
+    }
+
+    public interface IItemsControlModelBase
     {
 
         IEnumerable Items { get; set; }
 
     }
 
-    public interface IItemsControlModelBase<T> : IIsReadOnly, IItemsControlModelBase
+    public class ItemsControlModelBase : IItemsControlModelBase
+    {
+
+        public IEnumerable Items { get; set; }
+
+    }
+
+    public interface IItemsControlModelBase<T> : IItemsControlModelBase
     {
 
         new IEnumerable<T> Items { get; set; }
 
     }
 
-    public interface IHeaderedItemsControlModelBase : IIsReadOnly, IItemsControlModelBase
+    public class ItemsControlModelBase<T> : IItemsControlModelBase<T>
+
     {
 
-        object Header { get; set; }
+        public IEnumerable<T> Items { get; set; }
+
+        IEnumerable IItemsControlModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<T>>(value, nameof(value)); }
 
     }
 
-    public interface IHeaderedItemsControlModelBase<THeader, TItems> : IIsReadOnly, IItemsControlModelBase<TItems>, IHeaderedItemsControlModelBase
+    public interface IHeaderedItemsControlModelBase : IItemsControlModelBase, IHeaderedControlModelBase
     {
 
-        new THeader Header { get; set; }
+
+
+    }
+
+    public class HeaderedItemsControlModelBase : ItemsControlModelBase, IHeaderedItemsControlModelBase
+
+    {
+
+        public object Header { get; set; }
+
+    }
+
+    public interface IHeaderedItemsControlModelBase<THeader, TItems> : IItemsControlModelBase<TItems>, IHeaderedItemsControlModelBase
+    {
+
+    }
+
+    public class HeaderedItemsControlModelBase<THeader, TItems> : ItemsControlModelBase<TItems>, IHeaderedItemsControlModelBase<THeader, TItems>
+
+    {
+
+        public THeader Header { get; set; }
+
+        object IHeaderedControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
 
     }
 
     /// <summary>
-    /// Represents a base model for <see cref="GroupBox"/> controls.
+    /// Represents a base model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
-    public interface IGroupBoxModelBase : IIsReadOnly, IHeaderedContentControlModelBase
+    public interface IGroupBoxModelBase : IHeaderedContentControlModelBase
     {
+
+
 
     }
 
     /// <summary>
-    /// Represents a base model for <see cref="GroupBox"/> controls.
+    /// Represents a base model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
     public interface IGroupBoxModelBase<THeader, TContent> : IGroupBoxModelBase, IHeaderedContentControlModelBase<THeader, TContent>
     {
 
     }
 
-    public class GroupBoxModelBase : IGroupBoxModelBase
+    public class GroupBoxModelBase : HeaderedContentControlModelBase, IGroupBoxModelBase
     {
 
-        /// <summary>
-        /// Gets or sets the header of this <see cref="GroupBoxModelBase"/>.
-        /// </summary>
-        /// <seealso cref="IsReadOnly"/>
-        public object Header { get; set; }
 
-        /// <summary>
-        /// Gets or sets the content of this <see cref="GroupBoxModelBase"/>.
-        /// </summary>
-        /// <seealso cref="IsReadOnly"/>
-        public object Content { get; set; }
-
-        public virtual bool IsReadOnly { get; }
 
     }
 
-    public class GroupBoxModelBase<THeader, TContent> : IGroupBoxModelBase<THeader, TContent>
+    public class GroupBoxModelBase<THeader, TContent> : HeaderedContentControlModelBase<THeader, TContent>, IGroupBoxModelBase<THeader, TContent>
     {
 
-        /// <summary>
-        /// Gets or sets the header of this <see cref="GroupBoxModelBase{THeader, TContent}"/>.
-        /// </summary>
-        /// <seealso cref="IsReadOnly"/>
-        public THeader Header { get; set; }
 
-        object IHeaderedContentControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
-
-        /// <summary>
-        /// Gets or sets the content of this <see cref="GroupBoxModelBase{THeader, TContent}"/>.
-        /// </summary>
-        /// <seealso cref="IsReadOnly"/>
-        public TContent Content { get; set; }
-
-        object IContentControlModelBase.Content { get => Content; set => Content = GetOrThrowIfNotType<TContent>(value, nameof(value)); }
-
-        public virtual bool IsReadOnly { get; }
 
     }
 
     /// <summary>
-    /// Represents a base model for <see cref="TabItem"/> controls.
+    /// Represents a base model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
-    public interface ITabItemModelBase : IIsReadOnly, IHeaderedContentControlModelBase
+    public interface ITabItemModelBase : IHeaderedContentControlModelBase
     {
+
+
 
     }
 
     /// <summary>
-    /// Represents a base model for <see cref="TabItem"/> controls.
+    /// Represents a base model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
     public interface ITabItemModelBase<THeader, TContent> : ITabItemModelBase, IHeaderedContentControlModelBase<THeader, TContent>
     {
 
-    }
 
-    /// <summary>
-    /// Represents a base model for <see cref="TabItem"/> controls.
-    /// </summary>
-    public class TabItemModelBase : ITabItemModelBase
-    {
-
-        /// <summary>
-        /// Gets or sets the header of this <see cref="TabItemModelBase"/>.
-        /// </summary>
-        /// <seealso cref="IsReadOnly"/>
-        public object Header { get; set; }
-
-        /// <summary>
-        /// Gets or sets the content of this <see cref="TabItemModelBase"/>.
-        /// </summary>
-        /// <seealso cref="IsReadOnly"/>
-        public object Content { get; set; }
-
-        public virtual bool IsReadOnly { get; }
 
     }
 
     /// <summary>
-    /// Represents a base model for <see cref="TabItem"/> controls.
+    /// Represents a base model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
-    public class TabItemModelBase<THeader, TContent> : ITabItemModelBase<THeader, TContent>
+    public class TabItemModelBase : HeaderedContentControlModelBase, ITabItemModelBase
     {
 
-        /// <summary>
-        /// Gets or sets the header of this <see cref="TabItemModelBase{THeader, TContent}"/>.
-        /// </summary>
-        /// <seealso cref="IsReadOnly"/>
-        public THeader Header { get; set; }
 
-        object IHeaderedContentControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
-
-        /// <summary>
-        /// Gets or sets the content of this <see cref="TabItemModelBase{THeader, TContent}"/>.
-        /// </summary>
-        /// <seealso cref="IIsReadOnly.IsReadOnly"/>
-        public TContent Content { get; set; }
-
-        object IContentControlModelBase.Content { get => Content; set => Content = GetOrThrowIfNotType<TContent>(value, nameof(value)); }
-
-        public virtual bool IsReadOnly { get; }
 
     }
 
-    public interface IPropertyTabItemModelBase : IIsReadOnly, IHeaderedItemsControlModelBase
+    /// <summary>
+    /// Represents a base model that corresponds to a default view for <see cref="TabItem"/> controls.
+    /// </summary>
+    public class TabItemModelBase<THeader, TContent> : HeaderedContentControlModelBase<THeader, TContent>, ITabItemModelBase<THeader, TContent>
+    {
+
+
+
+    }
+
+    public interface IPropertyTabItemModelBase : IHeaderedItemsControlModelBase
     {
 
         new IEnumerable<IGroupBoxModelBase> Items { get; set; }
 
     }
 
-    public interface IPropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : IPropertyTabItemModelBase
+    public interface IPropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : IPropertyTabItemModelBase, IHeaderedItemsControlModelBase<TItemHeader, IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>>
 
     {
 
-        new IEnumerable<IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>> Items { get; set; }
-    
+
+
     }
 
     public class PropertyTabItemModelBase : IPropertyTabItemModelBase
@@ -314,27 +326,200 @@ namespace WinCopies.GUI.Controls.Models
 
         IEnumerable IItemsControlModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModelBase>>(value, nameof(value)); }
 
-        public virtual bool IsReadOnly { get; }
-
     }
 
-    public class PropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : IPropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
+    public class PropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlModelBase<TItemHeader, IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
     {
-
-        public TItemHeader Header { get; set; }
-
-        object IHeaderedItemsControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<TItemHeader>(value, nameof(value)); }
-
-        /// <summary>
-        /// Gets or sets the items of this <see cref="ITabItemModelBase"/>.
-        /// </summary>
-        public IEnumerable<IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>> Items { get; set; }
 
         IEnumerable<IGroupBoxModelBase> IPropertyTabItemModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>>>(value, nameof(value)); }
 
-        IEnumerable IItemsControlModelBase.Items { get => Items; set => GetOrThrowIfNotType<IEnumerable<IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>>>(value, nameof(value)); }
+    }
 
-        public virtual bool IsReadOnly { get; }
+    public interface IButtonModelBase : IContentControlModelBase, ICommandSource
+
+    {
+
+
+
+    }
+
+    public class ButtonModelBase : ContentControlModelBase, IButtonModelBase
+
+    {
+
+        public ICommand Command { get; set; }
+
+        public object CommandParameter { get; set; }
+
+        public IInputElement CommandTarget { get; set; }
+
+    }
+
+    public interface IButtonModelBase<T> : IButtonModelBase, IContentControlModelBase<T>
+
+    {
+
+
+
+    }
+
+    public class ButtonModelBase<T> : ContentControlModelBase<T>, IButtonModelBase<T>
+
+    {
+
+        public ICommand Command { get; set; }
+
+        public object CommandParameter { get; set; }
+
+        public IInputElement CommandTarget { get; set; }
+
+    }
+
+    public interface IToggleButtonModelBase : IButtonModelBase
+
+    {
+
+        bool? IsChecked { get; set; }
+
+        bool IsThreeState { get; set; }
+
+    }
+
+    public class ToggleButtonModelBase : ButtonModelBase
+
+    {
+
+        public bool? IsChecked { get; set; }
+
+        public bool IsThreeState { get; set; }
+
+    }
+
+    public interface IToggleButtonModelBase<T> : IToggleButtonModelBase, IButtonModelBase<T>
+
+    {
+
+
+
+    }
+
+    public class ToggleButtonModelBase<T> : ButtonModelBase<T>, IToggleButtonModelBase<T>
+
+    {
+
+        public bool? IsChecked { get; set; }
+
+        public bool IsThreeState { get; set; }
+    
+    }
+
+    public interface ICheckBoxModelBase : IToggleButtonModelBase
+    {
+
+    }
+
+    public interface ICheckBoxModelBase<T> : IToggleButtonModelBase<T>, ICheckBoxModelBase
+    {
+
+
+
+    }
+
+    public interface ITextBoxModelTextOrientedBase
+
+    {
+
+        public string Text { get; set; }
+        public bool IsReadOnly { get; set; }
+
+    }
+
+    public interface ITextBoxModelSelectionOriented : ITextBoxModelTextOrientedBase
+
+    {
+        public int CaretIndex { get; set; }
+        public int SelectionLength { get; set; }
+        public int SelectionStart { get; set; }
+        public string SelectedText { get; set; }
+        public bool IsReadOnlyCaretVisible { get; set; }
+        public bool AutoWordSelection { get; set; }
+        public Brush SelectionBrush { get; set; }
+        public Brush SelectionTextBrush { get; set; }
+        public Brush CaretBrush { get; set; }
+        public bool IsSelectionActive { get; }
+        public bool IsInactiveSelectionHighlightEnabled { get; set; }
+
+
+
+    }
+
+    public interface ITextBoxModelTextEditingOriented : ITextBoxModelTextOrientedBase
+
+    {
+
+        public int MinLines { get; set; }
+        public int MaxLines { get; set; }
+        public CharacterCasing CharacterCasing { get; set; }
+        public int MaxLength { get; set; }
+        public TextAlignment TextAlignment { get; set; }
+        public int LineCount { get; }
+        public TextDecorationCollection TextDecorations { get; set; }
+        public TextWrapping TextWrapping { get; set; }
+        public bool AcceptsReturn { get; set; }
+        public bool AcceptsTab { get; set; }
+        public double SelectionOpacity { get; set; }
+        public bool CanUndo { get; }
+        public bool CanRedo { get; }
+        public bool IsUndoEnabled { get; set; }
+        public int UndoLimit { get; set; }
+
+    }
+
+    public interface ITextBoxModelBase : ITextBoxModelTextOrientedBase, ITextBoxModelTextEditingOriented, ITextBoxModelSelectionOriented
+
+    {
+
+
+
+    }
+
+    public interface IRadioButtonCollection : IItemsControlModelBase<IRadioButton>
+
+    {
+
+        string GroupName { get; set; }
+
+    }
+
+    public interface IRadioButtonCollection<T> : IRadioButtonCollection, IItemsControlModelBase<IRadioButton<T>>
+
+    {
+
+
+
+    }
+
+    public interface IRadioButton : IToggleButtonModelBase
+
+    {
+
+
+
+    }
+
+    public interface IRadioButton<T> : IRadioButton, IToggleButtonModelBase<T>
+
+    {
+
+
+
+    }
+
+    public interface IGroupingRadioButtonModelBase : IContentControlModelBase
+
+    {
+
+        string GroupName { get; set; }
 
     }
 
