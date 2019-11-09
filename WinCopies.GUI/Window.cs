@@ -48,9 +48,6 @@ namespace WinCopies.GUI.Windows
 
         }
 
-        [DllImport("user32.dll")]
-        private static extern bool SetWindowPos(IntPtr hwnd, IntPtr hwndInsertAfter, int x, int y, int width, int height, uint flags);
-
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);

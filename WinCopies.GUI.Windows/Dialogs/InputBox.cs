@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.Util;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
@@ -38,13 +39,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(InputBox), new PropertyMetadata(null
 
 #if DEBUG 
-            , (DependencyObject d, DependencyPropertyChangedEventArgs e) =>
-            {
-
-                Debug.WriteLine("TextProperty value changed : " + e.NewValue);
-
-            }
-
+            , (DependencyObject d, DependencyPropertyChangedEventArgs e) => Debug.WriteLine("TextProperty value changed : " + e.NewValue)
 #endif 
 
             ));
@@ -134,9 +129,13 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         {
 
-            Command?.CanExecute(CommandParameter, CommandTarget);
+            ThrowIfNull(e, nameof(e));
 
+            _ = Command?.CanExecute(CommandParameter, CommandTarget);
+
+#pragma warning disable CA1062 // Validate arguments of public methods
             e.RoutedEvent = TextChangedEvent;
+#pragma warning restore CA1062 // Validate arguments of public methods
 
             RaiseEvent(e);
 
@@ -146,7 +145,11 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         {
 
+            ThrowIfNull(e, nameof(e));
+
+#pragma warning disable CA1062 // Validate arguments of public methods
             if (e.Parameter is TextChangedEventArgs _e)
+#pragma warning restore CA1062 // Validate arguments of public methods
 
                 OnTextChanged(_e);
 

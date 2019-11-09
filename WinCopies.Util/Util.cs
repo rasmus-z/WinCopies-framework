@@ -1639,9 +1639,20 @@ namespace WinCopies.Util
         /// <param name="enumType">The enum type in which to look for the specified enum field value.</param>
         /// <param name="fieldName">The enum field to look for.</param>
         /// <returns>The numeric value corresponding to this enum, in the given enum type underlying type.</returns>
-        public static object GetNumValue(Type enumType, string fieldName) => enumType.IsEnum ? Convert.ChangeType(enumType.GetField(fieldName).GetValue(null), Enum.GetUnderlyingType(enumType)) : throw new ArgumentException("'enumType' is not an enum type.");
+        public static object GetNumValue(Type enumType, string fieldName)
+        {
 
-        public static void ThrowIfNull(object obj, string argumentName)
+            ThrowIfNull(enumType, nameof(enumType));
+
+#pragma warning disable CA1062 // Validate arguments of public methods
+
+            return enumType.IsEnum ? Convert.ChangeType(enumType.GetField(fieldName).GetValue(null), Enum.GetUnderlyingType(enumType)) : throw new ArgumentException("'enumType' is not an enum type.");
+
+#pragma warning restore CA1062 // Validate arguments of public methods
+
+        }
+
+        public static void ThrowIfNull(in object obj, in string argumentName)
         {
 
             if (obj is null)
