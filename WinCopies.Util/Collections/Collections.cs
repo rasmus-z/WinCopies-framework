@@ -69,7 +69,15 @@ namespace WinCopies.Collections
 
         // IEnumerator<T> IReadOnlyCollection<T>.GetEnumerator() => throw new NotImplementedException();
 
-        void IReadOnlyList<T>.RemoveAt(int index) => throw new NotSupportedException("This collection is read-only.") ; 
+        void IReadOnlyList<T>.RemoveAt(int index) => throw new NotSupportedException("This collection is read-only.") ;
+
+    }
+
+    public interface ICollection<T, U> : System.Collections.Generic.ICollection<U> where T : U
+
+    {
+
+
 
     }
 

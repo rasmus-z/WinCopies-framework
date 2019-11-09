@@ -13,7 +13,9 @@
                     xmlns:guiDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI"
                     xmlns:guiWindows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
                     xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"
-                    xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp">
+                    xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp"
+                    xmlns:controlModels="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.Models"
+                    xmlns:dialogModels="clr-namespace:WinCopies.GUI.Windows.Dialogs.Models;assembly=WinCopies.Models">
     <!--xmlns:guiExplorerDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI.Explorer"-->
 
     <ResourceDictionary.MergedDictionaries>
@@ -370,4 +372,38 @@
         </Setter>
         <Setter Property="ShowHelpButton" Value="True" />
     </Style>
+
+    <DataTemplate DataType="{x:Type dialogModels:PropertyDialogModelBase }">
+        <TabControl Background="AliceBlue">
+            <TabControl.Style>
+                <Style TargetType="{x:Type TabControl}" BasedOn="{StaticResource {x:Type TabControl}}">
+                    <Setter Property="ItemsSource" Value="{Binding Items, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:PropertyDialog}}}" />
+                    <Setter Property="ItemTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <TabItem>
+                                    <TabItem.Style>
+                                        <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
+                                            <Setter Property="ContentTemplate">
+                                                <Setter.Value>
+                                                    <DataTemplate></DataTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </TabItem.Style>
+                                </TabItem>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Style>
+        </TabControl>
+    </DataTemplate>
+
+    <Style x:Shared="false" BasedOn="{StaticResource {x:Type guiDialogs:DialogWindow}}" TargetType="{x:Type dialogs:PropertyDialog}">
+
+        <Setter Property="Title" Value="{Binding Title}" />
+
+    </Style>
+
 </ResourceDictionary>

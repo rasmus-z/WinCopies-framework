@@ -6,12 +6,24 @@ using System.Threading.Tasks;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.GUI.Windows.Dialogs;
 using WinCopies.GUI.Windows.Dialogs.Models;
+using WinCopies.GUI.Windows.Dialogs.ViewModels;
 using WinCopies.Util.Data;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.GUI.Windows.Dialogs.ViewModels
 {
 
-    public class DialogViewModelBase<T> : WinCopies.Util.Data.ViewModel<T>, IDialogModelBase where T : IDialogModelBase
+    public class IsReadOnlyViewModel<T> : WinCopies.Util.Data.ViewModel<T>
+
+    {
+
+        public virtual bool IsReadOnly { get; }
+
+        public IsReadOnlyViewModel(T model) : base(model) { }
+
+    }
+
+    public class DialogViewModelBase<T> : IsReadOnlyViewModel<T>, IDialogModelBase where T : IDialogModelBase
     {
 
         public string Title { get => ModelGeneric.Title; set => OnPropertyChanged(nameof(Title), value, GetType()); }
@@ -33,31 +45,36 @@ namespace WinCopies.GUI.Windows.Dialogs.ViewModels
         public PropertyDialogViewModelBase(T model) : base(model) { }
 
     }
+
 }
 
 namespace WinCopies.GUI.Controls.ViewModels
 
 {
 
-    public class GroupBoxViewModelBase : ViewModel<IGroupBoxModelBase>, IGroupBoxModelBase
+    public class GroupBoxViewModelBase<T> : IsReadOnlyViewModel <T>, IGroupBoxModelBase where T : IGroupBoxModelBase
     {
 
         public object Header { get => ModelGeneric.Header; set => OnPropertyChanged(nameof(Header), value, GetType()); }
 
         public object Content { get => ModelGeneric.Content; set => OnPropertyChanged(nameof(Content), value, GetType()); }
 
-        public GroupBoxViewModelBase(IGroupBoxModelBase model) : base(model) { }
+        public GroupBoxViewModelBase( T model) : base(model) { }
 
     }
 
-    public class GroupBoxViewModelBase<THeader, TContent> : ViewModel<IGroupBoxModelBase<THeader, TContent>>, IGroupBoxModelBase
+    public class GroupBoxViewModelBase< T, THeader, TContent> : IsReadOnlyViewModel<T>, IGroupBoxModelBase<THeader, TContent> where T : IGroupBoxModelBase<THeader, TContent>
     {
 
-        public object Header { get => ModelGeneric.Header; set => OnPropertyChanged(nameof(Header), value, GetType()); }
+        public THeader Header { get => ModelGeneric.Header; set => OnPropertyChanged(nameof(Header), value, GetType()); }
 
-        public object Content { get => ModelGeneric.Content; set => OnPropertyChanged(nameof(Content), value, GetType()); }
+        object IGroupBoxModelBase. Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
 
-        public GroupBoxViewModelBase(IGroupBoxModelBase<THeader,TContent> model) : base(model) { }
+        public TContent Content { get => ModelGeneric.Content; set => OnPropertyChanged(nameof(Content), value, GetType()); }
+
+        object IGroupBoxModelBase.Content { get => Content; set => Content = GetOrThrowIfNotType<TContent>(value, nameof(value)); }
+
+        public GroupBoxViewModelBase( T model) : base(model) { }
 
     }
 
