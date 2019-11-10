@@ -69,6 +69,9 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
     public interface IPropertyDialogModelBase : IDialogModelBase
     {
 
+        /// <summary>
+        /// Gets or sets the items of this <see cref="IPropertyDialogModelBase"/>.
+        /// </summary>
         IEnumerable<IPropertyTabItemModelBase> Items { get; set; }
 
     }
@@ -79,6 +82,9 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
     public class PropertyDialogModelBase : DialogModelBase, IPropertyDialogModelBase
     {
 
+        /// <summary>
+        /// Gets or sets the items of this <see cref="IPropertyDialogModelBase"/>.
+        /// </summary>
         public IEnumerable<IPropertyTabItemModelBase> Items { get; set; }
 
     }
@@ -107,6 +113,9 @@ namespace WinCopies.GUI.Controls.Models
     public class ContentControlModelBase : IContentControlModelBase
     {
 
+        /// <summary>
+        /// Gets or sets the content of this <see cref="ContentControlModelBase"/>.
+        /// </summary>
         public object Content { get; set; }
 
     }
@@ -118,7 +127,7 @@ namespace WinCopies.GUI.Controls.Models
     {
 
         /// <summary>
-        /// Gets or sets the content of this <see cref="IGroupBoxModelBase"/>.
+        /// Gets or sets the content of this <see cref="IContentControlModelBase{T}"/>.
         /// </summary>
         new T Content { get; set; }
 
@@ -131,6 +140,9 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the content of this <see cref="ContentControlModelBase{T}"/>.
+        /// </summary>
         public T Content { get; set; }
 
         object IContentControlModelBase.Content { get => Content; set => Content = GetOrThrowIfNotType<T>(value, nameof(value)); }
@@ -168,6 +180,9 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the header of this <see cref="HeaderedContentControlModelBase"/>.
+        /// </summary>
         public object Header { get; set; }
 
     }
@@ -180,7 +195,7 @@ namespace WinCopies.GUI.Controls.Models
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="IGroupBoxModelBase"/>.
+        /// Gets or sets the header of this <see cref="IHeaderedControlModelBase{T}"/>.
         /// </summary>
         new T Header { get; set; }
 
@@ -203,6 +218,9 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the header of this <see cref="HeaderedContentControlModelBase{THeader, TContent}"/>.
+        /// </summary>
         public THeader Header { get; set; }
 
         object IHeaderedControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
@@ -215,6 +233,9 @@ namespace WinCopies.GUI.Controls.Models
     public interface IItemsControlModelBase
     {
 
+        /// <summary>
+        /// Gets or sets the items of this <see cref="IItemsControlModelBase"/>.
+        /// </summary>
         IEnumerable Items { get; set; }
 
     }
@@ -225,6 +246,9 @@ namespace WinCopies.GUI.Controls.Models
     public class ItemsControlModelBase : IItemsControlModelBase
     {
 
+        /// <summary>
+        /// Gets or sets the items of this <see cref="ItemsControlModelBase"/>.
+        /// </summary>
         public IEnumerable Items { get; set; }
 
     }
@@ -235,6 +259,9 @@ namespace WinCopies.GUI.Controls.Models
     public interface IItemsControlModelBase<T> : IItemsControlModelBase
     {
 
+        /// <summary>
+        /// Gets or sets the items of this <see cref="IItemsControlModelBase{T}"/>.
+        /// </summary>
         new IEnumerable<T> Items { get; set; }
 
     }
@@ -246,6 +273,9 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the items of this <see cref="ItemsControlModelBase{T}"/>.
+        /// </summary>
         public IEnumerable<T> Items { get; set; }
 
         IEnumerable IItemsControlModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<T>>(value, nameof(value)); }
@@ -269,6 +299,9 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the header of this <see cref="HeaderedItemsControlModelBase"/>.
+        /// </summary>
         public object Header { get; set; }
 
     }
@@ -276,7 +309,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a base model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
-    public interface IHeaderedItemsControlModelBase<THeader, TItems> : IItemsControlModelBase<TItems>, IHeaderedItemsControlModelBase
+    public interface IHeaderedItemsControlModelBase<THeader, TItems> : IItemsControlModelBase<TItems>, IHeaderedControlModelBase<THeader>
     {
 
 
@@ -290,6 +323,9 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the header of this <see cref="HeaderedItemsControlModelBase{THeader, TItems}"/>.
+        /// </summary>
         public THeader Header { get; set; }
 
         object IHeaderedControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
@@ -382,6 +418,9 @@ namespace WinCopies.GUI.Controls.Models
     public interface IPropertyTabItemModelBase : IHeaderedItemsControlModelBase
     {
 
+        /// <summary>
+        /// Gets or sets the header of this <see cref="IPropertyTabItemModelBase"/>.
+        /// </summary>
         new IEnumerable<IGroupBoxModelBase> Items { get; set; }
 
     }
@@ -403,8 +442,14 @@ namespace WinCopies.GUI.Controls.Models
     public class PropertyTabItemModelBase : IPropertyTabItemModelBase
     {
 
+        /// <summary>
+        /// Gets or sets the header of this <see cref="PropertyTabItemModelBase"/>.
+        /// </summary>
         public object Header { get; set; }
 
+        /// <summary>
+        /// Gets or sets the items of this <see cref="PropertyTabItemModelBase"/>.
+        /// </summary>
         public IEnumerable<IGroupBoxModelBase> Items { get; set; }
 
         IEnumerable IItemsControlModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModelBase>>(value, nameof(value)); }
@@ -439,10 +484,19 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the command of this <see cref="ButtonModelBase"/>.
+        /// </summary>
         public ICommand Command { get; set; }
 
+        /// <summary>
+        /// Gets or sets the command parameter of this <see cref="ButtonModelBase"/>.
+        /// </summary>
         public object CommandParameter { get; set; }
 
+        /// <summary>
+        /// Gets or sets the command target of this <see cref="ButtonModelBase"/>.
+        /// </summary>
         public IInputElement CommandTarget { get; set; }
 
     }
@@ -465,10 +519,19 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the command of this <see cref="ButtonModelBase{T}"/>.
+        /// </summary>
         public ICommand Command { get; set; }
 
+        /// <summary>
+        /// Gets or sets the command parameter of this <see cref="ButtonModelBase{T}"/>.
+        /// </summary>
         public object CommandParameter { get; set; }
 
+        /// <summary>
+        /// Gets or sets the command target of this <see cref="ButtonModelBase{T}"/>.
+        /// </summary>
         public IInputElement CommandTarget { get; set; }
 
     }
@@ -480,8 +543,14 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets a value that indeicates whether this <see cref="IToggleButtonModelBase"/> is checked.
+        /// </summary>
         bool? IsChecked { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value that indeicates whether this <see cref="IToggleButtonModelBase"/> is three state.
+        /// </summary>
         bool IsThreeState { get; set; }
 
     }
@@ -489,12 +558,18 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a base model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
-    public class ToggleButtonModelBase : ButtonModelBase
+    public class ToggleButtonModelBase : ButtonModelBase, IToggleButtonModelBase
 
     {
 
+        /// <summary>
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModelBase"/> is checked.
+        /// </summary>
         public bool? IsChecked { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModelBase"/> is three state.
+        /// </summary>
         public bool IsThreeState { get; set; }
 
     }
@@ -517,8 +592,14 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModelBase{T}"/> is checked.
+        /// </summary>
         public bool? IsChecked { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModelBase{T}"/> is three state.
+        /// </summary>
         public bool IsThreeState { get; set; }
 
     }
@@ -572,8 +653,14 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the text of this <see cref="ITextBoxModelTextOriented"/>.
+        /// </summary>
         string Text { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether this <see cref="ITextBoxModelTextOriented"/> is read-only.
+        /// </summary>
         bool IsReadOnly { get; set; }
 
     }
@@ -585,8 +672,14 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        /// <summary>
+        /// Gets or sets the text of this <see cref="TextBoxModelTextOriented"/>.
+        /// </summary>
         public string Text { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether this <see cref="TextBoxModelTextOriented"/> is read-only.
+        /// </summary>
         public bool IsReadOnly { get; set; }
 
     }
@@ -615,8 +708,6 @@ namespace WinCopies.GUI.Controls.Models
          Brush SelectionTextBrush { get; set; }
 
          Brush CaretBrush { get; set; }
-
-         bool IsSelectionActive { get; }
 
          bool IsInactiveSelectionHighlightEnabled { get; set; }
 
@@ -647,8 +738,6 @@ namespace WinCopies.GUI.Controls.Models
 
         public Brush CaretBrush { get; set; }
 
-        public bool IsSelectionActive { get; }
-
         public bool IsInactiveSelectionHighlightEnabled { get; set; }
 
     }
@@ -670,8 +759,6 @@ namespace WinCopies.GUI.Controls.Models
 
          TextAlignment TextAlignment { get; set; }
 
-         int LineCount { get; }
-
          TextDecorationCollection TextDecorations { get; set; }
 
          TextWrapping TextWrapping { get; set; }
@@ -681,10 +768,6 @@ namespace WinCopies.GUI.Controls.Models
          bool AcceptsTab { get; set; }
 
          double SelectionOpacity { get; set; }
-
-         bool CanUndo { get; }
-
-         bool CanRedo { get; }
 
          bool IsUndoEnabled { get; set; }
 
@@ -709,8 +792,6 @@ namespace WinCopies.GUI.Controls.Models
 
         public TextAlignment TextAlignment { get; set; }
 
-        public int LineCount { get; }
-
         public TextDecorationCollection TextDecorations { get; set; }
 
         public TextWrapping TextWrapping { get; set; }
@@ -720,10 +801,6 @@ namespace WinCopies.GUI.Controls.Models
         public bool AcceptsTab { get; set; }
 
         public double SelectionOpacity { get; set; }
-
-        public bool CanUndo { get; }
-
-        public bool CanRedo { get; }
 
         public bool IsUndoEnabled { get; set; }
 
