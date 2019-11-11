@@ -691,25 +691,25 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
-         int CaretIndex { get; set; }
+        int CaretIndex { get; set; }
 
-         int SelectionLength { get; set; }
+        int SelectionLength { get; set; }
 
-         int SelectionStart { get; set; }
+        int SelectionStart { get; set; }
 
-         string SelectedText { get; set; }
+        string SelectedText { get; set; }
 
-         bool IsReadOnlyCaretVisible { get; set; }
+        bool IsReadOnlyCaretVisible { get; set; }
 
-         bool AutoWordSelection { get; set; }
+        bool AutoWordSelection { get; set; }
 
-         Brush SelectionBrush { get; set; }
+        Brush SelectionBrush { get; set; }
 
-         Brush SelectionTextBrush { get; set; }
+        Brush SelectionTextBrush { get; set; }
 
-         Brush CaretBrush { get; set; }
+        Brush CaretBrush { get; set; }
 
-         bool IsInactiveSelectionHighlightEnabled { get; set; }
+        bool IsInactiveSelectionHighlightEnabled { get; set; }
 
     }
 
@@ -749,29 +749,29 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
-         int MinLines { get; set; }
+        int MinLines { get; set; }
 
-         int MaxLines { get; set; }
+        int MaxLines { get; set; }
 
-         CharacterCasing CharacterCasing { get; set; }
+        CharacterCasing CharacterCasing { get; set; }
 
-         int MaxLength { get; set; }
+        int MaxLength { get; set; }
 
-         TextAlignment TextAlignment { get; set; }
+        TextAlignment TextAlignment { get; set; }
 
-         TextDecorationCollection TextDecorations { get; set; }
+        TextDecorationCollection TextDecorations { get; set; }
 
-         TextWrapping TextWrapping { get; set; }
+        TextWrapping TextWrapping { get; set; }
 
-         bool AcceptsReturn { get; set; }
+        bool AcceptsReturn { get; set; }
 
-         bool AcceptsTab { get; set; }
+        bool AcceptsTab { get; set; }
 
-         double SelectionOpacity { get; set; }
+        double SelectionOpacity { get; set; }
 
-         bool IsUndoEnabled { get; set; }
+        bool IsUndoEnabled { get; set; }
 
-         int UndoLimit { get; set; }
+        int UndoLimit { get; set; }
 
     }
 
@@ -883,7 +883,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public interface IRadioButtonCollection : IItemsControlModelBase<IRadioButtonModelBase>
+    public interface IRadioButtonCollection : IEnumerable<IRadioButtonModelBase>
 
     {
 
@@ -894,7 +894,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public class RadioButtonCollection : ItemsControlModelBase<IRadioButtonModelBase>, IRadioButtonCollection
+    public class RadioButtonCollection : System.Collections.Generic.List<IRadioButtonModelBase>, IRadioButtonCollection
 
     {
 
@@ -905,7 +905,7 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public interface IRadioButtonCollection<T> : IRadioButtonCollection, IItemsControlModelBase<IRadioButtonModelBase<T>>
+    public interface IRadioButtonCollection<T> : IRadioButtonCollection, IEnumerable<IRadioButtonModelBase<T>>
 
     {
 
@@ -916,13 +916,13 @@ namespace WinCopies.GUI.Controls.Models
     /// <summary>
     /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public class RadioButtonCollection<T> : ItemsControlModelBase<IRadioButtonModelBase<T>>, IRadioButtonCollection<T>
+    public class RadioButtonCollection<T> : List<IRadioButtonModelBase<T>>, IRadioButtonCollection<T>
 
     {
 
         public string GroupName { get; set; }
 
-        IEnumerable<IRadioButtonModelBase> IItemsControlModelBase<IRadioButtonModelBase>.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IRadioButtonModelBase<T>>>(value, nameof(value)); }
+        IEnumerator<IRadioButtonModelBase> IEnumerable<IRadioButtonModelBase>.GetEnumerator() => GetEnumerator();
 
     }
 

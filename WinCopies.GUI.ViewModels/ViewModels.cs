@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -396,6 +397,74 @@ namespace WinCopies.GUI.Controls.ViewModels
         public bool IsInactiveSelectionHighlightEnabled { get => ModelGeneric.IsInactiveSelectionHighlightEnabled; set => OnPropertyChanged(nameof(IsInactiveSelectionHighlightEnabled), value, GetType()); }
 
         public TextBoxViewModelBase(T model) : base(model) { }
+
+    }
+
+    public class ObservableRadioButtonCollection : ObservableCollection<IRadioButtonModelBase>, IRadioButtonCollection
+
+    {
+
+        public string GroupName
+        {
+
+            get => ((RadioButtonCollection)Items).GroupName; set
+
+            {
+
+                ((RadioButtonCollection)Items).GroupName = value;
+
+                OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(GroupName)));
+
+            }
+
+        }
+
+        public ObservableRadioButtonCollection( RadioButtonCollection items) : base( items) { }
+
+    }
+
+    public class ObservableRadioButtonCollection<T> : ObservableCollection<IRadioButtonModelBase<T>>, IRadioButtonCollection<T>
+
+    {
+
+        public string GroupName
+        {
+
+            get => ((RadioButtonCollection)Items).GroupName; set
+
+            {
+
+                ((RadioButtonCollection)Items).GroupName = value;
+
+                OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(GroupName)));
+
+            }
+
+        }
+
+        IEnumerator<IRadioButtonModelBase> IEnumerable<IRadioButtonModelBase>.GetEnumerator() => GetEnumerator();
+
+        public ObservableRadioButtonCollection(RadioButtonCollection<T> items) : base(items) { }
+
+    }
+
+    public class GroupingRadioButtonViewModelBase<T> : ToggleButtonViewModelBase<T>, IGroupingRadioButtonModelBase where T : IGroupingRadioButtonModelBase
+
+    {
+
+        public string GroupName { get => ModelGeneric.GroupName; set => OnPropertyChanged(nameof(GroupName), value, GetType()); }
+
+        public GroupingRadioButtonViewModelBase(T model) : base(model) { }
+
+    }
+
+    public class GroupingRadioButtonViewModelBase<TModel, TContent> : ToggleButtonViewModelBase<TModel, TContent>, IGroupingRadioButtonModelBase where TModel : IGroupingRadioButtonModelBase<TContent>
+
+    {
+
+        public string GroupName { get => ModelGeneric.GroupName; set => OnPropertyChanged(nameof(GroupName), value, GetType()); }
+
+        public GroupingRadioButtonViewModelBase( TModel model ) : base(model) { }
 
     }
 
