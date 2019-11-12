@@ -12,13 +12,8 @@ Updates
 2.0
 ===
 
-WinCopies.Data (1.0)
+WinCopies.Data (2.0)
 --------------------
-
-First release
-
-WinCopies.IO (1.0)
-------------------
 
 First release
 
@@ -81,6 +76,7 @@ WinCopies.Util (2.0)
 			- Extension methods for LinkedLists
 			- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
 			- Extension method for throwing if an object that implements IDisposable is disposing or disposed.
+			- FirstOrDefault ienumerable extension method. This is a generic method that looks for the first item of the given generic type parameter. If any item is found, the method returns the default value for the given generic type parameter.
 		- Misc:
 			- The view model classes now have an OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
 			- The ReadOnlyObservableCollection has now an OnCollectionChanging protected virtual method.
@@ -100,6 +96,8 @@ WinCopies.Util (2.0)
 
 - Misc:
 	- ReadOnlyObservableCollection's CollectionChanging event has now the protected access modifier.
+	- Some code now uses the 'in' parameter modifier
+	- The dependency package System.Windows.Interactivity.WPF has been replaced by the Microsoft.Xaml.Behaviors.Wpf package.
 	- Updated doc.
 
 \* See WinCopies.Util.Extensions.SetProperty/Field

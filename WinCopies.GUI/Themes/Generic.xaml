@@ -45,7 +45,7 @@
                                                         <RowDefinition Height="auto" />
                                                     </Grid.RowDefinitions>
                                                     <ContentPresenter />
-                                                    <Button x:Name="PART_OkButton" Grid.Row="1" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{x:Static dialogs:DialogWindowCommandParameters.OK}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static dialogs:DefaultButton.OK}}" Content="{StaticResource Ok}" />
+                                                    <Button x:Name="PART_OkButton" Grid.Row="1" Command="{x:Static commands:Commands.CommonCommand}" CommandParameter="{x:Static dialogs:DialogWindowCommandParameters.OK}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static dialogs:DefaultButton.OK}}" Content="{StaticResource Ok}" />
                                                 </Grid>
                                             </ControlTemplate>
                                         </Setter.Value>

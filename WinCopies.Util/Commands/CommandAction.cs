@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.Xaml.Behaviors;
+using System;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
 
 namespace WinCopies.Util.Commands
 {
-    public class CommandAction : System.Windows.Interactivity.TriggerAction<DependencyObject>
+    public class CommandAction : TriggerAction<DependencyObject>
     {
 
 

@@ -2130,6 +2130,18 @@ namespace WinCopies.Util
 
         }
 
+        public static T FirstOrDefault<T>(this IEnumerable enumerable)
+
+        {
+
+            foreach (var obj in enumerable)
+
+                if (obj is T _obj) return _obj;
+
+            return default;
+
+        }
+
         #endregion
 
         /// <summary>
