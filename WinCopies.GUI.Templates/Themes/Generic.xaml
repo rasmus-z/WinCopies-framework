@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:WinCopies.GUI.Templates"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.Models">
     <DataTemplate DataType="{x:Type controls:ICheckBoxModelBase}">
                 <CheckBox Content="{Binding Content}" IsChecked="{Binding IsChecked}" IsThreeState="{Binding IsThreeState}" Command="{Binding Command}" CommandParameter="{Binding CommandParameter}" CommandTarget="{Binding CommandTarget}" />
