@@ -13,6 +13,15 @@
             <Style x:Key="ContentControlStyle" TargetType="{x:Type ContentControl}" BasedOn="{StaticResource {x:Type ContentControl}}">
                 <Setter Property="Content" Value="{Binding Content}" />
             </Style>
+            <Style x:Key="ItemsControlStyle" TargetType="{x:Type ItemsControl}" BasedOn="{StaticResource {x:Type ItemsControl}}" >
+                <Setter Property="ItemsSource" Value="{Binding Items}" />
+            </Style>
+            <Style x:Key="HeaderContentControlStyle" TargetType="{x:Type HeaderedContentControl}" BasedOn="{StaticResource {x:Type HeaderedContentControl}}" >
+                <Setter Property="Header" Value="{Binding Header}" />
+            </Style>
+            <Style x:Key="HeaderItemsControlStyle" TargetType="{x:Type HeaderedItemsControl}" BasedOn="{StaticResource {x:Type HeaderedItemsControl}}" >
+                <Setter Property="Header" Value="{Binding Header}" />
+            </Style>
             <Style x:Key="ButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type primitives:ButtonBase}}">
                 <Setter Property="Command" Value="{Binding Command}" />
                 <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
@@ -23,9 +32,39 @@
                 <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
                 <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
             </Style>
+            <Style x:Key="TextBoxStyleTextOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" >
+                <Setter Property="Text" Value="{Binding Text}" />
+                <Setter Property="IsReadOnly" Value="{Binding IsReadOnly}" />
+            </Style>
+            <Style x:Key="TextBoxStyleSelectionOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" >
+                <Setter Property="IsReadOnlyCaretVisible" Value="{Binding IsReadOnlyCaretVisible}" />
+                <Setter Property="AutoWordSelection" Value="{Binding AutoWordSelection}" />
+                <Setter Property="SelectionBrush" Value="{Binding SelectionBrush}" />
+                <Setter Property="SelectionOpacity" Value="{Binding SelectionOpacity}" />
+                <Setter Property="SelectionTextBrush" Value="{Binding SelectionTextBrush}" />
+                <Setter Property="CaretBrush" Value="{Binding CaretBrush}" />
+                <Setter Property="IsInactiveSelectionHighlightEnabled" Value="{Binding IsInactiveSelectionHighlightEnabled}" />
+            </Style>
+            <Style x:Key="TextBoxStyleTextEditingOriented" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" >
+                <Setter Property="MinLines" Value="{Binding MinLines}" />
+                <Setter Property="MaxLines" Value="{Binding MaxLines}" />
+                <Setter Property="CharacterCasing" Value="{Binding CharacterCasing}" />
+                <Setter Property="MaxLength" Value="{Binding MaxLength}" />
+                <Setter Property="TextAlignment" Value="{Binding TextAlignment}" />
+                <Setter Property="TextDecorations" Value="{Binding TextDecorations}" />
+                <Setter Property="TextWrapping" Value="{Binding TextWrapping}" />
+                <Setter Property="AcceptsReturn" Value="{Binding AcceptsReturn}" />
+                <Setter Property="AcceptsTab" Value="{Binding AcceptsTab}" />
+                <Setter Property="IsUndoEnabled" Value="{Binding IsUndoEnabled}" />
+                <Setter Property="UndoLimit" Value="{Binding UndoLimit}" />
+            </Style>
+            <!--todo: add a RadioButtonItemsControl control-->
+            <Style x:Key="RadioButtonStyle" TargetType="{x:Type RadioButton}" BasedOn="{StaticResource {x:Type RadioButton}}" >
+                <Setter Property="GroupName" Value="{Binding GroupName}" />
+            </Style>
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
-    <DataTemplate DataType="{x:Type controls:ICheckBoxModelBase}">
+    <DataTemplate DataType="{x:Type controls:ICheckBoxModel}">
         <CheckBox>
             <CheckBox.Style>
                 <util:MergedStyles>
@@ -39,3 +78,38 @@
         </CheckBox>
     </DataTemplate>
 </ResourceDictionary>
+
+
+
+<!--<DataTemplate DataType="{x:Type dialogModels:PropertyDialogModelBase }">
+    <TabControl>
+        <TabControl.Style>
+            <Style TargetType="{x:Type TabControl}" BasedOn="{StaticResource {x:Type TabControl}}">
+                <Setter Property="ItemsSource" Value="{Binding Items, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:PropertyDialog}}}" />
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TabItem>
+                                <TabItem.Style>
+                                    <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
+                                        <Setter Property="ContentTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate></DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </TabItem.Style>
+                            </TabItem>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </TabControl.Style>
+    </TabControl>
+</DataTemplate>
+
+<Style x:Shared="false" BasedOn="{StaticResource {x:Type guiDialogs:DialogWindow}}" TargetType="{x:Type dialogs:PropertyDialog}">
+
+    <Setter Property="Title" Value="{Binding Title}" />
+
+</Style>-->

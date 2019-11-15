@@ -18,74 +18,74 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
 {
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for dialog windows.
+    /// Represents a  model that corresponds to a default view for dialog windows.
     /// </summary>
-    public interface IDialogModelBase
+    public interface IDialogModel
     {
 
         /// <summary>
-        /// Gets or sets the title of this <see cref="IDialogModelBase"/>.
+        /// Gets or sets the title of this <see cref="IDialogModel"/>.
         /// </summary>
         string Title { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DialogButton"/> value of this <see cref="IDialogModelBase"/>.
+        /// Gets or sets the <see cref="Dialogs.DialogButton"/> value of this <see cref="IDialogModel"/>.
         /// </summary>
         DialogButton DialogButton { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DefaultButton"/> value of this <see cref="IDialogModelBase"/>.
+        /// Gets or sets the <see cref="Dialogs.DefaultButton"/> value of this <see cref="IDialogModel"/>.
         /// </summary>
         DefaultButton DefaultButton { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for dialog windows.
+    /// Represents a  model that corresponds to a default view for dialog windows.
     /// </summary>
-    public class DialogModelBase : IDialogModelBase
+    public class DialogModel : IDialogModel
     {
 
         /// <summary>
-        /// Gets or sets the title of this <see cref="DialogModelBase"/>.
+        /// Gets or sets the title of this <see cref="DialogModel"/>.
         /// </summary>
         public string Title { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DialogButton"/> value of this <see cref="DialogModelBase"/>.
+        /// Gets or sets the <see cref="Dialogs.DialogButton"/> value of this <see cref="DialogModel"/>.
         /// </summary>
         public DialogButton DialogButton { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DefaultButton"/> value of this <see cref="DialogModelBase"/>.
+        /// Gets or sets the <see cref="Dialogs.DefaultButton"/> value of this <see cref="DialogModel"/>.
         /// </summary>
         public DefaultButton DefaultButton { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for property dialog windows.
+    /// Represents a  model that corresponds to a default view for property dialog windows.
     /// </summary>
-    public interface IPropertyDialogModelBase : IDialogModelBase
+    public interface IPropertyDialogModel : IDialogModel
     {
 
         /// <summary>
-        /// Gets or sets the items of this <see cref="IPropertyDialogModelBase"/>.
+        /// Gets or sets the items of this <see cref="IPropertyDialogModel"/>.
         /// </summary>
-        IEnumerable<IPropertyTabItemModelBase> Items { get; set; }
+        IEnumerable<IPropertyTabItemModel> Items { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for property dialog windows.
+    /// Represents a  model that corresponds to a default view for property dialog windows.
     /// </summary>
-    public class PropertyDialogModelBase : DialogModelBase, IPropertyDialogModelBase
+    public class PropertyDialogModel : DialogModel, IPropertyDialogModel
     {
 
         /// <summary>
-        /// Gets or sets the items of this <see cref="IPropertyDialogModelBase"/>.
+        /// Gets or sets the items of this <see cref="IPropertyDialogModel"/>.
         /// </summary>
-        public IEnumerable<IPropertyTabItemModelBase> Items { get; set; }
+        public IEnumerable<IPropertyTabItemModel> Items { get; set; }
 
     }
 
@@ -95,78 +95,78 @@ namespace WinCopies.GUI.Controls.Models
 {
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ContentControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
-    public interface IContentControlModelBase
+    public interface IContentControlModel
     {
 
         /// <summary>
-        /// Gets or sets the content of this <see cref="IGroupBoxModelBase"/>.
+        /// Gets or sets the content of this <see cref="IGroupBoxModel"/>.
         /// </summary>
         object Content { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ContentControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
-    public class ContentControlModelBase : IContentControlModelBase
+    public class ContentControlModel : IContentControlModel
     {
 
         /// <summary>
-        /// Gets or sets the content of this <see cref="ContentControlModelBase"/>.
+        /// Gets or sets the content of this <see cref="ContentControlModel"/>.
         /// </summary>
         public object Content { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ContentControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
-    public interface IContentControlModelBase<T> : IContentControlModelBase
+    public interface IContentControlModel<T> : IContentControlModel
     {
 
         /// <summary>
-        /// Gets or sets the content of this <see cref="IContentControlModelBase{T}"/>.
+        /// Gets or sets the content of this <see cref="IContentControlModel{T}"/>.
         /// </summary>
         new T Content { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ContentControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
-    public class ContentControlModelBase<T> : IContentControlModelBase<T>
+    public class ContentControlModel<T> : IContentControlModel<T>
 
     {
 
         /// <summary>
-        /// Gets or sets the content of this <see cref="ContentControlModelBase{T}"/>.
+        /// Gets or sets the content of this <see cref="ContentControlModel{T}"/>.
         /// </summary>
         public T Content { get; set; }
 
-        object IContentControlModelBase.Content { get => Content; set => Content = GetOrThrowIfNotType<T>(value, nameof(value)); }
+        object IContentControlModel.Content { get => Content; set => Content = GetOrThrowIfNotType<T>(value, nameof(value)); }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for headered controls.
+    /// Represents a  model that corresponds to a default view for headered controls.
     /// </summary>
-    public interface IHeaderedControlModelBase
+    public interface IHeaderedControlModel
 
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="IGroupBoxModelBase"/>.
+        /// Gets or sets the header of this <see cref="IGroupBoxModel"/>.
         /// </summary>
         object Header { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
     /// </summary>
-    public interface IHeaderedContentControlModelBase : IContentControlModelBase, IHeaderedControlModelBase
+    public interface IHeaderedContentControlModel : IContentControlModel, IHeaderedControlModel
     {
 
 
@@ -174,37 +174,37 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
     /// </summary>
-    public class HeaderedContentControlModelBase : ContentControlModelBase, IHeaderedContentControlModelBase
+    public class HeaderedContentControlModel : ContentControlModel, IHeaderedContentControlModel
 
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="HeaderedContentControlModelBase"/>.
+        /// Gets or sets the header of this <see cref="HeaderedContentControlModel"/>.
         /// </summary>
         public object Header { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for headered controls.
+    /// Represents a  model that corresponds to a default view for headered controls.
     /// </summary>
-    public interface IHeaderedControlModelBase<T> : IHeaderedControlModelBase
+    public interface IHeaderedControlModel<T> : IHeaderedControlModel
 
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="IHeaderedControlModelBase{T}"/>.
+        /// Gets or sets the header of this <see cref="IHeaderedControlModel{T}"/>.
         /// </summary>
         new T Header { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
     /// </summary>
-    public interface IHeaderedContentControlModelBase<THeader, TContent> : IContentControlModelBase<TContent>, IHeaderedControlModelBase<THeader>
+    public interface IHeaderedContentControlModel<THeader, TContent> : IContentControlModel<TContent>, IHeaderedControlModel<THeader>
     {
 
 
@@ -212,80 +212,80 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
     /// </summary>
-    public class HeaderedContentControlModelBase<THeader, TContent> : ContentControlModelBase<TContent>, IHeaderedControlModelBase<THeader>
+    public class HeaderedContentControlModel<THeader, TContent> : ContentControlModel<TContent>, IHeaderedControlModel<THeader>
 
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="HeaderedContentControlModelBase{THeader, TContent}"/>.
+        /// Gets or sets the header of this <see cref="HeaderedContentControlModel{THeader, TContent}"/>.
         /// </summary>
         public THeader Header { get; set; }
 
-        object IHeaderedControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
+        object IHeaderedControlModel.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ItemsControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
-    public interface IItemsControlModelBase
+    public interface IItemsControlModel
     {
 
         /// <summary>
-        /// Gets or sets the items of this <see cref="IItemsControlModelBase"/>.
+        /// Gets or sets the items of this <see cref="IItemsControlModel"/>.
         /// </summary>
         IEnumerable Items { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ItemsControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
-    public class ItemsControlModelBase : IItemsControlModelBase
+    public class ItemsControlModel : IItemsControlModel
     {
 
         /// <summary>
-        /// Gets or sets the items of this <see cref="ItemsControlModelBase"/>.
+        /// Gets or sets the items of this <see cref="ItemsControlModel"/>.
         /// </summary>
         public IEnumerable Items { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ItemsControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
-    public interface IItemsControlModelBase<T> : IItemsControlModelBase
+    public interface IItemsControlModel<T> : IItemsControlModel
     {
 
         /// <summary>
-        /// Gets or sets the items of this <see cref="IItemsControlModelBase{T}"/>.
+        /// Gets or sets the items of this <see cref="IItemsControlModel{T}"/>.
         /// </summary>
         new IEnumerable<T> Items { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ItemsControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
-    public class ItemsControlModelBase<T> : IItemsControlModelBase<T>
+    public class ItemsControlModel<T> : IItemsControlModel<T>
 
     {
 
         /// <summary>
-        /// Gets or sets the items of this <see cref="ItemsControlModelBase{T}"/>.
+        /// Gets or sets the items of this <see cref="ItemsControlModel{T}"/>.
         /// </summary>
         public IEnumerable<T> Items { get; set; }
 
-        IEnumerable IItemsControlModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<T>>(value, nameof(value)); }
+        IEnumerable IItemsControlModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<T>>(value, nameof(value)); }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
-    public interface IHeaderedItemsControlModelBase : IItemsControlModelBase, IHeaderedControlModelBase
+    public interface IHeaderedItemsControlModel : IItemsControlModel, IHeaderedControlModel
     {
 
 
@@ -293,23 +293,23 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
-    public class HeaderedItemsControlModelBase : ItemsControlModelBase, IHeaderedItemsControlModelBase
+    public class HeaderedItemsControlModel : ItemsControlModel, IHeaderedItemsControlModel
 
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="HeaderedItemsControlModelBase"/>.
+        /// Gets or sets the header of this <see cref="HeaderedItemsControlModel"/>.
         /// </summary>
         public object Header { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
-    public interface IHeaderedItemsControlModelBase<THeader, TItems> : IItemsControlModelBase<TItems>, IHeaderedControlModelBase<THeader>
+    public interface IHeaderedItemsControlModel<THeader, TItems> : IItemsControlModel<TItems>, IHeaderedControlModel<THeader>
     {
 
 
@@ -317,25 +317,25 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
-    public class HeaderedItemsControlModelBase<THeader, TItems> : ItemsControlModelBase<TItems>, IHeaderedItemsControlModelBase<THeader, TItems>
+    public class HeaderedItemsControlModel<THeader, TItems> : ItemsControlModel<TItems>, IHeaderedItemsControlModel<THeader, TItems>
 
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="HeaderedItemsControlModelBase{THeader, TItems}"/>.
+        /// Gets or sets the header of this <see cref="HeaderedItemsControlModel{THeader, TItems}"/>.
         /// </summary>
         public THeader Header { get; set; }
 
-        object IHeaderedControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
+        object IHeaderedControlModel.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="GroupBox"/> controls.
+    /// Represents a  model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
-    public interface IGroupBoxModelBase : IHeaderedContentControlModelBase
+    public interface IGroupBoxModel : IHeaderedContentControlModel
     {
 
 
@@ -343,9 +343,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="GroupBox"/> controls.
+    /// Represents a  model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
-    public interface IGroupBoxModelBase<THeader, TContent> : IGroupBoxModelBase, IHeaderedContentControlModelBase<THeader, TContent>
+    public interface IGroupBoxModel<THeader, TContent> : IGroupBoxModel, IHeaderedContentControlModel<THeader, TContent>
     {
 
 
@@ -353,9 +353,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="GroupBox"/> controls.
+    /// Represents a  model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
-    public class GroupBoxModelBase : HeaderedContentControlModelBase, IGroupBoxModelBase
+    public class GroupBoxModel : HeaderedContentControlModel, IGroupBoxModel
     {
 
 
@@ -363,9 +363,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="GroupBox"/> controls.
+    /// Represents a  model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
-    public class GroupBoxModelBase<THeader, TContent> : HeaderedContentControlModelBase<THeader, TContent>, IGroupBoxModelBase<THeader, TContent>
+    public class GroupBoxModel<THeader, TContent> : HeaderedContentControlModel<THeader, TContent>, IGroupBoxModel<THeader, TContent>
     {
 
 
@@ -373,9 +373,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TabItem"/> controls.
+    /// Represents a  model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
-    public interface ITabItemModelBase : IHeaderedContentControlModelBase
+    public interface ITabItemModel : IHeaderedContentControlModel
     {
 
 
@@ -383,9 +383,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TabItem"/> controls.
+    /// Represents a  model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
-    public interface ITabItemModelBase<THeader, TContent> : ITabItemModelBase, IHeaderedContentControlModelBase<THeader, TContent>
+    public interface ITabItemModel<THeader, TContent> : ITabItemModel, IHeaderedContentControlModel<THeader, TContent>
     {
 
 
@@ -393,9 +393,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TabItem"/> controls.
+    /// Represents a  model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
-    public class TabItemModelBase : HeaderedContentControlModelBase, ITabItemModelBase
+    public class TabItemModel : HeaderedContentControlModel, ITabItemModel
     {
 
 
@@ -403,9 +403,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TabItem"/> controls.
+    /// Represents a  model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
-    public class TabItemModelBase<THeader, TContent> : HeaderedContentControlModelBase<THeader, TContent>, ITabItemModelBase<THeader, TContent>
+    public class TabItemModel<THeader, TContent> : HeaderedContentControlModel<THeader, TContent>, ITabItemModel<THeader, TContent>
     {
 
 
@@ -413,22 +413,22 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for property tab items.
+    /// Represents a  model that corresponds to a default view for property tab items.
     /// </summary>
-    public interface IPropertyTabItemModelBase : IHeaderedItemsControlModelBase
+    public interface IPropertyTabItemModel : IHeaderedItemsControlModel
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="IPropertyTabItemModelBase"/>.
+        /// Gets or sets the header of this <see cref="IPropertyTabItemModel"/>.
         /// </summary>
-        new IEnumerable<IGroupBoxModelBase> Items { get; set; }
+        new IEnumerable<IGroupBoxModel> Items { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for property tab items.
+    /// Represents a  model that corresponds to a default view for property tab items.
     /// </summary>
-    public interface IPropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : IPropertyTabItemModelBase, IHeaderedItemsControlModelBase<TItemHeader, IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>>
+    public interface IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : IPropertyTabItemModel, IHeaderedItemsControlModel<TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>
 
     {
 
@@ -437,39 +437,39 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for property tab items.
+    /// Represents a  model that corresponds to a default view for property tab items.
     /// </summary>
-    public class PropertyTabItemModelBase : IPropertyTabItemModelBase
+    public class PropertyTabItemModel : IPropertyTabItemModel
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="PropertyTabItemModelBase"/>.
+        /// Gets or sets the header of this <see cref="PropertyTabItemModel"/>.
         /// </summary>
         public object Header { get; set; }
 
         /// <summary>
-        /// Gets or sets the items of this <see cref="PropertyTabItemModelBase"/>.
+        /// Gets or sets the items of this <see cref="PropertyTabItemModel"/>.
         /// </summary>
-        public IEnumerable<IGroupBoxModelBase> Items { get; set; }
+        public IEnumerable<IGroupBoxModel> Items { get; set; }
 
-        IEnumerable IItemsControlModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModelBase>>(value, nameof(value)); }
+        IEnumerable IItemsControlModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModel>>(value, nameof(value)); }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for property tab items.
+    /// Represents a  model that corresponds to a default view for property tab items.
     /// </summary>
-    public class PropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlModelBase<TItemHeader, IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
+    public class PropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlModel<TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
     {
 
-        IEnumerable<IGroupBoxModelBase> IPropertyTabItemModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>>>(value, nameof(value)); }
+        IEnumerable<IGroupBoxModel> IPropertyTabItemModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>>(value, nameof(value)); }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="Button"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
-    public interface IButtonModelBase : IContentControlModelBase, ICommandSource
+    public interface IButtonModel : IContentControlModel, ICommandSource
 
     {
 
@@ -478,33 +478,33 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="Button"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
-    public class ButtonModelBase : ContentControlModelBase, IButtonModelBase
+    public class ButtonModel : ContentControlModel, IButtonModel
 
     {
 
         /// <summary>
-        /// Gets or sets the command of this <see cref="ButtonModelBase"/>.
+        /// Gets or sets the command of this <see cref="ButtonModel"/>.
         /// </summary>
         public ICommand Command { get; set; }
 
         /// <summary>
-        /// Gets or sets the command parameter of this <see cref="ButtonModelBase"/>.
+        /// Gets or sets the command parameter of this <see cref="ButtonModel"/>.
         /// </summary>
         public object CommandParameter { get; set; }
 
         /// <summary>
-        /// Gets or sets the command target of this <see cref="ButtonModelBase"/>.
+        /// Gets or sets the command target of this <see cref="ButtonModel"/>.
         /// </summary>
         public IInputElement CommandTarget { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="Button"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
-    public interface IButtonModelBase<T> : IButtonModelBase, IContentControlModelBase<T>
+    public interface IButtonModel<T> : IButtonModel, IContentControlModel<T>
 
     {
 
@@ -513,71 +513,71 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="Button"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
-    public class ButtonModelBase<T> : ContentControlModelBase<T>, IButtonModelBase<T>
+    public class ButtonModel<T> : ContentControlModel<T>, IButtonModel<T>
 
     {
 
         /// <summary>
-        /// Gets or sets the command of this <see cref="ButtonModelBase{T}"/>.
+        /// Gets or sets the command of this <see cref="ButtonModel{T}"/>.
         /// </summary>
         public ICommand Command { get; set; }
 
         /// <summary>
-        /// Gets or sets the command parameter of this <see cref="ButtonModelBase{T}"/>.
+        /// Gets or sets the command parameter of this <see cref="ButtonModel{T}"/>.
         /// </summary>
         public object CommandParameter { get; set; }
 
         /// <summary>
-        /// Gets or sets the command target of this <see cref="ButtonModelBase{T}"/>.
+        /// Gets or sets the command target of this <see cref="ButtonModel{T}"/>.
         /// </summary>
         public IInputElement CommandTarget { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ToggleButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
-    public interface IToggleButtonModelBase : IButtonModelBase
+    public interface IToggleButtonModel : IButtonModel
 
     {
 
         /// <summary>
-        /// Gets or sets a value that indeicates whether this <see cref="IToggleButtonModelBase"/> is checked.
+        /// Gets or sets a value that indeicates whether this <see cref="IToggleButtonModel"/> is checked.
         /// </summary>
         bool? IsChecked { get; set; }
 
         /// <summary>
-        /// Gets or sets a value that indeicates whether this <see cref="IToggleButtonModelBase"/> is three state.
+        /// Gets or sets a value that indeicates whether this <see cref="IToggleButtonModel"/> is three state.
         /// </summary>
         bool IsThreeState { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ToggleButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
-    public class ToggleButtonModelBase : ButtonModelBase, IToggleButtonModelBase
+    public class ToggleButtonModel : ButtonModel, IToggleButtonModel
 
     {
 
         /// <summary>
-        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModelBase"/> is checked.
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModel"/> is checked.
         /// </summary>
         public bool? IsChecked { get; set; }
 
         /// <summary>
-        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModelBase"/> is three state.
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModel"/> is three state.
         /// </summary>
         public bool IsThreeState { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ToggleButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
-    public interface IToggleButtonModelBase<T> : IToggleButtonModelBase, IButtonModelBase<T>
+    public interface IToggleButtonModel<T> : IToggleButtonModel, IButtonModel<T>
 
     {
 
@@ -586,28 +586,28 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="ToggleButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
-    public class ToggleButtonModelBase<T> : ButtonModelBase<T>, IToggleButtonModelBase<T>
+    public class ToggleButtonModel<T> : ButtonModel<T>, IToggleButtonModel<T>
 
     {
 
         /// <summary>
-        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModelBase{T}"/> is checked.
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModel{T}"/> is checked.
         /// </summary>
         public bool? IsChecked { get; set; }
 
         /// <summary>
-        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModelBase{T}"/> is three state.
+        /// Gets or sets a value that indeicates whether this <see cref="ToggleButtonModel{T}"/> is three state.
         /// </summary>
         public bool IsThreeState { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="CheckBox"/>'s.
+    /// Represents a  model that corresponds to a default view for <see cref="CheckBox"/>'s.
     /// </summary>
-    public interface ICheckBoxModelBase : IToggleButtonModelBase
+    public interface ICheckBoxModel : IToggleButtonModel
     {
 
 
@@ -615,30 +615,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="CheckBox"/>'.
+    /// Represents a  model that corresponds to a default view for <see cref="CheckBox"/>'.
     /// </summary>
-    public class CheckBoxModelBase : ToggleButtonModelBase, ICheckBoxModelBase
-
-    {
-
-
-
-    }
-
-    /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="CheckBox"/>'.
-    /// </summary>
-    public interface ICheckBoxModelBase<T> : IToggleButtonModelBase<T>, ICheckBoxModelBase
-    {
-
-
-
-    }
-
-    /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="CheckBox"/>'.
-    /// </summary>
-    public class CheckBoxModelBase<T> : ToggleButtonModelBase<T>, ICheckBoxModelBase<T>
+    public class CheckBoxModel : ToggleButtonModel, ICheckBoxModel
 
     {
 
@@ -647,7 +626,28 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a  model that corresponds to a default view for <see cref="CheckBox"/>'.
+    /// </summary>
+    public interface ICheckBoxModel<T> : IToggleButtonModel<T>, ICheckBoxModel
+    {
+
+
+
+    }
+
+    /// <summary>
+    /// Represents a  model that corresponds to a default view for <see cref="CheckBox"/>'.
+    /// </summary>
+    public class CheckBoxModel<T> : ToggleButtonModel<T>, ICheckBoxModel<T>
+
+    {
+
+
+
+    }
+
+    /// <summary>
+    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public interface ITextBoxModelTextOriented
 
@@ -666,7 +666,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public class TextBoxModelTextOriented : ITextBoxModelTextOriented
 
@@ -685,25 +685,19 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public interface ITextBoxModelSelectionOriented : ITextBoxModelTextOriented
 
     {
-
-        int CaretIndex { get; set; }
-
-        int SelectionLength { get; set; }
-
-        int SelectionStart { get; set; }
-
-        string SelectedText { get; set; }
 
         bool IsReadOnlyCaretVisible { get; set; }
 
         bool AutoWordSelection { get; set; }
 
         Brush SelectionBrush { get; set; }
+
+        double SelectionOpacity { get; set; }
 
         Brush SelectionTextBrush { get; set; }
 
@@ -714,7 +708,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public class TextBoxModelSelectionOriented : TextBoxModelTextOriented, ITextBoxModelSelectionOriented
 
@@ -734,6 +728,8 @@ namespace WinCopies.GUI.Controls.Models
 
         public Brush SelectionBrush { get; set; }
 
+        public double SelectionOpacity { get; set; }
+
         public Brush SelectionTextBrush { get; set; }
 
         public Brush CaretBrush { get; set; }
@@ -743,7 +739,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public interface ITextBoxModelTextEditingOriented : ITextBoxModelTextOriented
 
@@ -767,8 +763,6 @@ namespace WinCopies.GUI.Controls.Models
 
         bool AcceptsTab { get; set; }
 
-        double SelectionOpacity { get; set; }
-
         bool IsUndoEnabled { get; set; }
 
         int UndoLimit { get; set; }
@@ -776,7 +770,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public class TextBoxModelTextEditingOriented : TextBoxModelTextOriented, ITextBoxModelTextEditingOriented
 
@@ -800,8 +794,6 @@ namespace WinCopies.GUI.Controls.Models
 
         public bool AcceptsTab { get; set; }
 
-        public double SelectionOpacity { get; set; }
-
         public bool IsUndoEnabled { get; set; }
 
         public int UndoLimit { get; set; }
@@ -809,9 +801,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
-    public interface ITextBoxModelBase : ITextBoxModelTextOriented, ITextBoxModelTextEditingOriented, ITextBoxModelSelectionOriented
+    public interface ITextBoxModel : ITextBoxModelTextOriented, ITextBoxModelTextEditingOriented, ITextBoxModelSelectionOriented
 
     {
 
@@ -820,9 +812,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
-    public class TextBoxModelBase : TextBoxModelTextOriented, ITextBoxModelBase
+    public class TextBoxModel : TextBoxModelTextOriented, ITextBoxModel
 
     {
 
@@ -881,9 +873,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/> collection.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public interface IRadioButtonCollection : IEnumerable<IRadioButtonModelBase>
+    public interface IRadioButtonCollection : IEnumerable<IRadioButtonModel>
 
     {
 
@@ -892,9 +884,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/> collection.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public class RadioButtonCollection : System.Collections.Generic.List<IRadioButtonModelBase>, IRadioButtonCollection
+    public class RadioButtonCollection : System.Collections.Generic.List<IRadioButtonModel>, IRadioButtonCollection
 
     {
 
@@ -903,9 +895,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/> collection.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public interface IRadioButtonCollection<T> : IRadioButtonCollection, IEnumerable<IRadioButtonModelBase<T>>
+    public interface IRadioButtonCollection<T> : IRadioButtonCollection, IEnumerable<IRadioButtonModel<T>>
 
     {
 
@@ -914,22 +906,22 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/> collection.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
-    public class RadioButtonCollection<T> : List<IRadioButtonModelBase<T>>, IRadioButtonCollection<T>
+    public class RadioButtonCollection<T> : List<IRadioButtonModel<T>>, IRadioButtonCollection<T>
 
     {
 
         public string GroupName { get; set; }
 
-        IEnumerator<IRadioButtonModelBase> IEnumerable<IRadioButtonModelBase>.GetEnumerator() => GetEnumerator();
+        IEnumerator<IRadioButtonModel> IEnumerable<IRadioButtonModel>.GetEnumerator() => GetEnumerator();
 
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public interface IRadioButtonModelBase : IToggleButtonModelBase
+    public interface IRadioButtonModel : IToggleButtonModel
 
     {
 
@@ -938,9 +930,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public class RadioButtonModelBase : ToggleButtonModelBase, IRadioButtonModelBase
+    public class RadioButtonModel : ToggleButtonModel, IRadioButtonModel
 
     {
 
@@ -949,9 +941,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public interface IRadioButtonModelBase<T> : IRadioButtonModelBase, IToggleButtonModelBase<T>
+    public interface IRadioButtonModel<T> : IRadioButtonModel, IToggleButtonModel<T>
 
     {
 
@@ -960,9 +952,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public class RadioButtonModelBase<T> : ToggleButtonModelBase<T>, IRadioButtonModelBase<T>
+    public class RadioButtonModel<T> : ToggleButtonModel<T>, IRadioButtonModel<T>
 
     {
 
@@ -971,9 +963,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public interface IGroupingRadioButtonModelBase : IRadioButtonModelBase
+    public interface IGroupingRadioButtonModel : IRadioButtonModel
 
     {
 
@@ -982,9 +974,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public interface IGroupingRadioButtonModelBase<T> : IGroupingRadioButtonModelBase, IRadioButtonModelBase<T>
+    public interface IGroupingRadioButtonModel<T> : IGroupingRadioButtonModel, IRadioButtonModel<T>
 
     {
 
@@ -993,9 +985,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public class GroupingRadioButtonModelBase : RadioButtonModelBase, IGroupingRadioButtonModelBase
+    public class GroupingRadioButtonModel : RadioButtonModel, IGroupingRadioButtonModel
 
     {
 
@@ -1004,9 +996,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a base model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
-    public class GroupingRadioButtonModelBase<T> : RadioButtonModelBase<T>, IGroupingRadioButtonModelBase<T>
+    public class GroupingRadioButtonModel<T> : RadioButtonModel<T>, IGroupingRadioButtonModel<T>
 
     {
 

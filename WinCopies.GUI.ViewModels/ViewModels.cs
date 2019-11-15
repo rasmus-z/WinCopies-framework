@@ -19,46 +19,46 @@ using static WinCopies.Util.Util;
 namespace WinCopies.GUI.Windows.Dialogs.ViewModels
 {
 
-    public class DialogViewModelBase<T> : ViewModel<T>, IDialogModelBase where T : IDialogModelBase
+    public class DialogViewModel<T> : ViewModel<T>, IDialogModel where T : IDialogModel
     {
 
         /// <summary>
-        /// Gets or sets the title of this <see cref="DialogViewModelBase{T}"/>.
+        /// Gets or sets the title of this <see cref="DialogViewModel{T}"/>.
         /// </summary>
         public string Title { get => ModelGeneric.Title; set => OnPropertyChanged(nameof(Title), value, GetType()); }
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DialogButton"/> value of this <see cref="DialogViewModelBase{T}"/>.
+        /// Gets or sets the <see cref="Dialogs.DialogButton"/> value of this <see cref="DialogViewModel{T}"/>.
         /// </summary>
         public DialogButton DialogButton { get => ModelGeneric.DialogButton; set => OnPropertyChanged(nameof(DialogButton), value, GetType()); }
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DefaultButton"/> value of this <see cref="DialogViewModelBase{T}"/>.
+        /// Gets or sets the <see cref="Dialogs.DefaultButton"/> value of this <see cref="DialogViewModel{T}"/>.
         /// </summary>
         public DefaultButton DefaultButton { get => ModelGeneric.DefaultButton; set => OnPropertyChanged(nameof(DefaultButton), value, GetType()); }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DialogViewModelBase{T}"/> class.
+        /// Initializes a new instance of the <see cref="DialogViewModel{T}"/> class.
         /// </summary>
         /// <param name="model">The <typeparamref name="T"/> model to wrap in this <see cref="ViewModel{T}"/>.</param>
-        public DialogViewModelBase(T model) : base(model) { }
+        public DialogViewModel(T model) : base(model) { }
 
     }
 
-    public class PropertyDialogViewModelBase<T> : DialogViewModelBase<T>, IPropertyDialogModelBase where T : IPropertyDialogModelBase
+    public class PropertyDialogViewModel<T> : DialogViewModel<T>, IPropertyDialogModel where T : IPropertyDialogModel
 
     {
 
         /// <summary>
-        /// Gets or sets the items of this <see cref="PropertyDialogViewModelBase{T}"/>.
+        /// Gets or sets the items of this <see cref="PropertyDialogViewModel{T}"/>.
         /// </summary>
-        public IEnumerable<IPropertyTabItemModelBase> Items { get => ModelGeneric.Items; set => OnPropertyChanged(nameof(Items), value, GetType()); }
+        public IEnumerable<IPropertyTabItemModel> Items { get => ModelGeneric.Items; set => OnPropertyChanged(nameof(Items), value, GetType()); }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyDialogViewModelBase{T}"/> class.
+        /// Initializes a new instance of the <see cref="PropertyDialogViewModel{T}"/> class.
         /// </summary>
         /// <param name="model">The <typeparamref name="T"/> model to wrap in this <see cref="ViewModel{T}"/>.</param>
-        public PropertyDialogViewModelBase(T model) : base(model) { }
+        public PropertyDialogViewModel(T model) : base(model) { }
 
     }
 
@@ -68,161 +68,147 @@ namespace WinCopies.GUI.Controls.ViewModels
 
 {
 
-    public class ContentControlViewModelBase<T> : ViewModel<T>, IContentControlModelBase where T : IContentControlModelBase
+    public class ContentControlViewModel<T> : ViewModel<T>, IContentControlModel where T : IContentControlModel
     {
 
         public object Content { get => ModelGeneric.Content; set => OnPropertyChanged(nameof(Content), value, GetType()); }
 
-        public ContentControlViewModelBase(T model) : base(model) { }
+        public ContentControlViewModel(T model) : base(model) { }
 
     }
 
-    public class ContentControlViewModelBase<TModel, TContent> : ViewModel<TModel>, IContentControlModelBase<TContent> where TModel : IContentControlModelBase<TContent>
+    public class ContentControlViewModel<TModel, TContent> : ViewModel<TModel>, IContentControlModel<TContent> where TModel : IContentControlModel<TContent>
     {
 
         public TContent Content { get => ModelGeneric.Content; set => OnPropertyChanged(nameof(Content), value, GetType()); }
 
-        object IContentControlModelBase.Content { get => Content; set => Content = GetOrThrowIfNotType<TContent>(value, nameof(value)); }
+        object IContentControlModel.Content { get => Content; set => Content = GetOrThrowIfNotType<TContent>(value, nameof(value)); }
 
-        public ContentControlViewModelBase(TModel model) : base(model) { }
+        public ContentControlViewModel(TModel model) : base(model) { }
 
     }
 
-    public class HeaderedContentControlViewModelBase<T> : ContentControlViewModelBase<T>, IHeaderedContentControlModelBase where T : IHeaderedContentControlModelBase
+    public class HeaderedContentControlViewModel<T> : ContentControlViewModel<T>, IHeaderedContentControlModel where T : IHeaderedContentControlModel
 
     {
 
         public object Header { get => ModelGeneric.Header; set => OnPropertyChanged(nameof(Header), value, GetType()); }
 
-        public HeaderedContentControlViewModelBase(T model) : base(model) { }
+        public HeaderedContentControlViewModel(T model) : base(model) { }
 
     }
 
-    public class HeaderedContentControlViewModelBase<TModel, THeader, TContent> : ContentControlViewModelBase<TModel, TContent>, IHeaderedContentControlModelBase<THeader, TContent> where TModel : IHeaderedContentControlModelBase<THeader, TContent>
+    public class HeaderedContentControlViewModel<TModel, THeader, TContent> : ContentControlViewModel<TModel, TContent>, IHeaderedContentControlModel<THeader, TContent> where TModel : IHeaderedContentControlModel<THeader, TContent>
 
     {
 
         public THeader Header { get => ModelGeneric.Header; set => OnPropertyChanged(nameof(Header), value, GetType()); }
 
-        object IHeaderedControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
+        object IHeaderedControlModel.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
 
-        public HeaderedContentControlViewModelBase(TModel model) : base(model) { }
+        public HeaderedContentControlViewModel(TModel model) : base(model) { }
 
     }
 
-    public class ItemsControlViewModelBase<T> : ViewModel<T>, IItemsControlModelBase where T : IItemsControlModelBase
+    public class ItemsControlViewModel<T> : ViewModel<T>, IItemsControlModel where T : IItemsControlModel
     {
 
         public IEnumerable Items { get => ModelGeneric.Items; set => OnPropertyChanged(nameof(Items), value, GetType()); }
 
-        public ItemsControlViewModelBase(T model) : base(model) { }
+        public ItemsControlViewModel(T model) : base(model) { }
 
     }
 
-    public class ItemsControlViewModelBase<TModel, TItems> : ViewModel<TModel>, IItemsControlModelBase<TItems> where TModel : IItemsControlModelBase<TItems>
+    public class ItemsControlViewModel<TModel, TItems> : ViewModel<TModel>, IItemsControlModel<TItems> where TModel : IItemsControlModel<TItems>
 
     {
 
         public IEnumerable<TItems> Items { get => ModelGeneric.Items; set => OnPropertyChanged(nameof(Items), value, GetType()); }
 
-        IEnumerable IItemsControlModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<TItems>>(value, nameof(value)); }
+        IEnumerable IItemsControlModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<TItems>>(value, nameof(value)); }
 
-        public ItemsControlViewModelBase(TModel model) : base(model) { }
+        public ItemsControlViewModel(TModel model) : base(model) { }
 
     }
 
-    public class HeaderedItemsControlViewModelBase<T> : ItemsControlViewModelBase<T>, IHeaderedItemsControlModelBase where T : IHeaderedItemsControlModelBase
+    public class HeaderedItemsControlViewModel<T> : ItemsControlViewModel<T>, IHeaderedItemsControlModel where T : IHeaderedItemsControlModel
 
     {
 
         public object Header { get => ModelGeneric.Header; set => OnPropertyChanged(nameof(Header), value, GetType()); }
 
-        public HeaderedItemsControlViewModelBase(T model) : base(model) { }
+        public HeaderedItemsControlViewModel(T model) : base(model) { }
 
     }
 
-    public class HeaderedItemsControlViewModelBase<TModel, THeader, TItems> : ItemsControlViewModelBase<TModel, TItems>, IHeaderedItemsControlModelBase<THeader, TItems> where TModel : IHeaderedItemsControlModelBase<THeader, TItems>
+    public class HeaderedItemsControlViewModel<TModel, THeader, TItems> : ItemsControlViewModel<TModel, TItems>, IHeaderedItemsControlModel<THeader, TItems> where TModel : IHeaderedItemsControlModel<THeader, TItems>
 
     {
 
         public THeader Header { get => ModelGeneric.Header; set => OnPropertyChanged(nameof(Header), value, GetType()); }
 
-        object IHeaderedControlModelBase.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
+        object IHeaderedControlModel.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
 
-        public HeaderedItemsControlViewModelBase(TModel model) : base(model) { }
+        public HeaderedItemsControlViewModel(TModel model) : base(model) { }
 
     }
 
-    public class GroupBoxViewModelBase<T> : HeaderedContentControlViewModelBase<T>, IGroupBoxModelBase where T : IGroupBoxModelBase
+    public class GroupBoxViewModel<T> : HeaderedContentControlViewModel<T>, IGroupBoxModel where T : IGroupBoxModel
     {
 
-        public GroupBoxViewModelBase(T model) : base(model) { }
+        public GroupBoxViewModel(T model) : base(model) { }
 
     }
 
-    public class GroupBoxViewModelBase<TModel, THeader, TContent> : HeaderedContentControlViewModelBase<TModel, THeader, TContent>, IGroupBoxModelBase<THeader, TContent> where TModel : IGroupBoxModelBase<THeader, TContent>
+    public class GroupBoxViewModel<TModel, THeader, TContent> : HeaderedContentControlViewModel<TModel, THeader, TContent>, IGroupBoxModel<THeader, TContent> where TModel : IGroupBoxModel<THeader, TContent>
     {
 
-        public GroupBoxViewModelBase(TModel model) : base(model) { }
+        public GroupBoxViewModel(TModel model) : base(model) { }
 
     }
 
-    public class TabItemViewModelBase<T> : HeaderedContentControlViewModelBase<T>, ITabItemModelBase where T : ITabItemModelBase
-
-    {
-
-        public TabItemViewModelBase(T model) : base(model) { }
-
-    }
-
-    public class TabItemViewModelBase<TModel, THeader, TContent> : HeaderedContentControlViewModelBase<TModel, THeader, TContent>, ITabItemModelBase<THeader, TContent> where TModel : ITabItemModelBase<THeader, TContent>
+    public class TabItemViewModel<T> : HeaderedContentControlViewModel<T>, ITabItemModel where T : ITabItemModel
 
     {
 
-        public TabItemViewModelBase(TModel model) : base(model) { }
+        public TabItemViewModel(T model) : base(model) { }
 
     }
 
-    public class PropertyTabItemViewModelBase<T> : ViewModel<T>, IPropertyTabItemModelBase where T : IPropertyTabItemModelBase
+    public class TabItemViewModel<TModel, THeader, TContent> : HeaderedContentControlViewModel<TModel, THeader, TContent>, ITabItemModel<THeader, TContent> where TModel : ITabItemModel<THeader, TContent>
+
+    {
+
+        public TabItemViewModel(TModel model) : base(model) { }
+
+    }
+
+    public class PropertyTabItemViewModel<T> : ViewModel<T>, IPropertyTabItemModel where T : IPropertyTabItemModel
 
     {
 
         public object Header { get => ModelGeneric.Header; set => OnPropertyChanged(nameof(Header), value, GetType()); }
 
-        public IEnumerable<IGroupBoxModelBase> Items { get => ModelGeneric.Items; set => OnPropertyChanged(nameof(Items), value, GetType()); }
+        public IEnumerable<IGroupBoxModel> Items { get => ModelGeneric.Items; set => OnPropertyChanged(nameof(Items), value, GetType()); }
 
-        IEnumerable IItemsControlModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModelBase>>(value, nameof(value)); }
+        IEnumerable IItemsControlModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModel>>(value, nameof(value)); }
 
-        public PropertyTabItemViewModelBase(T model) : base(model) { }
+        public PropertyTabItemViewModel(T model) : base(model) { }
 
     }
 
-    public class PropertyTabItemViewModelBase<TModel, TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlViewModelBase<TModel, TItemHeader, IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent> where TModel : IPropertyTabItemModelBase<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
+    public class PropertyTabItemViewModel<TModel, TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlViewModel<TModel, TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> where TModel : IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
 
     {
 
-        IEnumerable<IGroupBoxModelBase> IPropertyTabItemModelBase.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModelBase<TGroupBoxHeader, TGroupBoxContent>>>(value, nameof(value)); }
+        IEnumerable<IGroupBoxModel> IPropertyTabItemModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>>(value, nameof(value)); }
 
-        public PropertyTabItemViewModelBase(TModel model) : base(model) { }
-
-    }
-
-
-    public class ButtonViewModelBase<T> : ContentControlViewModelBase<T>, IButtonModelBase where T : IButtonModelBase
-
-    {
-
-        public ICommand Command { get => ModelGeneric.Command; set => OnPropertyChanged(nameof(Command), value, GetType()); }
-
-        public object CommandParameter { get => ModelGeneric.CommandParameter; set => OnPropertyChanged(nameof(CommandParameter), value, GetType()); }
-
-        public IInputElement CommandTarget { get => ModelGeneric.CommandTarget; set => OnPropertyChanged(nameof(CommandTarget), value, GetType()); }
-
-        public ButtonViewModelBase(T model) : base(model) { }
+        public PropertyTabItemViewModel(TModel model) : base(model) { }
 
     }
 
-    public class ButtonViewModelBase<TModel, TContent> : ContentControlViewModelBase<TModel, TContent>, IButtonModelBase<TContent> where TModel : IButtonModelBase<TContent>
+
+    public class ButtonViewModel<T> : ContentControlViewModel<T>, IButtonModel where T : IButtonModel
 
     {
 
@@ -232,11 +218,25 @@ namespace WinCopies.GUI.Controls.ViewModels
 
         public IInputElement CommandTarget { get => ModelGeneric.CommandTarget; set => OnPropertyChanged(nameof(CommandTarget), value, GetType()); }
 
-        public ButtonViewModelBase(TModel model) : base(model) { }
+        public ButtonViewModel(T model) : base(model) { }
 
     }
 
-    public class ToggleButtonViewModelBase<T> : ButtonViewModelBase<T>, IToggleButtonModelBase where T : IToggleButtonModelBase
+    public class ButtonViewModel<TModel, TContent> : ContentControlViewModel<TModel, TContent>, IButtonModel<TContent> where TModel : IButtonModel<TContent>
+
+    {
+
+        public ICommand Command { get => ModelGeneric.Command; set => OnPropertyChanged(nameof(Command), value, GetType()); }
+
+        public object CommandParameter { get => ModelGeneric.CommandParameter; set => OnPropertyChanged(nameof(CommandParameter), value, GetType()); }
+
+        public IInputElement CommandTarget { get => ModelGeneric.CommandTarget; set => OnPropertyChanged(nameof(CommandTarget), value, GetType()); }
+
+        public ButtonViewModel(TModel model) : base(model) { }
+
+    }
+
+    public class ToggleButtonViewModel<T> : ButtonViewModel<T>, IToggleButtonModel where T : IToggleButtonModel
 
     {
 
@@ -244,11 +244,11 @@ namespace WinCopies.GUI.Controls.ViewModels
 
         public bool IsThreeState { get => ModelGeneric.IsThreeState; set => OnPropertyChanged(nameof(IsThreeState), value, GetType()); }
 
-        public ToggleButtonViewModelBase(T model) : base(model) { }
+        public ToggleButtonViewModel(T model) : base(model) { }
 
     }
 
-    public class ToggleButtonViewModelBase<TModel, TContent> : ButtonViewModelBase<TModel, TContent>, IToggleButtonModelBase<TContent> where TModel : IToggleButtonModelBase<TContent>
+    public class ToggleButtonViewModel<TModel, TContent> : ButtonViewModel<TModel, TContent>, IToggleButtonModel<TContent> where TModel : IToggleButtonModel<TContent>
 
     {
 
@@ -256,23 +256,23 @@ namespace WinCopies.GUI.Controls.ViewModels
 
         public bool IsThreeState { get => ModelGeneric.IsThreeState; set => OnPropertyChanged(nameof(IsThreeState), value, GetType()); }
 
-        public ToggleButtonViewModelBase(TModel model) : base(model) { }
+        public ToggleButtonViewModel(TModel model) : base(model) { }
 
     }
 
-    public class CheckBoxViewModelBase<T> : ToggleButtonViewModelBase<T>, ICheckBoxModelBase where T : ICheckBoxModelBase
+    public class CheckBoxViewModel<T> : ToggleButtonViewModel<T>, ICheckBoxModel where T : ICheckBoxModel
 
     {
 
-        public CheckBoxViewModelBase(T model) : base(model) { }
+        public CheckBoxViewModel(T model) : base(model) { }
 
     }
 
-    public class CheckBoxViewModelBase<TModel, TContent> : ToggleButtonViewModelBase<TModel, TContent>, ICheckBoxModelBase<TContent> where TModel : ICheckBoxModelBase<TContent>
+    public class CheckBoxViewModel<TModel, TContent> : ToggleButtonViewModel<TModel, TContent>, ICheckBoxModel<TContent> where TModel : ICheckBoxModel<TContent>
 
     {
 
-        public CheckBoxViewModelBase( TModel model) : base(model) { }
+        public CheckBoxViewModel(TModel model) : base(model) { }
 
     }
 
@@ -280,9 +280,9 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     {
 
-        public string Text { get=>ModelGeneric.Text; set=> OnPropertyChanged(nameof(Text), value, GetType()); }
+        public string Text { get => ModelGeneric.Text; set => OnPropertyChanged(nameof(Text), value, GetType()); }
 
-        public bool IsReadOnly { get=>ModelGeneric.IsReadOnly; set=>OnPropertyChanged(nameof(IsReadOnly),value,GetType()); }
+        public bool IsReadOnly { get => ModelGeneric.IsReadOnly; set => OnPropertyChanged(nameof(IsReadOnly), value, GetType()); }
 
         public TextBoxViewModelTextOriented(T model) : base(model) { }
 
@@ -292,25 +292,19 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     {
 
-        public int CaretIndex { get=>ModelGeneric.CaretIndex; set=>OnPropertyChanged(nameof(CaretIndex),value,GetType()); }
+        public bool IsReadOnlyCaretVisible { get => ModelGeneric.IsReadOnlyCaretVisible; set => OnPropertyChanged(nameof(IsReadOnlyCaretVisible), value, GetType()); }
 
-        public int SelectionLength { get=>ModelGeneric.SelectionLength; set=> OnPropertyChanged(nameof(SelectionLength), value, GetType()); }
+        public bool AutoWordSelection { get => ModelGeneric.AutoWordSelection; set => OnPropertyChanged(nameof(AutoWordSelection), value, GetType()); }
 
-        public int SelectionStart { get=>ModelGeneric.SelectionStart; set=> OnPropertyChanged(nameof(SelectionStart), value, GetType()); }
+        public Brush SelectionBrush { get => ModelGeneric.SelectionBrush; set => OnPropertyChanged(nameof(SelectionBrush), value, GetType()); }
 
-        public string SelectedText { get=>ModelGeneric.SelectedText; set=> OnPropertyChanged(nameof(SelectedText), value, GetType()); }
+        public double SelectionOpacity { get => ModelGeneric.SelectionOpacity; set => OnPropertyChanged(nameof(SelectionOpacity), value, GetType()); }
 
-        public bool IsReadOnlyCaretVisible { get=>ModelGeneric.IsReadOnlyCaretVisible; set=> OnPropertyChanged(nameof(IsReadOnlyCaretVisible), value, GetType()); }
+        public Brush SelectionTextBrush { get => ModelGeneric.SelectionTextBrush; set => OnPropertyChanged(nameof(SelectionTextBrush), value, GetType()); }
 
-        public bool AutoWordSelection { get=>ModelGeneric.AutoWordSelection; set=> OnPropertyChanged(nameof(AutoWordSelection), value, GetType()); }
+        public Brush CaretBrush { get => ModelGeneric.CaretBrush; set => OnPropertyChanged(nameof(CaretBrush), value, GetType()); }
 
-        public Brush SelectionBrush { get=>ModelGeneric.SelectionBrush; set=> OnPropertyChanged(nameof(SelectionBrush), value, GetType()); }
-
-        public Brush SelectionTextBrush { get=>ModelGeneric.SelectionTextBrush; set=> OnPropertyChanged(nameof(SelectionTextBrush), value, GetType()); }
-
-        public Brush CaretBrush { get=>ModelGeneric.CaretBrush; set=> OnPropertyChanged(nameof(CaretBrush), value, GetType()); }
-
-        public bool IsInactiveSelectionHighlightEnabled { get=>ModelGeneric.IsInactiveSelectionHighlightEnabled; set=> OnPropertyChanged(nameof(IsInactiveSelectionHighlightEnabled), value, GetType()); }
+        public bool IsInactiveSelectionHighlightEnabled { get => ModelGeneric.IsInactiveSelectionHighlightEnabled; set => OnPropertyChanged(nameof(IsInactiveSelectionHighlightEnabled), value, GetType()); }
 
         public TextBoxViewModelSelectionOriented(T model) : base(model) { }
 
@@ -320,35 +314,33 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     {
 
-        public int MinLines { get=>ModelGeneric.MinLines; set=>OnPropertyChanged(nameof(MinLines),value,GetType()); }
+        public int MinLines { get => ModelGeneric.MinLines; set => OnPropertyChanged(nameof(MinLines), value, GetType()); }
 
-        public int MaxLines { get=>ModelGeneric.MaxLines; set=> OnPropertyChanged(nameof(MaxLines), value, GetType()); }
+        public int MaxLines { get => ModelGeneric.MaxLines; set => OnPropertyChanged(nameof(MaxLines), value, GetType()); }
 
-        public CharacterCasing CharacterCasing { get=>ModelGeneric.CharacterCasing; set=> OnPropertyChanged(nameof(CharacterCasing), value, GetType()); }
+        public CharacterCasing CharacterCasing { get => ModelGeneric.CharacterCasing; set => OnPropertyChanged(nameof(CharacterCasing), value, GetType()); }
 
-        public int MaxLength { get=>ModelGeneric.MaxLength; set=> OnPropertyChanged(nameof(MaxLength), value, GetType()); }
+        public int MaxLength { get => ModelGeneric.MaxLength; set => OnPropertyChanged(nameof(MaxLength), value, GetType()); }
 
-        public TextAlignment TextAlignment { get=>ModelGeneric.TextAlignment; set=> OnPropertyChanged(nameof(TextAlignment), value, GetType()); }
+        public TextAlignment TextAlignment { get => ModelGeneric.TextAlignment; set => OnPropertyChanged(nameof(TextAlignment), value, GetType()); }
 
-        public TextDecorationCollection TextDecorations { get=>ModelGeneric.TextDecorations; set=> OnPropertyChanged(nameof(TextDecorations), value, GetType()); }
+        public TextDecorationCollection TextDecorations { get => ModelGeneric.TextDecorations; set => OnPropertyChanged(nameof(TextDecorations), value, GetType()); }
 
-        public TextWrapping TextWrapping { get=>ModelGeneric.TextWrapping; set=> OnPropertyChanged(nameof(TextWrapping), value, GetType()); }
+        public TextWrapping TextWrapping { get => ModelGeneric.TextWrapping; set => OnPropertyChanged(nameof(TextWrapping), value, GetType()); }
 
-        public bool AcceptsReturn { get=>ModelGeneric.AcceptsReturn; set=> OnPropertyChanged(nameof(AcceptsReturn), value, GetType()); }
+        public bool AcceptsReturn { get => ModelGeneric.AcceptsReturn; set => OnPropertyChanged(nameof(AcceptsReturn), value, GetType()); }
 
-        public bool AcceptsTab { get=>ModelGeneric.AcceptsTab; set=> OnPropertyChanged(nameof(AcceptsTab), value, GetType()); }
+        public bool AcceptsTab { get => ModelGeneric.AcceptsTab; set => OnPropertyChanged(nameof(AcceptsTab), value, GetType()); }
 
-        public double SelectionOpacity { get=>ModelGeneric.SelectionOpacity; set=> OnPropertyChanged(nameof(SelectionOpacity), value, GetType()); }
+        public bool IsUndoEnabled { get => ModelGeneric.IsUndoEnabled; set => OnPropertyChanged(nameof(IsUndoEnabled), value, GetType()); }
 
-        public bool IsUndoEnabled { get=>ModelGeneric.IsUndoEnabled; set=> OnPropertyChanged(nameof(IsUndoEnabled), value, GetType()); }
-
-        public int UndoLimit { get=>ModelGeneric.UndoLimit; set=> OnPropertyChanged(nameof(UndoLimit), value, GetType()); }
+        public int UndoLimit { get => ModelGeneric.UndoLimit; set => OnPropertyChanged(nameof(UndoLimit), value, GetType()); }
 
         public TextBoxViewModelTextEditingOriented(T model) : base(model) { }
-    
+
     }
 
-    public class TextBoxViewModelBase<T> : TextBoxViewModelTextOriented<T>, ITextBoxModelBase where T : ITextBoxModelBase
+    public class TextBoxViewModel<T> : TextBoxViewModelTextOriented<T>, ITextBoxModel where T : ITextBoxModel
 
     {
 
@@ -376,14 +368,6 @@ namespace WinCopies.GUI.Controls.ViewModels
 
         public int UndoLimit { get => ModelGeneric.UndoLimit; set => OnPropertyChanged(nameof(UndoLimit), value, GetType()); }
 
-        public int CaretIndex { get => ModelGeneric.CaretIndex; set => OnPropertyChanged(nameof(CaretIndex), value, GetType()); }
-
-        public int SelectionLength { get => ModelGeneric.SelectionLength; set => OnPropertyChanged(nameof(SelectionLength), value, GetType()); }
-
-        public int SelectionStart { get => ModelGeneric.SelectionStart; set => OnPropertyChanged(nameof(SelectionStart), value, GetType()); }
-
-        public string SelectedText { get => ModelGeneric.SelectedText; set => OnPropertyChanged(nameof(SelectedText), value, GetType()); }
-
         public bool IsReadOnlyCaretVisible { get => ModelGeneric.IsReadOnlyCaretVisible; set => OnPropertyChanged(nameof(IsReadOnlyCaretVisible), value, GetType()); }
 
         public bool AutoWordSelection { get => ModelGeneric.AutoWordSelection; set => OnPropertyChanged(nameof(AutoWordSelection), value, GetType()); }
@@ -396,11 +380,11 @@ namespace WinCopies.GUI.Controls.ViewModels
 
         public bool IsInactiveSelectionHighlightEnabled { get => ModelGeneric.IsInactiveSelectionHighlightEnabled; set => OnPropertyChanged(nameof(IsInactiveSelectionHighlightEnabled), value, GetType()); }
 
-        public TextBoxViewModelBase(T model) : base(model) { }
+        public TextBoxViewModel(T model) : base(model) { }
 
     }
 
-    public class ObservableRadioButtonCollection : ObservableCollection<IRadioButtonModelBase>, IRadioButtonCollection
+    public class ObservableRadioButtonCollection : ObservableCollection<IRadioButtonModel>, IRadioButtonCollection
 
     {
 
@@ -419,11 +403,11 @@ namespace WinCopies.GUI.Controls.ViewModels
 
         }
 
-        public ObservableRadioButtonCollection( RadioButtonCollection items) : base( items) { }
+        public ObservableRadioButtonCollection(RadioButtonCollection items) : base(items) { }
 
     }
 
-    public class ObservableRadioButtonCollection<T> : ObservableCollection<IRadioButtonModelBase<T>>, IRadioButtonCollection<T>
+    public class ObservableRadioButtonCollection<T> : ObservableCollection<IRadioButtonModel<T>>, IRadioButtonCollection<T>
 
     {
 
@@ -442,29 +426,29 @@ namespace WinCopies.GUI.Controls.ViewModels
 
         }
 
-        IEnumerator<IRadioButtonModelBase> IEnumerable<IRadioButtonModelBase>.GetEnumerator() => GetEnumerator();
+        IEnumerator<IRadioButtonModel> IEnumerable<IRadioButtonModel>.GetEnumerator() => GetEnumerator();
 
         public ObservableRadioButtonCollection(RadioButtonCollection<T> items) : base(items) { }
 
     }
 
-    public class GroupingRadioButtonViewModelBase<T> : ToggleButtonViewModelBase<T>, IGroupingRadioButtonModelBase where T : IGroupingRadioButtonModelBase
+    public class GroupingRadioButtonViewModel<T> : ToggleButtonViewModel<T>, IGroupingRadioButtonModel where T : IGroupingRadioButtonModel
 
     {
 
         public string GroupName { get => ModelGeneric.GroupName; set => OnPropertyChanged(nameof(GroupName), value, GetType()); }
 
-        public GroupingRadioButtonViewModelBase(T model) : base(model) { }
+        public GroupingRadioButtonViewModel(T model) : base(model) { }
 
     }
 
-    public class GroupingRadioButtonViewModelBase<TModel, TContent> : ToggleButtonViewModelBase<TModel, TContent>, IGroupingRadioButtonModelBase where TModel : IGroupingRadioButtonModelBase<TContent>
+    public class GroupingRadioButtonViewModel<TModel, TContent> : ToggleButtonViewModel<TModel, TContent>, IGroupingRadioButtonModel where TModel : IGroupingRadioButtonModel<TContent>
 
     {
 
         public string GroupName { get => ModelGeneric.GroupName; set => OnPropertyChanged(nameof(GroupName), value, GetType()); }
 
-        public GroupingRadioButtonViewModelBase( TModel model ) : base(model) { }
+        public GroupingRadioButtonViewModel(TModel model) : base(model) { }
 
     }
 

@@ -117,10 +117,6 @@
       <Project>{8d43c369-3d12-4536-8249-5bba3b69b417}</Project>
       <Name>WinCopies.GUI.Controls</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WinCopies.GUI.Windows\WinCopies.GUI.Windows.csproj">
-      <Project>{3c641513-6fc6-438e-916b-7f35262a3678}</Project>
-      <Name>WinCopies.GUI.Windows</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WinCopies.GUI\WinCopies.GUI.csproj">
       <Project>{8917a829-3028-4118-a1a2-798e80ca73c8}</Project>
       <Name>WinCopies.GUI</Name>
