@@ -234,7 +234,7 @@ namespace WinCopies.Util
             ThrowIfNull(collection, nameof(collection));
             ThrowIfNull(values, nameof(values));
 
-            var addedValues = new ArrayAndListBuilder<object>();
+            var addedValues = new ArrayBuilder<object>();
 
             foreach (object value in values)
 
@@ -298,7 +298,7 @@ namespace WinCopies.Util
             ThrowIfNull(collection, nameof(collection));
             ThrowIfNull(values, nameof(values));
 
-            var addedValues = new ArrayAndListBuilder<T>();
+            var addedValues = new ArrayBuilder<T>();
 
             foreach (T value in values)
 
@@ -343,7 +343,7 @@ namespace WinCopies.Util
             ThrowIfNull(collection, nameof(collection));
             ThrowIfNull(values, nameof(values));
 
-            var addedValues = new ArrayAndListBuilder<object>();
+            var addedValues = new ArrayBuilder<object>();
 
             foreach (object value in values)
 
@@ -386,7 +386,7 @@ namespace WinCopies.Util
             ThrowIfNull(collection, nameof(collection));
             ThrowIfNull(values, nameof(values));
 
-            var addedValues = new ArrayAndListBuilder<T>();
+            var addedValues = new ArrayBuilder<T>();
 
             foreach (T value in values)
 
@@ -437,7 +437,7 @@ namespace WinCopies.Util
             ThrowIfNull(collection, nameof(collection));
             ThrowIfNull(values, nameof(values));
 
-            var removedValues = new ArrayAndListBuilder<object>();
+            var removedValues = new ArrayBuilder<object>();
 
             foreach (object value in values)
 
@@ -488,7 +488,7 @@ namespace WinCopies.Util
             ThrowIfNull(collection, nameof(collection));
             ThrowIfNull(values, nameof(values));
 
-            var removedValues = new ArrayAndListBuilder<T>();
+            var removedValues = new ArrayBuilder<T>();
 
             foreach (T value in values)
 
@@ -602,7 +602,7 @@ namespace WinCopies.Util
 
 
         /// <summary>
-        /// Add multiple values at the top of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// Add multiple values at the top of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayBuilder{T}"/> class.
         /// </summary>
         /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
         /// <param name="values">The values to add to this <see cref="LinkedList{T}"/></param>
@@ -615,7 +615,7 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Add multiple values at the top of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// Add multiple values at the top of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayBuilder{T}"/> class.
         /// </summary>
         /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
         /// <param name="array">The values to add to this <see cref="LinkedList{T}"/></param>
@@ -646,7 +646,7 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Add multiple <see cref="LinkedListNode{T}"/>'s at the top of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// Add multiple <see cref="LinkedListNode{T}"/>'s at the top of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayBuilder{T}"/> class.
         /// </summary>
         /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
         /// <param name="array">The <see cref="LinkedListNode{T}"/>'s to add to a <see cref="LinkedList{T}"/></param>
@@ -664,7 +664,7 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Add multiple values at the end of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// Add multiple values at the end of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayBuilder{T}"/> class.
         /// </summary>
         /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
         /// <param name="values">The values to add to a <see cref="LinkedList{T}"/></param>
@@ -672,7 +672,7 @@ namespace WinCopies.Util
         public static LinkedListNode<T>[] AddRangeLast<T>(this LinkedList<T> collection, params T[] values) => collection.AddRangeLast((IEnumerable<T>)values);
 
         /// <summary>
-        /// Add multiple values at the end of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// Add multiple values at the end of a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayBuilder{T}"/> class.
         /// </summary>
         /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
         /// <param name="array">The values to add to a <see cref="LinkedList{T}"/></param>
@@ -721,7 +721,7 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Add multiple values before a specified node in a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// Add multiple values before a specified node in a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayBuilder{T}"/> class.
         /// </summary>
         /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
         /// <param name="node">The node before which to add the values</param>
@@ -730,7 +730,7 @@ namespace WinCopies.Util
         public static LinkedListNode<T>[] AddRangeBefore<T>(this LinkedList<T> collection, in LinkedListNode<T> node, params T[] values) => collection.AddRangeBefore(node, (IEnumerable<T>)values);
 
         /// <summary>
-        /// Add multiple values before a specified node in a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// Add multiple values before a specified node in a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayBuilder{T}"/> class.
         /// </summary>
         /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
         /// <param name="node">The node before which to add the values</param>
@@ -781,7 +781,7 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Add multiple values after a specified node in a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// Add multiple values after a specified node in a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayBuilder{T}"/> class.
         /// </summary>
         /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
         /// <param name="node">The node after which to add the values</param>
@@ -795,7 +795,7 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// Add multiple values after a specified node in a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayAndListBuilder{T}"/> class.
+        /// Add multiple values after a specified node in a <see cref="LinkedList{T}"/>. For better performance, use the <see cref="ArrayBuilder{T}"/> class.
         /// </summary>
         /// <param name="collection">The <see cref="LinkedList{T}"/> into which add the values.</param>
         /// <param name="node">The node after which to add the values</param>
@@ -871,7 +871,7 @@ namespace WinCopies.Util
 
             {
 
-                var arrayBuilder = new ArrayAndListBuilder<object>();
+                var arrayBuilder = new ArrayBuilder<object>();
 
                 foreach (object value in array)
 
@@ -956,7 +956,7 @@ namespace WinCopies.Util
 
             {
 
-                var arrayBuilder = new ArrayAndListBuilder<T>();
+                var arrayBuilder = new ArrayBuilder<T>();
 
                 foreach (T value in array)
 
@@ -2130,15 +2130,66 @@ namespace WinCopies.Util
 
         }
 
+        /// <summary>
+        /// Yield returns each object of an <see cref="IEnumerable"/>, so the given <see cref="IEnumerable"/> will be considered as an <see cref="IEnumerable{Object}"/>.
+        /// </summary>
+        /// <param name="enumerable">An <see cref="IEnumerable"/> to consider as a <see cref="IEnumerable{Object}"/>.</param>
+        /// <returns>Yield returns the same enumerable as the given <paramref name="enumerable"/>, as an <see cref="IEnumerable{Object}"/>.</returns>
+        public static IEnumerable<object> AsObjectEnumerable(this IEnumerable enumerable)
+
+        {
+
+            ThrowIfNull(enumerable, nameof(enumerable));
+
+            foreach (object item in enumerable)
+
+                yield return item;
+
+        }
+
+        /// <summary>
+        /// Returns the first item, if any, from <typeparamref name="T"/> in a given <see cref="IEnumerable"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the item to return.</typeparam>
+        /// <param name="enumerable">The <see cref="IEnumerable"/> in which to look for the first item of the given type.</param>
+        /// <returns>The first item, if any, from <typeparamref name="T"/> in <paramref name="enumerable"/> or the default value for <typeparamref name="T"/> if none value was found.</returns>
+        /// <seealso cref="LastOrDefault{T}(IEnumerable)"/>
         public static T FirstOrDefault<T>(this IEnumerable enumerable)
 
         {
 
-            foreach (var obj in enumerable)
+            ThrowIfNull(enumerable, nameof(enumerable));
+
+            foreach (object obj in enumerable)
 
                 if (obj is T _obj) return _obj;
 
             return default;
+
+        }
+
+        /// <summary>
+        /// Returns the last item, if any, from <typeparamref name="T"/> in a given <see cref="IEnumerable"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the item to return.</typeparam>
+        /// <param name="enumerable">The <see cref="IEnumerable"/> in which to look for the last item of the given type.</param>
+        /// <returns>The last item, if any, from <typeparamref name="T"/> in <paramref name="enumerable"/> or the default value for <typeparamref name="T"/> if none value was found.</returns>
+        /// <seealso cref="LastOrDefault{T}(IEnumerable)"/>
+        public static T LastOrDefault<T>(this IEnumerable enumerable)
+
+        {
+
+            ThrowIfNull(enumerable, nameof(enumerable));
+
+            var arrayBuilder = new ArrayBuilder<T>();
+
+            foreach (object item in enumerable)
+
+                if (item is T _item)
+
+                    _ = arrayBuilder.AddLast(_item);
+
+            return arrayBuilder.Count > 0 ? arrayBuilder.Last.Value : default;
 
         }
 
@@ -2271,7 +2322,7 @@ namespace WinCopies.Util
 
         }
 
-        internal static FieldInfo GetField( in string fieldName, in Type objectType, in BindingFlags bindingFlags)
+        internal static FieldInfo GetField(in string fieldName, in Type objectType, in BindingFlags bindingFlags)
 
         {
 
@@ -2289,7 +2340,7 @@ namespace WinCopies.Util
 
         }
 
-        internal static PropertyInfo GetProperty( in string propertyName, in Type objectType, in BindingFlags bindingFlags)
+        internal static PropertyInfo GetProperty(in string propertyName, in Type objectType, in BindingFlags bindingFlags)
 
         {
 

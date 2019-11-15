@@ -41,11 +41,12 @@ WinCopies.Util (2.0)
 - Addings:
 	- Classes:
 		- EnumComparer
-		- ArrayAndListBuilder class to build arrays, lists and observable collections like the .Net's StringBuilder does.
+		- ArrayBuilder class to build arrays, lists and observable collections.
 		- Comparer classes and interfaces for sorting support.
 		- ValueObjectEqualityComparer
 		- TreeNode
 		- ReadOnlyTreeNode
+		- InterfaceDataTemplateSelector
 	- Interfaces:
 		- IDeepCloneable
 		- IDisposable
@@ -76,7 +77,9 @@ WinCopies.Util (2.0)
 			- Extension methods for LinkedLists
 			- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
 			- Extension method for throwing if an object that implements IDisposable is disposing or disposed.
-			- FirstOrDefault ienumerable extension method. This is a generic method that looks for the first item of the given generic type parameter. If any item is found, the method returns the default value for the given generic type parameter.
+			- AsObjectEnumerable extension method to yield return items from an IEnumerable as items of an IEnumerable<T>.
+			- FirstOrDefault IEnumerable extension method. This is a generic method that looks for the first item of the given generic type parameter. If none item is found, the method returns the default value for the given generic type parameter.
+			- LastOrDefault IEnumerable extension method. Same method as the FirstOrDefault method but to get the last item of an IEnumerable instead of the first one.
 		- Misc:
 			- The view model classes now have an OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
 			- The ReadOnlyObservableCollection has now an OnCollectionChanging protected virtual method.

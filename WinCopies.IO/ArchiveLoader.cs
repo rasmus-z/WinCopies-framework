@@ -104,7 +104,7 @@ namespace WinCopies.IO
 
             //List<FolderLoader.IPathInfo> files = new List<FolderLoader.IPathInfo>();
 
-            var paths = new ArrayAndListBuilder<PathInfo>();
+            var paths = new ArrayBuilder<PathInfo>();
 
 #if DEBUG
 

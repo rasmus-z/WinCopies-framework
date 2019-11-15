@@ -118,7 +118,7 @@ namespace WinCopies.IO
 
             // {
 
-            var paths = new ArrayAndListBuilder<PathInfo>();
+            var paths = new ArrayBuilder<PathInfo>();
 
             PathInfo pathInfo;
 

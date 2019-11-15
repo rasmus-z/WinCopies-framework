@@ -56,7 +56,7 @@ namespace WinCopies.IO
         protected override void OnDoWork(DoWorkEventArgs e)
         {
 
-            var paths = new ArrayAndListBuilder<PathInfo>();
+            var paths = new ArrayBuilder<PathInfo>();
 
             string _path;
 

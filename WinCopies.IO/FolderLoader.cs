@@ -256,7 +256,7 @@ namespace WinCopies.IO
 
 #endif
 
-            var paths = new ArrayAndListBuilder<PathInfo>();
+            var paths = new ArrayBuilder<PathInfo>();
 
             void AddPath(ref string path, FileType fileType, ShellObject _shellObject)
 
