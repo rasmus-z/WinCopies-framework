@@ -17,6 +17,26 @@ using IComparer = System.Collections.IComparer;
 namespace WinCopies.Util
 {
 
+    public struct WrapperStruct<T> : IValueObject<T>
+
+    {
+
+        public T Value { get; set; }
+
+        bool IValueObject.IsReadOnly => false;
+
+        object IValueObject.Value { get => Value; set => Value = WinCopies.Util.Util.GetOrThrowIfNotType<T>(value, nameof(value)); }
+
+        public WrapperStruct(T value) => Value = value;
+
+        public void Dispose() => Value = default;
+
+        public bool Equals(IValueObject<T> valueObject) => new ValueObjectEqualityComparer<T>().Equals(this, valueObject);
+
+        bool IEquatable<IValueObject>.Equals(IValueObject valueObject) => new ValueObjectEqualityComparer().Equals(this, valueObject);
+
+    }
+
     /// <summary>
     /// Delegate for a non-generic predicate.
     /// </summary>

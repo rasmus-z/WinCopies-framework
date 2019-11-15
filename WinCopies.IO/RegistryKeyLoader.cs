@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Security;
 
 using Microsoft.Win32;
-
+using WinCopies.Collections;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 

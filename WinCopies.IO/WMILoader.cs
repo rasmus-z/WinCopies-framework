@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Management;
 using System.Threading;
+using WinCopies.Collections;
 using WinCopies.Util;
 
 namespace WinCopies.IO
@@ -256,7 +257,7 @@ namespace WinCopies.IO
 
                 var _paths = paths.ToList();
 
-                _paths.Sort((IComparer<PathInfo>)FileSystemObjectComparer);
+                _paths.Sort((System.Collections.Generic.IComparer<PathInfo>)FileSystemObjectComparer);
 
                 pathInfos = _paths;
 

@@ -9,6 +9,7 @@ using System.Security;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 using static WinCopies.IO.FolderLoader;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
@@ -163,7 +164,7 @@ namespace WinCopies.IO
                                 ? FileType.Link
                                 : IO.Path.IsSupportedArchiveFormat(System.IO.Path.GetExtension(_path)) ? FileType.Archive : FileType.File, ref archiveFileInfo);
 
-                        ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
+                        System.Collections.ObjectModel.ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
 
                         string fileName = "";
 
@@ -201,7 +202,7 @@ namespace WinCopies.IO
 
                                 // {
 
-                                foreach (IFileSystemObject pathInfo in paths)
+                                foreach (IFileSystemObject pathInfo in (IEnumerable<IFileSystemObject>) paths)
 
                                     if (pathInfo.Path == fileName)
 

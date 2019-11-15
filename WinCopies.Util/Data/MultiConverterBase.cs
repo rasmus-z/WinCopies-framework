@@ -9,6 +9,7 @@ namespace WinCopies.Util.Data
     /// <summary>
     /// Provides a base-class for any data-<see cref="MultiBinding"/> converter.
     /// </summary>
+    [MarkupExtensionReturnType(typeof(IMultiValueConverter))]
     public abstract class MultiConverterBase : MarkupExtension, IMultiValueConverter
     {
 

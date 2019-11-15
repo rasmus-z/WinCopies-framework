@@ -1677,9 +1677,9 @@ namespace WinCopies.GUI.Explorer
         protected internal virtual void OnOpening(params Explorer.IBrowsableObjectInfo[] paths)
         {
 
-            LinkedList<Explorer.IBrowsableObjectInfo> directories = new LinkedList<Explorer.IBrowsableObjectInfo>();
+            System.Collections.Generic.LinkedList<Explorer.IBrowsableObjectInfo> directories = new System.Collections.Generic.LinkedList<Explorer.IBrowsableObjectInfo>();
 
-            LinkedList<Explorer.IBrowsableObjectInfo> files = new LinkedList<Explorer.IBrowsableObjectInfo>();
+            System.Collections.Generic.LinkedList<Explorer.IBrowsableObjectInfo> files = new System.Collections.Generic.LinkedList<Explorer.IBrowsableObjectInfo>();
 
             foreach (Explorer.IBrowsableObjectInfo path in paths)
 

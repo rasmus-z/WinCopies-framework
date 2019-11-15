@@ -9,6 +9,7 @@ namespace WinCopies.Util.Data
     /// <summary>
     /// Provides a base-class for any data <see cref="Binding"/> converter.
     /// </summary>
+    [MarkupExtensionReturnType(typeof(IValueConverter))]
     public abstract class ConverterBase : MarkupExtension, IValueConverter
     {
 

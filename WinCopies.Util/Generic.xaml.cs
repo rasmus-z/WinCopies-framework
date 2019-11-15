@@ -1,4 +1,12 @@
-﻿using System;
+﻿//<!--<ResourceDictionary x:Class="WinCopies.Util.Generic"
+//             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+//             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+//             xmlns:local="clr-namespace:WinCopies.Util"
+//                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+//    --><!--<sys:String x:Key="DeclaringTypeIsNotInObjectInheritanceHierarchyException" >'{0}' is not in the inheritance hierarchy of '{1}'.</sys:String>--><!--
+//</ResourceDictionary>-->
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,7 +21,8 @@ namespace WinCopies.Util
 
         public static Dictionary<string, System.Windows.ResourceDictionary> ResourceDictionaries { get; } = new Dictionary<string, System.Windows.ResourceDictionary>();
 
-        public static T GetResource<T>(object key) => (T)ResourceDictionary[key];
+        [Obsolete("Please use the WinCopies.Util.Resources.GetResource<T>(string name) method instead.")]
+        public static T GetResource<T>(object key) => Resources.GetResource<T>((string)key);
 
         #region Resources
 

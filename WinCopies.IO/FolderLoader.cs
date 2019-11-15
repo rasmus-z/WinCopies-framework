@@ -14,6 +14,7 @@ using IFCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
 using static WinCopies.IO.FolderLoader;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {

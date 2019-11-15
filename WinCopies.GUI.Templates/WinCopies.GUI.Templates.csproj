@@ -159,10 +159,6 @@
       <Project>{8d43c369-3d12-4536-8249-5bba3b69b417}</Project>
       <Name>WinCopies.GUI.Controls</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WinCopies.GUI.Windows\WinCopies.GUI.Windows.csproj">
-      <Project>{3c641513-6fc6-438e-916b-7f35262a3678}</Project>
-      <Name>WinCopies.GUI.Windows</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WinCopies.GUI\WinCopies.GUI.csproj">
       <Project>{8917a829-3028-4118-a1a2-798e80ca73c8}</Project>
       <Name>WinCopies.GUI</Name>
@@ -170,6 +166,10 @@
     <ProjectReference Include="..\WinCopies.Models\WinCopies.Models.csproj">
       <Project>{31c5f3cf-a8fa-43e0-9041-3c61ed9e45a1}</Project>
       <Name>WinCopies.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WinCopies.Util\WinCopies.Util.csproj">
+      <Project>{53801d23-7375-4e30-a5a7-27623e950554}</Project>
+      <Name>WinCopies.Util</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

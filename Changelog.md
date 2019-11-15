@@ -47,6 +47,11 @@ WinCopies.Util (2.0)
 		- TreeNode
 		- ReadOnlyTreeNode
 		- InterfaceDataTemplateSelector
+		- WinCopies.Collections.DotNetFix.LinkedList
+		- WinCopies.Collections.LinkedList
+		- ReadOnlyLinkedList
+		- EnumeratorCollection
+		- MergedStylesExtension
 	- Interfaces:
 		- IDeepCloneable
 		- IDisposable
@@ -55,6 +60,7 @@ WinCopies.Util (2.0)
 		- WinCopies.Util.IValueObject
 		- ITreeNode
 		- IReadOnlyTreeNode
+		- ILinkedList
 	- Delegates:
 		- EqualityComparison
 		- FieldValidateValueCallback*
@@ -85,8 +91,9 @@ WinCopies.Util (2.0)
 			- The ReadOnlyObservableCollection has now an OnCollectionChanging protected virtual method.
 	- Parameters:
 		- The WinCopies.Util.Extensions.SetProperty/Field now have multiple new optional parameters to extend the capabilities of these methods.
-	- Misc:
+	- Structures:
 		- ValueObjectEnumerator structure
+		- WrapperStructure structure
 
 - Bug fixes:
 	- BackgroundWorker class: when aborting, the RunWorkerCompleted event was raised twice.

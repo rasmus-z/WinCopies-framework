@@ -158,7 +158,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArrayAndListBuilder.cs" />
+    <Compile Include="ArrayBuilder.cs" />
     <Compile Include="BackgroundWorker.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -195,9 +195,7 @@
     <Compile Include="Date.cs" />
     <Compile Include="Collections\EnumComparer.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Generic.xaml.cs">
-      <DependentUpon>Generic.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Generic.xaml.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IBackgroundWorker.cs" />
     <Compile Include="Collections\INotifyCollectionChanging.cs" />
@@ -208,6 +206,7 @@
     <Compile Include="IDisposable.cs" />
     <Compile Include="InterfaceDataTemplateSelector.cs" />
     <Compile Include="InvalidEnumArgumentException.cs" />
+    <Compile Include="MergedStylesMarkupExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\PropertyChangedEventArgs.cs" />
     <Compile Include="Collections\ReadOnlyArrayList.cs" />
@@ -234,12 +233,6 @@
     <None Include="packages.config" />
     <None Include="README.md" />
     <None Include="WinCopies.Util.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Generic.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.9.7\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />

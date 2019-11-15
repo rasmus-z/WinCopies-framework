@@ -1,7 +1,0 @@
-﻿<ResourceDictionary x:Class="WinCopies.Util.Generic"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:WinCopies.Util"
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <!--<sys:String x:Key="DeclaringTypeIsNotInObjectInheritanceHierarchyException" >'{0}' is not in the inheritance hierarchy of '{1}'.</sys:String>-->
-</ResourceDictionary>
