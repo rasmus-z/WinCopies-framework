@@ -38,7 +38,7 @@ WinCopies.Util (2.0)
 	- The WinCopies.Util.Data.ValueObject now implements the WinCopies.Util.IValueObject generic interface.**
 	- The WinCopies.Util.IValueObject interface implements IDisposable, so all classes that implements the WinCopies.Util.IValueObject are also disposable.
 
-- Added:
+- Addings:
 	- Classes:
 		- EnumComparer
 		- ArrayAndListBuilder class to build arrays, lists and observable collections like the .Net's StringBuilder does.
@@ -96,9 +96,10 @@ WinCopies.Util (2.0)
 
 - Misc:
 	- ReadOnlyObservableCollection's CollectionChanging event has now the protected access modifier.
-	- Some code now uses the 'in' parameter modifier
+	- Some code now uses the 'in' parameter modifier.
 	- The dependency package System.Windows.Interactivity.WPF has been replaced by the Microsoft.Xaml.Behaviors.Wpf package.
-	- Updated doc.
+	- Move resources from Generic.xaml to assembly's resource file.
+	- Update doc.
 
 \* See WinCopies.Util.Extensions.SetProperty/Field
 \*\* This also applies to the other already existing classes and interfaces, in the previous versions, that inherit from or implement these classes and interfaces.
