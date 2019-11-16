@@ -9,7 +9,7 @@ namespace WinCopies.Util
     public static class Resources
     {
 
-        public static T GetResource<T>(string name) => (T)typeof(WinCopies.Util.Properties.Resources).GetProperty(name).GetValue(null);
+        public static T GetResource<T>(string name) => (T)typeof(WinCopies.Util.Properties.Resources).GetProperty(name, WinCopies.Util.Util.DefaultBindingFlagsForPropertySet).GetValue(null);
 
         public static class CommandTexts
         {

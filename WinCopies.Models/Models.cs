@@ -83,7 +83,7 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
     {
 
         /// <summary>
-        /// Gets or sets the items of this <see cref="IPropertyDialogModel"/>.
+        /// Gets or sets the items of this <see cref="PropertyDialogModel"/>.
         /// </summary>
         public IEnumerable<IPropertyTabItemModel> Items { get; set; }
 
@@ -101,7 +101,7 @@ namespace WinCopies.GUI.Controls.Models
     {
 
         /// <summary>
-        /// Gets or sets the content of this <see cref="IGroupBoxModel"/>.
+        /// Gets or sets the content of this <see cref="IContentControlModel"/>.
         /// </summary>
         object Content { get; set; }
 
@@ -157,7 +157,7 @@ namespace WinCopies.GUI.Controls.Models
     {
 
         /// <summary>
-        /// Gets or sets the header of this <see cref="IGroupBoxModel"/>.
+        /// Gets or sets the header of this <see cref="IHeaderedControlModel"/>.
         /// </summary>
         object Header { get; set; }
 

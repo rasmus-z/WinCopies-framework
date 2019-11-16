@@ -30,78 +30,78 @@ namespace WinCopies.Util
         /// Gets the NewTab resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string NewTab => GetResource<string>(nameof(NewTab));
+        public static string NewTab => GetResource<string>(nameof(NewTab)+"WPF");
 
         /// <summary>
         /// Gets the NewWindow resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string NewWindow => GetResource<string>(nameof(NewWindow));
+        public static string NewWindow => GetResource<string>(nameof(NewWindow) + "WPF");
 
         /// <summary>
         /// Gets the NewWindowInNewInstance resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string NewWindowInNewInstance => GetResource<string>(nameof(NewWindowInNewInstance));
+        public static string NewWindowInNewInstance => GetResource<string>(nameof(NewWindowInNewInstance) + "WPF");
 
         /// <summary>
         /// Gets the CloseTab resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string CloseTab => GetResource<string>(nameof(CloseTab));
+        public static string CloseTab => GetResource<string>(nameof(CloseTab) + "WPF");
 
         /// <summary>
         /// Gets the CloseAllTabs resource.
         /// </summary>
-        public static string CloseAllTabs => GetResource<string>(nameof(CloseAllTabs));
+        public static string CloseAllTabs => GetResource<string>(nameof(CloseAllTabs) + "WPF");
 
         /// <summary>
         /// Gets the CloseWindow resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string CloseWindow => GetResource<string>(nameof(CloseWindow));
+        public static string CloseWindow => GetResource<string>(nameof(CloseWindow) + "WPF");
 
         /// <summary>
         /// Gets the NewFolder resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string NewFolder => GetResource<string>(nameof(NewFolder));
+        public static string NewFolder => GetResource<string>(nameof(NewFolder) + "WPF");
 
         /// <summary>
         /// Gets the NewArchive resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string NewArchive => GetResource<string>(nameof(NewArchive));
+        public static string NewArchive => GetResource<string>(nameof(NewArchive) + "WPF");
 
         /// <summary>
         /// Gets the ShowFileProperties resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string ShowFileProperties => GetResource<string>(nameof(ShowFileProperties));
+        public static string ShowFileProperties => GetResource<string>(nameof(ShowFileProperties) + "WPF");
 
         /// <summary>
         /// Gets the Rename resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string Rename => GetResource<string>(nameof(Rename));
+        public static string Rename => GetResource<string>(nameof(Rename) + "WPF");
 
         /// <summary>
         /// Gets the DeletePermanently resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string DeletePermanently => GetResource<string>(nameof(DeletePermanently));
+        public static string DeletePermanently => GetResource<string>(nameof(DeletePermanently) + "WPF");
 
         /// <summary>
         /// Gets the <see cref="DeselectAll"/> resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string DeselectAll => GetResource<string>(nameof(DeselectAll));
+        public static string DeselectAll => GetResource<string>(nameof(DeselectAll) + "WPF");
 
         /// <summary>
         /// Gets the <see cref="ReverseSelection"/> resource.
         /// </summary>
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.CommandTexts class instead.")]
-        public static string ReverseSelection => GetResource<string>(nameof(ReverseSelection));
+        public static string ReverseSelection => GetResource<string>(nameof(ReverseSelection) + "WPF");
 
         /// <summary>
         /// Gets the DeclaringTypesNotCorrespond resource.
@@ -161,7 +161,7 @@ namespace WinCopies.Util
 
         public static System.Windows.ResourceDictionary ResourceDictionary { get; } = null;
 
-        static Generic() => ResourceDictionary = AddNewDictionary("/WinCopies.Util;component/Generic.xaml");
+       // static Generic() => ResourceDictionary = AddNewDictionary("/WinCopies.Util;component/Generic.xaml");
 
         // public Generic() => ResourceDictionary = AddNewDictionary("/WinCopies.Util;component/Generic.xaml");
 
