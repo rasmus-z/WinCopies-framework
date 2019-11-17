@@ -12,6 +12,7 @@ using System.Windows.Data;
 
 namespace WinCopies.Data
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class ReaderToEntityMapperAttribute : Attribute
     {
 
@@ -21,7 +22,9 @@ namespace WinCopies.Data
 
         public CultureInfo ConverterCultureInfo { get; set; }
 
-        public string TableFieldName { get; set; }
+        public string TableFieldName { get; }
+
+        public ReaderToEntityMapperAttribute(string tableFieldName) => TableFieldName = tableFieldName;
 
     }
 }
