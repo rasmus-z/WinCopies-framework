@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.Data
 {
@@ -41,7 +42,7 @@ namespace WinCopies.Data
 
         }
 
-        private void Init(string query) => Query = Util.Util.IsNullEmptyOrWhiteSpace(query) ? throw new ArgumentException(string.Format(Util.Generic.StringParameterEmptyOrWhiteSpaces, nameof(query))) : query;
+        private void Init(string query) => Query = IsNullEmptyOrWhiteSpace(query) ? throw new ArgumentException(string.Format(Util.Generic.StringParameterEmptyOrWhiteSpaces, nameof(query))) : query;
 
     }
 }
