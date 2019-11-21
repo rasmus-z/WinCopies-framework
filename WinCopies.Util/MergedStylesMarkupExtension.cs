@@ -33,11 +33,11 @@ namespace WinCopies.Util
     public class MergedStylesExtension : MarkupExtension, INotifyPropertyChanged
     {
 
-        private Collection<Style> _styles;
+        private IEnumerable<Style> _styles;
 
         private Style _mergedStyle;
 
-        public Collection<Style> Styles { get => _styles; set { _styles = value; OnPropertyChanged(new PropertyChangedEventArgs(nameof(Styles))); } }
+        public IEnumerable<Style> Styles { get => _styles; set { _styles = value; OnPropertyChanged(new PropertyChangedEventArgs(nameof(Styles))); } }
 
         public Style MergedStyle { get => _mergedStyle; private set { _mergedStyle = value; OnPropertyChanged(new PropertyChangedEventArgs(nameof(MergedStyle))); } }
 
@@ -62,7 +62,9 @@ namespace WinCopies.Util
 
                 {
 
-                    _mergedStyle = enumerator.Current;
+                    _mergedStyle = new Style();
+                    
+                    MergeStyles(_mergedStyle, enumerator.Current);
 
                     // todo: sort styles by target types
 

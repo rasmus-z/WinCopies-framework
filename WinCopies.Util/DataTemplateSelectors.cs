@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 
 namespace WinCopies.Util
 {
@@ -37,10 +38,31 @@ namespace WinCopies.Util
 
             Type itemType = item.GetType();
 
-            return Enumerable.Repeat(itemType, 1).Concat(itemType.GetInterfaces()).Select(t => containerElement.TryFindResource(new DataTemplateKey(t)))
-                    .FirstOrDefault<DataTemplate>() ?? base.SelectTemplate(item, container);
+            return Enumerable.Repeat(itemType, 1).Concat(itemType.GetInterfaces())
+                    .FirstOrDefault<DataTemplate>(t => containerElement.TryFindResource(new DataTemplateKey(t))) ?? base.SelectTemplate(item, container);
 
         }
+
+    }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    public class TypeForDataTemplateAttribute : Attribute
+
+    {
+
+        public Type Type { get; }
+
+        public TypeForDataTemplateAttribute(Type type) => Type = type;
+
+    }
+
+    public class AttributeDataTemplateSelector : DataTemplateSelector
+    {
+
+        public override DataTemplate SelectTemplate(object item, DependencyObject container) => item == null || !(container is FrameworkElement containerElement)
+                ? base.SelectTemplate(item, container)
+                : ((TypeForDataTemplateAttribute[])item.GetType().GetCustomAttributes(typeof(TypeForDataTemplateAttribute), false))
+                    .FirstOrDefault< TypeForDataTemplateAttribute, DataTemplate>(t => containerElement.TryFindResource(new DataTemplateKey(t.Type))) ?? base.SelectTemplate(item, container);
 
     }
 }

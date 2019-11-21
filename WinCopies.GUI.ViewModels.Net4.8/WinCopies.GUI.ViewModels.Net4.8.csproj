@@ -112,6 +112,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj">
+      <Project>{8917a829-3028-4118-a1a2-798e80ca73c8}</Project>
+      <Name>WinCopies.GUI.Net4.8</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WinCopies.Models.Net4.8\WinCopies.Models.Net4.8.csproj">
       <Project>{31c5f3cf-a8fa-43e0-9041-3c61ed9e45a1}</Project>
       <Name>WinCopies.Models</Name>

@@ -30,6 +30,7 @@ using WinCopies.GUI.Controls.Models;
 using WinCopies.GUI.Windows.Dialogs;
 using WinCopies.GUI.Windows.Dialogs.Models;
 using WinCopies.GUI.Windows.Dialogs.ViewModels;
+using WinCopies.Util;
 using WinCopies.Util.Data;
 using static WinCopies.Util.Util;
 
@@ -85,6 +86,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
 {
 
+    [TypeForDataTemplate(typeof(IContentControlModel))]
     public class ContentControlViewModel<T> : ViewModel<T>, IContentControlModel where T : IContentControlModel
     {
 
@@ -94,6 +96,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IContentControlModel))]
     public class ContentControlViewModel<TModel, TContent> : ViewModel<TModel>, IContentControlModel<TContent> where TModel : IContentControlModel<TContent>
     {
 
@@ -105,6 +108,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IHeaderedContentControlModel))]
     public class HeaderedContentControlViewModel<T> : ContentControlViewModel<T>, IHeaderedContentControlModel where T : IHeaderedContentControlModel
 
     {
@@ -115,6 +119,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IHeaderedContentControlModel))]
     public class HeaderedContentControlViewModel<TModel, THeader, TContent> : ContentControlViewModel<TModel, TContent>, IHeaderedContentControlModel<THeader, TContent> where TModel : IHeaderedContentControlModel<THeader, TContent>
 
     {
@@ -127,6 +132,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IItemsControlModel))]
     public class ItemsControlViewModel<T> : ViewModel<T>, IItemsControlModel where T : IItemsControlModel
     {
 
@@ -136,6 +142,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IItemsControlModel))]
     public class ItemsControlViewModel<TModel, TItems> : ViewModel<TModel>, IItemsControlModel<TItems> where TModel : IItemsControlModel<TItems>
 
     {
@@ -148,6 +155,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IHeaderedItemsControlModel))]
     public class HeaderedItemsControlViewModel<T> : ItemsControlViewModel<T>, IHeaderedItemsControlModel where T : IHeaderedItemsControlModel
 
     {
@@ -158,6 +166,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IHeaderedItemsControlModel))]
     public class HeaderedItemsControlViewModel<TModel, THeader, TItems> : ItemsControlViewModel<TModel, TItems>, IHeaderedItemsControlModel<THeader, TItems> where TModel : IHeaderedItemsControlModel<THeader, TItems>
 
     {
@@ -170,6 +179,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IGroupBoxModel))]
     public class GroupBoxViewModel<T> : HeaderedContentControlViewModel<T>, IGroupBoxModel where T : IGroupBoxModel
     {
 
@@ -177,6 +187,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IGroupBoxModel))]
     public class GroupBoxViewModel<TModel, THeader, TContent> : HeaderedContentControlViewModel<TModel, THeader, TContent>, IGroupBoxModel<THeader, TContent> where TModel : IGroupBoxModel<THeader, TContent>
     {
 
@@ -184,6 +195,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(ITabItemModel))]
     public class TabItemViewModel<T> : HeaderedContentControlViewModel<T>, ITabItemModel where T : ITabItemModel
 
     {
@@ -192,6 +204,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(ITabItemModel))]
     public class TabItemViewModel<TModel, THeader, TContent> : HeaderedContentControlViewModel<TModel, THeader, TContent>, ITabItemModel<THeader, TContent> where TModel : ITabItemModel<THeader, TContent>
 
     {
@@ -200,6 +213,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IPropertyTabItemModel))]
     public class PropertyTabItemViewModel<T> : ViewModel<T>, IPropertyTabItemModel where T : IPropertyTabItemModel
 
     {
@@ -214,6 +228,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IPropertyTabItemModel))]
     public class PropertyTabItemViewModel<TModel, TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlViewModel<TModel, TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> where TModel : IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
 
     {
@@ -224,7 +239,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
-
+    [TypeForDataTemplate(typeof(IButtonModel))]
     public class ButtonViewModel<T> : ContentControlViewModel<T>, IButtonModel where T : IButtonModel
 
     {
@@ -239,6 +254,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IButtonModel))]
     public class ButtonViewModel<TModel, TContent> : ContentControlViewModel<TModel, TContent>, IButtonModel<TContent> where TModel : IButtonModel<TContent>
 
     {
@@ -253,6 +269,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IToggleButtonModel))]
     public class ToggleButtonViewModel<T> : ButtonViewModel<T>, IToggleButtonModel where T : IToggleButtonModel
 
     {
@@ -265,6 +282,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IToggleButtonModel))]
     public class ToggleButtonViewModel<TModel, TContent> : ButtonViewModel<TModel, TContent>, IToggleButtonModel<TContent> where TModel : IToggleButtonModel<TContent>
 
     {
@@ -277,6 +295,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(ICheckBoxModel))]
     public class CheckBoxViewModel<T> : ToggleButtonViewModel<T>, ICheckBoxModel where T : ICheckBoxModel
 
     {
@@ -285,6 +304,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(ICheckBoxModel))]
     public class CheckBoxViewModel<TModel, TContent> : ToggleButtonViewModel<TModel, TContent>, ICheckBoxModel<TContent> where TModel : ICheckBoxModel<TContent>
 
     {
@@ -293,6 +313,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(ITextBoxModelTextOriented))]
     public class TextBoxViewModelTextOriented<T> : ViewModel<T>, ITextBoxModelTextOriented where T : ITextBoxModelTextOriented
 
     {
@@ -305,6 +326,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(ITextBoxModelSelectionOriented))]
     public class TextBoxViewModelSelectionOriented<T> : TextBoxViewModelTextOriented<T>, ITextBoxModelSelectionOriented where T : ITextBoxModelSelectionOriented
 
     {
@@ -327,6 +349,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(ITextBoxModelTextEditingOriented))]
     public class TextBoxViewModelTextEditingOriented<T> : TextBoxViewModelTextOriented<T>, ITextBoxModelTextEditingOriented where T : ITextBoxModelTextEditingOriented
 
     {
@@ -357,6 +380,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(ITextBoxModel))]
     public class TextBoxViewModel<T> : TextBoxViewModelTextOriented<T>, ITextBoxModel where T : ITextBoxModel
 
     {
@@ -401,6 +425,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IRadioButtonCollection))]
     public class ObservableRadioButtonCollection : ObservableCollection<IRadioButtonModel>, IRadioButtonCollection
 
     {
@@ -424,6 +449,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IRadioButtonCollection))]
     public class ObservableRadioButtonCollection<T> : ObservableCollection<IRadioButtonModel<T>>, IRadioButtonCollection<T>
 
     {
@@ -449,6 +475,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IGroupingRadioButtonModel))]
     public class GroupingRadioButtonViewModel<T> : ToggleButtonViewModel<T>, IGroupingRadioButtonModel where T : IGroupingRadioButtonModel
 
     {
@@ -459,6 +486,7 @@ namespace WinCopies.GUI.Controls.ViewModels
 
     }
 
+    [TypeForDataTemplate(typeof(IGroupingRadioButtonModel))]
     public class GroupingRadioButtonViewModel<TModel, TContent> : ToggleButtonViewModel<TModel, TContent>, IGroupingRadioButtonModel where TModel : IGroupingRadioButtonModel<TContent>
 
     {

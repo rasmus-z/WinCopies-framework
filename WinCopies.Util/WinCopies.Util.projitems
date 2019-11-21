@@ -54,11 +54,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Date.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic.xaml.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IBackgroundWorker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDeepCloneable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDisposable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)InterfaceDataTemplateSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataTemplateSelectors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InvalidEnumArgumentException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MergedStylesMarkupExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Resources.cs" />

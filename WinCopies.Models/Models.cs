@@ -30,12 +30,13 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
+using WinCopies.Util;
 
 namespace WinCopies.GUI.Windows.Dialogs.Models
 {
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for dialog windows.
+    /// Represents a model that corresponds to a default view for dialog windows.
     /// </summary>
     public interface IDialogModel
     {
@@ -58,7 +59,7 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for dialog windows.
+    /// Represents a model that corresponds to a default view for dialog windows.
     /// </summary>
     public class DialogModel : IDialogModel
     {
@@ -81,7 +82,7 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for property dialog windows.
+    /// Represents a model that corresponds to a default view for property dialog windows.
     /// </summary>
     public interface IPropertyDialogModel : IDialogModel
     {
@@ -94,7 +95,7 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for property dialog windows.
+    /// Represents a model that corresponds to a default view for property dialog windows.
     /// </summary>
     public class PropertyDialogModel : DialogModel, IPropertyDialogModel
     {
@@ -112,7 +113,7 @@ namespace WinCopies.GUI.Controls.Models
 {
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ContentControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
     public interface IContentControlModel
     {
@@ -125,8 +126,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ContentControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IContentControlModel))]
     public class ContentControlModel : IContentControlModel
     {
 
@@ -138,7 +140,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ContentControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
     public interface IContentControlModel<T> : IContentControlModel
     {
@@ -151,8 +153,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ContentControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IContentControlModel))]
     public class ContentControlModel<T> : IContentControlModel<T>
 
     {
@@ -167,7 +170,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for headered controls.
+    /// Represents a model that corresponds to a default view for headered controls.
     /// </summary>
     public interface IHeaderedControlModel
 
@@ -181,7 +184,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
     /// </summary>
     public interface IHeaderedContentControlModel : IContentControlModel, IHeaderedControlModel
     {
@@ -191,8 +194,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IHeaderedContentControlModel))]
     public class HeaderedContentControlModel : ContentControlModel, IHeaderedContentControlModel
 
     {
@@ -205,7 +209,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for headered controls.
+    /// Represents a model that corresponds to a default view for headered controls.
     /// </summary>
     public interface IHeaderedControlModel<T> : IHeaderedControlModel
 
@@ -219,9 +223,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
     /// </summary>
-    public interface IHeaderedContentControlModel<THeader, TContent> : IContentControlModel<TContent>, IHeaderedControlModel<THeader>
+    public interface IHeaderedContentControlModel<THeader, TContent> : IContentControlModel<TContent>, IHeaderedControlModel<THeader>, IHeaderedContentControlModel
     {
 
 
@@ -229,9 +233,10 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="HeaderedContentControl"/>s.
     /// </summary>
-    public class HeaderedContentControlModel<THeader, TContent> : ContentControlModel<TContent>, IHeaderedControlModel<THeader>
+    [TypeForDataTemplate(typeof(IHeaderedContentControlModel))]
+    public class HeaderedContentControlModel<THeader, TContent> : ContentControlModel<TContent>, IHeaderedContentControlModel<THeader, TContent>
 
     {
 
@@ -245,7 +250,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ItemsControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
     public interface IItemsControlModel
     {
@@ -258,8 +263,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ItemsControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IItemsControlModel))]
     public class ItemsControlModel : IItemsControlModel
     {
 
@@ -271,7 +277,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ItemsControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
     public interface IItemsControlModel<T> : IItemsControlModel
     {
@@ -284,8 +290,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ItemsControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IItemsControlModel))]
     public class ItemsControlModel<T> : IItemsControlModel<T>
 
     {
@@ -300,7 +307,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
     public interface IHeaderedItemsControlModel : IItemsControlModel, IHeaderedControlModel
     {
@@ -310,8 +317,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IHeaderedItemsControlModel))]
     public class HeaderedItemsControlModel : ItemsControlModel, IHeaderedItemsControlModel
 
     {
@@ -324,9 +332,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
-    public interface IHeaderedItemsControlModel<THeader, TItems> : IItemsControlModel<TItems>, IHeaderedControlModel<THeader>
+    public interface IHeaderedItemsControlModel<THeader, TItems> : IItemsControlModel<TItems>, IHeaderedControlModel<THeader>, IHeaderedItemsControlModel
     {
 
 
@@ -334,8 +342,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IHeaderedItemsControlModel))]
     public class HeaderedItemsControlModel<THeader, TItems> : ItemsControlModel<TItems>, IHeaderedItemsControlModel<THeader, TItems>
 
     {
@@ -350,7 +359,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="GroupBox"/> controls.
+    /// Represents a model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
     public interface IGroupBoxModel : IHeaderedContentControlModel
     {
@@ -360,7 +369,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="GroupBox"/> controls.
+    /// Represents a model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
     public interface IGroupBoxModel<THeader, TContent> : IGroupBoxModel, IHeaderedContentControlModel<THeader, TContent>
     {
@@ -370,8 +379,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="GroupBox"/> controls.
+    /// Represents a model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
+    [TypeForDataTemplate(typeof(IGroupBoxModel))]
     public class GroupBoxModel : HeaderedContentControlModel, IGroupBoxModel
     {
 
@@ -380,8 +390,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="GroupBox"/> controls.
+    /// Represents a model that corresponds to a default view for <see cref="GroupBox"/> controls.
     /// </summary>
+    [TypeForDataTemplate(typeof(IGroupBoxModel))]
     public class GroupBoxModel<THeader, TContent> : HeaderedContentControlModel<THeader, TContent>, IGroupBoxModel<THeader, TContent>
     {
 
@@ -390,7 +401,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TabItem"/> controls.
+    /// Represents a model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
     public interface ITabItemModel : IHeaderedContentControlModel
     {
@@ -400,7 +411,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TabItem"/> controls.
+    /// Represents a model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
     public interface ITabItemModel<THeader, TContent> : ITabItemModel, IHeaderedContentControlModel<THeader, TContent>
     {
@@ -410,8 +421,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TabItem"/> controls.
+    /// Represents a model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
+    [TypeForDataTemplate(typeof(ITabItemModel))]
     public class TabItemModel : HeaderedContentControlModel, ITabItemModel
     {
 
@@ -420,8 +432,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TabItem"/> controls.
+    /// Represents a model that corresponds to a default view for <see cref="TabItem"/> controls.
     /// </summary>
+    [TypeForDataTemplate(typeof(ITabItemModel))]
     public class TabItemModel<THeader, TContent> : HeaderedContentControlModel<THeader, TContent>, ITabItemModel<THeader, TContent>
     {
 
@@ -430,7 +443,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for property tab items.
+    /// Represents a model that corresponds to a default view for property tab items.
     /// </summary>
     public interface IPropertyTabItemModel : IHeaderedItemsControlModel
     {
@@ -443,7 +456,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for property tab items.
+    /// Represents a model that corresponds to a default view for property tab items.
     /// </summary>
     public interface IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : IPropertyTabItemModel, IHeaderedItemsControlModel<TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>
 
@@ -454,8 +467,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for property tab items.
+    /// Represents a model that corresponds to a default view for property tab items.
     /// </summary>
+    [TypeForDataTemplate(typeof(IPropertyTabItemModel))]
     public class PropertyTabItemModel : IPropertyTabItemModel
     {
 
@@ -474,8 +488,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for property tab items.
+    /// Represents a model that corresponds to a default view for property tab items.
     /// </summary>
+    [TypeForDataTemplate(typeof(IPropertyTabItemModel))]
     public class PropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlModel<TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
     {
 
@@ -484,19 +499,24 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="Button"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
-    public interface IButtonModel : IContentControlModel, ICommandSource
+    public interface IButtonModel : IContentControlModel
 
     {
 
+        ICommand Command { get; set; }
 
+        object CommandParameter { get; set; }
+
+        IInputElement CommandTarget { get; set; }
 
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="Button"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IButtonModel))]
     public class ButtonModel : ContentControlModel, IButtonModel
 
     {
@@ -519,7 +539,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="Button"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
     public interface IButtonModel<T> : IButtonModel, IContentControlModel<T>
 
@@ -530,8 +550,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="Button"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IButtonModel))]
     public class ButtonModel<T> : ContentControlModel<T>, IButtonModel<T>
 
     {
@@ -554,7 +575,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ToggleButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
     public interface IToggleButtonModel : IButtonModel
 
@@ -573,8 +594,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ToggleButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IToggleButtonModel))]
     public class ToggleButtonModel : ButtonModel, IToggleButtonModel
 
     {
@@ -592,7 +614,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ToggleButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
     public interface IToggleButtonModel<T> : IToggleButtonModel, IButtonModel<T>
 
@@ -603,8 +625,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="ToggleButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="ToggleButton"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IToggleButtonModel))]
     public class ToggleButtonModel<T> : ButtonModel<T>, IToggleButtonModel<T>
 
     {
@@ -622,7 +645,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="CheckBox"/>'s.
+    /// Represents a model that corresponds to a default view for <see cref="CheckBox"/>'s.
     /// </summary>
     public interface ICheckBoxModel : IToggleButtonModel
     {
@@ -632,8 +655,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="CheckBox"/>'.
+    /// Represents a model that corresponds to a default view for <see cref="CheckBox"/>'s.
     /// </summary>
+    [TypeForDataTemplate(typeof(ICheckBoxModel))]
     public class CheckBoxModel : ToggleButtonModel, ICheckBoxModel
 
     {
@@ -643,7 +667,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="CheckBox"/>'.
+    /// Represents a model that corresponds to a default view for <see cref="CheckBox"/>'.
     /// </summary>
     public interface ICheckBoxModel<T> : IToggleButtonModel<T>, ICheckBoxModel
     {
@@ -653,8 +677,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="CheckBox"/>'.
+    /// Represents a model that corresponds to a default view for <see cref="CheckBox"/>'.
     /// </summary>
+    [TypeForDataTemplate(typeof(ICheckBoxModel))]
     public class CheckBoxModel<T> : ToggleButtonModel<T>, ICheckBoxModel<T>
 
     {
@@ -664,7 +689,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public interface ITextBoxModelTextOriented
 
@@ -683,8 +708,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
+    [TypeForDataTemplate(typeof(ITextBoxModelTextOriented))]
     public class TextBoxModelTextOriented : ITextBoxModelTextOriented
 
     {
@@ -702,7 +728,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public interface ITextBoxModelSelectionOriented : ITextBoxModelTextOriented
 
@@ -725,8 +751,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
+    [TypeForDataTemplate(typeof(ITextBoxModelSelectionOriented))]
     public class TextBoxModelSelectionOriented : TextBoxModelTextOriented, ITextBoxModelSelectionOriented
 
     {
@@ -756,7 +783,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public interface ITextBoxModelTextEditingOriented : ITextBoxModelTextOriented
 
@@ -787,8 +814,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
+    [TypeForDataTemplate(typeof(ITextBoxModelTextEditingOriented))]
     public class TextBoxModelTextEditingOriented : TextBoxModelTextOriented, ITextBoxModelTextEditingOriented
 
     {
@@ -818,7 +846,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
     public interface ITextBoxModel : ITextBoxModelTextOriented, ITextBoxModelTextEditingOriented, ITextBoxModelSelectionOriented
 
@@ -829,8 +857,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="TextBox"/>'s.
+    /// Represents a model that corresponds to a default view for <see cref="TextBox"/>'s.
     /// </summary>
+    [TypeForDataTemplate(typeof(ITextBoxModel))]
     public class TextBoxModel : TextBoxModelTextOriented, ITextBoxModel
 
     {
@@ -890,7 +919,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/> collection.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
     public interface IRadioButtonCollection : IEnumerable<IRadioButtonModel>
 
@@ -901,8 +930,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/> collection.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
+    [TypeForDataTemplate(typeof(IRadioButtonCollection))]
     public class RadioButtonCollection : System.Collections.Generic.List<IRadioButtonModel>, IRadioButtonCollection
 
     {
@@ -912,7 +942,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/> collection.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
     public interface IRadioButtonCollection<T> : IRadioButtonCollection, IEnumerable<IRadioButtonModel<T>>
 
@@ -923,8 +953,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/> collection.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/> collection.
     /// </summary>
+    [TypeForDataTemplate(typeof(IRadioButtonCollection))]
     public class RadioButtonCollection<T> : List<IRadioButtonModel<T>>, IRadioButtonCollection<T>
 
     {
@@ -936,7 +967,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
     public interface IRadioButtonModel : IToggleButtonModel
 
@@ -947,8 +978,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IRadioButtonModel))]
     public class RadioButtonModel : ToggleButtonModel, IRadioButtonModel
 
     {
@@ -958,7 +990,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
     public interface IRadioButtonModel<T> : IRadioButtonModel, IToggleButtonModel<T>
 
@@ -969,8 +1001,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IRadioButtonModel))]
     public class RadioButtonModel<T> : ToggleButtonModel<T>, IRadioButtonModel<T>
 
     {
@@ -980,7 +1013,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
     public interface IGroupingRadioButtonModel : IRadioButtonModel
 
@@ -991,7 +1024,7 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
     public interface IGroupingRadioButtonModel<T> : IGroupingRadioButtonModel, IRadioButtonModel<T>
 
@@ -1002,8 +1035,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IGroupingRadioButtonModel))]
     public class GroupingRadioButtonModel : RadioButtonModel, IGroupingRadioButtonModel
 
     {
@@ -1013,8 +1047,9 @@ namespace WinCopies.GUI.Controls.Models
     }
 
     /// <summary>
-    /// Represents a  model that corresponds to a default view for <see cref="RadioButton"/>s.
+    /// Represents a model that corresponds to a default view for <see cref="RadioButton"/>s.
     /// </summary>
+    [TypeForDataTemplate(typeof(IGroupingRadioButtonModel))]
     public class GroupingRadioButtonModel<T> : RadioButtonModel<T>, IGroupingRadioButtonModel<T>
 
     {
