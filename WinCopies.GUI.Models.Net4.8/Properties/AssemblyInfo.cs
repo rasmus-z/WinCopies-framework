@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("WinCopies.Models")]
+[assembly: AssemblyTitle("WinCopies.GUI.Models")]
 [assembly: AssemblyDescription("Models for the WinCopies framework")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("WinCopies.Models")]
+[assembly: AssemblyProduct("WinCopies.GUI.Models")]
 [assembly: AssemblyCopyright("Copyright © Pierre Sprimont 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

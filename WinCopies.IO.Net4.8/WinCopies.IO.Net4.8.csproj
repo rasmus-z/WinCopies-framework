@@ -187,7 +187,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj">
       <Project>{53801d23-7375-4e30-a5a7-27623e950554}</Project>
-      <Name>WinCopies.Util</Name>
+      <Name>WinCopies.Util.Net4.8</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\WinCopies.IO\WinCopies.IO.projitems" Label="Shared" />

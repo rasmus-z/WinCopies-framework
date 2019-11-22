@@ -20,7 +20,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:WinCopies.GUI.Templates"
     xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
-    xmlns:controls="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.Models"
+    xmlns:controls="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.GUI.Models"
     xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>

@@ -17,9 +17,9 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Util", "WinCopies
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Util.Net4.8", "WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj", "{53801D23-7375-4E30-A5A7-27623E950554}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Models", "WinCopies.Models\WinCopies.Models.shproj", "{A43AEE04-0665-4D64-A4B9-7FF1E471BF29}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Models", "WinCopies.GUI.Models\WinCopies.GUI.Models.shproj", "{A43AEE04-0665-4D64-A4B9-7FF1E471BF29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Models.Net4.8", "WinCopies.Models.Net4.8\WinCopies.Models.Net4.8.csproj", "{31C5F3CF-A8FA-43E0-9041-3C61ED9E45A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Models.Net4.8", "WinCopies.GUI.Models.Net4.8\WinCopies.GUI.Models.Net4.8.csproj", "{31C5F3CF-A8FA-43E0-9041-3C61ED9E45A1}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.ViewModels", "WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.shproj", "{589FCD51-85A1-46FF-AB94-3CDD133F92DE}"
 EndProject
@@ -58,7 +58,7 @@ Global
 		WinCopies.GUI.Explorer\WinCopies.GUI.Explorer.projitems*{0e581431-ee4e-4a47-8d7b-b18ff4f34e79}*SharedItemsImports = 4
 		WinCopies.Data\WinCopies.Data.projitems*{0ea8f0f5-12a8-4f14-bf17-5422e25ed835}*SharedItemsImports = 13
 		WinCopies.GUI.Templates\WinCopies.GUI.Templates.projitems*{1af939a9-d753-48e4-b114-fb59e5f3f7fb}*SharedItemsImports = 13
-		WinCopies.Models\WinCopies.Models.projitems*{31c5f3cf-a8fa-43e0-9041-3c61ed9e45a1}*SharedItemsImports = 4
+		WinCopies.GUI.Models\WinCopies.GUI.Models.projitems*{31c5f3cf-a8fa-43e0-9041-3c61ed9e45a1}*SharedItemsImports = 4
 		WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.projitems*{333ee919-8f76-48d7-b531-df15a2f08d3c}*SharedItemsImports = 4
 		WinCopies.GUI\WinCopies.GUI.projitems*{3aaf402a-7c4a-455f-8f42-6f4f13c5e185}*SharedItemsImports = 13
 		WinCopies.GUI.Windows\WinCopies.GUI.Windows.projitems*{3c641513-6fc6-438e-916b-7f35262a3678}*SharedItemsImports = 4
@@ -70,7 +70,7 @@ Global
 		WinCopies.GUI\WinCopies.GUI.projitems*{8917a829-3028-4118-a1a2-798e80ca73c8}*SharedItemsImports = 4
 		WinCopies.IO.FileProcesses\WinCopies.IO.FileProcesses.projitems*{892e0a63-8519-4ce0-a3f8-2390a6f8d3e0}*SharedItemsImports = 4
 		WinCopies.GUI.Controls\WinCopies.GUI.Controls.projitems*{8d43c369-3d12-4536-8249-5bba3b69b417}*SharedItemsImports = 4
-		WinCopies.Models\WinCopies.Models.projitems*{a43aee04-0665-4d64-a4b9-7ff1e471bf29}*SharedItemsImports = 13
+		WinCopies.GUI.Models\WinCopies.GUI.Models.projitems*{a43aee04-0665-4d64-a4b9-7ff1e471bf29}*SharedItemsImports = 13
 		WinCopies.IO.FileProcesses\WinCopies.IO.FileProcesses.projitems*{aceef113-2233-4c78-b0f2-87d104baa60c}*SharedItemsImports = 13
 		WinCopies.IO\WinCopies.IO.projitems*{c7de5838-3c6e-41b8-8fd1-9d0fbeb8e7ac}*SharedItemsImports = 4
 		WinCopies.GUI.Explorer\WinCopies.GUI.Explorer.projitems*{da1e9bd1-1aa5-4ccf-8079-e7591ae8ec62}*SharedItemsImports = 13

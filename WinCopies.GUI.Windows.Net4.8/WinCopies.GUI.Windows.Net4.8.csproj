@@ -173,15 +173,15 @@
   <ItemGroup>
     <ProjectReference Include="..\WinCopies.IO.Net4.8\WinCopies.IO.Net4.8.csproj">
       <Project>{c7de5838-3c6e-41b8-8fd1-9d0fbeb8e7ac}</Project>
-      <Name>WinCopies.IO</Name>
+      <Name>WinCopies.IO.Net4.8</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WinCopies.Models.Net4.8\WinCopies.Models.Net4.8.csproj">
+    <ProjectReference Include="..\WinCopies.GUI.Models.Net4.8\WinCopies.GUI.Models.Net4.8.csproj">
       <Project>{31c5f3cf-a8fa-43e0-9041-3c61ed9e45a1}</Project>
-      <Name>WinCopies.Models</Name>
+      <Name>WinCopies.GUI.Models.Net4.8</Name>
     </ProjectReference>
     <ProjectReference Include="..\WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj">
       <Project>{53801D23-7375-4E30-A5A7-27623E950554}</Project>
-      <Name>WinCopies.Util</Name>
+      <Name>WinCopies.Util.Net4.8</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

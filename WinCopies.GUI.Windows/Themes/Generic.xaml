@@ -31,8 +31,8 @@
                     xmlns:guiWindows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
                     xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"
                     xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp"
-                    xmlns:controlModels="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.Models"
-                    xmlns:dialogModels="clr-namespace:WinCopies.GUI.Windows.Dialogs.Models;assembly=WinCopies.Models">
+                    xmlns:controlModels="clr-namespace:WinCopies.GUI.Controls.Models;assembly=WinCopies.GUI.Models"
+                    xmlns:dialogModels="clr-namespace:WinCopies.GUI.Windows.Dialogs.Models;assembly=WinCopies.GUI.Models">
     <!--xmlns:guiExplorerDialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI.Explorer"-->
 
     <ResourceDictionary.MergedDictionaries>
