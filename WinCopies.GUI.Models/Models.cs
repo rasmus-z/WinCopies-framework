@@ -112,6 +112,54 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
 namespace WinCopies.GUI.Controls.Models
 {
 
+    public interface IModelDataTemplateSelectors
+
+    {
+
+        DataTemplateSelector HeaderDataTemplateSelector { get; }
+
+        DataTemplateSelector ContentDataTemplateSelector { get; }
+
+        DataTemplateSelector ItemsDataTemplateSelector { get; }
+
+    }
+
+    public class AttributeModelDataTemplateSelectors : IModelDataTemplateSelectors
+
+    {
+
+        public DataTemplateSelector HeaderDataTemplateSelector { get; }
+
+        public DataTemplateSelector ContentDataTemplateSelector { get; }
+
+        public DataTemplateSelector ItemsDataTemplateSelector { get; }
+
+        public AttributeModelDataTemplateSelectors()
+
+        {
+
+            var attributeDataTemplateSelector = new AttributeDataTemplateSelector();
+
+            HeaderDataTemplateSelector = attributeDataTemplateSelector;
+
+            ContentDataTemplateSelector = attributeDataTemplateSelector;
+
+            ItemsDataTemplateSelector = attributeDataTemplateSelector;
+
+        }
+
+    }
+
+    public interface IDataTemplateSelectorsModel
+
+    {
+
+        IModelDataTemplateSelectors ModelDataTemplateSelectors { get; set; }
+
+        bool AutoAddDataTemplateSelectors { get; set; }
+
+    }
+
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
@@ -129,13 +177,35 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IContentControlModel))]
-    public class ContentControlModel : IContentControlModel
+    public class ContentControlModel : IContentControlModel, IDataTemplateSelectorsModel
     {
+
+        public IModelDataTemplateSelectors ModelDataTemplateSelectors { get; set; }
+
+        public bool AutoAddDataTemplateSelectors { get; set; }
+
+        private object _content;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel"/>.
         /// </summary>
-        public object Content { get; set; }
+        public object Content { get => _content; set { object oldValue = _content; _content = value; OnContentChanged(oldValue); } }
+
+        protected virtual void OnContentChanged(object oldValue)
+
+        {
+
+            if (AutoAddDataTemplateSelectors && _content is IDataTemplateSelectorsModel dataTemplateSelectorsModel)
+
+            {
+
+                dataTemplateSelectorsModel.ModelDataTemplateSelectors = ModelDataTemplateSelectors;
+
+                dataTemplateSelectorsModel.AutoAddDataTemplateSelectors = true;
+
+            }
+
+        }
 
     }
 
@@ -156,16 +226,38 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="ContentControl"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IContentControlModel))]
-    public class ContentControlModel<T> : IContentControlModel<T>
+    public class ContentControlModel<T> : IContentControlModel<T>, IDataTemplateSelectorsModel
 
     {
+
+        public IModelDataTemplateSelectors ModelDataTemplateSelectors { get; set; }
+
+        public bool AutoAddDataTemplateSelectors { get; set; }
+
+        private T _content;
 
         /// <summary>
         /// Gets or sets the content of this <see cref="ContentControlModel{T}"/>.
         /// </summary>
-        public T Content { get; set; }
+        public T Content { get => _content; set { T oldValue = _content; _content = value; OnContentChanged(oldValue); } }
 
         object IContentControlModel.Content { get => Content; set => Content = GetOrThrowIfNotType<T>(value, nameof(value)); }
+
+        protected virtual void OnContentChanged(object oldValue)
+
+        {
+
+            if (AutoAddDataTemplateSelectors && _content is IDataTemplateSelectorsModel dataTemplateSelectorsModel)
+
+            {
+
+                dataTemplateSelectorsModel.ModelDataTemplateSelectors = ModelDataTemplateSelectors;
+
+                dataTemplateSelectorsModel.AutoAddDataTemplateSelectors = true;
+
+            }
+
+        }
 
     }
 
