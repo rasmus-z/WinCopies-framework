@@ -15,6 +15,8 @@ Updates
 WinCopies.Util (2.0)
 --------------------
 
+Available for .Net Framework, .Net Core and .Net Standard*
+
 - Existing items behavior updates:
 	- The view models OnPropertyChanged methods do not update the properties or fields anymore ; this feature has been replaced by the 'Update' methods added in the same classes.
 	- WinCopies.Util.BackgroundWorker class:
@@ -59,10 +61,10 @@ WinCopies.Util (2.0)
 		- ILinkedList
 	- Delegates:
 		- EqualityComparison
-		- FieldValidateValueCallback*
-		- FieldValueChangedCallback*
-		- PropertyValidateCallback*
-		- PropertyValueChangedCallback*
+		- FieldValidateValueCallback***
+		- FieldValueChangedCallback***
+		- PropertyValidateCallback***
+		- PropertyValueChangedCallback***
 		- ActionParams
 		- Func
 		- FuncParams
@@ -108,8 +110,9 @@ WinCopies.Util (2.0)
 	- Move resources from Generic.xaml to assembly's resource file.
 	- Update doc.
 
-\* See WinCopies.Util.Extensions.SetProperty/Field
+\* Some features are not available in the .Net Core and .Net Standard versions since these frameworks do not have the same structure as the .Net Framework. New packages that include these features will be released later.
 \*\* This also applies to the other already existing classes and interfaces, in the previous versions, that inherit from or implement these classes and interfaces.
+\*\*\* See WinCopies.Util.Extensions.SetProperty/Field
 
 WinCopies.Data (2.0)
 --------------------
