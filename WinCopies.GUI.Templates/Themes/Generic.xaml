@@ -34,10 +34,10 @@
             <Style x:Key="ItemsControlStyle" TargetType="{x:Type ItemsControl}" >
                 <Setter Property="ItemsSource" Value="{Binding Items}" />
             </Style>
-            <Style x:Key="HeaderedContentControlStyle" TargetType="{x:Type HeaderedContentControl}" >
+            <Style x:Key="HeaderedContentControlStyle" TargetType="{x:Type HeaderedContentControl}" BasedOn="{StaticResource ContentControlStyle}" >
                 <Setter Property="Header" Value="{Binding Header}" />
             </Style>
-            <Style x:Key="HeaderedItemsControlStyle" TargetType="{x:Type HeaderedItemsControl}" >
+            <Style x:Key="HeaderedItemsControlStyle" TargetType="{x:Type HeaderedItemsControl}" BasedOn="{StaticResource ItemsControlStyle}" >
                 <Setter Property="Header" Value="{Binding Header}" />
             </Style>
             <Style x:Key="ButtonStyle" TargetType="{x:Type Button}">
@@ -102,6 +102,16 @@
                         <x:Array xmlns:s="clr-namespace:System;assembly=mscorlib" Type="{x:Type Style}">
                             <StaticResource ResourceKey="HeaderedContentControlStyle" />
                             <StaticResource ResourceKey="{x:Type GroupBox}" />
+                            <Style TargetType="{x:Type GroupBox}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Converter={local:ModelToBooleanConverter}, ConverterParameter={x:Static local:ModelToBooleanConverterParameter.Header}}" Value="true">
+                                        <Setter Property="HeaderTemplateSelector" Value="{Binding ModelDataTemplateSelectors.HeaderDataTemplateSelector}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Converter={local:ModelToBooleanConverter}, ConverterParameter={x:Static local:ModelToBooleanConverterParameter.Content}}" Value="true">
+                                        <Setter Property="ContentTemplateSelector" Value="{Binding ModelDataTemplateSelectors.ContentDataTemplateSelector}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
                         </x:Array>
                     </util:MergedStyles.Styles>
                 </util:MergedStyles>
@@ -223,6 +233,13 @@
                             <StaticResource ResourceKey="ButtonStyle" />
                             <StaticResource ResourceKey="ToggleButtonStyle" />
                             <StaticResource ResourceKey="{x:Type CheckBox}" />
+                            <Style TargetType="{x:Type CheckBox}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Converter={local:ModelToBooleanConverter}, ConverterParameter={x:Static local:ModelToBooleanConverterParameter.Content}}" Value="true">
+                                        <Setter Property="ContentTemplateSelector" Value="{Binding ModelDataTemplateSelectors.ContentDataTemplateSelector}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
                         </x:Array>
                     </util:MergedStyles.Styles>
                 </util:MergedStyles>

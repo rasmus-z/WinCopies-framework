@@ -14,4 +14,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ModelToBooleanConverter.cs" />
+  </ItemGroup>
 </Project>

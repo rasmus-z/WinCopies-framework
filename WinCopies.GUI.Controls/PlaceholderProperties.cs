@@ -66,7 +66,7 @@ namespace WinCopies.GUI.Controls
         /// </value>
         public string Text
         {
-            get => text; set => OnPropertyChanged(nameof(Text), nameof(text), value);
+            get => text; set => OnPropertyChanged(nameof(Text), nameof(text), value, typeof(PlaceholderProperties));
         }
 
         private readonly bool acceptsReturn = false;
@@ -82,7 +82,7 @@ namespace WinCopies.GUI.Controls
         /// </remarks>
         public bool AcceptsReturn
         {
-            get => acceptsReturn; set => OnPropertyChanged(nameof(AcceptsReturn), nameof(acceptsReturn), value);
+            get => acceptsReturn; set => OnPropertyChanged(nameof(AcceptsReturn), nameof(acceptsReturn), value, typeof(PlaceholderProperties));
         }
 
         private readonly bool acceptsTab = false;
@@ -97,7 +97,7 @@ namespace WinCopies.GUI.Controls
         /// </value>
         public bool AcceptsTab
         {
-            get => acceptsTab; set => OnPropertyChanged(nameof(AcceptsTab), nameof(acceptsTab), value);
+            get => acceptsTab; set => OnPropertyChanged(nameof(AcceptsTab), nameof(acceptsTab), value, typeof(PlaceholderProperties));
         }
 
         private readonly System.Windows.Media.FontFamily fontFamily = new System.Windows.Media.FontFamily();
@@ -107,7 +107,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public System.Windows.Media.FontFamily FontFamily
         {
-            get => fontFamily; set => OnPropertyChanged(nameof(FontFamily), nameof(fontFamily), value);
+            get => fontFamily; set => OnPropertyChanged(nameof(FontFamily), nameof(fontFamily), value, typeof(PlaceholderProperties));
         }
 
         private readonly double fontSize = 12;
@@ -117,7 +117,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public double FontSize
         {
-            get => fontSize; set => OnPropertyChanged(nameof(FontSize), nameof(fontSize), value);
+            get => fontSize; set => OnPropertyChanged(nameof(FontSize), nameof(fontSize), value, typeof(PlaceholderProperties));
         }
 
         private readonly System.Windows.FontStretch fontStretch = new System.Windows.FontStretch();
@@ -127,7 +127,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public System.Windows.FontStretch FontStretch
         {
-            get => fontStretch; set => OnPropertyChanged(nameof(FontStretch), nameof(fontStretch), value);
+            get => fontStretch; set => OnPropertyChanged(nameof(FontStretch), nameof(fontStretch), value, typeof(PlaceholderProperties));
         }
 
         private readonly System.Windows.FontStyle fontStyle = new System.Windows.FontStyle();
@@ -137,7 +137,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public System.Windows.FontStyle FontStyle
         {
-            get => fontStyle; set => OnPropertyChanged(nameof(FontStyle), nameof(fontStyle), value);
+            get => fontStyle; set => OnPropertyChanged(nameof(FontStyle), nameof(fontStyle), value, typeof(PlaceholderProperties));
         }
 
         private System.Windows.FontWeight fontWeight = new System.Windows.FontWeight();
@@ -147,7 +147,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public System.Windows.FontWeight FontWeight
         {
-            get => fontWeight; set => OnPropertyChanged(nameof(FontWeight), nameof(fontWeight), value);
+            get => fontWeight; set => OnPropertyChanged(nameof(FontWeight), nameof(fontWeight), value, typeof(PlaceholderProperties));
         }
 
         private readonly System.Windows.Media.Brush foreground = System.Windows.Media.Brushes.Black;
@@ -157,7 +157,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public System.Windows.Media.Brush Foreground
         {
-            get => foreground; set => OnPropertyChanged(nameof(Foreground), nameof(foreground), value);
+            get => foreground; set => OnPropertyChanged(nameof(Foreground), nameof(foreground), value, typeof(PlaceholderProperties));
         }
 
         private readonly System.Windows.TextAlignment textAlignment = System.Windows.TextAlignment.Left;
@@ -167,7 +167,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public System.Windows.TextAlignment TextAlignment
         {
-            get => textAlignment; set => OnPropertyChanged(nameof(TextAlignment), nameof(textAlignment), value);
+            get => textAlignment; set => OnPropertyChanged(nameof(TextAlignment), nameof(textAlignment), value, typeof(PlaceholderProperties));
         }
 
         private readonly System.Windows.TextDecorationCollection textDecorations = null;
@@ -177,7 +177,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public System.Windows.TextDecorationCollection TextDecorations
         {
-            get => textDecorations; set => OnPropertyChanged(nameof(TextDecorations), nameof(textDecorations), value);
+            get => textDecorations; set => OnPropertyChanged(nameof(TextDecorations), nameof(textDecorations), value, typeof(PlaceholderProperties));
         }
 
         private readonly System.Windows.TextWrapping textWrapping = System.Windows.TextWrapping.NoWrap;
@@ -187,7 +187,7 @@ namespace WinCopies.GUI.Controls
         /// </summary>
         public System.Windows.TextWrapping TextWrapping
         {
-            get => textWrapping; set => OnPropertyChanged(nameof(TextWrapping), nameof(textWrapping), value);
+            get => textWrapping; set => OnPropertyChanged(nameof(TextWrapping), nameof(textWrapping), value, typeof(PlaceholderProperties));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

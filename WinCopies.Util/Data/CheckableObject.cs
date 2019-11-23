@@ -57,7 +57,7 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets a value that indicates whether the object is checked.
         /// </summary>
-        public bool IsChecked { get => _isChecked; set => OnPropertyChanged(nameof(IsChecked), nameof(_isChecked), value, typeof(CheckableObject)); }
+        public bool IsChecked { get => _isChecked; set => Update(nameof(IsChecked), nameof(_isChecked), value, typeof(CheckableObject)); }
 
         /// <summary>
         /// Determines whether this object is equal to a given object.
@@ -71,7 +71,7 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
-        public object Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(CheckableObject)); }
+        public object Value { get => _value; set => Update(nameof(Value), nameof(_value), value, typeof(CheckableObject)); }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckableObject"/> class.
@@ -146,7 +146,7 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets a value that indicates whether the object is checked.
         /// </summary>
-        public bool IsChecked { get => _isChecked; set => OnPropertyChanged(nameof(IsChecked), nameof(_isChecked), value, typeof(CheckableObject<T>)); }
+        public bool IsChecked { get => _isChecked; set => Update(nameof(IsChecked), nameof(_isChecked), value, typeof(CheckableObject<T>)); }
 
         /// <summary>
         /// Determines whether this object is equal to a given object.
@@ -167,7 +167,7 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
-        public T Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(CheckableObject)); }
+        public T Value { get => _value; set => Update(nameof(Value), nameof(_value), value, typeof(CheckableObject)); }
 
         object WinCopies.Util.IValueObject.Value
         {

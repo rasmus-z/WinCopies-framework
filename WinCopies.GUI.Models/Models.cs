@@ -31,6 +31,8 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 using WinCopies.Util;
+using WinCopies.Util.Data;
+using System.Windows.Data;
 
 namespace WinCopies.GUI.Windows.Dialogs.Models
 {
@@ -81,31 +83,31 @@ namespace WinCopies.GUI.Windows.Dialogs.Models
 
     }
 
-    /// <summary>
-    /// Represents a model that corresponds to a default view for property dialog windows.
-    /// </summary>
-    public interface IPropertyDialogModel : IDialogModel
-    {
+    ///// <summary>
+    ///// Represents a model that corresponds to a default view for property dialog windows.
+    ///// </summary>
+    //public interface IPropertyDialogModel : IDialogModel
+    //{
 
-        /// <summary>
-        /// Gets or sets the items of this <see cref="IPropertyDialogModel"/>.
-        /// </summary>
-        IEnumerable<IPropertyTabItemModel> Items { get; set; }
+    //    /// <summary>
+    //    /// Gets or sets the items of this <see cref="IPropertyDialogModel"/>.
+    //    /// </summary>
+    //    IEnumerable<IPropertyTabItemModel> Items { get; set; }
 
-    }
+    //}
 
-    /// <summary>
-    /// Represents a model that corresponds to a default view for property dialog windows.
-    /// </summary>
-    public class PropertyDialogModel : DialogModel, IPropertyDialogModel
-    {
+    ///// <summary>
+    ///// Represents a model that corresponds to a default view for property dialog windows.
+    ///// </summary>
+    //public class PropertyDialogModel : DialogModel, IPropertyDialogModel
+    //{
 
-        /// <summary>
-        /// Gets or sets the items of this <see cref="PropertyDialogModel"/>.
-        /// </summary>
-        public IEnumerable<IPropertyTabItemModel> Items { get; set; }
+    //    /// <summary>
+    //    /// Gets or sets the items of this <see cref="PropertyDialogModel"/>.
+    //    /// </summary>
+    //    public IEnumerable<IPropertyTabItemModel> Items { get; set; }
 
-    }
+    //}
 
 }
 
@@ -158,6 +160,86 @@ namespace WinCopies.GUI.Controls.Models
 
         bool AutoAddDataTemplateSelectors { get; set; }
 
+        BindingDirection BindingDirection { get; }
+
+    }
+
+    public enum BindingDirection
+
+    {
+
+        OneWay,
+
+        OneWayToSource
+
+    }
+
+    public static class DataTemplateSelectorModelExtensions
+
+    {
+
+        public static void TryUpdate(this IDataTemplateSelectorsModel dataTemplateSelectorsModel, in object value, BindingDirection bindingDirection)
+
+        {
+
+            if (value is IDataTemplateSelectorsModel _dataTemplateSelectorsModel)
+
+            {
+
+                switch (bindingDirection)
+
+                {
+
+                    case BindingDirection.OneWay:
+
+                        if (dataTemplateSelectorsModel.AutoAddDataTemplateSelectors)
+
+                        {
+
+                            _dataTemplateSelectorsModel.ModelDataTemplateSelectors = dataTemplateSelectorsModel.ModelDataTemplateSelectors;
+
+                            _dataTemplateSelectorsModel.AutoAddDataTemplateSelectors = true;
+
+                        }
+
+                        break;
+
+                    case BindingDirection.OneWayToSource:
+
+                        if (_dataTemplateSelectorsModel.AutoAddDataTemplateSelectors)
+
+                        {
+
+                            dataTemplateSelectorsModel.ModelDataTemplateSelectors = _dataTemplateSelectorsModel.ModelDataTemplateSelectors;
+
+                            dataTemplateSelectorsModel.AutoAddDataTemplateSelectors = true;
+
+                        }
+
+                        break;
+
+                }
+
+            }
+
+        }
+
+        public static void TryReset(this IDataTemplateSelectorsModel dataTemplateSelectorsModel, in object value)
+
+        {
+
+            if (value is IDataTemplateSelectorsModel oldDataTemplateSelectorsModel && object.ReferenceEquals(dataTemplateSelectorsModel.ModelDataTemplateSelectors, oldDataTemplateSelectorsModel.ModelDataTemplateSelectors))
+
+            {
+
+                oldDataTemplateSelectorsModel.AutoAddDataTemplateSelectors = false;
+
+                oldDataTemplateSelectorsModel.ModelDataTemplateSelectors = null;
+
+            }
+
+        }
+
     }
 
     /// <summary>
@@ -180,10 +262,6 @@ namespace WinCopies.GUI.Controls.Models
     public class ContentControlModel : IContentControlModel, IDataTemplateSelectorsModel
     {
 
-        public IModelDataTemplateSelectors ModelDataTemplateSelectors { get; set; }
-
-        public bool AutoAddDataTemplateSelectors { get; set; }
-
         private object _content;
 
         /// <summary>
@@ -191,19 +269,34 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public object Content { get => _content; set { object oldValue = _content; _content = value; OnContentChanged(oldValue); } }
 
+        public IModelDataTemplateSelectors ModelDataTemplateSelectors { get; set; }
+
+        public bool AutoAddDataTemplateSelectors { get; set; }
+
+        public BindingDirection BindingDirection { get; } = Models.BindingDirection.OneWay;
+
+        public ContentControlModel() { }
+
+        public ContentControlModel(object content) => Content = content;
+
+        public ContentControlModel(BindingDirection bindingDirection) => BindingDirection = bindingDirection;
+
+        public ContentControlModel(object content, BindingDirection bindingDirection)
+        {
+
+            Content = content;
+
+            BindingDirection = bindingDirection;
+
+        }
+
         protected virtual void OnContentChanged(object oldValue)
 
         {
 
-            if (AutoAddDataTemplateSelectors && _content is IDataTemplateSelectorsModel dataTemplateSelectorsModel)
+            this.TryReset(oldValue);
 
-            {
-
-                dataTemplateSelectorsModel.ModelDataTemplateSelectors = ModelDataTemplateSelectors;
-
-                dataTemplateSelectorsModel.AutoAddDataTemplateSelectors = true;
-
-            }
+            this.TryUpdate(_content, BindingDirection);
 
         }
 
@@ -230,10 +323,6 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
-        public IModelDataTemplateSelectors ModelDataTemplateSelectors { get; set; }
-
-        public bool AutoAddDataTemplateSelectors { get; set; }
-
         private T _content;
 
         /// <summary>
@@ -243,19 +332,34 @@ namespace WinCopies.GUI.Controls.Models
 
         object IContentControlModel.Content { get => Content; set => Content = GetOrThrowIfNotType<T>(value, nameof(value)); }
 
+        public IModelDataTemplateSelectors ModelDataTemplateSelectors { get; set; }
+
+        public bool AutoAddDataTemplateSelectors { get; set; }
+
+        public BindingDirection BindingDirection { get; } = Models.BindingDirection.OneWay;
+
+        public ContentControlModel() { }
+
+        public ContentControlModel(T content) => Content = content;
+
+        public ContentControlModel(BindingDirection bindingDirection) => BindingDirection = bindingDirection;
+
+        public ContentControlModel(T content, BindingDirection bindingDirection)
+        {
+
+            Content = content;
+
+            BindingDirection = bindingDirection;
+
+        }
+
         protected virtual void OnContentChanged(object oldValue)
 
         {
 
-            if (AutoAddDataTemplateSelectors && _content is IDataTemplateSelectorsModel dataTemplateSelectorsModel)
+            this.TryReset(oldValue);
 
-            {
-
-                dataTemplateSelectorsModel.ModelDataTemplateSelectors = ModelDataTemplateSelectors;
-
-                dataTemplateSelectorsModel.AutoAddDataTemplateSelectors = true;
-
-            }
+            this.TryUpdate(_content, BindingDirection);
 
         }
 
@@ -293,10 +397,30 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        object _header;
+
         /// <summary>
         /// Gets or sets the header of this <see cref="HeaderedContentControlModel"/>.
         /// </summary>
-        public object Header { get; set; }
+        public object Header { get => _header; set { object oldValue = _header; _header = value; OnHeaderChanged(oldValue); } }
+
+        public HeaderedContentControlModel() { }
+
+        public HeaderedContentControlModel(object header, object content) : base(content) => Header = header;
+
+        public HeaderedContentControlModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public HeaderedContentControlModel(object header, object content, BindingDirection bindingDirection) : base(content, bindingDirection) => Header = header;
+
+        protected virtual void OnHeaderChanged(object oldValue)
+
+        {
+
+            this.TryReset(oldValue);
+
+            this.TryUpdate(_header, BindingDirection);
+
+        }
 
     }
 
@@ -332,12 +456,32 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        private THeader _header;
+
         /// <summary>
         /// Gets or sets the header of this <see cref="HeaderedContentControlModel{THeader, TContent}"/>.
         /// </summary>
-        public THeader Header { get; set; }
+        public THeader Header { get => _header; set { THeader oldValue = _header; _header = value; OnHeaderChanged(oldValue); } }
 
         object IHeaderedControlModel.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
+
+        public HeaderedContentControlModel() { }
+
+        public HeaderedContentControlModel(THeader header, TContent content) : base(content) => Header = header;
+
+        public HeaderedContentControlModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public HeaderedContentControlModel(THeader header, TContent content, BindingDirection bindingDirection) : base(content, bindingDirection) => Header = header;
+
+        protected virtual void OnHeaderChanged(THeader oldValue)
+
+        {
+
+            this.TryReset(oldValue);
+
+            this.TryUpdate(_header, BindingDirection);
+
+        }
 
     }
 
@@ -358,13 +502,46 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IItemsControlModel))]
-    public class ItemsControlModel : IItemsControlModel
+    public class ItemsControlModel : IItemsControlModel, IDataTemplateSelectorsModel
     {
+
+        private IEnumerable _items;
 
         /// <summary>
         /// Gets or sets the items of this <see cref="ItemsControlModel"/>.
         /// </summary>
-        public IEnumerable Items { get; set; }
+        public IEnumerable Items { get => _items; set { IEnumerable oldItems = _items; _items = value; OnItemsChanged(oldItems); } }
+
+        public IModelDataTemplateSelectors ModelDataTemplateSelectors { get; set; }
+
+        public bool AutoAddDataTemplateSelectors { get; set; }
+
+        public BindingDirection BindingDirection { get; } = Models.BindingDirection.OneWay;
+
+        public ItemsControlModel() { }
+
+        public ItemsControlModel(IEnumerable items) => Items = items;
+
+        public ItemsControlModel(BindingDirection bindingDirection) => BindingDirection = bindingDirection;
+
+        public ItemsControlModel(IEnumerable items, BindingDirection bindingDirection)
+        {
+
+            Items = items;
+
+            BindingDirection = bindingDirection;
+
+        }
+
+        protected virtual void OnItemsChanged(IEnumerable oldItems)
+
+        {
+
+            this.TryReset(oldItems);
+
+            this.TryUpdate(_items, BindingDirection);
+
+        }
 
     }
 
@@ -385,16 +562,49 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="ItemsControl"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IItemsControlModel))]
-    public class ItemsControlModel<T> : IItemsControlModel<T>
+    public class ItemsControlModel<T> : IItemsControlModel<T>, IDataTemplateSelectorsModel
 
     {
+
+        private IEnumerable<T> _items;
 
         /// <summary>
         /// Gets or sets the items of this <see cref="ItemsControlModel{T}"/>.
         /// </summary>
-        public IEnumerable<T> Items { get; set; }
+        public IEnumerable<T> Items { get => _items; set { IEnumerable<T> oldItems = _items; _items = value; OnItemsChanged(oldItems); } }
 
         IEnumerable IItemsControlModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<T>>(value, nameof(value)); }
+
+        public IModelDataTemplateSelectors ModelDataTemplateSelectors { get; set; }
+
+        public bool AutoAddDataTemplateSelectors { get; set; }
+
+        public BindingDirection BindingDirection { get; } = Models.BindingDirection.OneWay;
+
+        public ItemsControlModel() { }
+
+        public ItemsControlModel(IEnumerable<T> items) => Items = items;
+
+        public ItemsControlModel(BindingDirection bindingDirection) => BindingDirection = bindingDirection;
+
+        public ItemsControlModel(IEnumerable<T> items, BindingDirection bindingDirection)
+        {
+
+            Items = items;
+
+            BindingDirection = bindingDirection;
+
+        }
+
+        protected virtual void OnItemsChanged(IEnumerable<T> oldItems)
+
+        {
+
+            this.TryReset(oldItems);
+
+            this.TryUpdate(_items, BindingDirection);
+
+        }
 
     }
 
@@ -412,14 +622,34 @@ namespace WinCopies.GUI.Controls.Models
     /// Represents a model that corresponds to a default view for <see cref="HeaderedItemsControl"/>s.
     /// </summary>
     [TypeForDataTemplate(typeof(IHeaderedItemsControlModel))]
-    public class HeaderedItemsControlModel : ItemsControlModel, IHeaderedItemsControlModel
+    public class HeaderedItemsControlModel : ItemsControlModel, IHeaderedItemsControlModel, IDataTemplateSelectorsModel
 
     {
+
+        private object _header;
 
         /// <summary>
         /// Gets or sets the header of this <see cref="HeaderedItemsControlModel"/>.
         /// </summary>
-        public object Header { get; set; }
+        public object Header { get => _header; set { object oldValue = _header; _header = value; OnHeaderChanged(oldValue); } }
+
+        public HeaderedItemsControlModel() { }
+
+        public HeaderedItemsControlModel(object header, IEnumerable items) : base(items) => Header = header;
+
+        public HeaderedItemsControlModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public HeaderedItemsControlModel(object header, IEnumerable items, BindingDirection bindingDirection) : base(items, bindingDirection) => Header = header;
+
+        protected virtual void OnHeaderChanged(object oldValue)
+
+        {
+
+            this.TryReset(oldValue);
+
+            this.TryUpdate(_header, BindingDirection);
+
+        }
 
     }
 
@@ -441,12 +671,32 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        private THeader _header;
+
         /// <summary>
         /// Gets or sets the header of this <see cref="HeaderedItemsControlModel{THeader, TItems}"/>.
         /// </summary>
-        public THeader Header { get; set; }
+        public THeader Header { get => _header; set { THeader oldValue = _header; _header = value; OnHeaderChanged(oldValue); } }
 
         object IHeaderedControlModel.Header { get => Header; set => Header = GetOrThrowIfNotType<THeader>(value, nameof(value)); }
+
+        public HeaderedItemsControlModel() { }
+
+        public HeaderedItemsControlModel(THeader header, IEnumerable<TItems> items) : base(items) => Header = header;
+
+        public HeaderedItemsControlModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public HeaderedItemsControlModel(THeader header, IEnumerable<TItems> items, BindingDirection bindingDirection) : base(items, bindingDirection) => Header = header;
+
+        protected virtual void OnHeaderChanged(THeader oldValue)
+
+        {
+
+            this.TryReset(oldValue);
+
+            this.TryUpdate(_header, BindingDirection);
+
+        }
 
     }
 
@@ -477,7 +727,13 @@ namespace WinCopies.GUI.Controls.Models
     public class GroupBoxModel : HeaderedContentControlModel, IGroupBoxModel
     {
 
+        public GroupBoxModel() { }
 
+        public GroupBoxModel(object header, object content) : base(header, content) { }
+
+        public GroupBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public GroupBoxModel(object header, object content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { }
 
     }
 
@@ -488,7 +744,13 @@ namespace WinCopies.GUI.Controls.Models
     public class GroupBoxModel<THeader, TContent> : HeaderedContentControlModel<THeader, TContent>, IGroupBoxModel<THeader, TContent>
     {
 
+        public GroupBoxModel() { }
 
+        public GroupBoxModel(THeader header, TContent content) : base(header, content) { }
+
+        public GroupBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public GroupBoxModel(THeader header, TContent content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { }
 
     }
 
@@ -519,7 +781,13 @@ namespace WinCopies.GUI.Controls.Models
     public class TabItemModel : HeaderedContentControlModel, ITabItemModel
     {
 
+        public TabItemModel() { }
 
+        public TabItemModel(object header, object content) : base(header, content) { }
+
+        public TabItemModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public TabItemModel(object header, object content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { }
 
     }
 
@@ -530,65 +798,87 @@ namespace WinCopies.GUI.Controls.Models
     public class TabItemModel<THeader, TContent> : HeaderedContentControlModel<THeader, TContent>, ITabItemModel<THeader, TContent>
     {
 
+        public TabItemModel() { }
 
+        public TabItemModel(THeader header, TContent content) : base(header, content) { }
 
-    }
+        public TabItemModel(BindingDirection bindingDirection) : base(bindingDirection) { }
 
-    /// <summary>
-    /// Represents a model that corresponds to a default view for property tab items.
-    /// </summary>
-    public interface IPropertyTabItemModel : IHeaderedItemsControlModel
-    {
-
-        /// <summary>
-        /// Gets or sets the header of this <see cref="IPropertyTabItemModel"/>.
-        /// </summary>
-        new IEnumerable<IGroupBoxModel> Items { get; set; }
+        public TabItemModel(THeader header, TContent content, BindingDirection bindingDirection) : base(header, content, bindingDirection) { }
 
     }
 
-    /// <summary>
-    /// Represents a model that corresponds to a default view for property tab items.
-    /// </summary>
-    public interface IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : IPropertyTabItemModel, IHeaderedItemsControlModel<TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>
+    ///// <summary>
+    ///// Represents a model that corresponds to a default view for property tab items.
+    ///// </summary>
+    //public interface IPropertyTabItemModel : IHeaderedItemsControlModel<object, IGroupBoxModel>
+    //{
 
-    {
+    //    /// <summary>
+    //    /// Gets or sets the header of this <see cref="IPropertyTabItemModel"/>.
+    //    /// </summary>
+    //    new IEnumerable<IGroupBoxModel> Items { get; set; }
+
+    //}
+
+    ///// <summary>
+    ///// Represents a model that corresponds to a default view for property tab items.
+    ///// </summary>
+    //public interface IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : IPropertyTabItemModel, IHeaderedItemsControlModel<TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>
+
+    //{
 
 
 
-    }
+    //}
 
-    /// <summary>
-    /// Represents a model that corresponds to a default view for property tab items.
-    /// </summary>
-    [TypeForDataTemplate(typeof(IPropertyTabItemModel))]
-    public class PropertyTabItemModel : IPropertyTabItemModel
-    {
+    ///// <summary>
+    ///// Represents a model that corresponds to a default view for property tab items.
+    ///// </summary>
+    //[TypeForDataTemplate(typeof(IPropertyTabItemModel))]
+    //public class PropertyTabItemModel : HeaderedItemsControlModel<object, IGroupBoxModel>, IPropertyTabItemModel
+    //{
 
-        /// <summary>
-        /// Gets or sets the header of this <see cref="PropertyTabItemModel"/>.
-        /// </summary>
-        public object Header { get; set; }
+    //    /// <summary>
+    //    /// Gets or sets the header of this <see cref="PropertyTabItemModel"/>.
+    //    /// </summary>
+    //    public object Header { get; set; }
 
-        /// <summary>
-        /// Gets or sets the items of this <see cref="PropertyTabItemModel"/>.
-        /// </summary>
-        public IEnumerable<IGroupBoxModel> Items { get; set; }
+    //    /// <summary>
+    //    /// Gets or sets the items of this <see cref="PropertyTabItemModel"/>.
+    //    /// </summary>
+    //    public IEnumerable<IGroupBoxModel> Items { get; set; }
 
-        IEnumerable IItemsControlModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModel>>(value, nameof(value)); }
+    //    IEnumerable IItemsControlModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModel>>(value, nameof(value)); }
 
-    }
+    //    public PropertyTabItemModel() { }
 
-    /// <summary>
-    /// Represents a model that corresponds to a default view for property tab items.
-    /// </summary>
-    [TypeForDataTemplate(typeof(IPropertyTabItemModel))]
-    public class PropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlModel<TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
-    {
+    //    public PropertyTabItemModel(object header, IEnumerable<IGroupBoxModel> items) : base(header, items) { }
 
-        IEnumerable<IGroupBoxModel> IPropertyTabItemModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>>(value, nameof(value)); }
+    //    public PropertyTabItemModel(BindingDirection bindingDirection) : base(bindingDirection) { }
 
-    }
+    //    public PropertyTabItemModel(object header, IEnumerable<IGroupBoxModel> items, BindingDirection bindingDirection) : base(header, items, bindingDirection) { }
+
+    //}
+
+    ///// <summary>
+    ///// Represents a model that corresponds to a default view for property tab items.
+    ///// </summary>
+    //[TypeForDataTemplate(typeof(IPropertyTabItemModel))]
+    //public class PropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent> : HeaderedItemsControlModel<TItemHeader, IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>, IPropertyTabItemModel<TItemHeader, TGroupBoxHeader, TGroupBoxContent>
+    //{
+
+    //    IEnumerable<IGroupBoxModel> IPropertyTabItemModel.Items { get => Items; set => Items = GetOrThrowIfNotType<IEnumerable<IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>>>(value, nameof(value)); }
+
+    //    public PropertyTabItemModel() { }
+
+    //    public PropertyTabItemModel(TItemHeader header, IEnumerable<IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>> items) : base(header, items) { }
+
+    //    public PropertyTabItemModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+    //    public PropertyTabItemModel(TItemHeader header, IEnumerable<IGroupBoxModel<TGroupBoxHeader, TGroupBoxContent>> items, BindingDirection bindingDirection) : base(header, items, bindingDirection) { }
+
+    //}
 
     /// <summary>
     /// Represents a model that corresponds to a default view for <see cref="Button"/>s.
@@ -628,6 +918,14 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public IInputElement CommandTarget { get; set; }
 
+        public ButtonModel() { }
+
+        public ButtonModel(object content) : base(content) { }
+
+        public ButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public ButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { }
+
     }
 
     /// <summary>
@@ -663,6 +961,14 @@ namespace WinCopies.GUI.Controls.Models
         /// Gets or sets the command target of this <see cref="ButtonModel{T}"/>.
         /// </summary>
         public IInputElement CommandTarget { get; set; }
+
+        public ButtonModel() { }
+
+        public ButtonModel(T content) : base(content) { }
+
+        public ButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public ButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { }
 
     }
 
@@ -703,6 +1009,14 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public bool IsThreeState { get; set; }
 
+        public ToggleButtonModel() { }
+
+        public ToggleButtonModel(object content) : base(content) { }
+
+        public ToggleButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public ToggleButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { }
+
     }
 
     /// <summary>
@@ -734,6 +1048,14 @@ namespace WinCopies.GUI.Controls.Models
         /// </summary>
         public bool IsThreeState { get; set; }
 
+        public ToggleButtonModel() { }
+
+        public ToggleButtonModel(T content) : base(content) { }
+
+        public ToggleButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public ToggleButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { }
+
     }
 
     /// <summary>
@@ -754,7 +1076,13 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        public CheckBoxModel() { }
 
+        public CheckBoxModel(object content) : base(content) { }
+
+        public CheckBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public CheckBoxModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { }
 
     }
 
@@ -776,7 +1104,13 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        public CheckBoxModel() { }
 
+        public CheckBoxModel(T content) : base(content) { }
+
+        public CheckBoxModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public CheckBoxModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { }
 
     }
 
@@ -1077,7 +1411,13 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        public RadioButtonModel() { }
 
+        public RadioButtonModel(object content) : base(content) { }
+
+        public RadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public RadioButtonModel(object content, BindingDirection bindingDirection) : base(content, bindingDirection) { }
 
     }
 
@@ -1100,7 +1440,13 @@ namespace WinCopies.GUI.Controls.Models
 
     {
 
+        public RadioButtonModel() { }
 
+        public RadioButtonModel(T content) : base(content) { }
+
+        public RadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public RadioButtonModel(T content, BindingDirection bindingDirection) : base(content, bindingDirection) { }
 
     }
 
@@ -1136,6 +1482,14 @@ namespace WinCopies.GUI.Controls.Models
 
         public string GroupName { get; set; }
 
+        public GroupingRadioButtonModel() { }
+
+        public GroupingRadioButtonModel(object content) : base(content) { }
+
+        public GroupingRadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public GroupingRadioButtonModel( object content, BindingDirection bindingDirection) : base( content, bindingDirection) { }
+
     }
 
     /// <summary>
@@ -1147,6 +1501,14 @@ namespace WinCopies.GUI.Controls.Models
     {
 
         public string GroupName { get; set; }
+
+        public GroupingRadioButtonModel() { }
+
+        public GroupingRadioButtonModel(T content) : base(content) { }
+
+        public GroupingRadioButtonModel(BindingDirection bindingDirection) : base(bindingDirection) { }
+
+        public GroupingRadioButtonModel( T content, BindingDirection bindingDirection) : base( content, bindingDirection) { }
 
     }
 

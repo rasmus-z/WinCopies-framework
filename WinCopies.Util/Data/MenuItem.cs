@@ -33,46 +33,46 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets a value that represents the header of this item.
         /// </summary>
-        public object Header { get => _header; set => OnPropertyChanged(nameof(Header), nameof(_header), value, typeof(MenuItem)); }
+        public object Header { get => _header; set => Update(nameof(Header), nameof(_header), value, typeof(MenuItem)); }
 
         private readonly ImageSource _icon;
 
-        public ImageSource Icon { get => _icon; set => OnPropertyChanged(nameof(Icon), nameof(_icon), value, typeof(MenuItem)); }
+        public ImageSource Icon { get => _icon; set => Update(nameof(Icon), nameof(_icon), value, typeof(MenuItem)); }
 
         private readonly ICommand _command;
 
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> that represents the action to do when the user clicks on the menu item.
         /// </summary>
-        public ICommand Command { get => _command; set => OnPropertyChanged(nameof(Command), nameof(_command), value, typeof(MenuItem)); }
+        public ICommand Command { get => _command; set => Update(nameof(Command), nameof(_command), value, typeof(MenuItem)); }
 
         private readonly object _commandParameter;
 
         /// <summary>
         /// Gets or sets the command parameter for the <see cref="Command"/> property value.
         /// </summary>
-        public object CommandParameter { get => _commandParameter; set => OnPropertyChanged(nameof(CommandParameter), nameof(_commandParameter), value, typeof(MenuItem)); }
+        public object CommandParameter { get => _commandParameter; set => Update(nameof(CommandParameter), nameof(_commandParameter), value, typeof(MenuItem)); }
 
         private readonly IInputElement _commandTarget;
 
         /// <summary>
         /// Gets or sets the command target for this menu item.
         /// </summary>
-        public IInputElement CommandTarget { get => _commandTarget; set => OnPropertyChanged(nameof(CommandTarget), nameof(_commandTarget), value, typeof(MenuItem)); }
+        public IInputElement CommandTarget { get => _commandTarget; set => Update(nameof(CommandTarget), nameof(_commandTarget), value, typeof(MenuItem)); }
 
         private readonly bool _isCheckable = false;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the menu item can be checked.
         /// </summary>
-        public bool IsCheckable { get => _isCheckable; set => OnPropertyChanged(nameof(IsCheckable), nameof(_isCheckable), value, typeof(MenuItem)); }
+        public bool IsCheckable { get => _isCheckable; set => Update(nameof(IsCheckable), nameof(_isCheckable), value, typeof(MenuItem)); }
 
         private readonly bool _isChecked = false;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the menu item is checked.
         /// </summary>
-        public bool IsChecked { get => _isChecked; set => OnPropertyChanged(nameof(IsChecked), nameof(_isChecked), value, typeof(MenuItem)); }
+        public bool IsChecked { get => _isChecked; set => Update(nameof(IsChecked), nameof(_isChecked), value, typeof(MenuItem)); }
 
         // todo: do not reduce this enumerable to MenuItemData and perform a check for the type of item in xaml. Seeing also TabControl.xaml.cs for the other use of this class in this solution.
 
@@ -136,43 +136,43 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets a value that represents the header of this item.
         /// </summary>
-        public THeader Header { get => _header; set => OnPropertyChanged(nameof(Header), nameof(_header), value, typeof(MenuItem)); }
+        public THeader Header { get => _header; set => Update(nameof(Header), nameof(_header), value, typeof(MenuItem)); }
 
         private readonly ImageSource _icon = null;
 
-        public ImageSource Icon { get => _icon; set => OnPropertyChanged(nameof(Icon), nameof(_icon), value, typeof(MenuItem)); }
+        public ImageSource Icon { get => _icon; set => Update(nameof(Icon), nameof(_icon), value, typeof(MenuItem)); }
 
         private readonly ICommand _command = null;
 
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> that represents the action to do when user click on this menu item.
         /// </summary>
-        public ICommand Command { get => _command; set => OnPropertyChanged(nameof(Command), nameof(_command), value, typeof(MenuItem)); }
+        public ICommand Command { get => _command; set => Update(nameof(Command), nameof(_command), value, typeof(MenuItem)); }
 
         private readonly object _commandParameter = null;
 
         /// <summary>
         /// Gets or sets the command parameter for the <see cref="CommandParameter"/> property.
         /// </summary>
-        public object CommandParameter { get => _commandParameter; set => OnPropertyChanged(nameof(CommandParameter), nameof(_commandParameter), value, typeof(MenuItem)); }
+        public object CommandParameter { get => _commandParameter; set => Update(nameof(CommandParameter), nameof(_commandParameter), value, typeof(MenuItem)); }
 
         private readonly IInputElement _commandTarget = null;
 
-        public IInputElement CommandTarget { get => _commandTarget; set => OnPropertyChanged(nameof(CommandTarget), nameof(_commandTarget), value, typeof(MenuItem)); }
+        public IInputElement CommandTarget { get => _commandTarget; set => Update(nameof(CommandTarget), nameof(_commandTarget), value, typeof(MenuItem)); }
 
         private readonly bool _isCheckable = false;
 
         /// <summary>
         /// Gets or sets a value that indicates whether this menu item can be checked.
         /// </summary>
-        public bool IsCheckable { get => _isCheckable; set => OnPropertyChanged(nameof(IsCheckable), nameof(_isCheckable), value, typeof(MenuItem)); }
+        public bool IsCheckable { get => _isCheckable; set => Update(nameof(IsCheckable), nameof(_isCheckable), value, typeof(MenuItem)); }
 
         private readonly bool _isChecked = false;
 
         /// <summary>
         /// Gets or sets a value that indicates whether this menu item is checked.
         /// </summary>
-        public bool IsChecked { get => _isChecked; set => OnPropertyChanged(nameof(IsChecked), nameof(_isChecked), value, typeof(MenuItem)); }
+        public bool IsChecked { get => _isChecked; set => Update(nameof(IsChecked), nameof(_isChecked), value, typeof(MenuItem)); }
 
         // todo: do not reduce this enumerable to MenuItemData and perform a check for the type of item in xaml. Seeing also TabControl.xaml.cs for the other use of this class in this solution.
 

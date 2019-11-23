@@ -45,7 +45,7 @@ namespace WinCopies.Util.Data
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
         /// <param name="performIntegrityCheck">Whether to throw when the property is not settable or declaring types of the property and the setter method do not correspond</param>
         // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
-        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true)
+        protected virtual void Update(string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true)
 
         {
 
@@ -54,6 +54,10 @@ namespace WinCopies.Util.Data
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
         }
+
+        protected virtual void OnPropertyChanged(string propertyName) => OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+
+        protected virtual void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
         /// <summary>
         /// Raises the <see cref="PropertyChanged"/> event.
@@ -70,7 +74,7 @@ namespace WinCopies.Util.Data
         /// <param name="newValue">The value to set in the property</param>
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
         /// <param name="performIntegrityCheck">Whether to throw when the property is not settable</param>
-        protected virtual void OnAutoPropertyChanged(string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true)
+        protected virtual void Update(string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true)
 
         {
 
@@ -145,7 +149,7 @@ namespace WinCopies.Util.Data
         /// <param name="performIntegrityCheck">Whether to throw when the property is not settable or declaring types of the property and the setter method do not correspond</param>
         /// <param name="propertyChangeScope">Whether to reflect on the <see cref="Model"/> object or on the current view model. This value is set to <see cref="PropertyChangeScope.ViewModel"/> by default for this method.</param>
         // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
-        protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, PropertyChangeScope propertyChangeScope = PropertyChangeScope.ViewModel)
+        protected virtual void Update(string propertyName, string fieldName, object newValue, Type declaringType, bool performIntegrityCheck = true, PropertyChangeScope propertyChangeScope = PropertyChangeScope.ViewModel)
 
         {
 
@@ -163,7 +167,7 @@ namespace WinCopies.Util.Data
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
         /// <param name="propertyChangeScope">Whether to reflect on the <see cref="Model"/> object or on the current view model. This value is set to <see cref="PropertyChangeScope.Model"/> by default for this method.</param>
         // /// <remarks>To use this method, you need to work with the WinCopies Framework Property changed notification pattern. See the website of the WinCopies Framework for more details.</remarks>
-        protected virtual void OnPropertyChanged(string propertyName, object newValue, Type declaringType, PropertyChangeScope propertyChangeScope = PropertyChangeScope.Model)
+        protected virtual void Update(string propertyName, object newValue, Type declaringType, PropertyChangeScope propertyChangeScope = PropertyChangeScope.Model)
 
         {
 
@@ -173,6 +177,8 @@ namespace WinCopies.Util.Data
 
         }
 
+        protected virtual void OnPropertyChanged(string propertyName) => OnPropertyChanged(new System.ComponentModel. PropertyChangedEventArgs(propertyName));
+
         /// <summary>
         /// Raises the <see cref="PropertyChanged"/> event.
         /// </summary>
@@ -181,6 +187,8 @@ namespace WinCopies.Util.Data
         /// <param name="newValue">The new value of the property. This parameter is ignored by default. You can override this method and use the <see cref="PropertyChangedEventArgs"/> if you want for the <see cref="PropertyChanged"/> event to notify for this value.</param>
         protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 
+        protected virtual void OnPropertyChanged( System.ComponentModel. PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
+
         /// <summary>
         /// Sets a value for a property. If succeeds, then call the <see cref="OnPropertyChanged(string, object, object)"/> method to raise the <see cref="PropertyChanged"/> event.
         /// </summary>
@@ -188,7 +196,7 @@ namespace WinCopies.Util.Data
         /// <param name="newValue">The value to set in the property</param>
         /// <param name="declaringType">The declaring type of both the property and its associated field</param>
         /// <param name="performIntegrityCheck">Whether to throw when the property is not settable</param>
-        protected virtual void OnAutoPropertyChanged(string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true)
+        protected virtual void UpdateAutoProperty(string propertyName, object newValue, Type declaringType, bool performIntegrityCheck = true)
 
         {
 

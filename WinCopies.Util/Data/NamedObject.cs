@@ -57,7 +57,7 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets the name of the object.
         /// </summary>
-        public string Name { get => _name; set => OnPropertyChanged(nameof(Name), nameof(_name), value, typeof(NamedObject)); }
+        public string Name { get => _name; set => Update(nameof(Name), nameof(_name), value, typeof(NamedObject)); }
 
         /// <summary>
         /// Determines whether this object is equal to a given object.
@@ -71,7 +71,7 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
-        public object Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(NamedObject)); }
+        public object Value { get => _value; set => Update(nameof(Value), nameof(_value), value, typeof(NamedObject)); }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NamedObject"/> class.
@@ -146,7 +146,7 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets the name of the object.
         /// </summary>
-        public string Name { get => _name; set => OnPropertyChanged(nameof(Name), nameof(_name), value, typeof(NamedObject<T>)); }
+        public string Name { get => _name; set => Update(nameof(Name), nameof(_name), value, typeof(NamedObject<T>)); }
 
         /// <summary>
         /// Determines whether this object is equal to a given object.
@@ -167,7 +167,7 @@ namespace WinCopies.Util.Data
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
-        public T Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(NamedObject)); }
+        public T Value { get => _value; set => Update(nameof(Value), nameof(_value), value, typeof(NamedObject)); }
 
         object WinCopies.Util.IValueObject.Value
         {
