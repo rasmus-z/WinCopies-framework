@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Windows.Controls;
@@ -26,6 +27,7 @@ namespace WinCopies.GUI.Templates
     public class ModelToBooleanConverter : ConverterBase
 
     {
+
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 
         {
@@ -46,7 +48,7 @@ namespace WinCopies.GUI.Templates
 
                     case ModelToBooleanConverterParameter.Items:
 
-                        return !(_value.ModelDataTemplateSelectors?.ItemsDataTemplateSelector is null);
+                        return !(_value.ModelDataTemplateSelectors?.ItemDataTemplateSelector is null);
 
                     default:
 

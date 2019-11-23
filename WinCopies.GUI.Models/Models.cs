@@ -122,7 +122,7 @@ namespace WinCopies.GUI.Controls.Models
 
         DataTemplateSelector ContentDataTemplateSelector { get; }
 
-        DataTemplateSelector ItemsDataTemplateSelector { get; }
+        DataTemplateSelector ItemDataTemplateSelector { get; }
 
     }
 
@@ -134,7 +134,7 @@ namespace WinCopies.GUI.Controls.Models
 
         public DataTemplateSelector ContentDataTemplateSelector { get; }
 
-        public DataTemplateSelector ItemsDataTemplateSelector { get; }
+        public DataTemplateSelector ItemDataTemplateSelector { get; }
 
         public AttributeModelDataTemplateSelectors()
 
@@ -146,7 +146,7 @@ namespace WinCopies.GUI.Controls.Models
 
             ContentDataTemplateSelector = attributeDataTemplateSelector;
 
-            ItemsDataTemplateSelector = attributeDataTemplateSelector;
+            ItemDataTemplateSelector = attributeDataTemplateSelector;
 
         }
 
