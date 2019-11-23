@@ -22,7 +22,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+#if NETFRAMEWORK
 using System.Windows.Controls;
+#endif
 
 using static WinCopies.Util.Util;
 

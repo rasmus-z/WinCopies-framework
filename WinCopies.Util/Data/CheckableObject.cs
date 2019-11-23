@@ -44,6 +44,8 @@ namespace WinCopies.Util.Data
 
     }
 
+#if NETFRAMEWORK
+
     /// <summary>
     /// Provides an object that defines a value that can be checked and notifies of the checked status or value change. For example, this class can be used in a view for items that can be selected.
     /// </summary>
@@ -92,7 +94,7 @@ namespace WinCopies.Util.Data
 
         }
 
-        #region IDisposable Support
+#region IDisposable Support
         private bool disposedValue = false;
 
         /// <summary>
@@ -129,7 +131,7 @@ namespace WinCopies.Util.Data
             GC.SuppressFinalize(this);
 
         }
-        #endregion
+#endregion
     }
 
     /// <summary>
@@ -207,7 +209,7 @@ namespace WinCopies.Util.Data
 
         }
 
-        #region IDisposable Support
+#region IDisposable Support
         private bool disposedValue = false;
 
         /// <summary>
@@ -244,7 +246,7 @@ namespace WinCopies.Util.Data
             GC.SuppressFinalize(this);
 
         }
-        #endregion
+#endregion
 
         //private void SetProperty(string propertyName, string fieldName, object newValue)
 
@@ -285,5 +287,7 @@ namespace WinCopies.Util.Data
         //}
 
     }
+
+#endif
 
 }

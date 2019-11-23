@@ -28,6 +28,8 @@ namespace WinCopies.Util
 
         public static T GetResource<T>(string name) => (T)typeof(WinCopies.Util.Properties.Resources).GetProperty(name, WinCopies.Util.Util.DefaultBindingFlagsForPropertySet).GetValue(null);
 
+#if NETFRAMEWORK
+
         public static class CommandTexts
         {
 
@@ -98,13 +100,15 @@ namespace WinCopies.Util
 
         }
 
+#endif 
+
         public static class ExceptionMessages
         {
 
             /// <summary>
             /// Gets the DeclaringTypesNotCorrespond resource.
             /// </summary>
-            public static string DeclaringTypesNotCorrespond => Properties.Resources.DeclaringTypesNotCorrespond;
+            public static string DeclaringTypesNotCorrespond =>  Properties.Resources.DeclaringTypesNotCorrespond;
 
             /// <summary>
             /// Gets the FieldOrPropertyNotFound resource.

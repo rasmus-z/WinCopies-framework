@@ -24,7 +24,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using WinCopies.Util;
-using static WinCopies.Util.Generic;
 using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
@@ -311,7 +310,7 @@ namespace WinCopies.Util
 
                 case IfComp.NotEqual:
 
-                    return !predicateResult() ||    result != 0;
+                    return !predicateResult() || result != 0;
 
                 default:
 
@@ -321,13 +320,42 @@ namespace WinCopies.Util
 
         }
 
-        private static bool CheckEqualityComparison(in IfComp comparison, in object value, in object valueToCompare, in Func< bool > predicateResult, in EqualityComparison comparisonDelegate)
+        private static bool CheckEqualityComparison(in IfComp comparison, in object value, in object valueToCompare, in Func<bool> predicateResult, in EqualityComparison comparisonDelegate)
         {
 
             if (comparison == IfComp.ReferenceEqual && !value.GetType().IsClass) throw new InvalidOperationException("ReferenceEqual comparison is only valid with class types.");
 
             if (comparison != IfComp.NotEqual && !predicateResult()) return false;
 
+#if NETSTANDARD
+
+            switch (comparison)
+            {
+
+                case IfComp.Equal:
+
+                    return comparisonDelegate(value, valueToCompare);
+
+                case IfComp.NotEqual:
+            
+                    return !predicateResult() || !comparisonDelegate(value, valueToCompare);
+
+#pragma warning disable IDE0002
+
+                case IfComp.ReferenceEqual:
+            
+                    return object.ReferenceEquals(value, valueToCompare);
+
+#pragma warning restore IDE0002
+
+                default:
+            
+                    return false;
+
+            }
+
+#else
+
             return comparison switch
             {
                 IfComp.Equal => comparisonDelegate(value, valueToCompare),
@@ -342,14 +370,43 @@ namespace WinCopies.Util
 
                 _ => false
             };
+
+#endif
         }
 
-        private static bool CheckEqualityComparison<T>(in IfComp comparison, in T value, in T valueToCompare, in Func< bool > predicateResult, in EqualityComparison<T> comparisonDelegate)
+        private static bool CheckEqualityComparison<T>(in IfComp comparison, in T value, in T valueToCompare, in Func<bool> predicateResult, in EqualityComparison<T> comparisonDelegate)
         {
 
             // Because we've already checked that for the 'T' type in the 'If' method and assuming that 'T' is the base type of all the values to test, if 'T' is actually a class, we don't need to check here if the type of the current value is actually a class when comparison is set to ReferenceEqual.
 
-            if (comparison != IfComp.NotEqual && !predicateResult())                return false;
+            if (comparison != IfComp.NotEqual && !predicateResult()) return false;
+
+#if NETSTANDARD
+
+            switch (comparison)
+            {
+                case IfComp.Equal:
+            
+                    return comparisonDelegate(value, valueToCompare);
+
+                case IfComp.NotEqual:
+            
+                    return !predicateResult() || !comparisonDelegate(value, valueToCompare);
+
+#pragma warning disable IDE0002
+
+                case IfComp.ReferenceEqual:
+            
+                    return object.ReferenceEquals(value, valueToCompare);
+
+#pragma warning restore IDE0002
+
+                default:
+            
+                    return false;
+            }
+
+#else
 
             return comparison switch
             {
@@ -365,15 +422,17 @@ namespace WinCopies.Util
 
                 _ => false
             };
+
+#endif 
         }
 
         private delegate bool CheckIfComparisonDelegate(in object value, in Func<bool> predicate);
 
         private delegate bool CheckIfComparisonDelegate<T>(in T value, in Func<bool> predicate);
 
-        #endregion
+#endregion
 
-        #region Enumerables
+#region Enumerables
 
         private interface IIfValuesEnumerable
         {
@@ -591,7 +650,7 @@ namespace WinCopies.Util
 
         }
 
-        #endregion
+#endregion
 
         private static bool IfInternal(in IfCT comparisonType, in IfCM comparisonMode, CheckIfComparisonDelegate comparisonDelegate, in IIfValuesEnumerable values)
 
@@ -1057,9 +1116,9 @@ namespace WinCopies.Util
 
         }
 
-        #region Non generic methods
+#region Non generic methods
 
-        #region Comparisons without key notification
+#region Comparisons without key notification
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of values.
@@ -1217,9 +1276,9 @@ namespace WinCopies.Util
 
         }
 
-        #endregion
+#endregion
 
-        #region Comparisons with key notification
+#region Comparisons with key notification
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values.
@@ -1315,13 +1374,13 @@ namespace WinCopies.Util
 
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Generic methods
+#region Generic methods
 
-        #region Comparisons without key notification
+#region Comparisons without key notification
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values.
@@ -1395,9 +1454,9 @@ namespace WinCopies.Util
 
         }
 
-        #endregion
+#endregion
 
-        #region Comparisons with key notification
+#region Comparisons with key notification
 
         /// <summary>
         /// Performs a comparison by testing a value compared to an array of objects or values.
@@ -1469,11 +1528,11 @@ namespace WinCopies.Util
 
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
         public static bool IsNullEmptyOrWhiteSpace(in string value) => string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
 
@@ -1519,7 +1578,7 @@ namespace WinCopies.Util
 
                 // todo : in a newer version, instead, get the maximum rank of arrays in params Array[] arrays and add a gesture of this in the process (also for the ConcatenateLong method) ; and not forgetting to change the comments of the xmldoc about this.
 
-                if (array.Rank != 1) throw new ArgumentException(ArrayWithMoreThanOneDimension);
+                if (array.Rank != 1) throw new ArgumentException(Resources.ExceptionMessages.ArrayWithMoreThanOneDimension);
 
                 totalArraysLength += array.Length;
 

@@ -18,7 +18,6 @@
 using System;
 using System.ComponentModel;
 using System.Threading;
-using static WinCopies.Util.Generic;
 
 namespace WinCopies.Util
 {
@@ -207,7 +206,7 @@ namespace WinCopies.Util
 
                 // todo:
 
-                throw new InvalidOperationException(BackgroundWorkerIsBusy);
+                throw new InvalidOperationException( Resources.ExceptionMessages. BackgroundWorkerIsBusy);
 
             Reset(false);
 

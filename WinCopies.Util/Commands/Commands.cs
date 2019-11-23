@@ -22,6 +22,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+#if NETFRAMEWORK
+
 namespace WinCopies.Util.Commands
 {
     public static class Commands
@@ -36,3 +38,5 @@ namespace WinCopies.Util.Commands
 
     }
 }
+
+#endif

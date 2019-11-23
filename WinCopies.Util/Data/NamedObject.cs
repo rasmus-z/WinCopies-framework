@@ -44,6 +44,8 @@ namespace WinCopies.Util.Data
 
     }
 
+#if NETFRAMEWORK
+
     /// <summary>
     /// Provides an object that defines a value with an associated name and notifies of the name or value change.
     /// </summary>
@@ -92,7 +94,7 @@ namespace WinCopies.Util.Data
 
         }
 
-        #region IDisposable Support
+#region IDisposable Support
         private bool disposedValue = false;
 
         /// <summary>
@@ -129,7 +131,7 @@ namespace WinCopies.Util.Data
             GC.SuppressFinalize(this);
 
         }
-        #endregion
+#endregion
     }
 
     /// <summary>
@@ -207,7 +209,7 @@ namespace WinCopies.Util.Data
 
         }
 
-        #region IDisposable Support
+#region IDisposable Support
         private bool disposedValue = false;
 
         /// <summary>
@@ -244,7 +246,9 @@ namespace WinCopies.Util.Data
             GC.SuppressFinalize(this);
 
         }
-        #endregion
+#endregion
     }
+
+#endif
 
 }

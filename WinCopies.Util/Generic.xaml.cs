@@ -31,6 +31,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+#if NETFRAMEWORK
+
 namespace WinCopies.Util
 {
     public partial class Generic
@@ -41,7 +43,7 @@ namespace WinCopies.Util
         [Obsolete("Please use the WinCopies.Util.Resources.GetResource<T>(string name) method instead.")]
         public static T GetResource<T>(object key) => Resources.GetResource<T>((string)key);
 
-        #region Resources
+#region Resources
 
         /// <summary>
         /// Gets the NewTab resource.
@@ -174,7 +176,7 @@ namespace WinCopies.Util
         [Obsolete("This property is obsolete. Please use the same property of the WinCopies.Util.Resources.ExceptionMessages class instead.")]
         public static string ReadOnlyCollection => GetResource<string>(nameof(ReadOnlyCollection));
 
-        #endregion
+#endregion
 
         public static System.Windows.ResourceDictionary ResourceDictionary { get; } = null;
 
@@ -216,3 +218,5 @@ namespace WinCopies.Util
         public static object GetResource(object resourceKey, string resourceDictionaryKey = null) => GetResourceDictionary(resourceDictionaryKey)[resourceKey];
     }
 }
+
+#endif

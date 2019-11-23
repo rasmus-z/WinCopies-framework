@@ -60,7 +60,7 @@ namespace WinCopies.Collections.DotNetFix
 
         LinkedListNode<T> FindLast(T value);
 
-        System.Collections.Generic.LinkedList<T>.Enumerator GetEnumerator();
+        new System.Collections.Generic.LinkedList<T>.Enumerator GetEnumerator();
 
         void Remove(LinkedListNode<T> node);
 

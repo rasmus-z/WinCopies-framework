@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#if NETFRAMEWORK
+
 using System.Windows;
 using System.Windows.Input;
 
@@ -54,3 +56,5 @@ namespace WinCopies.Util.Commands
 
     }
 }
+
+ #endif

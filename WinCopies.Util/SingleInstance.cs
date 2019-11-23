@@ -25,6 +25,8 @@
 // </summary>
 //-----------------------------------------------------------------------
 
+#if NETFRAMEWORK
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -148,10 +150,10 @@ namespace Microsoft.Shell
         DWMCOLORIZATIONCOLORCHANGED = 0x0320,
         DWMWINDOWMAXIMIZEDCHANGE = 0x0321,
 
-        #region Windows 7
+#region Windows 7
         DWMSENDICONICTHUMBNAIL = 0x0323,
         DWMSENDICONICLIVEPREVIEWBITMAP = 0x0326,
-        #endregion
+#endregion
 
         USER = 0x0400,
 
@@ -238,7 +240,7 @@ namespace Microsoft.Shell
                 where TApplication : Application, ISingleInstanceApp
 
     {
-        #region Private Fields
+#region Private Fields
 
         /// <summary>
         /// String delimiter used in channel names.
@@ -270,18 +272,18 @@ namespace Microsoft.Shell
         /// </summary>
         private static IpcServerChannel channel;
 
-        #endregion
+#endregion
 
-        #region Public Properties
+#region Public Properties
 
         /// <summary>
         /// Gets list of command line arguments for the application.
         /// </summary>
         public static IList<string> CommandLineArgs { get; private set; }
 
-        #endregion
+#endregion
 
-        #region Public Methods
+#region Public Methods
 
         /// <summary>
         /// Checks if the instance of the application attempting to start is the first instance. 
@@ -328,9 +330,9 @@ namespace Microsoft.Shell
             }
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods
+#region Private Methods
 
         /// <summary>
         /// Gets command line args - for ClickOnce deployed applications, command line args may not be passed directly, they have to be retrieved.
@@ -464,9 +466,9 @@ namespace Microsoft.Shell
             _ = ((TApplication)Application.Current).SignalExternalCommandLineArgs(args);
         }
 
-        #endregion
+#endregion
 
-        #region Private Classes
+#region Private Classes
 
         /// <summary>
         /// Remoting service class which is exposed by the server i.e the first instance and called by the second instance
@@ -495,6 +497,8 @@ namespace Microsoft.Shell
             public override object InitializeLifetimeService() => null;
         }
 
-        #endregion
+#endregion
     }
 }
+
+#endif

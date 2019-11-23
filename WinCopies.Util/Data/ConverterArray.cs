@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+#if NETFRAMEWORK
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -359,3 +361,5 @@ namespace WinCopies.Util.Data
         }
     }
 }
+
+ #endif
