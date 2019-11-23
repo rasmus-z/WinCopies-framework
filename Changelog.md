@@ -12,15 +12,11 @@ Updates
 2.0
 ===
 
-WinCopies.Data (2.0)
---------------------
-
-First release
-
 WinCopies.Util (2.0)
 --------------------
 
 - Existing items behavior updates:
+	- The view models OnPropertyChanged methods do not update the properties or fields anymore ; this feature has been replaced by the 'Update' methods added in the same classes.
 	- WinCopies.Util.BackgroundWorker class:
 		- The BackgroundWorker class now resets its properties in background.
 		- If a ThreadAbortException is thrown, and is not caught, in the background thread, the BackgroundWorker will consider that a cancellation has occurred.
@@ -87,6 +83,7 @@ WinCopies.Util (2.0)
 			- FirstOrDefault IEnumerable extension method. This is a generic method that looks for the first item of the given generic type parameter. If none item is found, the method returns the default value for the given generic type parameter.
 			- LastOrDefault IEnumerable extension method. Same method as the FirstOrDefault method but to get the last item of an IEnumerable instead of the first one.
 		- Misc:
+			- Update methods in the view model classes to replace the update feature of the OnPropertyChanged methods of these classes. The OnPropertyChanged methods still exist in these classes, but now just raise the PropertyChanged event.
 			- The view model classes now have an OnAutoPropertyChanged method to automatically set an auto-property and raise the PropertyChanged event.
 			- The ReadOnlyObservableCollection has now an OnCollectionChanging protected virtual method.
 	- Parameters:
@@ -113,6 +110,31 @@ WinCopies.Util (2.0)
 
 \* See WinCopies.Util.Extensions.SetProperty/Field
 \*\* This also applies to the other already existing classes and interfaces, in the previous versions, that inherit from or implement these classes and interfaces.
+
+WinCopies.Data (2.0)
+--------------------
+
+First release
+
+WinCoipies.GUI (2.0)
+--------------------
+
+First release
+
+WinCopies.GUI.Models (2.0)
+--------------------------
+
+First release
+
+WinCopies.GUI.ViewModels (2.0)
+------------------------------
+
+First release
+
+WinCopies.GUI.Templates (2.0)
+-----------------------------
+
+First release
 
 Project link
 ------------
