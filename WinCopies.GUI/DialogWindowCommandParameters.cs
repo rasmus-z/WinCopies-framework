@@ -15,26 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
 
-namespace WinCopies.GUI.Windows.Dialogs
-{
-    public enum DialogWindowCommandParameters
-    {    
+//namespace WinCopies.GUI.Windows.Dialogs
+//{
+//    public enum DialogWindowCommandParameters
+//    {
 
-        OK = 0,
+//        OK = 0,
 
-        Apply = 1,
+//        Apply = 1,
 
-        Cancel = 2,
+//        Cancel = 2,
 
-        Yes = 3,
+//        Yes = 3,
 
-        No = 4
+//        No = 4
 
-    }
-}
+//    }
+//}

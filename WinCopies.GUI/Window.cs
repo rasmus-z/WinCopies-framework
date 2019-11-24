@@ -27,24 +27,25 @@ using System.Windows.Interop;
 
 namespace WinCopies.GUI.Windows
 {
+
     public class Window : System.Windows.Window
     {
 
         /// <summary>
         /// Identifies the <see cref="ShowHelpButton"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ShowHelpButtonProperty = DependencyProperty.Register(nameof(ShowHelpButton), typeof(bool), typeof(Window), new PropertyMetadata(false, (DependencyObject d, DependencyPropertyChangedEventArgs e) => d.SetValue(IsInHelpModePropertyKey, (bool?)e.NewValue == true ? (bool?)false : null)));
+        public static readonly DependencyProperty ShowHelpButtonProperty = DependencyProperty.Register(nameof(ShowHelpButton), typeof(bool), typeof(Window), new PropertyMetadata(false));
 
         public bool ShowHelpButton { get => (bool)GetValue(ShowHelpButtonProperty); set => SetValue(ShowHelpButtonProperty, value); }
 
-        private static readonly DependencyPropertyKey IsInHelpModePropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsInHelpMode), typeof(bool?), typeof(Window), new PropertyMetadata(null));
+        private static readonly DependencyPropertyKey IsInHelpModePropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsInHelpMode), typeof(bool), typeof(Window), new PropertyMetadata(false));
 
         /// <summary>
         /// Identifies the <see cref="IsInHelpMode"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsInHelpModeProperty = IsInHelpModePropertyKey.DependencyProperty;
 
-        public bool? IsInHelpMode => (bool?)GetValue(IsInHelpModeProperty);
+        public bool IsInHelpMode => (bool)GetValue(IsInHelpModeProperty);
 
         public static readonly DependencyProperty NotInHelpModeCursorProperty = DependencyProperty.Register(nameof(NotInHelpModeCursor), typeof(Cursor), typeof(Window), new PropertyMetadata(Cursors.Arrow));
 
@@ -65,6 +66,8 @@ namespace WinCopies.GUI.Windows
 
         }
 
+        static Window() => DefaultStyleKeyProperty. OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
@@ -74,7 +77,7 @@ namespace WinCopies.GUI.Windows
 
                 WindowUtilities.SetWindow(hwnd, IntPtr.Zero, 0, 0, 0, 0, (WindowStyles)(((uint)WindowUtilities.GetWindowStyles(hwnd) & 0xFFFFFFFF) ^ ((uint)WindowStyles.MinimizeBox | (uint)WindowStyles.MaximizeBox)), (WindowStylesEx)((uint)WindowUtilities.GetWindowStylesEx(hwnd) | (uint)WindowStylesEx.ContextHelp), SetWindowPositionOptions.NoMove | SetWindowPositionOptions.NoSize | SetWindowPositionOptions.NoZOrder | SetWindowPositionOptions.FrameChanged);
 
-                ((HwndSource)PresentationSource.FromVisual(this)).AddHook(OnHelpButtonClickHook);
+                ((HwndSource)PresentationSource.FromVisual(this)).AddHook(OnSourceHook);
 
                 //IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
                 //uint styles = GetWindowLongPtr(hwnd, GWL_STYLE);
@@ -96,25 +99,21 @@ namespace WinCopies.GUI.Windows
 
         {
 
-            if (IsInHelpMode.HasValue)
+            // if (IsInHelpMode)
 
-            {
+            // {
 
                 SetValue(IsInHelpModePropertyKey, !(bool)IsInHelpMode);
 
-                Cursor = (bool)IsInHelpMode ? Cursors.Help : Cursors.Arrow;
+                // Cursor = (bool)IsInHelpMode ? Cursors.Help : Cursors.Arrow;
 
-            }
+            // }
 
             RaiseHelpButtonClickEvent();
 
         }
 
-        protected virtual IntPtr OnHelpButtonClickHook(IntPtr hwnd,
-                int msg,
-                IntPtr wParam,
-                IntPtr lParam,
-                ref bool handled)
+        protected virtual IntPtr OnSourceHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == (int)WindowMessage.SystemCommand &&
                     ((int)wParam & 0xFFF0) == (int)SystemCommand.ContextHelp)

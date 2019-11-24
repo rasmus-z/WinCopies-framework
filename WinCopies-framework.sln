@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Changelog.md = Changelog.md
+		LICENSE = LICENSE
 	EndProjectSection
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Data", "WinCopies.Data\WinCopies.Data.shproj", "{0EA8F0F5-12A8-4F14-BF17-5422E25ED835}"
@@ -56,6 +57,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Util.NetCore3.0", "WinCopies.Util.NetCore3.0\WinCopies.Util.NetCore3.0.csproj", "{72713C39-9F83-48CC-8FC4-71145B081B04}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Util.NetStandard2.0", "WinCopies.Util.NetStandard2.0\WinCopies.Util.NetStandard2.0.csproj", "{4E0E3717-4FEC-42DB-B14C-963BA35B4A98}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{820B7BD2-F4FD-4A18-AE49-A0A88BD970C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Samples.Net4.8", "Samples\WinCopies.GUI.Samples.Net4.8\WinCopies.GUI.Samples.Net4.8.csproj", "{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -193,9 +198,20 @@ Global
 		{4E0E3717-4FEC-42DB-B14C-963BA35B4A98}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4E0E3717-4FEC-42DB-B14C-963BA35B4A98}.Release|x64.ActiveCfg = Release|Any CPU
 		{4E0E3717-4FEC-42DB-B14C-963BA35B4A98}.Release|x64.Build.0 = Release|Any CPU
+		{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11}.Debug|x64.Build.0 = Debug|Any CPU
+		{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11}.Release|x64.ActiveCfg = Release|Any CPU
+		{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1B0203D7-4AE0-4A07-AB45-5AE1FC7D7C11} = {820B7BD2-F4FD-4A18-AE49-A0A88BD970C3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75922CA2-98D5-4443-BE25-39062994E598}

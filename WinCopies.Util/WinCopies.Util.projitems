@@ -26,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Commands\ApplicationCommands.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\CommandAction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\Commands.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\DialogCommands.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\FileSystemCommands.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\KeyCommandHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\BooleanToVisibilityConverter.cs" />

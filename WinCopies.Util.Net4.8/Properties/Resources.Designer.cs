@@ -61,6 +61,24 @@ namespace WinCopies.Util.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à A_bort.
+        /// </summary>
+        internal static string AbortWPF {
+            get {
+                return ResourceManager.GetString("AbortWPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à _Apply.
+        /// </summary>
+        internal static string ApplyWPF {
+            get {
+                return ResourceManager.GetString("ApplyWPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Arrays must have only one dimension..
         /// </summary>
         internal static string ArrayWithMoreThanOneDimension {
@@ -75,6 +93,15 @@ namespace WinCopies.Util.Properties {
         internal static string BackgroundWorkerIsBusy {
             get {
                 return ResourceManager.GetString("BackgroundWorkerIsBusy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à _Cancel.
+        /// </summary>
+        internal static string CancelWPF {
+            get {
+                return ResourceManager.GetString("CancelWPF", resourceCulture);
             }
         }
         
@@ -102,6 +129,15 @@ namespace WinCopies.Util.Properties {
         internal static string CloseWindowWPF {
             get {
                 return ResourceManager.GetString("CloseWindowWPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à C_ontinue.
+        /// </summary>
+        internal static string ContinueWPF {
+            get {
+                return ResourceManager.GetString("ContinueWPF", resourceCulture);
             }
         }
         
@@ -138,6 +174,15 @@ namespace WinCopies.Util.Properties {
         internal static string FieldOrPropertyNotFound {
             get {
                 return ResourceManager.GetString("FieldOrPropertyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à _Ignore.
+        /// </summary>
+        internal static string IgnoreWPF {
+            get {
+                return ResourceManager.GetString("IgnoreWPF", resourceCulture);
             }
         }
         
@@ -196,11 +241,38 @@ namespace WinCopies.Util.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à No to a_ll.
+        /// </summary>
+        internal static string NoToAllWPF {
+            get {
+                return ResourceManager.GetString("NoToAllWPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; must be one of the {1} enum values..
         /// </summary>
         internal static string NoValidEnumValue {
             get {
                 return ResourceManager.GetString("NoValidEnumValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à _No.
+        /// </summary>
+        internal static string NoWPF {
+            get {
+                return ResourceManager.GetString("NoWPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à _Ok.
+        /// </summary>
+        internal static string OkWPF {
+            get {
+                return ResourceManager.GetString("OkWPF", resourceCulture);
             }
         }
         
@@ -232,6 +304,15 @@ namespace WinCopies.Util.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à _Retry.
+        /// </summary>
+        internal static string RetryWPF {
+            get {
+                return ResourceManager.GetString("RetryWPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à _Reverse selection.
         /// </summary>
         internal static string ReverseSelectionWPF {
@@ -255,6 +336,24 @@ namespace WinCopies.Util.Properties {
         internal static string StringParameterEmptyOrWhiteSpaces {
             get {
                 return ResourceManager.GetString("StringParameterEmptyOrWhiteSpaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Yes _to all.
+        /// </summary>
+        internal static string YesToAllWPF {
+            get {
+                return ResourceManager.GetString("YesToAllWPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à _Yes.
+        /// </summary>
+        internal static string YesWPF {
+            get {
+                return ResourceManager.GetString("YesWPF", resourceCulture);
             }
         }
     }

@@ -29,24 +29,14 @@ namespace WinCopies.GUI.Windows.Dialogs
         {
             if (value is HorizontalAlignment _value)
 
-                switch (_value)
-
+                return _value switch
                 {
+                    HorizontalAlignment.Left => System.Windows.HorizontalAlignment.Left,
 
-                    case HorizontalAlignment.Left:
+                    HorizontalAlignment.Right => System.Windows.HorizontalAlignment.Right,
 
-                        return System.Windows.HorizontalAlignment.Left;
-
-                    case HorizontalAlignment.Right:
-
-                        return System.Windows.HorizontalAlignment.Right;
-
-                    default:
-
-                        throw new ArgumentException("Invalid value for HorizontalAlignment.");
-
-                }
-
+                    _ => throw new ArgumentException("Invalid value for HorizontalAlignment."),
+                };
             else
 
                 return null;
@@ -56,24 +46,14 @@ namespace WinCopies.GUI.Windows.Dialogs
         {
             if (value is System.Windows.HorizontalAlignment _value)
 
-                switch (_value)
-
+                return _value switch
                 {
+                    System.Windows.HorizontalAlignment.Left => HorizontalAlignment.Left,
 
-                    case System.Windows.HorizontalAlignment.Left:
+                    System.Windows.HorizontalAlignment.Right => HorizontalAlignment.Right,
 
-                        return HorizontalAlignment.Left;
-
-                    case System.Windows.HorizontalAlignment.Right:
-
-                        return HorizontalAlignment.Right;
-
-                    default:
-
-                        throw new ArgumentException("Invalid value for HorizontalAlignment.");
-
-                }
-
+                    _ => throw new ArgumentException("Invalid value for HorizontalAlignment."),
+                };
             else
 
                 return null;

@@ -26,13 +26,14 @@ using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
 using System.Windows.Controls;
+using System.Collections.Generic;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
     /// <summary>
     /// Represents a common dialog window for WPF.
     /// </summary>
-    [TemplatePart( Name = PART_OkButton, Type = typeof(Button))]
+    [TemplatePart(Name = PART_OkButton, Type = typeof(Button))]
     [TemplatePart(Name = PART_ApplyButton, Type = typeof(Button))]
     [TemplatePart(Name = PART_YesButton, Type = typeof(Button))]
     [TemplatePart(Name = PART_NoButton, Type = typeof(Button))]
@@ -59,7 +60,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         }));
 
         /// <summary>
-        /// Gets or sets the <see cref="Dialogs.DialogButton"/>. This is a dependency property.
+        /// Gets or sets the <see cref="Dialogs.DialogButton"/>. <see cref="Command"/> will not be executed if this property is set to <see cref="DialogButton.OK"/>, or if the user clicks on one of the following buttons: Cancel, Ignore, Abort. This is a dependency property.
         /// </summary>
         public DialogButton DialogButton { get => (DialogButton)GetValue(DialogButtonProperty); set => SetValue(DialogButtonProperty, value); }
 
@@ -82,7 +83,9 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             var dialogButton = (DialogButton)d.GetValue(DialogButtonProperty);
 
-            void throwArgumentException() => throw new ArgumentException("DefaultButton must be included in DialogButton value.");
+            static void throwArgumentException() => throw new ArgumentException("DefaultButton must be included in DialogButton value.");
+
+            var sender = (DialogWindow)d;
 
             switch (dialogButton)
 
@@ -92,29 +95,103 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                     if (defaultButton != DefaultButton.OK) throwArgumentException();
 
+                    var commands = new RoutedUICommand[1] { DialogCommands.Ok };
+
+                    var properties = typeof(DialogWindow).GetProperties();
+
+                    // todo:
+
+                    foreach (var property in properties)
+
+                        if ( !commands.Contains() && sender.CommandBindings.Contains())
+
+                            sender.CommandBindings.RemoveAt();
+
+                    foreach (RoutedUICommand command in commands)
+
+                    {
+
+                        var commandBinding = new CommandBinding(command, sender.Command_Executed, sender.Command_CanExecute);
+
+                        _ = sender.CommandBindings.AddIfNotContains(commandBinding);
+
+                    }
+
                     break;
 
                 case DialogButton.OKCancel:
 
-                    if (defaultButton != DefaultButton.OK && defaultButton != DefaultButton.Cancel) throwArgumentException();
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.OK, DefaultButton.Cancel)) throwArgumentException();
+
+                    _ = sender.CommandBindings.Add(new CommandBinding(DialogCommands.Ok, sender.Command_Executed, sender.Command_CanExecute));
+
+                    _ = sender.CommandBindings.Add(new CommandBinding(DialogCommands.Cancel, sender.Command_Executed, sender.Command_CanExecute));
 
                     break;
 
-                case DialogButton.OKApplyCancel:
+                case DialogButton.AbortRetryIgnore:
 
-                    if (defaultButton != DefaultButton.OK && defaultButton != DefaultButton.Apply && defaultButton != DefaultButton.Cancel) throwArgumentException();
+                    if (If(IfCT.And, IfCM.Binary, IfComp.Equal, defaultButton, DefaultButton.Abort, DefaultButton.Retry, DefaultButton.Ignore)) throwArgumentException();
 
                     break;
 
                 case DialogButton.YesNoCancel:
 
-                    if (defaultButton != DefaultButton.Yes && defaultButton != DefaultButton.No && defaultButton != DefaultButton.Cancel) throwArgumentException();
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.Yes, DefaultButton.No, DefaultButton.Cancel)) throwArgumentException();
 
                     break;
 
                 case DialogButton.YesNo:
 
-                    if (defaultButton != DefaultButton.Yes && defaultButton != DefaultButton.No) throwArgumentException();
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.Yes, DefaultButton.No)) throwArgumentException();
+
+                    break;
+
+                case DialogButton.RetryCancel:
+
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.Retry, DefaultButton.Cancel)) throwArgumentException();
+
+                    break;
+
+                case DialogButton.CancelTryContinue:
+
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.Cancel, DefaultButton.Retry, DefaultButton.Continue)) throwArgumentException();
+
+                    break;
+
+                case DialogButton.ContinueIgnoreCancel:
+
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.Continue, DefaultButton.Ignore, DefaultButton.Cancel)) throwArgumentException();
+
+                    break;
+
+                case DialogButton.OKApplyCancel:
+
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.OK, DefaultButton.Apply, DefaultButton.Cancel)) throwArgumentException();
+
+                    break;
+
+                case DialogButton.RetryIgnoreCancel:
+
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.Retry, DefaultButton.Ignore, DefaultButton.Cancel)) ; throwArgumentException();
+
+                    break;
+
+                case DialogButton.IgnoreCancel:
+
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.Ignore, DefaultButton.Cancel)) throwArgumentException();
+
+                    break;
+
+                case DialogButton.YesToAllNoToAllCancel:
+
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.YesToAll, DefaultButton.NoToAll, DefaultButton.Cancel)) throwArgumentException();
+
+                    break;
+
+                case DialogButton.YesToAllNoToAll:
+
+                    if (If(IfCT.And, IfCM.Logical, IfComp.NotEqual, defaultButton, DefaultButton.YesToAll, DefaultButton.NoToAll)) throwArgumentException();
 
                     break;
 
@@ -124,8 +201,12 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         public DefaultButton DefaultButton { get => (DefaultButton)GetValue(DefaultButtonProperty); set => SetValue(DefaultButtonProperty, value); }
 
+        public static DependencyProperty ShowHelpButtonAsCommandButtonProperty = DependencyProperty.Register(nameof(ShowHelpButtonAsCommandButton), typeof(bool), typeof(DialogWindow));
+
+        public bool ShowHelpButtonAsCommandButton { get => (bool)GetValue(ShowHelpButtonAsCommandButtonProperty); set => SetValue(ShowHelpButtonAsCommandButtonProperty, value); }
+
         /// <summary>
-        /// Gets the <see cref="System.Windows.MessageBoxResult"/>.
+        /// Gets the <see cref="WinCopies.GUI.Windows.Dialogs.MessageBoxResult"/>.
         /// </summary>
         public MessageBoxResult MessageBoxResult { get; private set; } = MessageBoxResult.None;
 
@@ -166,119 +247,141 @@ namespace WinCopies.GUI.Windows.Dialogs
 
 
         public DialogWindow() : this(System.Reflection.Assembly.GetEntryAssembly().GetName().Name) { }
+
         // InitializeComponent();
 
         // ActionCommand = new WinCopies.Util.DelegateCommand(ActionCommandMethod);
 
-        public DialogWindow(string title)
-        {
-            Title = title;
+        public DialogWindow(string title) => Title = title;
 
-            CommandTarget = this;
-        }
+        //public override void OnApplyTemplate()
+        //{
 
-        public override void OnApplyTemplate()
-        {
+        //    base.OnApplyTemplate();
 
-            base.OnApplyTemplate();
+        //    //switch (DialogButton)
 
-            CommandBindings.Add(new CommandBinding(WinCopies.Util.Commands.Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //{
 
-            //switch (DialogButton)
+        //    //    case DialogButton.OK:
+        //    //        var b = (Template.FindName(PART_OkButton, this) as Button);
+        //    //        _ = b.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //        MessageBox.Show(b.Content.ToString());
+        //    //        break;
 
-            //{
+        //    //    case DialogButton.OKCancel:
 
-            //    case DialogButton.OK:
-            //        var b = (Template.FindName(PART_OkButton, this) as Button);
-            //        _ = b.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
-            //        MessageBox.Show(b.Content.ToString());
-            //        break;
+        //    //        _ = (GetTemplateChild(PART_OkButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //    case DialogButton.OKCancel:
+        //    //        _ = (GetTemplateChild(PART_CancelButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //        _ = (GetTemplateChild(PART_OkButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //        break;
 
-            //        _ = (GetTemplateChild(PART_CancelButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //    case DialogButton.OKApplyCancel:
 
-            //        break;
+        //    //        _ = (GetTemplateChild(PART_OkButton) as Button).CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //    case DialogButton.OKApplyCancel:
+        //    //        _ = (GetTemplateChild(PART_ApplyButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //        _ = (GetTemplateChild(PART_OkButton) as Button).CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //        _ = (GetTemplateChild(PART_CancelButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //        _ = (GetTemplateChild(PART_ApplyButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //        break;
 
-            //        _ = (GetTemplateChild(PART_CancelButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //    case DialogButton.YesNo:
 
-            //        break;
+        //    //        _ = (GetTemplateChild(PART_YesButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //    case DialogButton.YesNo:
+        //    //        _ = (GetTemplateChild(PART_NoButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //        _ = (GetTemplateChild(PART_YesButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //        break;
 
-            //        _ = (GetTemplateChild(PART_NoButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //    case DialogButton.YesNoCancel:
 
-            //        break;
+        //    //        _ = (GetTemplateChild(PART_YesButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //    case DialogButton.YesNoCancel:
+        //    //        _ = (GetTemplateChild(PART_NoButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //        _ = (GetTemplateChild(PART_YesButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //        _ = (GetTemplateChild(PART_CancelButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
 
-            //        _ = (GetTemplateChild(PART_NoButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //        break;
 
-            //        _ = (GetTemplateChild(PART_CancelButton) as Button)?.CommandBindings.Add(new CommandBinding(Commands.CommonCommand, Command_Executed, Command_CanExecute));
+        //    //}
 
-            //        break;
-
-            //}
-
-        }
+        //}
 
         private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnCommandCanExecute(e);
 
-        protected virtual void OnCommandCanExecute(CanExecuteRoutedEventArgs e) => e.CanExecute = e.Parameter is DialogWindowCommandParameters parameter ? If(IfCT.Or, IfCM.Logical, IfComp.Equal, parameter, DialogWindowCommandParameters.Cancel, DialogWindowCommandParameters.No) || (parameter == DialogWindowCommandParameters.OK && DialogButton == DialogButton.OK) || Command == null ? true : Command.CanExecute(CommandParameter) : true;
+        protected virtual void OnCommandCanExecute(CanExecuteRoutedEventArgs e)
+        {
+
+            if (e.Command == DialogCommands.Ok)
+
+                e.CanExecute = DialogButton == DialogButton.OK || Command == null || Command.CanExecute(CommandParameter, CommandTarget);
+
+            else if (e.Command == DialogCommands.Apply)
+
+                e.CanExecute = Command?.CanExecute(CommandParameter, CommandTarget) == true;
+
+            else if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, e.Command, DialogCommands.Yes, DialogCommands.Retry, DialogCommands.Continue))
+
+                e.CanExecute = Command == null || Command.CanExecute(CommandParameter, CommandTarget);
+
+            else if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, e.Command, DialogCommands.No, DialogCommands.YesToAll, DialogCommands.NoToAll, DialogCommands.Cancel, DialogCommands.Abort, DialogCommands.Ignore))
+
+                e.CanExecute = true;
+
+        }
 
         private void Command_Executed(object sender, ExecutedRoutedEventArgs e) => OnCommandExecuted(e);
 
         protected virtual void OnCommandExecuted(ExecutedRoutedEventArgs e)
+
         {
-            if (e.Parameter is DialogWindowCommandParameters d)
 
-                switch (d)
+            if (e.Command == DialogCommands.Ok)
 
-                {
+                CloseWindowWithDialogResult(true, MessageBoxResult.OK);
 
-                    case DialogWindowCommandParameters.OK:
+            else if (e.Command == DialogCommands.Apply)
 
-                        CloseWindowWithDialogResult(true, MessageBoxResult.OK);
+                Command.Execute(CommandParameter, CommandTarget);
 
-                        break;
+            else if (e.Command == DialogCommands.Yes)
 
-                    case DialogWindowCommandParameters.Apply:
+                CloseWindowWithDialogResult(true, MessageBoxResult.Yes);
 
-                        _ = Command.TryExecute(CommandParameter, CommandTarget);
+            else if (e.Command == DialogCommands.No)
 
-                        break;
+                CloseWindowWithDialogResult(false, MessageBoxResult.No);
 
-                    case DialogWindowCommandParameters.Cancel:
+            else if (e.Command == DialogCommands.YesToAll)
 
-                        CloseWindowWithDialogResult(false, MessageBoxResult.Cancel);
+                CloseWindowWithDialogResult(true, MessageBoxResult.YesToAll);
 
-                        break;
+            else if (e.Command == DialogCommands.NoToAll)
 
-                    case DialogWindowCommandParameters.Yes:
+                CloseWindowWithDialogResult(false, MessageBoxResult.NoToAll);
 
-                        CloseWindowWithDialogResult(true, MessageBoxResult.Yes);
+            else if (e.Command == DialogCommands.Cancel)
 
-                        break;
+                CloseWindowWithDialogResult(false, MessageBoxResult.Cancel);
 
-                    case DialogWindowCommandParameters.No:
+            else if (e.Command == DialogCommands.Abort)
 
-                        CloseWindowWithDialogResult(false, MessageBoxResult.No);
+                CloseWindowWithDialogResult(false, MessageBoxResult.Abort);
 
-                        break;
+            else if (e.Command == DialogCommands.Ignore)
 
-                }
+                CloseWindowWithDialogResult(false, MessageBoxResult.Ignore);
+
+            else if (e.Command == DialogCommands.Retry)
+
+                CloseWindowWithDialogResult(true, MessageBoxResult.Retry);
+
+            else if (e.Command == DialogCommands.Continue)
+
+                CloseWindowWithDialogResult(true, MessageBoxResult.Continue);
+
         }
 
         protected void CloseWindowWithDialogResult(bool dialogResult, MessageBoxResult messageBoxResult)
@@ -289,7 +392,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             MessageBoxResult = messageBoxResult;
 
-            if (DialogButton != DialogButton.OK && dialogResult && Command != null)
+            if (dialogResult && Command != null && DialogButton != DialogButton.OK)
 
                 Command.Execute(CommandParameter, CommandTarget);
 

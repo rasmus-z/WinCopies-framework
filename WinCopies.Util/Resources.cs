@@ -36,67 +36,89 @@ namespace WinCopies.Util
             /// <summary>
             /// Gets the NewTab resource.
             /// </summary>
-            public static string NewTab => Properties.Resources.NewTabWPF;
+            public static string NewTabWPF => Properties.Resources.NewTabWPF;
 
             /// <summary>
             /// Gets the NewWindow resource.
             /// </summary>
-            public static string NewWindow => Properties.Resources.NewWindowWPF;
+            public static string NewWindowWPF => Properties.Resources.NewWindowWPF;
 
             /// <summary>
             /// Gets the NewWindowInNewInstance resource.
             /// </summary>
-            public static string NewWindowInNewInstance => Properties.Resources.NewWindowInNewInstanceWPF;
+            public static string NewWindowInNewInstanceWPF => Properties.Resources.NewWindowInNewInstanceWPF;
 
             /// <summary>
             /// Gets the CloseTab resource.
             /// </summary>
-            public static string CloseTab => Properties.Resources.CloseTabWPF;
+            public static string CloseTabWPF => Properties.Resources.CloseTabWPF;
 
             /// <summary>
             /// Gets the CloseAllTabs resource.
             /// </summary>
-            public static string CloseAllTabs => Properties.Resources.CloseAllTabsWPF;
+            public static string CloseAllTabsWPF => Properties.Resources.CloseAllTabsWPF;
 
             /// <summary>
             /// Gets the CloseWindow resource.
             /// </summary>
-            public static string CloseWindow => Properties.Resources.CloseWindowWPF;
+            public static string CloseWindowWPF => Properties.Resources.CloseWindowWPF;
 
             /// <summary>
             /// Gets the NewFolder resource.
             /// </summary>
-            public static string NewFolder => Properties.Resources.NewFolderWPF;
+            public static string NewFolderWPF => Properties.Resources.NewFolderWPF;
 
             /// <summary>
             /// Gets the NewArchive resource.
             /// </summary>
-            public static string NewArchive => Properties.Resources.NewArchiveWPF;
+            public static string NewArchiveWPF => Properties.Resources.NewArchiveWPF;
 
             /// <summary>
             /// Gets the ShowFileProperties resource.
             /// </summary>
-            public static string ShowFileProperties => Properties.Resources.ShowFilePropertiesWPF;
+            public static string ShowFilePropertiesWPF => Properties.Resources.ShowFilePropertiesWPF;
 
             /// <summary>
             /// Gets the Rename resource.
             /// </summary>
-            public static string Rename => Properties.Resources.RenameWPF;
+            public static string RenameWPF => Properties.Resources.RenameWPF;
 
             /// <summary>
             /// Gets the DeletePermanently resource.
             /// </summary>
-            public static string DeletePermanently => Properties.Resources.DeletePermanentlyWPF;
+            public static string DeletePermanentlyWPF => Properties.Resources.DeletePermanentlyWPF;
 
             /// <summary>
             /// Gets the <see cref="DeselectAll"/> resource.
             /// </summary>
-            public static string DeselectAll => Properties.Resources.DeselectAllWPF;
+            public static string DeselectAllWPF => Properties.Resources.DeselectAllWPF;
 
             /// <summary>
             /// Gets the <see cref="ReverseSelection"/> resource.
             /// </summary>
-            public static string ReverseSelection => Properties.Resources.ReverseSelectionWPF;
+            public static string ReverseSelectionWPF => Properties.Resources.ReverseSelectionWPF;
+
+            public static string OkWPF => Properties.Resources.OkWPF;
+
+            public static string CancelWPF => Properties.Resources.CancelWPF;
+
+            public static string YesWPF => Properties.Resources.YesWPF;
+
+            public static string YesToAllWPF => Properties.Resources.YesToAllWPF;
+
+            public static string NoWPF => Properties.Resources.NoWPF;
+
+            public static string NoToAllWPF => Properties.Resources.NoToAllWPF;
+
+            public static string ApplyWPF => Properties.Resources.ApplyWPF;
+
+            public static string RetryWPF => Properties.Resources.RetryWPF;
+
+            public static string IgnoreWPF => Properties.Resources.IgnoreWPF;
+
+            public static string AbortWPF => Properties.Resources.AbortWPF;
+
+            public static string ContinueWPF => Properties.Resources.ContinueWPF;
 
         }
 
@@ -108,7 +130,7 @@ namespace WinCopies.Util
             /// <summary>
             /// Gets the DeclaringTypesNotCorrespond resource.
             /// </summary>
-            public static string DeclaringTypesNotCorrespond =>  Properties.Resources.DeclaringTypesNotCorrespond;
+            public static string DeclaringTypesNotCorrespond => Properties.Resources.DeclaringTypesNotCorrespond;
 
             /// <summary>
             /// Gets the FieldOrPropertyNotFound resource.

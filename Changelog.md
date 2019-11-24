@@ -111,7 +111,9 @@ Available for .Net Framework, .Net Core and .Net Standard*
 	- Update doc.
 
 \* Some features are not available in the .Net Core and .Net Standard versions since these frameworks do not have the same structure as the .Net Framework. New packages that include these features will be released later.
+
 \*\* This also applies to the other already existing classes and interfaces, in the previous versions, that inherit from or implement these classes and interfaces.
+
 \*\*\* See WinCopies.Util.Extensions.SetProperty/Field
 
 WinCopies.Data (2.0)

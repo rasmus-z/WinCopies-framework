@@ -68,12 +68,12 @@ namespace WinCopies.Util.Commands
         /// <summary>
         /// Gets the <b>DeselectAll</b> command.
         /// </summary>
-        public static RoutedUICommand DeselectAll { get; } = new RoutedUICommand(Generic.DeselectAll, nameof(DeselectAll), typeof(System.Windows.Input.ApplicationCommands));
+        public static RoutedUICommand DeselectAll { get; } = new RoutedUICommand(Generic.DeselectAll, nameof(DeselectAll), typeof(ApplicationCommands));
 
         /// <summary>
         /// Gets the <b>ReverseSelection</b> command.
         /// </summary>
-        public static RoutedUICommand ReverseSelection { get; } = new RoutedUICommand(Generic.ReverseSelection, nameof(ReverseSelection), typeof(System.Windows.Input.ApplicationCommands));
+        public static RoutedUICommand ReverseSelection { get; } = new RoutedUICommand(Generic.ReverseSelection, nameof(ReverseSelection), typeof(ApplicationCommands));
 
     }
 }

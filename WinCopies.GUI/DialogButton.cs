@@ -17,18 +17,57 @@
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
-    public enum DialogButton
+    public enum DialogButton : uint
     {
 
-        OK = 0,
+        /// <summary>
+        /// This field correspond to the Win32 MB_OK flag.
+        /// </summary>
+        OK = 0x00000000,
 
-        OKCancel = 1,
+        /// <summary>
+        /// This field correspond to the Win32 MB_OKCANCEL flag.
+        /// </summary>
+        OKCancel = 0x00000001,
 
-        OKApplyCancel = 2,
+        /// <summary>
+        /// This field correspond to the Win32 MB_ABORTRETRYIGNORE flag.
+        /// </summary>
+        AbortRetryIgnore = 0x000002,
 
-        YesNoCancel = 3,
+        /// <summary>
+        /// This field correspond to the Win32 MB_YESNOCANCEL flag.
+        /// </summary>
+        YesNoCancel = 0x000003,
 
-        YesNo = 4
+        /// <summary>
+        /// This field correspond to the Win32 MB_YESNO flag.
+        /// </summary>
+        YesNo = 0x000004,
+
+        /// <summary>
+        /// This field correspond to the Win32 MB_RETRYCANCEL flag.
+        /// </summary>
+        RetryCancel = 0x000005,
+
+        /// <summary>
+        /// This field correspond to the Win32 MB_CANCELTRYCONTINUE flag.
+        /// </summary>
+        CancelTryContinue = 0x000006,
+
+        CancelRetryContinue = CancelTryContinue,
+
+        ContinueIgnoreCancel=0x000007,
+
+        OKApplyCancel = 0x000008,
+
+        RetryIgnoreCancel = 0x000009,
+
+        IgnoreCancel = 0x000010,
+
+        YesToAllNoToAllCancel = 0x000011,
+
+        YesToAllNoToAll = 0x000012
 
     }
 
@@ -39,13 +78,53 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         OK = 1,
 
-        Apply = 2,
+        Cancel = 2,
 
-        Yes = 3,
+        Abort = 3,
 
-        No = 4,
+        Retry = 4,
 
-        Cancel = 5
+        Ignore = 5,
+
+        Yes = 6,
+
+        No = 7,
+
+        YesToAll=8,
+
+        NoToAll=9,
+
+        Apply = 10,
+
+        Continue = 11
+
+    }
+
+    public enum MessageBoxResult
+
+    {
+
+        None = 0,
+
+        OK = 1,
+
+        Cancel = 2,
+
+        Abort = 3,
+
+        Retry = 4,
+
+        Ignore = 5,
+
+        Yes = 6,
+
+        No = 7,
+
+        YesToAll=8,
+
+        NoToAll=9,
+
+        Continue=10
 
     }
 }
