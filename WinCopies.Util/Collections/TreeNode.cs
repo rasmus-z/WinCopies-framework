@@ -32,12 +32,23 @@ namespace WinCopies.Collections
 
     // todo: make non-generic
 
+    ///// <summary>
+    ///// Represents a tree node.
+    ///// </summary>
+    ///// <typeparam name="T">The value type.</typeparam>
+    //public abstract class TreeNode<T> : ITreeNode<T>
+
+    //{
+
+    //}
+
     /// <summary>
     /// Represents a tree node.
     /// </summary>
-    /// <typeparam name="T">The value type.</typeparam>
-    public abstract class TreeNode<T> : ITreeNode<T>
-
+    /// <typeparam name="T">The value and item type.</typeparam>
+    [Serializable]
+    [DebuggerDisplay("Value = {Value}, Count = {Count}")]
+    public class TreeNode<T> : IReadOnlyTreeNode, WinCopies.Util.IValueObject, ITreeNode<T>, ICollection<TreeNode<T>>, System.Collections.Generic.IList<TreeNode<T>>, ICollection, System.Collections.IList, IReadOnlyCollection<TreeNode<T>>, System.Collections.Generic.IReadOnlyList<TreeNode<T>>, IReadOnlyCollection<T>, System.Collections.Generic.IReadOnlyList<T>
     {
 
         /// <summary>
@@ -50,45 +61,53 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="obj">Object to compare to the current object.</param>
         /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
-        public bool Equals(IValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+        bool IEquatable<IReadOnlyValueObject>.Equals(IReadOnlyValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
 
         /// <summary>
         /// Determines whether this object is equal to a given object.
         /// </summary>
         /// <param name="obj">Object to compare to the current object.</param>
         /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
-        public bool Equals(IValueObject<T> obj) => new ValueObjectEqualityComparer<T>().Equals(this, obj);
+        bool IEquatable<IReadOnlyValueObject<T>>.Equals(IReadOnlyValueObject<T> obj) => new ValueObjectEqualityComparer<T>().Equals(this, obj);
 
         /// <summary>
         /// Gets the parent of the current node.
         /// </summary>
-        public virtual ITreeNode Parent { get; protected internal set; }
+        public IReadOnlyTreeNode Parent { get; internal set; }
 
         private T _value;
 
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
-        public T Value { get => _value; set => SetValue(value); }
+        public T Value { get => _value; set => SeT(value); }
 
-        protected virtual void SetValue(T newValue) => _value = newValue;
+        private void SeT(T newValue) => _value = newValue;
 
         object IValueObject.Value { get => Value; set => Value = (T)value; }
 
-        protected TreeNode() { }
+        object IReadOnlyValueObject.Value => Value;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TreeNode{T}"/> class.
-        /// </summary>
-        /// <param name="value">The value of the new <see cref="TreeNode{T}"/>.</param>
-        protected TreeNode(T value) => Value = value;
+        // protected TreeNode() { }
+
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="TreeNode{T}"/> class.
+        ///// </summary>
+        ///// <param name="value">The value of the new <see cref="TreeNode{T}"/>.</param>
+        //protected TreeNode(T value) => Value = value;
 
         /// <summary>
         /// Determines whether this object is equal to a given object.
         /// </summary>
         /// <param name="obj">The object to compare.</param>
         /// <returns><see langword="true"/> if the current object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
-        public override bool Equals(object obj) => obj is IValueObject _obj ? Equals(_obj) : obj is T __obj ? Value?.Equals(__obj) == true : obj is null ? !(Value is object) : false;
+        public override bool Equals(object obj) => obj is IReadOnlyTreeNode<T> treeNode
+                ? Equals(treeNode)
+                : obj is IReadOnlyValueObject<T> _obj
+                ? Equals(_obj)
+                : obj is IReadOnlyValueObject __obj
+                ? Equals(__obj)
+                : obj is T value ? Value?.Equals(value) == true : obj is null ? !(Value is object) : false;
 
         /// <summary>
         /// Returns a hash code for the current object.
@@ -118,6 +137,8 @@ namespace WinCopies.Collections
 
             this.Parent = null;
 
+            Clear();
+
             disposedValue = true;
 
         }
@@ -139,64 +160,41 @@ namespace WinCopies.Collections
         }
         #endregion
 
-    }
-
-    /// <summary>
-    /// Represents a tree node.
-    /// </summary>
-    /// <typeparam name="TValue">The value type.</typeparam>
-    /// <typeparam name="TItems">The items type.</typeparam>
-    [Serializable]
-    [DebuggerDisplay("Value = {Value}, Count = {Count}")]
-    public class TreeNode<TValue, TItems> : TreeNode<TValue>, ITreeNode<TValue, TItems>, ICollection<TreeNode<TItems>>, System.Collections.Generic.IList<TreeNode<TItems>>, ICollection, System.Collections.IList, IReadOnlyCollection<TreeNode<TItems>>, System.Collections.Generic.IReadOnlyList<TreeNode<TItems>>, IReadOnlyCollection<TItems>, System.Collections.Generic.IReadOnlyList<TItems>
-    {
+        /// <summary>
+        /// Returns the default comparer for <see cref="TreeNode{T}"/> objects.
+        /// </summary>
+        /// <returns>The default comparer for <see cref="TreeNode{T}"/> objects.</returns>
+        protected virtual IEqualityComparer<TreeNode<T>> GetDefaultTreeNodeItemsComparer() => (IEqualityComparer<TreeNode<T>>)new ValueObjectEqualityComparer<TreeNode<T>>();
 
         /// <summary>
-        /// Returns the default comparer for <see cref="TreeNode{TValue, TItems}"/> objects.
+        /// Gets the inner <see cref="System.Collections.Generic.IList{T}"/> of this <see cref="TreeNode{T}"/>.
         /// </summary>
-        /// <returns>The default comparer for <see cref="TreeNode{TValue, TItems}"/> objects.</returns>
-        protected virtual IEqualityComparer<TreeNode<TItems>> GetDefaultTreeNodeItemsComparer() => new ValueObjectEqualityComparer<TItems>();
+        protected System.Collections.Generic.IList<TreeNode<T>> Items { get; }
 
-        /// <summary>
-        /// Gets the inner <see cref="System.Collections.Generic.IList{T}"/> of this <see cref="TreeNode{TValue, TItems}"/>.
-        /// </summary>
-        protected System.Collections.Generic.IList<TreeNode<TItems>> Items { get; }
-
-        // protected virtual ITreeCollection<TItems> GetDefaultItemCollection() => new TreeCollection<TItems>(this);
+        // protected virtual ITreeCollection<T> GetDefaultItemCollection() => new TreeCollection<T>(this);
 
         public TreeNode() : this(value: default) { }
 
-        public TreeNode(System.Collections.Generic.IList<TreeNode<TItems>> items) : this(default, items) { }
+        public TreeNode(System.Collections.Generic.IList<TreeNode<T>> items) : this(default, items) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TreeNode{TValue, TItems}"/> class using a custom value.
+        /// Initializes a new instance of the <see cref="TreeNode{T}"/> class using a custom value.
         /// </summary>
-        /// <param name="value">The value of the new <see cref="TreeNode{TValue, TItems}"/>.</param>
-        public TreeNode(TValue value) : this(value, new List<TreeNode<TItems>>()) { }
+        /// <param name="value">The value of the new <see cref="TreeNode{T}"/>.</param>
+        public TreeNode(T value) : this(value, new List<TreeNode<T>>()) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TreeNode{TValue, TItems}"/> class using a custom value and inner <see cref="IList{T}"/>.
+        /// Initializes a new instance of the <see cref="TreeNode{T}"/> class using a custom value and inner <see cref="IList{T}"/>.
         /// </summary>
-        /// <param name="value">The value of the new <see cref="TreeNode{TValue, TItems}"/>.</param>
+        /// <param name="value">The value of the new <see cref="TreeNode{T}"/>.</param>
         /// <param name="items">A custom inner <see cref="IList{T}"/>.</param>
-        public TreeNode(TValue value, System.Collections.Generic.IList<TreeNode<TItems>> items) : base(value)
+        public TreeNode(T value, System.Collections.Generic.IList<TreeNode<T>> items)
         {
             ThrowIfNull(items, nameof(items));
 
+            Value = value;
+
             Items = items;
-        }
-
-        /// <summary>
-        /// Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
-        protected override void Dispose(bool disposing)
-        {
-
-            Clear();
-
-            base.Dispose(disposing);
-
         }
 
         [NonSerialized]
@@ -207,62 +205,66 @@ namespace WinCopies.Collections
         bool ICollection.IsSynchronized => false;
 
         /// <summary>
-        /// Gets or sets the item at the specified index in this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Gets or sets the item at the specified index in this <see cref="TreeNode{T}"/>.
         /// </summary>
         /// <param name="index">The index of the item.</param>
         /// <returns>The item at the given index.</returns>
         /// <exception cref="IndexOutOfRangeException">The given index is lesser than 0 or greater than <see cref="Count"/>.</exception>
-        /// <seealso cref="SetItem(int, TreeNode{TItems})"/>
-        public TreeNode<TItems> this[int index] { get => Items[index]; set => SetItem(index, value); }
+        /// <seealso cref="SetItem(inTreeNode{T})"/>
+        public TreeNode<T> this[int index] { get => Items[index]; set => SetItem(index, value); }
 
-        TItems System.Collections.Generic.IReadOnlyList<TItems>.this[int index] => this[index].Value;
+        ITreeNode<T> System.Collections.Generic.IReadOnlyList<ITreeNode<T>>.this[int index] => this[index];
 
-        object System.Collections.IList.this[int index] { get => this[index]; set => this[index] = GetOrThrowIfNotType<TreeNode<TItems>>(value, nameof(value)); }
+        T System.Collections.Generic.IReadOnlyList<T>.this[int index] => this[index].Value;
+
+        object System.Collections.IList.this[int index] { get => throw new NotImplementedException("Currently not implemented."); set => throw new NotImplementedException("Currently not implemented."); }
+
+        ITreeNode<T> System.Collections.Generic.IList<ITreeNode<T>>.this[int index] { get => this[index]; set => this[index] = GetOrThrowIfNotType<TreeNode<T>>(value, nameof(value)); }
+
+        IReadOnlyTreeNode<T> System.Collections.Generic. IReadOnlyList<IReadOnlyTreeNode<T>> . this[int index] { get => this[index]; }
 
         /// <summary>
-        /// Gets the number of items that this <see cref="TreeNode{TValue, TItems}"/> directly contains.
+        /// Gets the number of items that this <see cref="TreeNode{T}"/> directly contains.
         /// </summary>
         public int Count => Items.Count;
 
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="TreeNode{TValue, TItems}"/> is fixed-size.
+        /// Gets a value that indicates whether this <see cref="TreeNode{T}"/> is fixed-size.
         /// </summary>
         public bool IsFixedSize => Items is IList _items ? _items.IsFixedSize : false /*Items.IsReadOnly*/;
 
         /// <summary>
-        /// Returns an <see cref="IEnumerator{T}"/> for this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Returns an <see cref="IEnumerator{T}"/> for this <see cref="TreeNode{T}"/>.
         /// </summary>
-        /// <returns><see cref="IEnumerator{T}"/> for this <see cref="TreeNode{TValue, TItems}"/>.</returns>
-        public IEnumerator<TreeNode<TItems>> GetEnumerator() => Items.GetEnumerator();
+        /// <returns><see cref="IEnumerator{T}"/> for this <see cref="TreeNode{T}"/>.</returns>
+        public IEnumerator<TreeNode<T>> GetEnumerator() => Items.GetEnumerator();
 
-        IEnumerator<TItems> IEnumerable<TItems>.GetEnumerator() => new ValueObjectEnumerator<TItems>(GetEnumerator());
+        IEnumerator<ITreeNode<T>> IEnumerable<ITreeNode<T>>.GetEnumerator() => GetEnumerator();
 
-        IEnumerator<ITreeNode<TItems>> IEnumerable<ITreeNode<TItems>>.GetEnumerator() => GetEnumerator();
+        IEnumerator<IReadOnlyTreeNode<T>> IEnumerable<IReadOnlyTreeNode<T>>.GetEnumerator() => GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => new ValueObjectEnumerator<T>(GetEnumerator());
+
+        // IEnumerator<ITreeNode<T>> IEnumerable<ITreeNode<T>>.GetEnumerator() => GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => new ValueObjectEnumerator<T>(GetEnumerator());
 
         /// <summary>
-        /// Adds a new item to the end of this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Adds a new item to the end of this <see cref="TreeNode{T}"/>.
         /// </summary>
         /// <param name="item">The item to add.</param>
-        /// <seealso cref="InsertItem(int, TreeNode{TItems})"/>
-        public void Add(TreeNode<TItems> item) => InsertItem(Count, item);
+        public void Add(TreeNode<T> item) => InsertItem(Count, item);
 
-        int System.Collections.IList.Add(object value)
-        {
-            Add(GetOrThrowIfNotType<TreeNode<TItems>>(value, nameof(value)));
+        int System.Collections.IList.Add(object value) => throw new InvalidOperationException("TreeNodes do not support adding a common object. Add a TreeNode<T> instead.");
 
-            return Count - 1;
-        }
-
-        void ICollection<ITreeNode<TItems>>.Add(ITreeNode<TItems> item) => Add(GetOrThrowIfNotType<TreeNode<TItems>>(item, nameof(item)));
+        void ICollection<ITreeNode<T>>.Add(ITreeNode<T> item) => Add(GetOrThrowIfNotType<TreeNode<T>>(item, nameof(item)));
 
         /// <summary>
-        /// Checks if this <see cref="TreeNode{TValue, TItems}"/> directly contains a given <see cref="TreeNode{T}"/>.
+        /// Checks if this <see cref="TreeNode{T}"/> directly contains a given <see cref="TreeNode{T}"/>.
         /// </summary>
         /// <param name="item">The <see cref="TreeNode{T}"/> to look for.</param>
-        /// <returns><see langword="true"/> if this <see cref="TreeNode{TValue, TItems}"/> directly contains the given <see cref="TreeNode{T}"/>, otherwise <see langword="false"/>.</returns>
-        public bool Contains(TreeNode<TItems> item)
+        /// <returns><see langword="true"/> if this <see cref="TreeNode{T}"/> directly contains the given <see cref="TreeNode{T}"/>, otherwise <see langword="false"/>.</returns>
+        public bool Contains(TreeNode<T> item)
 
         {
 
@@ -270,9 +272,9 @@ namespace WinCopies.Collections
 
                 return false;
 
-            IEqualityComparer<TreeNode<TItems>> comp = GetDefaultTreeNodeItemsComparer();
+            IEqualityComparer<TreeNode<T>> comp = GetDefaultTreeNodeItemsComparer();
 
-            foreach (TreeNode<TItems> _item in this)
+            foreach (TreeNode<T> _item in this)
 
                 if (comp.Equals(_item, item))
 
@@ -283,11 +285,11 @@ namespace WinCopies.Collections
         }
 
         /// <summary>
-        /// Checks if this <see cref="TreeNode{TValue, TItems}"/> directly contains a given item.
+        /// Checks if this <see cref="TreeNode{T}"/> directly contains a given item.
         /// </summary>
         /// <param name="item">The item to look for.</param>
-        /// <returns><see langword="true"/> if this <see cref="TreeNode{TValue, TItems}"/> directly contains the given item, otherwise <see langword="false"/>.</returns>
-        public bool Contains(TItems item)
+        /// <returns><see langword="true"/> if this <see cref="TreeNode{T}"/> directly contains the given item, otherwise <see langword="false"/>.</returns>
+        public bool Contains(T item)
 
         {
 
@@ -295,9 +297,9 @@ namespace WinCopies.Collections
 
                 return false;
 
-            EqualityComparer<TItems> comp = EqualityComparer<TItems>.Default;
+            EqualityComparer<T> comp = EqualityComparer<T>.Default;
 
-            foreach (TreeNode<TItems> _item in this)
+            foreach (TreeNode<T> _item in this)
 
                 if (comp.Equals(_item.Value, item))
 
@@ -307,16 +309,16 @@ namespace WinCopies.Collections
 
         }
 
-        bool System.Collections.IList.Contains(object value) => value is TItems item ? Contains(item) : value is TreeNode<TItems> node ? Contains(node) : false;
+        bool System.Collections.IList.Contains(object value) => value is T item ? Contains(item) : false;
 
-        bool ICollection<ITreeNode<TItems>>.Contains(ITreeNode<TItems> item) => item is TreeNode<TItems> _item ? Contains(_item) : false;
+        bool ICollection<ITreeNode<T>>.Contains(ITreeNode<T> item) => item is TreeNode<T> _item ? Contains(_item) : false;
 
         /// <summary>
-        /// Returns the idnex of a given item in this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Returns the idnex of a given item in this <see cref="TreeNode{T}"/>.
         /// </summary>
         /// <param name="item">The item for which to find the index.</param>
-        /// <returns>The index of <paramref name="item"/> if this <see cref="TreeNode{TValue, TItems}"/> contains <paramref name="item"/>, otherwise -1.</returns>
-        public int IndexOf(TreeNode<TItems> item)
+        /// <returns>The index of <paramref name="item"/> if this <see cref="TreeNode{T}"/> contains <paramref name="item"/>, otherwise -1.</returns>
+        public int IndexOf(TreeNode<T> item)
 
         {
 
@@ -324,7 +326,7 @@ namespace WinCopies.Collections
 
                 return -1;
 
-            IEqualityComparer<TreeNode<TItems>> comp = GetDefaultTreeNodeItemsComparer();
+            IEqualityComparer<TreeNode<T>> comp = GetDefaultTreeNodeItemsComparer();
 
             for (int i = 0; i < Count; i++)
 
@@ -336,12 +338,14 @@ namespace WinCopies.Collections
 
         }
 
+        int System.Collections.Generic.IList<ITreeNode<T>>.IndexOf(ITreeNode<T> item) => item is TreeNode<T> _item ? IndexOf(_item) : -1;
+
         /// <summary>
-        /// Returns the idnex of a given item in this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Returns the idnex of a given item in this <see cref="TreeNode{T}"/>.
         /// </summary>
         /// <param name="item">The item for which to find out the index.</param>
-        /// <returns>The index of <paramref name="item"/> if this <see cref="TreeNode{TValue, TItems}"/> contains <paramref name="item"/>, otherwise -1.</returns>
-        public int IndexOf(TItems item)
+        /// <returns>The index of <paramref name="item"/> if this <see cref="TreeNode{T}"/> contains <paramref name="item"/>, otherwise -1.</returns>
+        public int IndexOf(T item)
 
         {
 
@@ -349,7 +353,7 @@ namespace WinCopies.Collections
 
                 return -1;
 
-            EqualityComparer<TItems> comp = EqualityComparer<TItems>.Default;
+            EqualityComparer<T> comp = EqualityComparer<T>.Default;
 
             for (int i = 0; i < Count; i++)
 
@@ -361,14 +365,14 @@ namespace WinCopies.Collections
 
         }
 
-        int System.Collections.IList.IndexOf(object value) => value is TItems item ? IndexOf(item) : value is TreeNode<TItems> node ? IndexOf(node) : -1;
+        int System.Collections.IList.IndexOf(object value) => value is T item ? IndexOf(item) : -1;
 
         /// <summary>
         /// Removes the item at a given index.
         /// </summary>
         /// <param name="index">The index from which to remove the item.</param>
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is lesser than 0 or greater than <see cref="Count"/>.</exception>
-        /// <exception cref="NotSupportedException">This <see cref="TreeNode{TValue, TItems}"/> is fixed-size.</exception>
+        /// <exception cref="NotSupportedException">This <see cref="TreeNode{T}"/> is fixed-size.</exception>
         /// <seealso cref="RemoveItem(int)"/>
         public void RemoveAt(int index) => RemoveItem(index);
 
@@ -378,7 +382,7 @@ namespace WinCopies.Collections
         /// <param name="item">The item to remove from the current node.</param>
         /// <returns><see langword="true"/> if <paramref name="item"/> is removed, otherwise <see langword="false"/>.</returns>
         /// <seealso cref="RemoveItem(int)"/>
-        public bool Remove(TreeNode<TItems> item)
+        public bool Remove(TreeNode<T> item)
 
         {
 
@@ -404,7 +408,7 @@ namespace WinCopies.Collections
         /// <param name="item">The item to remove from the current node.</param>
         /// <returns><see langword="true"/> if <paramref name="item"/> is removed, otherwise <see langword="false"/>.</returns>
         /// <seealso cref="RemoveItem(int)"/>
-        public bool Remove(TItems item)
+        public bool Remove(T item)
 
         {
 
@@ -412,7 +416,7 @@ namespace WinCopies.Collections
 
                 return false;
 
-            EqualityComparer<TItems> comp = EqualityComparer<TItems>.Default;
+            EqualityComparer<T> comp = EqualityComparer<T>.Default;
 
             for (int i = 0; i < Count; i++)
 
@@ -430,42 +434,39 @@ namespace WinCopies.Collections
 
         }
 
-        bool ICollection<ITreeNode<TItems>>.Remove(ITreeNode<TItems> item) => Remove(item as TreeNode<TItems> ?? throw new ArgumentException($"The given item is not a {typeof(TreeNode<TItems>).FullName}."));
+        bool ICollection<ITreeNode<T>>.Remove(ITreeNode<T> item) => Remove(item as TreeNode<T> ?? throw new ArgumentException($"The given item is not a {typeof(TreeNode<T>).FullName}."));
 
         void System.Collections.IList.Remove(object value)
         {
-            if (value is TItems item)
+            if (value is T _value)
 
-                _ = Remove(item);
-
-            else if (value is TreeNode<TItems> node)
-
-                _ = Remove(node);
+                _ = Remove(_value);
         }
 
         /// <summary>
-        /// Inserts a given item at a specified index in this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Inserts a given item at a specified index in this <see cref="TreeNode{T}"/>.
         /// </summary>
         /// <param name="index">The index of the new item.</param>
-        /// <param name="item">The item to insert in this <see cref="TreeNode{TValue, TItems}"/>.</param>
-        /// <seealso cref="InsertItem(int, TreeNode{TItems})"/>
-        public void Insert(int index, TreeNode<TItems> item) => InsertItem(index, item);
+        /// <param name="item">The item to insert in this <see cref="TreeNode{T}"/>.</param>
+        public void Insert(int index, TreeNode<T> item) => InsertItem(index, item);
 
-        void System.Collections.IList.Insert(int index, object value) => InsertItem(index, value as TreeNode<TItems> ?? throw new ArgumentException($"The given item is not a {typeof(TreeNode<TItems>).FullName}."));
+        void System.Collections.IList.Insert(int index, object value) => throw new InvalidOperationException("TreeNodes do not support adding common objects. Add a TreeNode<T> instead.");
+
+        void System.Collections.Generic.IList<ITreeNode<T>>.Insert(int index, ITreeNode<T> item) => Insert(index, GetOrThrowIfNotType<TreeNode<T>>(item, nameof(item)));
 
         /// <summary>
-        /// Performs a shallow copy of the items that the current <see cref="TreeNode{TValue, TItems}"/> directly contains starting at a given index of a given array of <see cref="TreeNode{T}"/>.
+        /// Performs a shallow copy of the items that the current <see cref="TreeNode{T}"/> directly contains starting at a given index of a given array of <see cref="TreeNode{T}"/>.
         /// </summary>
-        /// <param name="array">The array in which to store the shallow copies of the items that <see cref="TreeNode{TValue, TItems}"/> directly contains.</param>
+        /// <param name="array">The array in which to store the shallow copies of the items that <see cref="TreeNode{T}"/> directly contains.</param>
         /// <param name="arrayIndex">The index from which to store the items in <paramref name="array"/>.</param>
-        public void CopyTo(TreeNode<TItems>[] array, int arrayIndex) => Items.CopyTo(array, arrayIndex);
+        public void CopyTo(TreeNode<T>[] array, int arrayIndex) => Items.CopyTo(array, arrayIndex);
 
-        void ICollection<ITreeNode<TItems>>.CopyTo(ITreeNode<TItems>[] array, int arrayIndex)
+        void ICollection<ITreeNode<T>>.CopyTo(ITreeNode<T>[] array, int arrayIndex)
         {
 
             ThrowOnInvalidCopyToArrayOperation(array, arrayIndex, Count, nameof(array), nameof(arrayIndex));
 
-            if (array is TreeNode<TItems>[] _array)
+            if (array is TreeNode<T>[] _array)
 
             {
 
@@ -475,7 +476,7 @@ namespace WinCopies.Collections
 
             }
 
-            //if (array is TItems[] itemsArray)
+            //if (array is T[] itemsArray)
 
             //{
 
@@ -492,7 +493,7 @@ namespace WinCopies.Collections
             try
             {
 
-                foreach (TreeNode<TItems> item in this)
+                foreach (TreeNode<T> item in this)
 
                     array[arrayIndex++] = item;
 
@@ -508,71 +509,72 @@ namespace WinCopies.Collections
 
         }
 
-        void ICollection.CopyTo(Array array, int arrayIndex)
-        {
+        void ICollection.CopyTo(Array array, int arrayIndex) => throw new NotImplementedException("Currently not implemented.");
 
-            ThrowOnInvalidCopyToArrayOperation(array, arrayIndex, Count, nameof(array), nameof(arrayIndex));
+        //{
 
-            if (array is TreeNode<TItems>[] _array)
+        //    ThrowOnInvalidCopyToArrayOperation(array, arrayIndex, Count, nameof(array), nameof(arrayIndex));
 
-            {
+        //    if (array is TreeNode<T>[] _array)
 
-                CopyTo(_array, arrayIndex);
+        //    {
 
-                return;
+        //        CopyTo(_array, arrayIndex);
 
-            }
+        //        return;
 
-            //if (array is TItems[] itemsArray)
+        //    }
 
-            //{
+        //    //if (array is T[] itemsArray)
 
-            //    foreach (var item in this)
+        //    //{
 
-            //        itemsArray[arrayIndex++] = item.Value;
+        //    //    foreach (var item in this)
 
-            //    return;
+        //    //        itemsArray[arrayIndex++] = item.Value;
 
-            //}
+        //    //    return;
 
-            // todo: make better checks
+        //    //}
 
-            try
-            {
+        //    // todo: make better checks
 
-                foreach (TreeNode<TItems> item in this)
+        //    try
+        //    {
 
-                    array.SetValue(item, arrayIndex++);
+        //        foreach (TreeNode<T> item in this)
 
-            }
+        //            array.SeT(item, arrayIndex++);
 
-            catch (ArrayTypeMismatchException)
+        //    }
 
-            {
+        //    catch (ArrayTypeMismatchException)
 
-                try
+        //    {
 
-                {
+        //        try
 
-                    foreach (TreeNode<TItems> item in this)
+        //        {
 
-                        array.SetValue(item.Value, arrayIndex++);
+        //            foreach (TreeNode<T> item in this)
 
-                }
+        //                array.SeT(item.Value, arrayIndex++);
 
-                catch (ArrayTypeMismatchException)
+        //        }
 
-                {
+        //        catch (ArrayTypeMismatchException)
 
-                    throw new ArgumentException("Invalid array type.");
+        //        {
 
-                }
+        //            throw new ArgumentException("Invalid array type.");
 
-            }
+        //        }
 
-        }
+        //    }
 
-        private void ThrowOnInvalidItem(TreeNode<TItems> item)
+        //}
+
+        private void ThrowOnInvalidItem(TreeNode<T> item)
 
         {
 
@@ -586,12 +588,7 @@ namespace WinCopies.Collections
 
         }
 
-        /// <summary>
-        /// Inserts a given item at a specified index in this <see cref="TreeNode{TValue, TItems}"/>. You can override this method in order to change the behavior of the <see cref="Add(TreeNode{TItems})"/> and <see cref="Insert(int, TreeNode{TItems})"/> methods.
-        /// </summary>
-        /// <param name="index">The index of the new item.</param>
-        /// <param name="item">The item to insert in this <see cref="TreeNode{TValue, TItems}"/>.</param>
-        protected virtual void InsertItem(int index, TreeNode<TItems> item)
+        private void InsertItem(int index, TreeNode<T> item)
         {
 
             ThrowOnInvalidItem(item);
@@ -609,40 +606,28 @@ namespace WinCopies.Collections
         }
 
         /// <summary>
-        /// Removes all items of this <see cref="TreeNode{TValue, TItems}"/>.
+        /// Removes all items of this <see cref="TreeNode{T}"/>.
         /// </summary>
         /// <seealso cref="ClearItems"/>
         public void Clear() => ClearItems();
 
-        /// <summary>
-        /// Removes all items of this <see cref="TreeNode{TValue, TItems}"/>. You can override this method in order to change the behavior of the <see cref="Clear"/> method.
-        /// </summary>
-        protected virtual void ClearItems()
+        private void ClearItems()
         {
-            foreach (TreeNode<TItems> item in this)
+            foreach (TreeNode<T> item in this)
 
                 item.Parent = null;
 
             Items.Clear();
         }
 
-        /// <summary>
-        /// Removes the item at a given index. You can override this method in order to change the behavior of the Remove methods.
-        /// </summary>
-        /// <param name="index">The index from which to remove the item.</param>
-        protected virtual void RemoveItem(int index)
+        private void RemoveItem(int index)
         {
             this[index].Parent = null;
 
             Items.RemoveAt(index);
         }
 
-        /// <summary>
-        /// Sets a given item at a specified index of this <see cref="TreeNode{TValue, TItems}"/>. This method sets <paramref name="item"/> directly in the current <see cref="TreeNode{TValue, TItems}"/>. You can override this method in order to change the behavior of the <see cref="this[int]"/> method.
-        /// </summary>
-        /// <param name="index">The index at which to set <paramref name="item"/>.</param>
-        /// <param name="item">The item to update with.</param>
-        protected virtual void SetItem(int index, TreeNode<TItems> item)
+        private void SetItem(int index, TreeNode<T> item)
         {
             ThrowOnInvalidItem(item);
 
@@ -654,4 +639,48 @@ namespace WinCopies.Collections
         }
 
     }
+
+    //[Serializable]
+    //[DebuggerDisplay("Value = {Value}, Count = {Count}")]
+    //public class TreeNodeCollection<T> : ITreeNode<T>, ICollection<TreeNode<T>>, System.Collections.Generic.IList<TreeNode<T>>, ICollection, System.Collections.IList, IReadOnlyCollection<TreeNode<T>>, System.Collections.Generic.IReadOnlyList<TreeNode<T>>, IReadOnlyCollection<T>, System.Collections.Generic.IReadOnlyList<T> where T : T
+
+    //{
+
+    //    protected ITreeNode<T> TreeNode { get; }
+
+    //    public ITreeNode Parent => GetParent();
+
+    //    protected virtual ITreeNode GetParent() => TreeNode.Parent;
+
+    //    protected virtual T GeT() => TreeNode.Value;
+
+    //    protected virtual void SeT(T value) => TreeNode.Value = value;
+
+    //    public T Value { get => GeT(); set => SeT(value); }
+
+    //    public bool IsReadOnly => false;
+
+    //    public int Count => TreeNode.Count;
+
+    //    object IValueObject.Value { get => GeT(); set => SeT(GetOrThrowIfNotType<T>(value, nameof(value))); }
+
+    //    public void Add(ITreeNode<T> item) => throw new NotImplementedException();
+
+    //    protected virtual void InsertItem(int index, ITreeNode<T> item) => TreeNode.Insert(index, item);
+
+    //    public void Clear() => throw new NotImplementedException();
+
+    //    public bool Contains(T item) => throw new NotImplementedException();
+
+    //    public bool Contains(ITreeNode<T> item) => throw new NotImplementedException();
+
+    //    public void CopyTo(ITreeNode<T>[] array, int arrayIndex) => throw new NotImplementedException();
+
+    //    public void Dispose() => throw new NotImplementedException();
+    //    public bool Equals(IValueObject other) => throw new NotImplementedException();
+    //    public bool Equals(IValueObject<T> other) => throw new NotImplementedException();
+    //    public IEnumerator<ITreeNode<T>> GetEnumerator() => throw new NotImplementedException();
+    //    public bool Remove(ITreeNode<T> item) => throw new NotImplementedException();
+    //    IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
+    //}
 }

@@ -24,6 +24,7 @@ namespace WinCopies.Util.Data
     /// <summary>
     /// Provides an object that defines a value that can be checked and notifies of the checked status or value change. For example, this interface can be used in a view for items that can be selected.
     /// </summary>
+    [Obsolete("This interface has been replaced by the ICheckBoxModel interface of the WinCopies.GUI.Models assembly, and will be removed in later versions.")]
     public interface ICheckableObject : IValueObject
 
     {
@@ -38,6 +39,7 @@ namespace WinCopies.Util.Data
     /// <summary>
     /// Provides an object that defines a value that can be checked and notifies of the checked status or value change. For example, this interface can be used in a view for items that can be selected.
     /// </summary>
+    [Obsolete("This interface has been replaced by the ICheckBoxModel interface of the WinCopies.GUI.Models assembly, and will be removed in later versions.")]
     public interface ICheckableObject<T> : ICheckableObject, IValueObject<T>
 
     {
@@ -49,6 +51,7 @@ namespace WinCopies.Util.Data
     /// <summary>
     /// Provides an object that defines a value that can be checked and notifies of the checked status or value change. For example, this class can be used in a view for items that can be selected.
     /// </summary>
+    [Obsolete("This class has been replaced by the CheckBoxModel class of the WinCopies.GUI.Models assembly, and will be removed in later versions.")]
     public class CheckableObject : ViewModelBase, ICheckableObject
     {
 
@@ -67,6 +70,13 @@ namespace WinCopies.Util.Data
         /// <param name="obj">Object to compare to the current object.</param>
         /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
         public bool Equals(WinCopies.Util.IValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+
+        /// <summary>
+        /// Determines whether this object is equal to a given object.
+        /// </summary>
+        /// <param name="obj">Object to compare to the current object.</param>
+        /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
+        public bool Equals(WinCopies.Util.IReadOnlyValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
 
         private readonly object _value;
 
@@ -138,6 +148,7 @@ namespace WinCopies.Util.Data
     /// Provides an object that defines a generic value that can be checked and notifies of the checked status or value change. For example, this class can be used in a view for items that can be selected.
     /// </summary>
     /// <typeparam name="T">The type of the value of this object.</typeparam>
+    [Obsolete("This class has been replaced by the CheckBoxModel class of the WinCopies.GUI.Models assembly, and will be removed in later versions.")]
     public class CheckableObject<T> : ViewModelBase, ICheckableObject<T>
     {
 
@@ -162,6 +173,20 @@ namespace WinCopies.Util.Data
         /// </summary>
         /// <param name="obj">Object to compare to the current object.</param>
         /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
+        public bool Equals(WinCopies.Util.IReadOnlyValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+
+        /// <summary>
+        /// Determines whether this object is equal to a given object.
+        /// </summary>
+        /// <param name="obj">Object to compare to the current object.</param>
+        /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
+        public bool Equals(WinCopies.Util.IReadOnlyValueObject<T> obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+
+        /// <summary>
+        /// Determines whether this object is equal to a given object.
+        /// </summary>
+        /// <param name="obj">Object to compare to the current object.</param>
+        /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
         public bool Equals(WinCopies.Util.IValueObject<T> obj) => new ValueObjectEqualityComparer<T>().Equals(this, obj);
 
         private readonly T _value;
@@ -170,6 +195,8 @@ namespace WinCopies.Util.Data
         /// Gets or sets the value of the object.
         /// </summary>
         public T Value { get => _value; set => Update(nameof(Value), nameof(_value), value, typeof(CheckableObject)); }
+
+        object IReadOnlyValueObject.Value => _value;
 
         object WinCopies.Util.IValueObject.Value
         {

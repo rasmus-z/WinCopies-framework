@@ -6,10 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace WinCopies.GUI.Samples.Net4._8
+namespace WinCopies.GUI.Samples
 {
     /// <summary>
-    /// Logique d'interaction pour App.xaml
+    /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {

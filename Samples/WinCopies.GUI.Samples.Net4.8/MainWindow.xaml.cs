@@ -34,7 +34,7 @@ using WinCopies.GUI.Windows.Dialogs;
 namespace WinCopies.GUI.Samples
 {
     /// <summary>
-    /// Logique d'interaction pour MainWindow.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : WinCopies.GUI.Windows.Window
     {

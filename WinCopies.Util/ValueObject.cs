@@ -28,7 +28,28 @@ namespace WinCopies.Util
     /// <summary>
     /// Represents a value container. See the <see cref="IValueObject{T}"/> for a generic version of this class.
     /// </summary>
-    public interface IValueObject : IEquatable<IValueObject>, System. IDisposable
+    public interface IValueObject : IReadOnlyValueObject, System. IDisposable
+    {
+
+        new object Value { get; set; }
+
+    }
+
+    /// <summary>
+    /// Represents a value container. See the <see cref="IValueObject"/> for a non-generic version of this class.
+    /// </summary>
+    public interface IValueObject<T> : IReadOnlyValueObject<T>, IValueObject, System.IDisposable
+    {
+
+        /// <summary>
+        /// Gets or sets the value of the object.
+        /// </summary>
+        new T Value { get; set; }
+
+    }
+
+    public interface IReadOnlyValueObject : IEquatable<IReadOnlyValueObject>, System.IDisposable
+
     {
 
         /// <summary>
@@ -39,66 +60,61 @@ namespace WinCopies.Util
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
-        object Value { get; set; }
+        object Value { get; }
+
+    }
+
+    public interface IReadOnlyValueObject<T> : IReadOnlyValueObject, IEquatable<IReadOnlyValueObject<T>>, System.IDisposable
+
+    {
+
+        new T Value { get; }
 
     }
 
     /// <summary>
-    /// Represents a value container. See the <see cref="IValueObject"/> for a non-generic version of this class.
+    /// Represents a default comparer for <see cref="IReadOnlyValueObject"/>s.
     /// </summary>
-    public interface IValueObject<T> : IValueObject, IEquatable<IValueObject<T>>
+    public sealed class ValueObjectEqualityComparer : IEqualityComparer<IReadOnlyValueObject>
     {
 
         /// <summary>
-        /// Gets or sets the value of the object.
-        /// </summary>
-        new T Value { get; set; }
-
-    }
-
-    /// <summary>
-    /// Represents a default comparer for <see cref="IValueObject"/>s.
-    /// </summary>
-    public sealed class ValueObjectEqualityComparer : IEqualityComparer<IValueObject>
-    {
-
-        /// <summary>
-        /// Checks if two <see cref="IValueObject"/>s are equal.
+        /// Checks if two <see cref="IReadOnlyValueObject"/>s are equal.
         /// </summary>
         /// <param name="x">The first object to compare.</param>
         /// <param name="y">The second object to compare.</param>
         /// <returns><see langword="true"/> if <paramref name="x"/> and <paramref name="y"/> are equal, otherwise <see langword="false"/>.</returns>
-        public bool Equals(IValueObject x, IValueObject y) => x is object && y is object ? EqualityComparer<object>.Default.Equals(x.Value, y.Value) : !(x is object || y is object);
+        public bool Equals(IReadOnlyValueObject x, IReadOnlyValueObject y) => x is object && y is object ? EqualityComparer<object>.Default.Equals(x.Value, y.Value) : !(x is object || y is object);
 
         /// <summary>
-        /// Returns the hash code for a given <see cref="IValueObject"/>. If <paramref name="obj"/> has a value, this function returns the hash code of <paramref name="obj"/>'s <see cref="IValueObject.Value"/>, otherwise this function returns the hash code of <paramref name="obj"/>.
+        /// Returns the hash code for a given <see cref="IReadOnlyValueObject"/>. If <paramref name="obj"/> has a value, this function returns the hash code of <paramref name="obj"/>'s <see cref="IReadOnlyValueObject.Value"/>, otherwise this function returns the hash code of <paramref name="obj"/>.
         /// </summary>
-        /// <param name="obj">The <see cref="IValueObject"/> for which to return the hash code.</param>
-        /// <returns>The hash code of <paramref name="obj"/>'s <see cref="IValueObject.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
-        public int GetHashCode(IValueObject obj) => (obj.Value is object ? obj.Value : obj).GetHashCode();
+        /// <param name="obj">The <see cref="IReadOnlyValueObject"/> for which to return the hash code.</param>
+        /// <returns>The hash code of <paramref name="obj"/>'s <see cref="IReadOnlyValueObject.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
+        public int GetHashCode(IReadOnlyValueObject obj) => (obj.Value is object ? obj.Value : obj).GetHashCode();
 
     }
 
     /// <summary>
-    /// Represents a default comparer for <see cref="IValueObject{T}"/>s.
+    /// Represents a default comparer for <see cref="IReadOnlyValueObject{T}"/>s.
     /// </summary>
-    public class ValueObjectEqualityComparer<T> : IEqualityComparer<IValueObject<T>>
+    public class ValueObjectEqualityComparer<T> : IEqualityComparer<IReadOnlyValueObject<T>>
     {
 
         /// <summary>
-        /// Checks if two <see cref="IValueObject{T}"/>s are equal.
+        /// Checks if two <see cref="IReadOnlyValueObject{T}"/>s are equal.
         /// </summary>
         /// <param name="x">The first object to compare.</param>
         /// <param name="y">The second object to compare.</param>
         /// <returns><see langword="true"/> if <paramref name="x"/> and <paramref name="y"/> are equal, otherwise <see langword="false"/>.</returns>
-        public bool Equals(IValueObject<T> x, IValueObject<T> y) => x is object && y is object ? EqualityComparer<T>.Default.Equals(x.Value, y.Value) : !(x is object || y is object);
+        public bool Equals(IReadOnlyValueObject<T> x, IReadOnlyValueObject<T> y) => x is object && y is object ? EqualityComparer<T>.Default.Equals(x.Value, y.Value) : !(x is object || y is object);
 
         /// <summary>
-        /// Returns the hash code for a given <see cref="IValueObject{T}"/>. If <paramref name="obj"/> has a value, this function returns the hash code of <paramref name="obj"/>'s <see cref="IValueObject{T}.Value"/>, otherwise this function returns the hash code of <paramref name="obj"/>.
+        /// Returns the hash code for a given <see cref="IReadOnlyValueObject{T}"/>. If <paramref name="obj"/> has a value, this function returns the hash code of <paramref name="obj"/>'s <see cref="IReadOnlyValueObject{T}.Value"/>, otherwise this function returns the hash code of <paramref name="obj"/>.
         /// </summary>
-        /// <param name="obj">The <see cref="IValueObject{T}"/> for which to return the hash code.</param>
-        /// <returns>The hash code of <paramref name="obj"/>'s <see cref="IValueObject{T}.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
-        public int GetHashCode(IValueObject<T> obj) => obj.Value is object ? obj.Value.GetHashCode() : obj.GetHashCode();
+        /// <param name="obj">The <see cref="IReadOnlyValueObject{T}"/> for which to return the hash code.</param>
+        /// <returns>The hash code of <paramref name="obj"/>'s <see cref="IReadOnlyValueObject{T}.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
+        public int GetHashCode(IReadOnlyValueObject<T> obj) => obj.Value is object ? obj.Value.GetHashCode() : obj.GetHashCode();
 
     }
 
@@ -106,13 +122,13 @@ namespace WinCopies.Util
     public struct ValueObjectEnumerator<T> : IEnumerator<T>, IEnumerator
     {
 
-        private IEnumerator<IValueObject<T>> _enumerator;
+        private IEnumerator<IReadOnlyValueObject<T>> _enumerator;
 
         public T Current { get; private set; }
 
         object IEnumerator.Current => Current;
 
-        public ValueObjectEnumerator(IEnumerator<IValueObject<T>> enumerator)
+        public ValueObjectEnumerator(IEnumerator<IReadOnlyValueObject<T>> enumerator)
         {
 
             _enumerator = enumerator;

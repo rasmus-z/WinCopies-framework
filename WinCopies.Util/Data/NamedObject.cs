@@ -68,6 +68,13 @@ namespace WinCopies.Util.Data
         /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
         public bool Equals(WinCopies.Util.IValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
 
+        /// <summary>
+        /// Determines whether this object is equal to a given object.
+        /// </summary>
+        /// <param name="obj">Object to compare to the current object.</param>
+        /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
+        public bool Equals(WinCopies.Util.IReadOnlyValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+
         private readonly object _value;
 
         /// <summary>
@@ -94,7 +101,7 @@ namespace WinCopies.Util.Data
 
         }
 
-#region IDisposable Support
+        #region IDisposable Support
         private bool disposedValue = false;
 
         /// <summary>
@@ -131,7 +138,7 @@ namespace WinCopies.Util.Data
             GC.SuppressFinalize(this);
 
         }
-#endregion
+        #endregion
     }
 
     /// <summary>
@@ -164,12 +171,28 @@ namespace WinCopies.Util.Data
         /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
         public bool Equals(WinCopies.Util.IValueObject<T> obj) => new ValueObjectEqualityComparer<T>().Equals(this, obj);
 
+        /// <summary>
+        /// Determines whether this object is equal to a given object.
+        /// </summary>
+        /// <param name="obj">Object to compare to the current object.</param>
+        /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
+        public bool Equals(WinCopies.Util.IReadOnlyValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+
+        /// <summary>
+        /// Determines whether this object is equal to a given object.
+        /// </summary>
+        /// <param name="obj">Object to compare to the current object.</param>
+        /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
+        public bool Equals(WinCopies.Util.IReadOnlyValueObject<T> obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+
         private readonly T _value;
 
         /// <summary>
         /// Gets or sets the value of the object.
         /// </summary>
         public T Value { get => _value; set => Update(nameof(Value), nameof(_value), value, typeof(NamedObject)); }
+
+        object IReadOnlyValueObject.Value => _value;
 
         object WinCopies.Util.IValueObject.Value
         {
@@ -209,7 +232,7 @@ namespace WinCopies.Util.Data
 
         }
 
-#region IDisposable Support
+        #region IDisposable Support
         private bool disposedValue = false;
 
         /// <summary>
@@ -246,7 +269,7 @@ namespace WinCopies.Util.Data
             GC.SuppressFinalize(this);
 
         }
-#endregion
+        #endregion
     }
 
 #endif

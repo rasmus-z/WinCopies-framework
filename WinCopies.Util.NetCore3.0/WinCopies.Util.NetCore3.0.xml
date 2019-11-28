@@ -2258,16 +2258,6 @@
             Represents a value container. See the <see cref="T:WinCopies.Util.IValueObject`1"/> for a generic version of this class.
             </summary>
         </member>
-        <member name="P:WinCopies.Util.IValueObject.IsReadOnly">
-            <summary>
-            Gets a value that indicates whether this object is read-only.
-            </summary>
-        </member>
-        <member name="P:WinCopies.Util.IValueObject.Value">
-            <summary>
-            Gets or sets the value of the object.
-            </summary>
-        </member>
         <member name="T:WinCopies.Util.IValueObject`1">
             <summary>
             Represents a value container. See the <see cref="T:WinCopies.Util.IValueObject"/> for a non-generic version of this class.
@@ -2278,45 +2268,55 @@
             Gets or sets the value of the object.
             </summary>
         </member>
-        <member name="T:WinCopies.Util.ValueObjectEqualityComparer">
+        <member name="P:WinCopies.Util.IReadOnlyValueObject.IsReadOnly">
             <summary>
-            Represents a default comparer for <see cref="T:WinCopies.Util.IValueObject"/>s.
+            Gets a value that indicates whether this object is read-only.
             </summary>
         </member>
-        <member name="M:WinCopies.Util.ValueObjectEqualityComparer.Equals(WinCopies.Util.IValueObject,WinCopies.Util.IValueObject)">
+        <member name="P:WinCopies.Util.IReadOnlyValueObject.Value">
             <summary>
-            Checks if two <see cref="T:WinCopies.Util.IValueObject"/>s are equal.
+            Gets or sets the value of the object.
+            </summary>
+        </member>
+        <member name="T:WinCopies.Util.ValueObjectEqualityComparer">
+            <summary>
+            Represents a default comparer for <see cref="T:WinCopies.Util.IReadOnlyValueObject"/>s.
+            </summary>
+        </member>
+        <member name="M:WinCopies.Util.ValueObjectEqualityComparer.Equals(WinCopies.Util.IReadOnlyValueObject,WinCopies.Util.IReadOnlyValueObject)">
+            <summary>
+            Checks if two <see cref="T:WinCopies.Util.IReadOnlyValueObject"/>s are equal.
             </summary>
             <param name="x">The first object to compare.</param>
             <param name="y">The second object to compare.</param>
             <returns><see langword="true"/> if <paramref name="x"/> and <paramref name="y"/> are equal, otherwise <see langword="false"/>.</returns>
         </member>
-        <member name="M:WinCopies.Util.ValueObjectEqualityComparer.GetHashCode(WinCopies.Util.IValueObject)">
+        <member name="M:WinCopies.Util.ValueObjectEqualityComparer.GetHashCode(WinCopies.Util.IReadOnlyValueObject)">
             <summary>
-            Returns the hash code for a given <see cref="T:WinCopies.Util.IValueObject"/>. If <paramref name="obj"/> has a value, this function returns the hash code of <paramref name="obj"/>'s <see cref="P:WinCopies.Util.IValueObject.Value"/>, otherwise this function returns the hash code of <paramref name="obj"/>.
+            Returns the hash code for a given <see cref="T:WinCopies.Util.IReadOnlyValueObject"/>. If <paramref name="obj"/> has a value, this function returns the hash code of <paramref name="obj"/>'s <see cref="P:WinCopies.Util.IReadOnlyValueObject.Value"/>, otherwise this function returns the hash code of <paramref name="obj"/>.
             </summary>
-            <param name="obj">The <see cref="T:WinCopies.Util.IValueObject"/> for which to return the hash code.</param>
-            <returns>The hash code of <paramref name="obj"/>'s <see cref="P:WinCopies.Util.IValueObject.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
+            <param name="obj">The <see cref="T:WinCopies.Util.IReadOnlyValueObject"/> for which to return the hash code.</param>
+            <returns>The hash code of <paramref name="obj"/>'s <see cref="P:WinCopies.Util.IReadOnlyValueObject.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
         </member>
         <member name="T:WinCopies.Util.ValueObjectEqualityComparer`1">
             <summary>
-            Represents a default comparer for <see cref="T:WinCopies.Util.IValueObject`1"/>s.
+            Represents a default comparer for <see cref="T:WinCopies.Util.IReadOnlyValueObject`1"/>s.
             </summary>
         </member>
-        <member name="M:WinCopies.Util.ValueObjectEqualityComparer`1.Equals(WinCopies.Util.IValueObject{`0},WinCopies.Util.IValueObject{`0})">
+        <member name="M:WinCopies.Util.ValueObjectEqualityComparer`1.Equals(WinCopies.Util.IReadOnlyValueObject{`0},WinCopies.Util.IReadOnlyValueObject{`0})">
             <summary>
-            Checks if two <see cref="T:WinCopies.Util.IValueObject`1"/>s are equal.
+            Checks if two <see cref="T:WinCopies.Util.IReadOnlyValueObject`1"/>s are equal.
             </summary>
             <param name="x">The first object to compare.</param>
             <param name="y">The second object to compare.</param>
             <returns><see langword="true"/> if <paramref name="x"/> and <paramref name="y"/> are equal, otherwise <see langword="false"/>.</returns>
         </member>
-        <member name="M:WinCopies.Util.ValueObjectEqualityComparer`1.GetHashCode(WinCopies.Util.IValueObject{`0})">
+        <member name="M:WinCopies.Util.ValueObjectEqualityComparer`1.GetHashCode(WinCopies.Util.IReadOnlyValueObject{`0})">
             <summary>
-            Returns the hash code for a given <see cref="T:WinCopies.Util.IValueObject`1"/>. If <paramref name="obj"/> has a value, this function returns the hash code of <paramref name="obj"/>'s <see cref="P:WinCopies.Util.IValueObject`1.Value"/>, otherwise this function returns the hash code of <paramref name="obj"/>.
+            Returns the hash code for a given <see cref="T:WinCopies.Util.IReadOnlyValueObject`1"/>. If <paramref name="obj"/> has a value, this function returns the hash code of <paramref name="obj"/>'s <see cref="P:WinCopies.Util.IReadOnlyValueObject`1.Value"/>, otherwise this function returns the hash code of <paramref name="obj"/>.
             </summary>
-            <param name="obj">The <see cref="T:WinCopies.Util.IValueObject`1"/> for which to return the hash code.</param>
-            <returns>The hash code of <paramref name="obj"/>'s <see cref="P:WinCopies.Util.IValueObject`1.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
+            <param name="obj">The <see cref="T:WinCopies.Util.IReadOnlyValueObject`1"/> for which to return the hash code.</param>
+            <returns>The hash code of <paramref name="obj"/>'s <see cref="P:WinCopies.Util.IReadOnlyValueObject`1.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
         </member>
         <member name="T:WinCopies.Collections.ArrayBuilder`1">
             <summary>
@@ -2671,12 +2671,12 @@
             <param name="y">Second parameter to compare</param>
             <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
         </member>
-        <member name="T:WinCopies.Collections.ITreeNode">
+        <member name="T:WinCopies.Collections.IReadOnlyTreeNode">
             <summary>
             Represents a tree node.
             </summary>
         </member>
-        <member name="P:WinCopies.Collections.ITreeNode.Parent">
+        <member name="P:WinCopies.Collections.IReadOnlyTreeNode.Parent">
             <summary>
             Gets the parent of the current node.
             </summary>
@@ -2686,12 +2686,7 @@
             Represents a tree node.
             </summary>
         </member>
-        <member name="T:WinCopies.Collections.ITreeNode`2">
-            <summary>
-            Represents a tree node.
-            </summary>
-        </member>
-        <member name="T:WinCopies.Collections.IReadOnlyTreeNode`2">
+        <member name="T:WinCopies.Collections.IReadOnlyTreeNode`1">
             <summary>
             Represents a tree node.
             </summary>
@@ -2748,290 +2743,25 @@
             <remarks><para>The base class calls this method when the list is being cleared. This implementation raises the <see cref="E:WinCopies.Collections.INotifyCollectionChanging.CollectionChanging"/> and the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> events.</para>
             <para>For more information, see the <see cref="M:System.Collections.ObjectModel.Collection`1.ClearItems"/> method of the <see cref="T:System.Collections.ObjectModel.Collection`1"/> base class.</para></remarks>
         </member>
-        <member name="T:WinCopies.Collections.ObservableTreeNode`2">
-            <summary>
-            Represents an observable <see cref="T:WinCopies.Collections.TreeNode`2"/>.
-            </summary>
-            <typeparam name="TValue">The value type.</typeparam>
-            <typeparam name="TItems">The items type.</typeparam>
-        </member>
-        <member name="M:WinCopies.Collections.ObservableTreeNode`2.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableTreeNode`2"/> class.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ObservableTreeNode`2.#ctor(System.Collections.Generic.List{WinCopies.Collections.TreeNode{`1}})">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableTreeNode`2"/> class and copy the items of <paramref name="items"/>.
-            </summary>
-            <param name="items">Items to copy to the new tree node.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ObservableTreeNode`2.#ctor(System.Collections.Generic.IEnumerable{WinCopies.Collections.TreeNode{`1}})">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableTreeNode`2"/> class and copy the items of <paramref name="collection"/>.
-            </summary>
-            <param name="collection">Items to copy to the new tree node.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ObservableTreeNode`2.#ctor(`0)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableTreeNode`2"/> class with a custom value.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ObservableTreeNode`2.#ctor(`0,System.Collections.Generic.List{WinCopies.Collections.TreeNode{`1}})">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableTreeNode`2"/> class with a custom value and copy the items of <paramref name="items"/>.
-            </summary>
-            <param name="value">The value of the new tree node.</param>
-            <param name="items">Items to copy to the new tree node.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ObservableTreeNode`2.#ctor(`0,System.Collections.Generic.IEnumerable{WinCopies.Collections.TreeNode{`1}})">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableTreeNode`2"/> class with a custom value and copy the items of <paramref name="collection"/>.
-            </summary>
-            <param name="value">The valeu of the new tree node.</param>
-            <param name="collection">Items to copy to the new tree node.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ObservableTreeNode`2.OnCountChanged">
-            <summary>
-            Calls <see cref="M:WinCopies.Collections.ObservableTreeNode`2.OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs)"/> for the <see cref="P:WinCopies.Collections.TreeNode`2.Count"/> property, then for the indexer property.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ObservableTreeNode`2.OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs)">
-            <summary>
-            Raises the <see cref="E:WinCopies.Collections.ObservableTreeNode`2.PropertyChanged"/> event, if not null, for the given <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/>.
-            </summary>
-            <param name="e">The <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> of the event.</param>
-        </member>
-        <member name="T:WinCopies.Collections.ReadOnlyObservableTreeNode`2">
-            <summary>
-            Represents an observable <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.
-            </summary>
-            <typeparam name="TValue">The value type.</typeparam>
-            <typeparam name="TItems">The items type.</typeparam>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyObservableTreeNode`2.#ctor(`0)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableTreeNode`2"/> class with a custom value.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyObservableTreeNode`2.#ctor(`0,System.Collections.Generic.List{WinCopies.Collections.ReadOnlyTreeNode{`1}})">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableTreeNode`2"/> class with a custom value and copy the items of <paramref name="items"/>.
-            </summary>
-            <param name="value">The value of the new tree node.</param>
-            <param name="items">Items to copy to the new tree node.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyObservableTreeNode`2.#ctor(`0,System.Collections.Generic.IEnumerable{WinCopies.Collections.ReadOnlyTreeNode{`1}})">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableTreeNode`2"/> class with a custom value and copy the items of <paramref name="collection"/>.
-            </summary>
-            <param name="value">The valeu of the new tree node.</param>
-            <param name="collection">Items to copy to the new tree node.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyObservableTreeNode`2.OnCountChanged">
-            <summary>
-            Calls <see cref="M:WinCopies.Collections.ReadOnlyObservableTreeNode`2.OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs)"/> for the <see cref="P:WinCopies.Collections.ReadOnlyTreeNode`2.Count"/> property, then for the indexer property.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyObservableTreeNode`2.OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs)">
-            <summary>
-            Raises the <see cref="E:WinCopies.Collections.ReadOnlyObservableTreeNode`2.PropertyChanged"/> event, if not null, for the given <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/>.
-            </summary>
-            <param name="e">The <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> of the event.</param>
-        </member>
-        <member name="T:WinCopies.Collections.ReadOnlyTreeNode`1">
-            <summary>
-            Represents a tree node.
-            </summary>
-            <typeparam name="T">The value type.</typeparam>
-        </member>
-        <member name="P:WinCopies.Collections.ReadOnlyTreeNode`1.IsReadOnly">
-            <summary>
-            Gets a value that indicates whether this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`1"/> is read-only. This value is always <see langword="false"/> for this class.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`1.Equals(WinCopies.Util.IValueObject)">
-            <summary>
-            Determines whether this object is equal to a given object.
-            </summary>
-            <param name="obj">Object to compare to the current object.</param>
-            <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`1.Equals(WinCopies.Util.IValueObject{`0})">
-            <summary>
-            Determines whether this object is equal to a given object.
-            </summary>
-            <param name="obj">Object to compare to the current object.</param>
-            <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
-        </member>
-        <member name="P:WinCopies.Collections.ReadOnlyTreeNode`1.Parent">
-            <summary>
-            Gets the parent of the current node.
-            </summary>
-        </member>
-        <member name="P:WinCopies.Collections.ReadOnlyTreeNode`1.Value">
-            <summary>
-            Gets the value of the object.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`1.#ctor(`0)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`1"/> class.
-            </summary>
-            <param name="value">The value of the new <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`1"/>.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`1.Equals(System.Object)">
-            <summary>
-            Determines whether this object is equal to a given object.
-            </summary>
-            <param name="obj">The object to compare.</param>
-            <returns><see langword="true"/> if the current object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`1.GetHashCode">
-            <summary>
-            Returns a hash code for the current object.
-            </summary>
-            <returns>A hash code for the current object.</returns>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`1.Dispose(System.Boolean)">
-            <summary>
-            Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
-            </summary>
-            <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.Dispose(System.Boolean)">
-            <summary>
-            Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
-            </summary>
-            <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.GetDefaultTreeNodeItemsComparer">
-            <summary>
-            Returns the default comparer for <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> objects.
-            </summary>
-            <returns>The default comparer for <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> objects.</returns>
-        </member>
-        <member name="P:WinCopies.Collections.ReadOnlyTreeNode`2.Items">
-            <summary>
-            Gets the inner <see cref="T:WinCopies.Collections.IList`1"/> of this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.#ctor(`0)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> class using a custom value.
-            </summary>
-            <param name="value">The value of the new <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.#ctor(`0,System.Collections.Generic.IList{WinCopies.Collections.ReadOnlyTreeNode{`1}})">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> class using a custom value and inner <see cref="T:WinCopies.Collections.IList`1"/>.
-            </summary>
-            <param name="value">The value of the new <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.</param>
-            <param name="items">A custom inner <see cref="T:WinCopies.Collections.IList`1"/>.</param>
-        </member>
-        <member name="P:WinCopies.Collections.ReadOnlyTreeNode`2.Item(System.Int32)">
-            <summary>
-            Gets the item at the specified index in this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.
-            </summary>
-            <param name="index">The index of the item.</param>
-            <returns>The item at the given index.</returns>
-            <exception cref="T:System.IndexOutOfRangeException">The given index is lesser than 0 or greater than <see cref="P:WinCopies.Collections.ReadOnlyTreeNode`2.Count"/>.</exception>
-        </member>
-        <member name="P:WinCopies.Collections.ReadOnlyTreeNode`2.Count">
-            <summary>
-            Gets the number of items that this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> directly contains.
-            </summary>
-        </member>
-        <member name="P:WinCopies.Collections.ReadOnlyTreeNode`2.IsFixedSize">
-            <summary>
-            Gets a value that indicates whether this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> is fixed-size.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.GetEnumerator">
-            <summary>
-            Returns an <see cref="T:System.Collections.Generic.IEnumerator`1"/> for this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.
-            </summary>
-            <returns><see cref="T:System.Collections.Generic.IEnumerator`1"/> for this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.</returns>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.Contains(WinCopies.Collections.ReadOnlyTreeNode{`1})">
-            <summary>
-            Checks if this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> directly contains a given <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`1"/>.
-            </summary>
-            <param name="item">The <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`1"/> to look for.</param>
-            <returns><see langword="true"/> if this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> directly contains the given <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`1"/>, otherwise <see langword="false"/>.</returns>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.Contains(`1)">
-            <summary>
-            Checks if this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> directly contains a given item.
-            </summary>
-            <param name="item">The item to look for.</param>
-            <returns><see langword="true"/> if this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> directly contains the given item, otherwise <see langword="false"/>.</returns>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.IndexOf(WinCopies.Collections.ReadOnlyTreeNode{`1})">
-            <summary>
-            Returns the idnex of a given item in this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.
-            </summary>
-            <param name="item">The item for which to find the index.</param>
-            <returns>The index of <paramref name="item"/> if this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> contains <paramref name="item"/>, otherwise -1.</returns>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.IndexOf(`1)">
-            <summary>
-            Returns the idnex of a given item in this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.
-            </summary>
-            <param name="item">The item for which to find out the index.</param>
-            <returns>The index of <paramref name="item"/> if this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> contains <paramref name="item"/>, otherwise -1.</returns>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.CopyTo(WinCopies.Collections.ReadOnlyTreeNode{`1}[],System.Int32)">
-            <summary>
-            Performs a shallow copy of the items that the current <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> directly contains starting at a given index of a given array of <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`1"/>.
-            </summary>
-            <param name="array">The array in which to store the shallow copies of the items that <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> directly contains.</param>
-            <param name="arrayIndex">The index from which to store the items in <paramref name="array"/>.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.InsertItem(System.Int32,WinCopies.Collections.ReadOnlyTreeNode{`1})">
-            <summary>
-            Inserts a given item at a specified index in this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>. Because it is impossible to have a read-only wrapper for <see cref="T:WinCopies.Collections.ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> class, but without the mutable methods. So, if you want to insert new items in <see cref="P:WinCopies.Collections.ReadOnlyTreeNode`2.Items"/>, you should use this method in order to insert new items properly.
-            </summary>
-            <param name="index">The index of the new item.</param>
-            <param name="item">The item to insert in this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.ClearItems">
-            <summary>
-            Removes all items of this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>. Because it is impossible to have read-only wrappers for <see cref="T:WinCopies.Collections.ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> class, but without the mutable methods. So, if you want to clear all items in <see cref="P:WinCopies.Collections.ReadOnlyTreeNode`2.Items"/>, you should use this method in order to remove the items properly.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.RemoveItem(System.Int32)">
-            <summary>
-            Removes the item at a given index. Because it is impossible to have read-only wrappers for <see cref="T:WinCopies.Collections.ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> class, but without the mutable methods. So, if you want to remove items from <see cref="P:WinCopies.Collections.ReadOnlyTreeNode`2.Items"/>, you should use this method in order to remove the items properly.
-            </summary>
-            <param name="index">The index from which to remove the item.</param>
-        </member>
-        <member name="M:WinCopies.Collections.ReadOnlyTreeNode`2.SetItem(System.Int32,WinCopies.Collections.ReadOnlyTreeNode{`1})">
-            <summary>
-            Sets a given item at a specified index of this <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>. This method sets <paramref name="item"/> directly in the current <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/>. Because it is impossible to have read-only wrappers for <see cref="T:WinCopies.Collections.ITreeNode"/>, like collections read-only wrappers, this class is the same as the <see cref="T:WinCopies.Collections.ReadOnlyTreeNode`2"/> class, but without the mutable methods. So, if you want to alter existing items in <see cref="P:WinCopies.Collections.ReadOnlyTreeNode`2.Items"/>, you should use this method in order to alter the items properly.
-            </summary>
-            <param name="index">The index at which to set <paramref name="item"/>.</param>
-            <param name="item">The item to update with.</param>
-        </member>
         <member name="T:WinCopies.Collections.TreeNode`1">
             <summary>
             Represents a tree node.
             </summary>
-            <typeparam name="T">The value type.</typeparam>
+            <typeparam name="T">The value and item type.</typeparam>
         </member>
         <member name="P:WinCopies.Collections.TreeNode`1.IsReadOnly">
             <summary>
             Gets a value that indicates whether this <see cref="T:WinCopies.Collections.TreeNode`1"/> is read-only. This value is always <see langword="false"/> for this class.
             </summary>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`1.Equals(WinCopies.Util.IValueObject)">
+        <member name="M:WinCopies.Collections.TreeNode`1.System#IEquatable{WinCopies#Util#IReadOnlyValueObject}#Equals(WinCopies.Util.IReadOnlyValueObject)">
             <summary>
             Determines whether this object is equal to a given object.
             </summary>
             <param name="obj">Object to compare to the current object.</param>
             <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`1.Equals(WinCopies.Util.IValueObject{`0})">
+        <member name="M:WinCopies.Collections.TreeNode`1.System#IEquatable{WinCopies#Util#IReadOnlyValueObject{T}}#Equals(WinCopies.Util.IReadOnlyValueObject{`0})">
             <summary>
             Determines whether this object is equal to a given object.
             </summary>
@@ -3047,12 +2777,6 @@
             <summary>
             Gets or sets the value of the object.
             </summary>
-        </member>
-        <member name="M:WinCopies.Collections.TreeNode`1.#ctor(`0)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.TreeNode`1"/> class.
-            </summary>
-            <param name="value">The value of the new <see cref="T:WinCopies.Collections.TreeNode`1"/>.</param>
         </member>
         <member name="M:WinCopies.Collections.TreeNode`1.Equals(System.Object)">
             <summary>
@@ -3073,173 +2797,133 @@
             </summary>
             <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
         </member>
-        <member name="T:WinCopies.Collections.TreeNode`2">
+        <member name="M:WinCopies.Collections.TreeNode`1.GetDefaultTreeNodeItemsComparer">
             <summary>
-            Represents a tree node.
+            Returns the default comparer for <see cref="T:WinCopies.Collections.TreeNode`1"/> objects.
             </summary>
-            <typeparam name="TValue">The value type.</typeparam>
-            <typeparam name="TItems">The items type.</typeparam>
+            <returns>The default comparer for <see cref="T:WinCopies.Collections.TreeNode`1"/> objects.</returns>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.GetDefaultTreeNodeItemsComparer">
+        <member name="P:WinCopies.Collections.TreeNode`1.Items">
             <summary>
-            Returns the default comparer for <see cref="T:WinCopies.Collections.TreeNode`2"/> objects.
-            </summary>
-            <returns>The default comparer for <see cref="T:WinCopies.Collections.TreeNode`2"/> objects.</returns>
-        </member>
-        <member name="P:WinCopies.Collections.TreeNode`2.Items">
-            <summary>
-            Gets the inner <see cref="T:System.Collections.Generic.IList`1"/> of this <see cref="T:WinCopies.Collections.TreeNode`2"/>.
+            Gets the inner <see cref="T:System.Collections.Generic.IList`1"/> of this <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.#ctor(`0)">
+        <member name="M:WinCopies.Collections.TreeNode`1.#ctor(`0)">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.TreeNode`2"/> class using a custom value.
+            Initializes a new instance of the <see cref="T:WinCopies.Collections.TreeNode`1"/> class using a custom value.
             </summary>
-            <param name="value">The value of the new <see cref="T:WinCopies.Collections.TreeNode`2"/>.</param>
+            <param name="value">The value of the new <see cref="T:WinCopies.Collections.TreeNode`1"/>.</param>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.#ctor(`0,System.Collections.Generic.IList{WinCopies.Collections.TreeNode{`1}})">
+        <member name="M:WinCopies.Collections.TreeNode`1.#ctor(`0,System.Collections.Generic.IList{WinCopies.Collections.TreeNode{`0}})">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.TreeNode`2"/> class using a custom value and inner <see cref="T:WinCopies.Collections.IList`1"/>.
+            Initializes a new instance of the <see cref="T:WinCopies.Collections.TreeNode`1"/> class using a custom value and inner <see cref="T:WinCopies.Collections.IList`1"/>.
             </summary>
-            <param name="value">The value of the new <see cref="T:WinCopies.Collections.TreeNode`2"/>.</param>
+            <param name="value">The value of the new <see cref="T:WinCopies.Collections.TreeNode`1"/>.</param>
             <param name="items">A custom inner <see cref="T:WinCopies.Collections.IList`1"/>.</param>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.Dispose(System.Boolean)">
+        <member name="P:WinCopies.Collections.TreeNode`1.Item(System.Int32)">
             <summary>
-            Removes the unmanaged resources and the managed resources if needed. If you override this method, you should call this implementation of this method in your override implementation to avoid unexpected results when using this object laater.
-            </summary>
-            <param name="disposing"><see langword="true"/> to dispose managed resources, otherwise <see langword="false"/>.</param>
-        </member>
-        <member name="P:WinCopies.Collections.TreeNode`2.Item(System.Int32)">
-            <summary>
-            Gets or sets the item at the specified index in this <see cref="T:WinCopies.Collections.TreeNode`2"/>.
+            Gets or sets the item at the specified index in this <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
             <param name="index">The index of the item.</param>
             <returns>The item at the given index.</returns>
-            <exception cref="T:System.IndexOutOfRangeException">The given index is lesser than 0 or greater than <see cref="P:WinCopies.Collections.TreeNode`2.Count"/>.</exception>
-            <seealso cref="M:WinCopies.Collections.TreeNode`2.SetItem(System.Int32,WinCopies.Collections.TreeNode{`1})"/>
+            <exception cref="T:System.IndexOutOfRangeException">The given index is lesser than 0 or greater than <see cref="P:WinCopies.Collections.TreeNode`1.Count"/>.</exception>
+            <seealso cref="!:SetItem(inTreeNode&lt;T&gt;)"/>
         </member>
-        <member name="P:WinCopies.Collections.TreeNode`2.Count">
+        <member name="P:WinCopies.Collections.TreeNode`1.Count">
             <summary>
-            Gets the number of items that this <see cref="T:WinCopies.Collections.TreeNode`2"/> directly contains.
+            Gets the number of items that this <see cref="T:WinCopies.Collections.TreeNode`1"/> directly contains.
             </summary>
         </member>
-        <member name="P:WinCopies.Collections.TreeNode`2.IsFixedSize">
+        <member name="P:WinCopies.Collections.TreeNode`1.IsFixedSize">
             <summary>
-            Gets a value that indicates whether this <see cref="T:WinCopies.Collections.TreeNode`2"/> is fixed-size.
+            Gets a value that indicates whether this <see cref="T:WinCopies.Collections.TreeNode`1"/> is fixed-size.
             </summary>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.GetEnumerator">
+        <member name="M:WinCopies.Collections.TreeNode`1.GetEnumerator">
             <summary>
-            Returns an <see cref="T:System.Collections.Generic.IEnumerator`1"/> for this <see cref="T:WinCopies.Collections.TreeNode`2"/>.
+            Returns an <see cref="T:System.Collections.Generic.IEnumerator`1"/> for this <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
-            <returns><see cref="T:System.Collections.Generic.IEnumerator`1"/> for this <see cref="T:WinCopies.Collections.TreeNode`2"/>.</returns>
+            <returns><see cref="T:System.Collections.Generic.IEnumerator`1"/> for this <see cref="T:WinCopies.Collections.TreeNode`1"/>.</returns>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.Add(WinCopies.Collections.TreeNode{`1})">
+        <member name="M:WinCopies.Collections.TreeNode`1.Add(WinCopies.Collections.TreeNode{`0})">
             <summary>
-            Adds a new item to the end of this <see cref="T:WinCopies.Collections.TreeNode`2"/>.
+            Adds a new item to the end of this <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
             <param name="item">The item to add.</param>
-            <seealso cref="M:WinCopies.Collections.TreeNode`2.InsertItem(System.Int32,WinCopies.Collections.TreeNode{`1})"/>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.Contains(WinCopies.Collections.TreeNode{`1})">
+        <member name="M:WinCopies.Collections.TreeNode`1.Contains(WinCopies.Collections.TreeNode{`0})">
             <summary>
-            Checks if this <see cref="T:WinCopies.Collections.TreeNode`2"/> directly contains a given <see cref="T:WinCopies.Collections.TreeNode`1"/>.
+            Checks if this <see cref="T:WinCopies.Collections.TreeNode`1"/> directly contains a given <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
             <param name="item">The <see cref="T:WinCopies.Collections.TreeNode`1"/> to look for.</param>
-            <returns><see langword="true"/> if this <see cref="T:WinCopies.Collections.TreeNode`2"/> directly contains the given <see cref="T:WinCopies.Collections.TreeNode`1"/>, otherwise <see langword="false"/>.</returns>
+            <returns><see langword="true"/> if this <see cref="T:WinCopies.Collections.TreeNode`1"/> directly contains the given <see cref="T:WinCopies.Collections.TreeNode`1"/>, otherwise <see langword="false"/>.</returns>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.Contains(`1)">
+        <member name="M:WinCopies.Collections.TreeNode`1.Contains(`0)">
             <summary>
-            Checks if this <see cref="T:WinCopies.Collections.TreeNode`2"/> directly contains a given item.
+            Checks if this <see cref="T:WinCopies.Collections.TreeNode`1"/> directly contains a given item.
             </summary>
             <param name="item">The item to look for.</param>
-            <returns><see langword="true"/> if this <see cref="T:WinCopies.Collections.TreeNode`2"/> directly contains the given item, otherwise <see langword="false"/>.</returns>
+            <returns><see langword="true"/> if this <see cref="T:WinCopies.Collections.TreeNode`1"/> directly contains the given item, otherwise <see langword="false"/>.</returns>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.IndexOf(WinCopies.Collections.TreeNode{`1})">
+        <member name="M:WinCopies.Collections.TreeNode`1.IndexOf(WinCopies.Collections.TreeNode{`0})">
             <summary>
-            Returns the idnex of a given item in this <see cref="T:WinCopies.Collections.TreeNode`2"/>.
+            Returns the idnex of a given item in this <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
             <param name="item">The item for which to find the index.</param>
-            <returns>The index of <paramref name="item"/> if this <see cref="T:WinCopies.Collections.TreeNode`2"/> contains <paramref name="item"/>, otherwise -1.</returns>
+            <returns>The index of <paramref name="item"/> if this <see cref="T:WinCopies.Collections.TreeNode`1"/> contains <paramref name="item"/>, otherwise -1.</returns>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.IndexOf(`1)">
+        <member name="M:WinCopies.Collections.TreeNode`1.IndexOf(`0)">
             <summary>
-            Returns the idnex of a given item in this <see cref="T:WinCopies.Collections.TreeNode`2"/>.
+            Returns the idnex of a given item in this <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
             <param name="item">The item for which to find out the index.</param>
-            <returns>The index of <paramref name="item"/> if this <see cref="T:WinCopies.Collections.TreeNode`2"/> contains <paramref name="item"/>, otherwise -1.</returns>
+            <returns>The index of <paramref name="item"/> if this <see cref="T:WinCopies.Collections.TreeNode`1"/> contains <paramref name="item"/>, otherwise -1.</returns>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.RemoveAt(System.Int32)">
+        <member name="M:WinCopies.Collections.TreeNode`1.RemoveAt(System.Int32)">
             <summary>
             Removes the item at a given index.
             </summary>
             <param name="index">The index from which to remove the item.</param>
-            <exception cref="T:System.IndexOutOfRangeException"><paramref name="index"/> is lesser than 0 or greater than <see cref="P:WinCopies.Collections.TreeNode`2.Count"/>.</exception>
-            <exception cref="T:System.NotSupportedException">This <see cref="T:WinCopies.Collections.TreeNode`2"/> is fixed-size.</exception>
-            <seealso cref="M:WinCopies.Collections.TreeNode`2.RemoveItem(System.Int32)"/>
+            <exception cref="T:System.IndexOutOfRangeException"><paramref name="index"/> is lesser than 0 or greater than <see cref="P:WinCopies.Collections.TreeNode`1.Count"/>.</exception>
+            <exception cref="T:System.NotSupportedException">This <see cref="T:WinCopies.Collections.TreeNode`1"/> is fixed-size.</exception>
+            <seealso cref="M:WinCopies.Collections.TreeNode`1.RemoveItem(System.Int32)"/>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.Remove(WinCopies.Collections.TreeNode{`1})">
+        <member name="M:WinCopies.Collections.TreeNode`1.Remove(WinCopies.Collections.TreeNode{`0})">
             <summary>
             Removes a given item from the node. The current node must directly contains the given item. This function removes <paramref name="item"/> and returns <see langword="true"/> if <paramref name="item"/> is found, otherwise <see langword="false"/> is returned.
             </summary>
             <param name="item">The item to remove from the current node.</param>
             <returns><see langword="true"/> if <paramref name="item"/> is removed, otherwise <see langword="false"/>.</returns>
-            <seealso cref="M:WinCopies.Collections.TreeNode`2.RemoveItem(System.Int32)"/>
+            <seealso cref="M:WinCopies.Collections.TreeNode`1.RemoveItem(System.Int32)"/>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.Remove(`1)">
+        <member name="M:WinCopies.Collections.TreeNode`1.Remove(`0)">
             <summary>
             Removes a given item from the node. The current node must directly contains the given item. This function removes <paramref name="item"/> and returns <see langword="true"/> if <paramref name="item"/> is found, otherwise <see langword="false"/> is returned.
             </summary>
             <param name="item">The item to remove from the current node.</param>
             <returns><see langword="true"/> if <paramref name="item"/> is removed, otherwise <see langword="false"/>.</returns>
-            <seealso cref="M:WinCopies.Collections.TreeNode`2.RemoveItem(System.Int32)"/>
+            <seealso cref="M:WinCopies.Collections.TreeNode`1.RemoveItem(System.Int32)"/>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.Insert(System.Int32,WinCopies.Collections.TreeNode{`1})">
+        <member name="M:WinCopies.Collections.TreeNode`1.Insert(System.Int32,WinCopies.Collections.TreeNode{`0})">
             <summary>
-            Inserts a given item at a specified index in this <see cref="T:WinCopies.Collections.TreeNode`2"/>.
+            Inserts a given item at a specified index in this <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
             <param name="index">The index of the new item.</param>
-            <param name="item">The item to insert in this <see cref="T:WinCopies.Collections.TreeNode`2"/>.</param>
-            <seealso cref="M:WinCopies.Collections.TreeNode`2.InsertItem(System.Int32,WinCopies.Collections.TreeNode{`1})"/>
+            <param name="item">The item to insert in this <see cref="T:WinCopies.Collections.TreeNode`1"/>.</param>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.CopyTo(WinCopies.Collections.TreeNode{`1}[],System.Int32)">
+        <member name="M:WinCopies.Collections.TreeNode`1.CopyTo(WinCopies.Collections.TreeNode{`0}[],System.Int32)">
             <summary>
-            Performs a shallow copy of the items that the current <see cref="T:WinCopies.Collections.TreeNode`2"/> directly contains starting at a given index of a given array of <see cref="T:WinCopies.Collections.TreeNode`1"/>.
+            Performs a shallow copy of the items that the current <see cref="T:WinCopies.Collections.TreeNode`1"/> directly contains starting at a given index of a given array of <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
-            <param name="array">The array in which to store the shallow copies of the items that <see cref="T:WinCopies.Collections.TreeNode`2"/> directly contains.</param>
+            <param name="array">The array in which to store the shallow copies of the items that <see cref="T:WinCopies.Collections.TreeNode`1"/> directly contains.</param>
             <param name="arrayIndex">The index from which to store the items in <paramref name="array"/>.</param>
         </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.InsertItem(System.Int32,WinCopies.Collections.TreeNode{`1})">
+        <member name="M:WinCopies.Collections.TreeNode`1.Clear">
             <summary>
-            Inserts a given item at a specified index in this <see cref="T:WinCopies.Collections.TreeNode`2"/>. You can override this method in order to change the behavior of the <see cref="M:WinCopies.Collections.TreeNode`2.Add(WinCopies.Collections.TreeNode{`1})"/> and <see cref="M:WinCopies.Collections.TreeNode`2.Insert(System.Int32,WinCopies.Collections.TreeNode{`1})"/> methods.
+            Removes all items of this <see cref="T:WinCopies.Collections.TreeNode`1"/>.
             </summary>
-            <param name="index">The index of the new item.</param>
-            <param name="item">The item to insert in this <see cref="T:WinCopies.Collections.TreeNode`2"/>.</param>
-        </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.Clear">
-            <summary>
-            Removes all items of this <see cref="T:WinCopies.Collections.TreeNode`2"/>.
-            </summary>
-            <seealso cref="M:WinCopies.Collections.TreeNode`2.ClearItems"/>
-        </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.ClearItems">
-            <summary>
-            Removes all items of this <see cref="T:WinCopies.Collections.TreeNode`2"/>. You can override this method in order to change the behavior of the <see cref="M:WinCopies.Collections.TreeNode`2.Clear"/> method.
-            </summary>
-        </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.RemoveItem(System.Int32)">
-            <summary>
-            Removes the item at a given index. You can override this method in order to change the behavior of the Remove methods.
-            </summary>
-            <param name="index">The index from which to remove the item.</param>
-        </member>
-        <member name="M:WinCopies.Collections.TreeNode`2.SetItem(System.Int32,WinCopies.Collections.TreeNode{`1})">
-            <summary>
-            Sets a given item at a specified index of this <see cref="T:WinCopies.Collections.TreeNode`2"/>. This method sets <paramref name="item"/> directly in the current <see cref="T:WinCopies.Collections.TreeNode`2"/>. You can override this method in order to change the behavior of the <see cref="P:WinCopies.Collections.TreeNode`2.Item(System.Int32)"/> method.
-            </summary>
-            <param name="index">The index at which to set <paramref name="item"/>.</param>
-            <param name="item">The item to update with.</param>
+            <seealso cref="M:WinCopies.Collections.TreeNode`1.ClearItems"/>
         </member>
     </members>
 </doc>

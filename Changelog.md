@@ -43,7 +43,6 @@ Available for .Net Framework, .Net Core and .Net Standard*
 		- Comparer classes and interfaces for sorting support.
 		- ValueObjectEqualityComparer
 		- TreeNode
-		- ReadOnlyTreeNode
 		- InterfaceDataTemplateSelector
 		- WinCopies.Collections.DotNetFix.LinkedList
 		- WinCopies.Collections.LinkedList
@@ -58,6 +57,8 @@ Available for .Net Framework, .Net Core and .Net Standard*
 		- WinCopies.Util.IValueObject
 		- ITreeNode
 		- IReadOnlyTreeNode
+		- IObservableTreeNode
+		- IReadOnlyObservableTreeNode
 		- ILinkedList
 	- Delegates:
 		- EqualityComparison

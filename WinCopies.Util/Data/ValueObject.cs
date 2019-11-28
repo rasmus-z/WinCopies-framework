@@ -70,6 +70,8 @@ namespace WinCopies.Util.Data
         /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
         public bool Equals(WinCopies.Util.IValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
 
+        bool IEquatable<IReadOnlyValueObject>.Equals(IReadOnlyValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
@@ -173,7 +175,9 @@ namespace WinCopies.Util.Data
         /// </summary>
         public T Value { get => _value; set => OnPropertyChanged(nameof(Value), nameof(_value), value, typeof(ValueObject<T>)); }
 
-        object WinCopies.Util.IValueObject.Value { get => Value; set => Value = (T)value; }
+        object WinCopies.Util.IValueObject.Value { get => _value; set => Value = (T)value; }
+
+        object IReadOnlyValueObject.Value => _value;
 
         /// <summary>
         /// Determines whether this object is equal to a given object.
@@ -188,6 +192,10 @@ namespace WinCopies.Util.Data
         /// <param name="obj">Object to compare to the current object.</param>
         /// <returns><see langword="true"/> if this object is equal to <paramref name="obj"/>, otherwise <see langword="false"/>.</returns>
         public bool Equals(WinCopies.Util.IValueObject<T> obj) => new ValueObjectEqualityComparer<T>().Equals(this, obj);
+
+        bool IEquatable<IReadOnlyValueObject>.Equals(IReadOnlyValueObject obj) => new ValueObjectEqualityComparer().Equals(this, obj);
+
+        bool IEquatable<IReadOnlyValueObject<T>>.Equals(IReadOnlyValueObject<T> obj) => new ValueObjectEqualityComparer<T>().Equals(this, obj);
 
         /// <summary>
         /// Occurs when a property value changes.

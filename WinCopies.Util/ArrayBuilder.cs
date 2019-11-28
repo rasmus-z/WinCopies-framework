@@ -100,29 +100,29 @@ namespace WinCopies.Collections
 
         bool ICollection<T>.IsReadOnly => false;
 
-        object ICollection. SyncRoot => ((ICollection)InnerList).SyncRoot;
+        object ICollection.SyncRoot => ((ICollection)InnerList).SyncRoot;
 
-        bool ICollection. IsSynchronized => ((ICollection)InnerList).IsSynchronized;
+        bool ICollection.IsSynchronized => ((ICollection)InnerList).IsSynchronized;
 
         void ICollection<T>.Add(T item) => ((ICollection<T>)InnerList).Add(item);
 
-        public virtual LinkedListNode<T> AddAfter(LinkedListNode<T> node, T value) => InnerList.AddAfter(node, value);
+        public LinkedListNode<T> AddAfter(LinkedListNode<T> node, T value) => InnerList.AddAfter(node, value);
 
-        public virtual void AddAfter(LinkedListNode<T> node, LinkedListNode<T> newNode) => InnerList.AddAfter(node, newNode);
+        public void AddAfter(LinkedListNode<T> node, LinkedListNode<T> newNode) => InnerList.AddAfter(node, newNode);
 
-        public virtual LinkedListNode<T> AddBefore(LinkedListNode<T> node, T value) => InnerList.AddBefore(node, value);
+        public LinkedListNode<T> AddBefore(LinkedListNode<T> node, T value) => InnerList.AddBefore(node, value);
 
-        public virtual void AddBefore(LinkedListNode<T> node, LinkedListNode<T> newNode) => InnerList.AddBefore(node, newNode);
+        public void AddBefore(LinkedListNode<T> node, LinkedListNode<T> newNode) => InnerList.AddBefore(node, newNode);
 
-        public virtual LinkedListNode<T> AddFirst(T value) => InnerList.AddFirst(value);
+        public LinkedListNode<T> AddFirst(T value) => InnerList.AddFirst(value);
 
-        public virtual void AddFirst(LinkedListNode<T> node) => InnerList.AddFirst(node);
+        public void AddFirst(LinkedListNode<T> node) => InnerList.AddFirst(node);
 
-        public virtual LinkedListNode<T> AddLast(T value) => InnerList.AddLast(value);
+        public LinkedListNode<T> AddLast(T value) => InnerList.AddLast(value);
 
-        public virtual void AddLast(LinkedListNode<T> node) => InnerList.AddLast(node);
+        public void AddLast(LinkedListNode<T> node) => InnerList.AddLast(node);
 
-        public virtual void Clear() => InnerList.Clear();
+        public void Clear() => InnerList.Clear();
 
         public bool Contains(T value) => InnerList.Contains(value);
 
@@ -142,18 +142,19 @@ namespace WinCopies.Collections
 
         public virtual void OnDeserialization(object sender) => InnerList.OnDeserialization(sender);
 
-        public virtual bool Remove(T value) => InnerList.Remove(value);
+        public bool Remove(T value) => InnerList.Remove(value);
 
-        public virtual void Remove(LinkedListNode<T> node) => InnerList.Remove(node);
+        public void Remove(LinkedListNode<T> node) => InnerList.Remove(node);
 
-        public virtual void RemoveFirst() => InnerList.RemoveFirst();
+        public void RemoveFirst() => InnerList.RemoveFirst();
 
-        public virtual void RemoveLast() => InnerList.RemoveLast();
+        public void RemoveLast() => InnerList.RemoveLast();
 
-        public void CopyTo(Array array, int index) => ((ICollection)InnerList).CopyTo(array, index) ;
+        public void CopyTo(Array array, int index) => ((ICollection)InnerList).CopyTo(array, index);
 
     }
 
+    [DebuggerDisplay("Count = {Count}")]
     public class ReadOnlyLinkedList<T> : ILinkedList<T>
 
     {
@@ -229,36 +230,36 @@ namespace WinCopies.Collections
     public class EnumeratorCollection : Collection<IEnumerator>
     {
 
-        private WrapperStruct<int> _wrapperStruct;
+        public int EnumerableVersion { get; private set; }
 
-        protected ref WrapperStruct<int> WrapperStruct => ref _wrapperStruct;
+        public EnumeratorCollection() : base() { }
 
-        public EnumeratorCollection(List<IEnumerator> list, ref WrapperStruct<int> wrapperStruct) : base(list) => _wrapperStruct = wrapperStruct;
-
-        protected virtual void Reset() => _wrapperStruct.Value = 0;
-
-        protected virtual void TryReset()
-
-        {
-
-            if (Count == 0)
-
-                Reset();
-
-        }
+        public EnumeratorCollection(IList<IEnumerator> list) : base(list) { }
 
         protected override void ClearItems()
         {
             base.ClearItems();
 
-            Reset();
+            EnumerableVersion = 0;
         }
 
         protected override void RemoveItem(int index)
         {
             RemoveItem(index);
 
-            TryReset();
+            if (Count == 0)
+
+                EnumerableVersion = 0;
+        }
+
+        public void OnCollectionUpdated()
+
+        {
+
+            if (Count > 0)
+
+                EnumerableVersion++ ; 
+
         }
 
     }
@@ -271,9 +272,7 @@ namespace WinCopies.Collections
     public class ArrayBuilder<T> : ILinkedList<T>
     {
 
-        public EnumeratorCollection Enumerators { get; }
-
-        protected WrapperStruct<int> _wrapperStruct = new WrapperStruct<int>(0);
+        protected EnumeratorCollection Enumerators { get; }
 
         /// <summary>
         /// Gets the <see cref="System.Collections.Generic.LinkedList{T}"/> that is used to build the arrays and collections.
@@ -285,7 +284,7 @@ namespace WinCopies.Collections
         /// </summary>
         public ArrayBuilder()
         {
-            Enumerators = new EnumeratorCollection(new System.Collections.Generic.List<IEnumerator>(), ref _wrapperStruct);
+            Enumerators = new EnumeratorCollection();
 
             InnerList = new System.Collections.Generic.LinkedList<T>();
         }
@@ -294,39 +293,49 @@ namespace WinCopies.Collections
         /// Initializes a new instance of the <see cref="ArrayBuilder{T}"/> class with a given <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <param name="enumerable"></param>
-        public ArrayBuilder(IEnumerable<T> enumerable) => InnerList = new System.Collections.Generic.LinkedList<T>(enumerable);
+        public ArrayBuilder(IEnumerable<T> enumerable)
+        {
+            Enumerators = new EnumeratorCollection();
+
+            InnerList = new System.Collections.Generic.LinkedList<T>(enumerable);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArrayBuilder{T}"/> class using a custom <see cref="System.Collections.Generic.LinkedList{T}"/> to build the arrays and collections.
         /// </summary>
         /// <param name="innerList"></param>
-        protected ArrayBuilder(System.Collections.Generic.LinkedList<T> innerList) => InnerList = innerList;
+        protected ArrayBuilder(System.Collections.Generic.LinkedList<T> innerList)
+        {
+            Enumerators = new EnumeratorCollection();
+
+            InnerList = innerList;
+        }
 
         /// <summary>
         /// Gets the last node of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <returns>The last <see cref="LinkedListNode{T}"/> of this <see cref="ArrayBuilder{T}"/>.</returns>
-        public virtual LinkedListNode<T> Last => InnerList.Last;
+        public LinkedListNode<T> Last => InnerList.Last;
 
         /// <summary>
         /// Gets the first node of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <returns>The first <see cref="LinkedListNode{T}"/> of this <see cref="ArrayBuilder{T}"/>.</returns>
-        public virtual LinkedListNode<T> First => InnerList.First;
+        public LinkedListNode<T> First => InnerList.First;
 
         /// <summary>
         /// Gets the number of nodes actually contained in this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <returns>The number of nodes actually contained in this <see cref="ArrayBuilder{T}"/>.</returns>
-        public virtual int Count => InnerList.Count;
+        public int Count => InnerList.Count;
 
-        bool ICollection<T>. IsReadOnly => false ; 
+        bool ICollection<T>.IsReadOnly => false;
 
-        object ICollection. SyncRoot => ((ICollection)InnerList).SyncRoot;
+        object ICollection.SyncRoot => ((ICollection)InnerList).SyncRoot;
 
-        bool ICollection. IsSynchronized => ((ICollection)InnerList).IsSynchronized;
+        bool ICollection.IsSynchronized => ((ICollection)InnerList).IsSynchronized;
 
-        protected virtual void OnUpdate() => _wrapperStruct.Value++;
+        private void OnUpdate() => Enumerators.OnCollectionUpdated();
 
         /// <summary>
         /// Adds a new node containing the specified value after the specified existing node in this <see cref="ArrayBuilder{T}"/>.
@@ -336,7 +345,7 @@ namespace WinCopies.Collections
         /// <returns>The new <see cref="LinkedListNode{T}"/> containing value.</returns>
         /// <exception cref="ArgumentNullException">node is null.</exception>
         /// <exception cref="InvalidOperationException">node is not in the current <see cref="ArrayBuilder{T}"/>.</exception>
-        public virtual LinkedListNode<T> AddAfter(LinkedListNode<T> node, T value)
+        public LinkedListNode<T> AddAfter(LinkedListNode<T> node, T value)
         {
             LinkedListNode<T> result = InnerList.AddAfter(node, value);
 
@@ -352,7 +361,7 @@ namespace WinCopies.Collections
         /// <param name="newNode">The new <see cref="LinkedListNode{T}"/> to add to this <see cref="ArrayBuilder{T}"/>.</param>
         /// <exception cref="ArgumentNullException">node is null. -or- newNode is null.</exception>
         /// <exception cref="InvalidOperationException">node is not in the current <see cref="ArrayBuilder{T}"/>. -or- newNode belongs to another <see cref="ILinkedList{T}"/>.</exception>
-        public virtual void AddAfter(LinkedListNode<T> node, LinkedListNode<T> newNode)
+        public void AddAfter(LinkedListNode<T> node, LinkedListNode<T> newNode)
         {
             InnerList.AddAfter(node, newNode);
 
@@ -367,7 +376,7 @@ namespace WinCopies.Collections
         /// <returns>The new <see cref="LinkedListNode{T}"/> containing value.</returns>
         /// <exception cref="ArgumentNullException">node is null.</exception>
         /// <exception cref="InvalidOperationException">node is not in the current <see cref="ArrayBuilder{T}"/>.</exception>
-        public virtual LinkedListNode<T> AddBefore(LinkedListNode<T> node, T value)
+        public LinkedListNode<T> AddBefore(LinkedListNode<T> node, T value)
         {
             var result = InnerList.AddBefore(node, value);
 
@@ -383,7 +392,7 @@ namespace WinCopies.Collections
         /// <param name="newNode">The new <see cref="LinkedListNode{T}"/> to add to this <see cref="ArrayBuilder{T}"/>.</param>
         /// <exception cref="ArgumentNullException">node is null. -or- newNode is null.</exception>
         /// <exception cref="InvalidOperationException">node is not in the current <see cref="ArrayBuilder{T}"/>. -or- newNode belongs to another <see cref="ILinkedList{T}"/>.</exception>
-        public virtual void AddBefore(LinkedListNode<T> node, LinkedListNode<T> newNode)
+        public void AddBefore(LinkedListNode<T> node, LinkedListNode<T> newNode)
         {
             InnerList.AddBefore(node, newNode);
 
@@ -395,7 +404,7 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="value">The value to add at the start of this <see cref="ArrayBuilder{T}"/>.</param>
         /// <returns>The new <see cref="LinkedListNode{T}"/> containing value.</returns>
-        public virtual LinkedListNode<T> AddFirst(T value)
+        public LinkedListNode<T> AddFirst(T value)
         {
             var result = InnerList.AddFirst(value);
 
@@ -410,7 +419,7 @@ namespace WinCopies.Collections
         /// <param name="node">The new <see cref="LinkedListNode{T}"/> to add at the start of this <see cref="ArrayBuilder{T}"/>.</param>
         /// <exception cref="ArgumentNullException">node is null.</exception>
         /// <exception cref="InvalidOperationException">node belongs to another <see cref="ILinkedList{T}"/>.</exception>
-        public virtual void AddFirst(LinkedListNode<T> node)
+        public void AddFirst(LinkedListNode<T> node)
         {
             InnerList.AddFirst(node);
 
@@ -422,7 +431,7 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="value">The value to add at the end of this <see cref="ArrayBuilder{T}"/>.</param>
         /// <returns>The new <see cref="LinkedListNode{T}"/> containing value.</returns>
-        public virtual LinkedListNode<T> AddLast(T value)
+        public LinkedListNode<T> AddLast(T value)
         {
             var result = InnerList.AddLast(value);
 
@@ -437,7 +446,7 @@ namespace WinCopies.Collections
         /// <param name="node">The new <see cref="LinkedListNode{T}"/> to add at the end of this <see cref="ArrayBuilder{T}"/>.</param>
         /// <exception cref="ArgumentNullException">node is null.</exception>
         /// <exception cref="InvalidOperationException">node belongs to another <see cref="ArrayBuilder{T}"/>.</exception>
-        public virtual void AddLast(LinkedListNode<T> node)
+        public void AddLast(LinkedListNode<T> node)
         {
             InnerList.AddLast(node);
 
@@ -451,33 +460,33 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="values">The values to add to this <see cref="ArrayBuilder{T}"/></param>
         /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
-        public virtual LinkedListNode<T>[] AddRangeFirst(params T[] values) => InnerList.First == null ? AddRangeLast(values) : AddRangeBefore(InnerList.First, values);
+        public LinkedListNode<T>[] AddRangeFirst(params T[] values) => InnerList.First == null ? AddRangeLast(values) : AddRangeBefore(InnerList.First, values);
 
         /// <summary>
         /// Add multiple values at the top of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <param name="array">The values to add to this <see cref="ArrayBuilder{T}"/></param>
         /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
-        public virtual LinkedListNode<T>[] AddRangeFirst(IEnumerable<T> array) => InnerList.First == null ? AddRangeLast(array) : AddRangeBefore(InnerList.First, array);
+        public LinkedListNode<T>[] AddRangeFirst(IEnumerable<T> array) => InnerList.First == null ? AddRangeLast(array) : AddRangeBefore(InnerList.First, array);
 
         /// <summary>
         /// Add multiple <see cref="LinkedListNode{T}"/>'s at the top of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <param name="nodes">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayBuilder{T}"/></param>
-        public virtual void AddRangeFirst(params LinkedListNode<T>[] nodes) { if (InnerList.First == null) AddRangeLast(nodes); else AddRangeBefore(InnerList.First, nodes); }
+        public void AddRangeFirst(params LinkedListNode<T>[] nodes) { if (InnerList.First == null) AddRangeLast(nodes); else AddRangeBefore(InnerList.First, nodes); }
 
         /// <summary>
         /// Add multiple <see cref="LinkedListNode{T}"/>'s at the top of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <param name="array">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayBuilder{T}"/></param>
-        public virtual void AddRangeFirst(IEnumerable<LinkedListNode<T>> array) { if (InnerList.First == null) AddRangeLast(array); else AddRangeBefore(InnerList.First, array); }
+        public void AddRangeFirst(IEnumerable<LinkedListNode<T>> array) { if (InnerList.First == null) AddRangeLast(array); else AddRangeBefore(InnerList.First, array); }
 
         /// <summary>
         /// Add multiple values at the end of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <param name="values">The values to add to this <see cref="ArrayBuilder{T}"/></param>
         /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
-        public virtual LinkedListNode<T>[] AddRangeLast(params T[] values)
+        public LinkedListNode<T>[] AddRangeLast(params T[] values)
         {
 
             var result = new LinkedListNode<T>[values.Length];
@@ -495,7 +504,7 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="array">The values to add to this <see cref="ArrayBuilder{T}"/></param>
         /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
-        public virtual LinkedListNode<T>[] AddRangeLast(IEnumerable<T> array)
+        public LinkedListNode<T>[] AddRangeLast(IEnumerable<T> array)
 
         {
 
@@ -519,7 +528,7 @@ namespace WinCopies.Collections
 
             }
 
-            var values = new System.Collections.Generic. LinkedList<LinkedListNode<T>>();
+            var values = new System.Collections.Generic.LinkedList<LinkedListNode<T>>();
 
             foreach (T item in array)
 
@@ -540,13 +549,13 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="nodes">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayBuilder{T}"/></param>
         /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
-        public virtual void AddRangeLast(params LinkedListNode<T>[] nodes) => AddRangeLast((IEnumerable<LinkedListNode<T>>)nodes);
+        public void AddRangeLast(params LinkedListNode<T>[] nodes) => AddRangeLast((IEnumerable<LinkedListNode<T>>)nodes);
 
         /// <summary>
         /// Add multiple <see cref="LinkedListNode{T}"/>'s at the end of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <param name="array">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayBuilder{T}"/></param>
-        public virtual void AddRangeLast(IEnumerable<LinkedListNode<T>> array)
+        public void AddRangeLast(IEnumerable<LinkedListNode<T>> array)
 
         {
 
@@ -562,7 +571,7 @@ namespace WinCopies.Collections
         /// <param name="node">The node before which to add the values</param>
         /// <param name="values">The values to add to this <see cref="ArrayBuilder{T}"/></param>
         /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
-        public virtual LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, params T[] values)
+        public LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, params T[] values)
         {
 
             var result = new LinkedListNode<T>[values.Length];
@@ -581,11 +590,11 @@ namespace WinCopies.Collections
         /// <param name="node">The node before which to add the values</param>
         /// <param name="array">The values to add to this <see cref="ArrayBuilder{T}"/></param>
         /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
-        public virtual LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, IEnumerable<T> array)
+        public LinkedListNode<T>[] AddRangeBefore(LinkedListNode<T> node, IEnumerable<T> array)
 
         {
 
-            var values = new System.Collections.Generic. LinkedList<LinkedListNode<T>>();
+            var values = new System.Collections.Generic.LinkedList<LinkedListNode<T>>();
 
             foreach (T item in array)
 
@@ -608,14 +617,14 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="node">The node before which to add the values</param>
         /// <param name="nodes">The <see cref="LinkedListNode{T}"/>'s to add to this <see cref="ArrayBuilder{T}"/></param>
-        public virtual void AddRangeBefore(LinkedListNode<T> node, params LinkedListNode<T>[] nodes) => AddRangeBefore(node, (IEnumerable<LinkedListNode<T>>)nodes);
+        public void AddRangeBefore(LinkedListNode<T> node, params LinkedListNode<T>[] nodes) => AddRangeBefore(node, (IEnumerable<LinkedListNode<T>>)nodes);
 
         /// <summary>
         /// Add multiple values before a specified node in this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <param name="node">The node before which to add the values</param>
         /// <param name="array">The values to add to this <see cref="ArrayBuilder{T}"/></param>
-        public virtual void AddRangeBefore(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
+        public void AddRangeBefore(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array)
 
         {
 
@@ -631,7 +640,7 @@ namespace WinCopies.Collections
         /// <param name="node">The node after which to add the values</param>
         /// <param name="values">The values to add to this <see cref="ArrayBuilder{T}"/></param>
         /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
-        public virtual LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, params T[] values) => node.Next == null ? AddRangeLast(values) : AddRangeBefore(node.Next, values);
+        public LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, params T[] values) => node.Next == null ? AddRangeLast(values) : AddRangeBefore(node.Next, values);
 
         /// <summary>
         /// Add multiple values after a specified node in this <see cref="ArrayBuilder{T}"/>.
@@ -639,28 +648,28 @@ namespace WinCopies.Collections
         /// <param name="node">The node after which to add the values</param>
         /// <param name="array">The values to add to this <see cref="ArrayBuilder{T}"/></param>
         /// <returns>The added <see cref="LinkedListNode{T}"/>'s.</returns>
-        public virtual LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, IEnumerable<T> array) => node.Next == null ? AddRangeLast(array) : AddRangeBefore(node.Next, array);
+        public LinkedListNode<T>[] AddRangeAfter(LinkedListNode<T> node, IEnumerable<T> array) => node.Next == null ? AddRangeLast(array) : AddRangeBefore(node.Next, array);
 
         /// <summary>
         /// Add multiple values after a specified node in this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <param name="node">The node after which to add the values</param>
         /// <param name="nodes">The values to add to this <see cref="ArrayBuilder{T}"/></param>
-        public virtual void AddRangeAfter(LinkedListNode<T> node, params LinkedListNode<T>[] nodes) { if (node.Next == null) AddRangeLast(nodes); else AddRangeBefore(node.Next, nodes); }
+        public void AddRangeAfter(LinkedListNode<T> node, params LinkedListNode<T>[] nodes) { if (node.Next == null) AddRangeLast(nodes); else AddRangeBefore(node.Next, nodes); }
 
         /// <summary>
         /// Add multiple values after a specified node in this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <param name="node">The node after which to add the values</param>
         /// <param name="array">The values to add to this <see cref="ArrayBuilder{T}"/></param>
-        public virtual void AddRangeAfter(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array) { if (node.Next == null) AddRangeLast(array); else AddRangeBefore(node.Next, array); }
+        public void AddRangeAfter(LinkedListNode<T> node, IEnumerable<LinkedListNode<T>> array) { if (node.Next == null) AddRangeLast(array); else AddRangeBefore(node.Next, array); }
 
         #endregion
 
         /// <summary>
         /// Removes all nodes from this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
-        public virtual void Clear()
+        public void Clear()
         {
             InnerList.Clear();
 
@@ -672,7 +681,7 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="value">The value to locate in this <see cref="ArrayBuilder{T}"/>. The value can be null for reference types.</param>
         /// <returns>true if value is found in this <see cref="ArrayBuilder{T}"/>; otherwise, false.</returns>
-        public virtual bool Contains(T value) => InnerList.Contains(value);
+        public bool Contains(T value) => InnerList.Contains(value);
 
         /// <summary>
         /// Copies the entire <see cref="ArrayBuilder{T}"/> to a compatible one-dimensional <see cref="Array"/>, starting at the specified index of the target array.
@@ -682,29 +691,29 @@ namespace WinCopies.Collections
         /// <exception cref="ArgumentNullException">array is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">index is less than zero.</exception>
         /// <exception cref="ArgumentException">The number of elements in the source <see cref="ArrayBuilder{T}"/> is greater than the available space from index to the end of the destination array.</exception>
-        public virtual void CopyTo(T[] array, int index) => InnerList.Contains(array, index);
+        public void CopyTo(T[] array, int index) => InnerList.Contains(array, index);
 
         /// <summary>
         /// Finds the first node that contains the specified value.
         /// </summary>
         /// <param name="value">The value to locate in this <see cref="ArrayBuilder{T}"/>.</param>
         /// <returns>The first <see cref="LinkedListNode{T}"/> that contains the specified value, if found; otherwise, null.</returns>
-        public virtual LinkedListNode<T> Find(T value) => InnerList.Find(value);
+        public LinkedListNode<T> Find(T value) => InnerList.Find(value);
 
         /// <summary>
         /// Finds the last node that contains the specified value.
         /// </summary>
         /// <param name="value">The value to locate in this <see cref="ArrayBuilder{T}"/>.</param>
         /// <returns>The last <see cref="LinkedListNode{T}"/> that contains the specified value, if found; otherwise, null.</returns>
-        public virtual LinkedListNode<T> FindLast(T value) => InnerList.FindLast(value);
+        public LinkedListNode<T> FindLast(T value) => InnerList.FindLast(value);
 
         /// <summary>
         /// Returns an enumerator that iterates through this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <returns>An <see cref="System.Collections.Generic.LinkedList{T}"/>.Enumerator for this <see cref="ArrayBuilder{T}"/>.</returns>
-        public virtual Enumerator GetEnumerator()
+        public Enumerator GetEnumerator()
         {
-            var enumerator = new Enumerator(this, Enumerators.Count, _wrapperStruct.Value);
+            var enumerator = new Enumerator(this);
 
             Enumerators.Add(enumerator);
 
@@ -731,7 +740,7 @@ namespace WinCopies.Collections
         /// </summary>
         /// <param name="value">The value to remove from this <see cref="ArrayBuilder{T}"/>.</param>
         /// <returns><see langword="true"/> if the element containing value is successfully removed; otherwise, <see langword="false"/>. This method also returns <see langword="false"/> if value was not found in the original <see cref="ArrayBuilder{T}"/>.</returns>
-        public virtual bool Remove(T value)
+        public bool Remove(T value)
         {
             var result = InnerList.Remove(value);
 
@@ -746,7 +755,7 @@ namespace WinCopies.Collections
         /// <param name="node">The <see cref="LinkedListNode{T}"/> to remove from this <see cref="ArrayBuilder{T}"/>.</param>
         /// <exception cref="ArgumentNullException">node is null.</exception>
         /// <exception cref="InvalidOperationException">node is not in the current <see cref="ArrayBuilder{T}"/>.</exception>
-        public virtual void Remove(LinkedListNode<T> node)
+        public void Remove(LinkedListNode<T> node)
         {
             InnerList.Remove(node);
 
@@ -757,7 +766,7 @@ namespace WinCopies.Collections
         /// Removes the node at the start of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="ArrayBuilder{T}"/> is empty.</exception>
-        public virtual void RemoveFirst()
+        public void RemoveFirst()
         {
             InnerList.RemoveFirst();
 
@@ -768,7 +777,7 @@ namespace WinCopies.Collections
         /// Removes the node at the end of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">The <see cref="ArrayBuilder{T}"/> is empty.</exception>
-        public virtual void RemoveLast()
+        public void RemoveLast()
         {
             InnerList.RemoveLast();
 
@@ -785,7 +794,7 @@ namespace WinCopies.Collections
         /// Returns an array with the items of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <returns>An array with the items of this <see cref="ArrayBuilder{T}"/>.</returns>
-        public virtual T[] ToArray()
+        public T[] ToArray()
 
         {
 
@@ -805,7 +814,7 @@ namespace WinCopies.Collections
         /// Returns an <see cref="ArrayList"/> with the items of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <returns>An <see cref="ArrayList"/> with the items of this <see cref="ArrayBuilder{T}"/>.</returns>
-        public virtual ArrayList ToArrayList()
+        public ArrayList ToArrayList()
         {
 
             var result = new ArrayList(InnerList.Count);
@@ -822,7 +831,7 @@ namespace WinCopies.Collections
         /// Returns a <see cref="List{T}"/> with the items of this <see cref="ArrayBuilder{T}"/>.
         /// </summary>
         /// <returns>A <see cref="List{T}"/> with the items of this <see cref="ArrayBuilder{T}"/>.</returns>
-        public virtual List<T> ToList()
+        public List<T> ToList()
 
         {
 
@@ -836,17 +845,16 @@ namespace WinCopies.Collections
 
         }
 
-        void ICollection<T>. Add(T item) => ((ICollection<T>)InnerList).Add(item) ;
+        void ICollection<T>.Add(T item) => ((ICollection<T>)InnerList).Add(item);
 
-        void ICollection. CopyTo(Array array, int index) => ((ICollection)InnerList).CopyTo(array, index) ;
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)InnerList).CopyTo(array, index);
 
-        public struct Enumerator : IEnumerator<LinkedListNode<T>>
+        [Serializable]
+        public struct Enumerator : IEnumerator<LinkedListNode<T>>, IEnumerator
 
         {
 
             private ArrayBuilder<T> _arrayBuilder;
-
-            private int _enumeratorIndex;
 
             private int _version;
 
@@ -854,15 +862,13 @@ namespace WinCopies.Collections
 
             object IEnumerator.Current => Current;
 
-            internal Enumerator(ArrayBuilder<T> arrayBuilder, int enumeratorIndex, int version)
+            internal Enumerator(ArrayBuilder<T> arrayBuilder)
 
             {
 
                 _arrayBuilder = arrayBuilder;
 
-                _enumeratorIndex = enumeratorIndex;
-
-                _version = version ;
+                _version = arrayBuilder.Enumerators.EnumerableVersion;
 
                 Current = null;
 
@@ -873,9 +879,7 @@ namespace WinCopies.Collections
 
                 Reset();
 
-                _arrayBuilder.Enumerators.RemoveAt(_enumeratorIndex);
-
-                _enumeratorIndex = -1;
+                _arrayBuilder.Enumerators.Remove(this);
 
                 _arrayBuilder = null;
 
@@ -884,7 +888,7 @@ namespace WinCopies.Collections
             public bool MoveNext()
             {
 
-                if (_arrayBuilder._wrapperStruct.Value != _version)
+                if (_arrayBuilder.Enumerators.EnumerableVersion != _version)
 
                     throw new InvalidOperationException("The collection has changed during enumeration.");
 
