@@ -2318,6 +2318,58 @@
             <param name="obj">The <see cref="T:WinCopies.Util.IReadOnlyValueObject`1"/> for which to return the hash code.</param>
             <returns>The hash code of <paramref name="obj"/>'s <see cref="P:WinCopies.Util.IReadOnlyValueObject`1.Value"/> if <paramref name="obj"/> has a value, otherwise the <paramref name="obj"/>'s hash code.</returns>
         </member>
+        <member name="T:WinCopies.Collections.DotNetFix.ObservableCollection`1">
+            <summary>
+            Represents a dynamic data collection that provides notifications when items get added, removed, or when the whole list is refreshed.
+            </summary>
+            <typeparam name="T">The type of elements in the collection.</typeparam>
+            <remarks>
+            <para>In many cases the data that you work with is a collection of objects. For example, a common scenario in data binding is to use an <see cref="!:ItemsControl"/> such as a <see cref="!:ListBox"/>, <see cref="!:ListView"/>, or <see cref="!:TreeView"/> to display a collection of records.</para>
+            <para>You can enumerate over any collection that implements the <see cref="T:System.Collections.IEnumerable"/> interface. However, to set up dynamic bindings so that insertions or deletions in the collection update the UI automatically, the collection must implement the <see cref="T:WinCopies.Collections.DotNetFix.INotifyCollectionChanged"/> interface. This interface exposes the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event, an event that should be raised whenever the underlying collection changes.</para>
+            <para>WPF provides the <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/> class, which is a built-in implementation of a data collection that implements the <see cref="T:WinCopies.Collections.DotNetFix.INotifyCollectionChanged"/> interface.</para>
+            <para>Before implementing your own collection, consider using <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/> or one of the existing collection classes, such as <see cref="T:System.Collections.Generic.List`1"/>, <see cref="T:System.Collections.ObjectModel.Collection`1"/>, and <see cref="T:System.ComponentModel.BindingList`1"/>, among many others. If you have an advanced scenario and want to implement your own collection, consider using <see cref="T:System.Collections.IList"/>, which provides a non-generic collection of objects that can be individually accessed by index. Implementing <see cref="T:System.Collections.IList"/> provides the best performance with the data binding engine.</para>
+            <para>Notes: To fully support transferring data values from binding source objects to binding targets, each object in your collection that supports bindable properties must implement an appropriate property changed notification mechanism such as the <see cref="T:System.ComponentModel.INotifyPropertyChanged"/> interface.</para>
+            <para>For more information, see "Binding to Collections" in the Data Binding Overview article at: https://docs.microsoft.com/en-us/dotnet/framework/wpf/data/data-binding-overview?view=netframework-4.8</para>
+            <para>For notes on XAML usage, see the following article: https://docs.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.observablecollection-1?view=netframework-4.8</para>
+            </remarks>
+        </member>
+        <member name="M:WinCopies.Collections.DotNetFix.ObservableCollection`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.Collections.DotNetFix.ObservableCollection`1"/> class.
+            </summary>
+        </member>
+        <member name="M:WinCopies.Collections.DotNetFix.ObservableCollection`1.#ctor(System.Collections.Generic.List{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.Collections.DotNetFix.ObservableCollection`1"/> class that contains elements copied from the specified list.
+            </summary>
+            <param name="list">The list from which the elements are copied.</param>
+            <remarks>The elements are copied onto the <see cref="T:WinCopies.Collections.DotNetFix.ObservableCollection`1"/> in the same order they are read by the enumerator of the list.</remarks>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="list"/> parameter cannot be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:WinCopies.Collections.DotNetFix.ObservableCollection`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.Collections.DotNetFix.ObservableCollection`1"/> class that contains elements copied from the specified collection.
+            </summary>
+            <param name="collection">The collection from which the elements are copied.</param>
+            <remarks>The elements are copied onto the <see cref="T:WinCopies.Collections.DotNetFix.ObservableCollection`1"/> in the same order they are read by the enumerator of the collection.</remarks>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="collection"/> parameter cannot be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:WinCopies.Collections.DotNetFix.ObservableCollection`1.InsertItem(System.Int32,`0)">
+            <summary>
+            Inserts an item into the collection at the specified index.
+            </summary>
+            <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            <param name="item">The object to insert.</param>
+            <remarks><para>The base class calls this method when an item is added to the collection. This implementation raises the <see cref="E:WinCopies.Collections.INotifyCollectionChanging.CollectionChanging"/> and the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> events.</para>
+            <para>For more information, see the <see cref="M:System.Collections.ObjectModel.Collection`1.InsertItem(System.Int32,`0)"/> method of the <see cref="T:System.Collections.ObjectModel.Collection`1"/> base class.</para></remarks>
+        </member>
+        <member name="M:WinCopies.Collections.DotNetFix.ObservableCollection`1.ClearItems">
+            <summary>
+            Removes all items from the collection.
+            </summary>
+            <remarks><para>The base class calls this method when the list is being cleared. This implementation raises the <see cref="E:WinCopies.Collections.INotifyCollectionChanging.CollectionChanging"/> and the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> events.</para>
+            <para>For more information, see the <see cref="M:System.Collections.ObjectModel.Collection`1.ClearItems"/> method of the <see cref="T:System.Collections.ObjectModel.Collection`1"/> base class.</para></remarks>
+        </member>
         <member name="T:WinCopies.Collections.ArrayBuilder`1">
             <summary>
             Builds arrays and lists by sizing them only when required. This class can be used to initialize your array or list before adding or removing values to it.
@@ -2691,21 +2743,6 @@
             Represents a tree node.
             </summary>
         </member>
-        <member name="T:WinCopies.Collections.ObservableCollection`1">
-            <summary>
-            Represents a dynamic data collection that provides notifications when items get added, removed, or when the whole list is refreshed.
-            </summary>
-            <typeparam name="T">The type of elements in the collection.</typeparam>
-            <remarks>
-            <para>In many cases the data that you work with is a collection of objects. For example, a common scenario in data binding is to use an <see cref="!:ItemsControl"/> such as a <see cref="!:ListBox"/>, <see cref="!:ListView"/>, or <see cref="!:TreeView"/> to display a collection of records.</para>
-            <para>You can enumerate over any collection that implements the <see cref="T:System.Collections.IEnumerable"/> interface. However, to set up dynamic bindings so that insertions or deletions in the collection update the UI automatically, the collection must implement the <see cref="T:WinCopies.Collections.INotifyCollectionChanged"/> interface. This interface exposes the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event, an event that should be raised whenever the underlying collection changes.</para>
-            <para>WPF provides the <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/> class, which is a built-in implementation of a data collection that implements the <see cref="T:WinCopies.Collections.INotifyCollectionChanged"/> interface.</para>
-            <para>Before implementing your own collection, consider using <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/> or one of the existing collection classes, such as <see cref="T:System.Collections.Generic.List`1"/>, <see cref="T:System.Collections.ObjectModel.Collection`1"/>, and <see cref="T:System.ComponentModel.BindingList`1"/>, among many others. If you have an advanced scenario and want to implement your own collection, consider using <see cref="T:WinCopies.Collections.IList"/>, which provides a non-generic collection of objects that can be individually accessed by index. Implementing <see cref="T:WinCopies.Collections.IList"/> provides the best performance with the data binding engine.</para>
-            <para>Notes: To fully support transferring data values from binding source objects to binding targets, each object in your collection that supports bindable properties must implement an appropriate property changed notification mechanism such as the <see cref="T:System.ComponentModel.INotifyPropertyChanged"/> interface.</para>
-            <para>For more information, see "Binding to Collections" in the Data Binding Overview article at: https://docs.microsoft.com/en-us/dotnet/framework/wpf/data/data-binding-overview?view=netframework-4.8</para>
-            <para>For notes on XAML usage, see the following article: https://docs.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.observablecollection-1?view=netframework-4.8</para>
-            </remarks>
-        </member>
         <member name="M:WinCopies.Collections.ObservableCollection`1.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.Collections.ObservableCollection`1"/> class.
@@ -2816,10 +2853,10 @@
         </member>
         <member name="M:WinCopies.Collections.TreeNode`1.#ctor(`0,System.Collections.Generic.IList{WinCopies.Collections.TreeNode{`0}})">
             <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.Collections.TreeNode`1"/> class using a custom value and inner <see cref="T:WinCopies.Collections.IList`1"/>.
+            Initializes a new instance of the <see cref="T:WinCopies.Collections.TreeNode`1"/> class using a custom value and inner <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
             <param name="value">The value of the new <see cref="T:WinCopies.Collections.TreeNode`1"/>.</param>
-            <param name="items">A custom inner <see cref="T:WinCopies.Collections.IList`1"/>.</param>
+            <param name="items">A custom inner <see cref="T:System.Collections.Generic.IList`1"/>.</param>
         </member>
         <member name="P:WinCopies.Collections.TreeNode`1.Item(System.Int32)">
             <summary>
