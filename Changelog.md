@@ -50,6 +50,7 @@ Available for .Net Framework, .Net Core and .Net Standard*
 		- WinCopies.Util.Data.CheckableObjects generic and non-generic:
 			- are now obsoletes and have been replaced by the corresponding models and view models of the new WinCopies.GUI.Models and WinCopies.GUI.ViewModels packages.
 		- (I)ReadOnlyArrayList
+		- The Generic class is being replaced by the Resources class and will be removed in later versions.
 	- Extension methods:
 		- static bool ContainsOneValue(this IEnumerable array, Comparison<object> comparison, out bool containsMoreThanOneValue, params object[] values) IEnumerable extension method (replaced by ContainsOneValue(this IEnumerable array, WinCopies.Collections.Comparison comparison, out bool containsMoreThanOneValue, params object[] values)).
 		- static object GetNumValue(this Enum @enum, string enumName) Enum extension method. Replaced by:

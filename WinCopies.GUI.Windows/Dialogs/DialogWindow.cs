@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using AttachedCommandBehavior;
 using System;
 using System.Windows;
 using System.Windows.Input;
@@ -33,19 +32,8 @@ namespace WinCopies.GUI.Windows.Dialogs
     /// <summary>
     /// Represents a common dialog window for WPF.
     /// </summary>
-    [TemplatePart(Name = PART_OkButton, Type = typeof(Button))]
-    [TemplatePart(Name = PART_ApplyButton, Type = typeof(Button))]
-    [TemplatePart(Name = PART_YesButton, Type = typeof(Button))]
-    [TemplatePart(Name = PART_NoButton, Type = typeof(Button))]
-    [TemplatePart(Name = PART_CancelButton, Type = typeof(Button))]
     public partial class DialogWindow : Window, ICommandSource
     {
-
-        private const string PART_OkButton = "PART_OkButton";
-        private const string PART_ApplyButton = "PART_ApplyButton";
-        private const string PART_YesButton = "PART_YesButton";
-        private const string PART_NoButton = "PART_NoButton";
-        private const string PART_CancelButton = "PART_CancelButton";
 
         /// <summary>
         /// Identifies the <see cref="DialogButton"/> dependency property.

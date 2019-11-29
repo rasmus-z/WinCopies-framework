@@ -21,15 +21,15 @@
 
 using System.Windows.Input;
 
-namespace WinCopies.GUI.Windows.Dialogs
-{
+//namespace WinCopies.GUI.Windows.Dialogs
+//{
 
-    public static class Commands
+//    public static class Commands
 
-    {
+//    {
 
-        public static RoutedUICommand SelectPath { get; } =     new RoutedUICommand(nameof(SelectPath), nameof(SelectPath), typeof(Commands));
+//        public static RoutedUICommand SelectPath { get; } =     new RoutedUICommand(nameof(SelectPath), nameof(SelectPath), typeof(Commands));
 
-    }
+//    }
 
-}
+//}

@@ -23,6 +23,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace WinCopies.GUI.Windows.Dialogs
-{
-}
+//namespace WinCopies.GUI.Windows.Dialogs
+//{
+//}

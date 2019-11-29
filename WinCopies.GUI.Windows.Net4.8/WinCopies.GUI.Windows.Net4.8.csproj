@@ -69,9 +69,6 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AttachedCommandBehavior, Version=3.1.0.0, Culture=neutral, PublicKeyToken=96599f0dfaf8a712, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinCopies.AttachedCommandBehavior.3.1.0\lib\net48\AttachedCommandBehavior.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeAnalysis.Common.3.3.1\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
     </Reference>
@@ -84,8 +81,17 @@
     <Reference Include="Microsoft.CodeAnalysis.Workspaces, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common.3.3.1\lib\netstandard2.0\Microsoft.CodeAnalysis.Workspaces.dll</HintPath>
     </Reference>
-    <Reference Include="SevenZipSharp, Version=1.2.231.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb, processorArchitecture=MSIL">
-      <HintPath>..\packages\Squid-Box.SevenZipSharp.1.2.231\lib\net45\SevenZipSharp.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.2.0.0, Culture=neutral, PublicKeyToken=36e1beb1f73d5bc6, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.1.2.0\lib\net48\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.2.2.0, Culture=neutral, PublicKeyToken=2b99ebdf8bdbb372, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.Shell.1.2.2\lib\net48\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.ShellExtensions.1.2.1\lib\net48\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Win32Native, Version=1.2.1.0, Culture=neutral, PublicKeyToken=83ecd65d6ddba0f8, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.Win32Native.1.2.1\lib\net48\Microsoft.WindowsAPICodePack.Win32Native.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -130,8 +136,10 @@
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.0-preview.18571.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -171,9 +179,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WinCopies.IO.Net4.8\WinCopies.IO.Net4.8.csproj">
-      <Project>{c7de5838-3c6e-41b8-8fd1-9d0fbeb8e7ac}</Project>
-      <Name>WinCopies.IO.Net4.8</Name>
+    <ProjectReference Include="..\WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj">
+      <Project>{8917a829-3028-4118-a1a2-798e80ca73c8}</Project>
+      <Name>WinCopies.GUI.Net4.8</Name>
     </ProjectReference>
     <ProjectReference Include="..\WinCopies.GUI.Models.Net4.8\WinCopies.GUI.Models.Net4.8.csproj">
       <Project>{31c5f3cf-a8fa-43e0-9041-3c61ed9e45a1}</Project>

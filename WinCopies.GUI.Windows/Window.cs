@@ -54,7 +54,7 @@ namespace WinCopies.GUI.Windows
         /// <summary>
         /// Identifies the <see cref="HelpButtonClick"/> routed event.
         /// </summary>
-        public static RoutedEvent HelpButtonClickEvent = EventManager.RegisterRoutedEvent(nameof(HelpButtonClick), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Window));
+        public static readonly RoutedEvent HelpButtonClickEvent = EventManager.RegisterRoutedEvent(nameof(HelpButtonClick), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Window));
 
         public event RoutedEventHandler HelpButtonClick
 

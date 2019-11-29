@@ -17,13 +17,11 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ButtonAlignmentToHorizontalAlignmentConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DialogButton.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DialogWindow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DialogWindowCommandParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HorizontalAlignment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ResourcesHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml.cs">
       <DependentUpon>Generic.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Window.cs" />
   </ItemGroup>
 </Project>

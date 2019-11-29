@@ -35,7 +35,7 @@ using System.Threading.Tasks;
 
 namespace WinCopies.Util
 {
-    [Obsolete("This class has been replaced by the Resources static class and will be removed in later versions.")]
+    [Obsolete("This class is being replaced by the Resources static class and will be removed in later versions.")]
     public static class Generic
     {
 
