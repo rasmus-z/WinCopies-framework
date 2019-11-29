@@ -21,15 +21,4 @@ namespace WinCopies.Collections
     {
         event NotifyCollectionChangingEventHandler CollectionChanging;
     }
-
-    namespace DotNetFix
-
-    {
-
-        public interface INotifyCollectionChanged : INotifyCollectionChanging, System.Collections.Specialized.INotifyCollectionChanged
-        {
-
-        }
-
-    }
 }

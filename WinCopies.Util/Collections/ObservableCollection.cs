@@ -89,7 +89,7 @@ namespace WinCopies.Collections
     /// <para>For notes on XAML usage, see the following article: https://docs.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.observablecollection-1?view=netframework-4.8</para>
     /// </remarks>
     [Serializable]
-    public class ObservableCollection<T> : System.Collections.ObjectModel.ObservableCollection<T>, IObservableCollection<T> /*, INotifyCollectionChanging */
+    public class ObservableCollection<T> : System.Collections.ObjectModel.ObservableCollection<T>, IObservableCollection<T> , INotifyCollectionChanging 
     {
 
         public virtual event NotifyCollectionChangingEventHandler CollectionChanging;
@@ -269,7 +269,7 @@ namespace WinCopies.Collections
     /// <para>For notes on XAML usage, see the following article: https://docs.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.observablecollection-1?view=netframework-4.8</para>
     /// </remarks>
     [Serializable]
-    public class ObservableCollection<T> : System.Collections.ObjectModel.ObservableCollection<T>, IObservableCollection<T> /*, INotifyCollectionChanging */
+    public class ObservableCollection<T> : System.Collections.ObjectModel.ObservableCollection<T>, IObservableCollection<T> , INotifyCollectionChanging     
     {
 
         public virtual event NotifyCollectionChangingEventHandler CollectionChanging;

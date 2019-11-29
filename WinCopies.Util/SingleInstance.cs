@@ -45,7 +45,7 @@ using System.ComponentModel;
 namespace Microsoft.Shell
 {
 
-    [Obsolete("This enum has been replaced by the same enum of the version 1.1.0 of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
+    [Obsolete("This enum has been replaced by the same enum of the version 1.1.0 and later of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
     public enum WM
     {
         NULL = 0x0000,
@@ -163,7 +163,7 @@ namespace Microsoft.Shell
         APP = 0x8000,
     }
 
-    [Obsolete("These methods have been replaced by the same methods of the version 1.1.0 of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
+    [Obsolete("These methods have been replaced by the same methods of the version 1.1.0 and later of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
     [SuppressUnmanagedCodeSecurity]
     public static class NativeMethods
     {
@@ -218,7 +218,7 @@ namespace Microsoft.Shell
 
     }
 
-    [Obsolete("This interface has been replaced by the same interface of the version 1.1.0 of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
+    [Obsolete("This interface has been replaced by the same interface of the version 1.1.0 and later of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
     public interface ISingleInstanceApp
     {
         bool SignalExternalCommandLineArgs(IList<string> args);
@@ -235,7 +235,7 @@ namespace Microsoft.Shell
     /// running as Administrator, can activate it with command line arguments.
     /// For most apps, this will not be much of an issue.
     /// </remarks>
-    [Obsolete("This class has been replaced by the same class of the version 1.1.0 of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
+    [Obsolete("This class has been replaced by the same class of the version 1.1.0 and later of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/ and will be removed in further versions.")]
     public static class SingleInstance<TApplication>
                 where TApplication : Application, ISingleInstanceApp
 

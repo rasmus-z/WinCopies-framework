@@ -56,24 +56,26 @@ namespace WinCopies.Collections
 
     //}using WinCopies.Util;
 
-        namespace DotNetFix
-        {
-            public class ReadOnlyObservableCollection<T> : System.Collections.ObjectModel.ReadOnlyObservableCollection<T>, INotifyCollectionChanging
-            {
-
-                public event NotifyCollectionChangingEventHandler CollectionChanging;
-
-                public ReadOnlyObservableCollection(ObservableCollection<T> list) : base(list) => list.CollectionChanging += (object sender, DotNetFix. NotifyCollectionChangedEventArgs e) => CollectionChanging?.Invoke(this, e);
-            }
-        }
-
-        [Obsolete("This class has been moved to the WinCopies.Collections.DotNetFix namespace. This implementation is still here temporarily only.")]
+    namespace DotNetFix
+    {
+        [Serializable]
         public class ReadOnlyObservableCollection<T> : System.Collections.ObjectModel.ReadOnlyObservableCollection<T>, INotifyCollectionChanging
         {
 
             public event NotifyCollectionChangingEventHandler CollectionChanging;
 
-            public ReadOnlyObservableCollection(ObservableCollection<T> list) : base(list) => list.CollectionChanging += (object sender, DotNetFix. NotifyCollectionChangedEventArgs e) => CollectionChanging?.Invoke(this, e);
+            public ReadOnlyObservableCollection(ObservableCollection<T> list) : base(list) => list.CollectionChanging += (object sender, DotNetFix.NotifyCollectionChangedEventArgs e) => CollectionChanging?.Invoke(this, e);
         }
+    }
+
+    [Obsolete("This class has been moved to the WinCopies.Collections.DotNetFix namespace. This implementation is still here temporarily only.")]
+    [Serializable]
+    public class ReadOnlyObservableCollection<T> : System.Collections.ObjectModel.ReadOnlyObservableCollection<T>, INotifyCollectionChanging
+    {
+
+        public event NotifyCollectionChangingEventHandler CollectionChanging;
+
+        public ReadOnlyObservableCollection(ObservableCollection<T> list) : base(list) => list.CollectionChanging += (object sender, DotNetFix.NotifyCollectionChangedEventArgs e) => CollectionChanging?.Invoke(this, e);
+    }
 
 }

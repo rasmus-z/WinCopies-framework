@@ -6,6 +6,8 @@ The WinCopies® software framework
 CHANGELOG
 =========
 
+Please note that some changes may not appear in the Change Log.
+
 Updates
 -------
 
@@ -27,14 +29,40 @@ Available for .Net Framework, .Net Core and .Net Standard*
 	- The 'If' methods now set up the out 'key' parameter with the second value and predicate pair that was checked, if any, instead of the default value for the key type when performing a 'xor' comparison.
 	- The ApartmentState, WorkerReportsProgress and WorkerSupportsCancellation properties of the IBackgroundWorker interface are now settable.
 	- The IsNullConverter class now uses the 'is' operator instead of '=='.
-	- WinCopies.Util.Collections.ObservableCollection class:
-		- Now calls base methods for avoinding reentrancy.
-		- Now have the Serializable attribute
-	- WinCopies.Util.Data.IValueObject generic and non-generic:
-		- are now obsoletes and have been replaced by the WinCopies.Util.IValueObject interfaces**;
-		- now inherits from the WinCopies.Util.IValueObject interfaces.**
 	- The WinCopies.Util.Data.ValueObject now implements the WinCopies.Util.IValueObject generic interface.**
 	- The WinCopies.Util.IValueObject interface implements IDisposable, so all classes that implements the WinCopies.Util.IValueObject are also disposable.
+	- The following items have been moved to the WinCopies.Collections.DotNetFix namespace:
+		- NotifyCollectionChangedEventArgs
+		- ObservableCollection:
+			- ObservableCollection classes:
+				- Now call base methods for avoinding reentrancy.
+				- Now have the Serializable attribute
+				- Now implement the IObservableCollection interface
+		- ReadOnlyObservableCollection:
+			- The ReadOnlyObservableCollection classes:
+				- Now have the Serializable attribute.
+
+- Obsolete items:
+	- Classes and interfaces:
+		- WinCopies.Util.Data.IValueObjects generic and non-generic:
+			- are now obsoletes and have been replaced by the WinCopies.Util.IValueObject interfaces.**;
+			- now inherit from the WinCopies.Util.IValueObject interfaces.**
+		- WinCopies.Util.Data.CheckableObjects generic and non-generic:
+			- are now obsoletes and have been replaced by the corresponding models and view models of the new WinCopies.GUI.Models and WinCopies.GUI.ViewModels packages.
+		- (I)ReadOnlyArrayList
+	- Extension methods:
+		- static bool ContainsOneValue(this IEnumerable array, Comparison<object> comparison, out bool containsMoreThanOneValue, params object[] values) IEnumerable extension method (replaced by ContainsOneValue(this IEnumerable array, WinCopies.Collections.Comparison comparison, out bool containsMoreThanOneValue, params object[] values)).
+		- static object GetNumValue(this Enum @enum, string enumName) Enum extension method. Replaced by:
+			- GetNumValue(this Enum @enum)
+			- WinCopies.Util.GetNumValue(Type enumType, string fieldName)
+		- static bool Contains(this string s, IEqualityComparer<char> comparer, string value) (replaced by Contains(this string s, string value, IEqualityComparer<char> comparer)).
+		- static bool Contains(this string s, char value, IEqualityComparer<char> comparer, out int index) (replaced by array-common methods).
+	- Util methods:
+		- static (bool propertyChanged, object oldValue) SetPropertyWhenNotBusy<T>(T bgWorker, string propertyName, string fieldName, object newValue, Type declaringType, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet, bool throwIfBusy = true) where T : IBackgroundWorker, INotifyPropertyChanged (replaced by the WinCopies.Util.Extensions.SetBackgroundWorkerProperty method overloads).
+		- Static If methods with object-generic delegates have been replaced by ones with new non-generic delegates.
+	- Misc:
+		- The resources are now available from the new Resources static class.
+		- The Microsoft.Shell namespace members are now available from the version 1.1.0 and later of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/
 
 - Addings:
 	- Classes:
@@ -49,6 +77,7 @@ Available for .Net Framework, .Net Core and .Net Standard*
 		- ReadOnlyLinkedList
 		- EnumeratorCollection
 		- MergedStylesExtension
+		- Resources static class
 	- Interfaces:
 		- IDeepCloneable
 		- IDisposable
