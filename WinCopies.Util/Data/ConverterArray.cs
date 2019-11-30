@@ -35,6 +35,8 @@ namespace WinCopies.Util.Data
 
         public object Parameter { get; set; }
 
+        public ConverterArrayParameter() { } 
+
         public ConverterArrayParameter(IEnumerable<IValueConverter> converters, object parameter)
 
         {
@@ -56,10 +58,12 @@ namespace WinCopies.Util.Data
 
         public IList<object> Parameters { get; set; }
 
+        public ConverterArrayMultiParametersParameter() { } 
+
         public ConverterArrayMultiParametersParameter(IList<IValueConverter> converters, IList<object> parameters)
         {
 
-            if (converters.Count != parameters.Count) throw new ArgumentException("converters and parameters does not have the same number of parameters.");
+            if (converters.Count != parameters.Count) throw new ArgumentException("converters and parameters does not have the same number of items.");
 
             Converters = converters;
 

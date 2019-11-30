@@ -253,15 +253,17 @@
                             <Control Grid.Row="1" HorizontalAlignment="{Binding ButtonAlignment, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={dialogs:ButtonAlignmentToHorizontalAlignmentConverter}}" Focusable="False" >
                                 <Control.Style>
                                     <Style TargetType="{x:Type Control}">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate>
-                                                    <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-
                                         <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.OK}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate>
+                                                            <Button Command="{x:Static commands:DialogCommands.Ok}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=Self}}" IsDefault="{Binding DefaultButton, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dialogs:DialogWindow}}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static guiDialogs:DefaultButton.OK}}" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+
                                             <DataTrigger Binding="{Binding DialogButton, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Static guiDialogs:DialogButton.OKCancel}">
                                                 <Setter Property="Template">
                                                     <Setter.Value>
@@ -423,6 +425,36 @@
                                                         </ControlTemplate>
                                                     </Setter.Value>
                                                 </Setter>
+                                            </DataTrigger>
+
+                                            <DataTrigger>
+                                                <DataTrigger.Binding>
+                                                    <Binding Path="CustomButtons" RelativeSource="{RelativeSource Mode=TemplatedParent}">
+                                                        <Binding.Converter>
+                                                            <dataConverters:ConverterArray />
+                                                        </Binding.Converter>
+                                                        <Binding.ConverterParameter>
+                                                            <dataConverters:ConverterArrayParameter >
+                                                                <dataConverters:ConverterArrayParameter.Converters>
+                                                                    <x:Array Type="{x:Type IValueConverter}" >
+                                                                        <dataConverters:IsNullConverter />
+                                                                        <dataConverters:ReverseBooleanConverter />
+                                                                    </x:Array>
+                                                                </dataConverters:ConverterArrayParameter.Converters>
+                                                            </dataConverters:ConverterArrayParameter>
+                                                        </Binding.ConverterParameter>
+                                                    </Binding>
+                                                </DataTrigger.Binding>
+
+                                                <DataTrigger.Setters>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type Control}" >
+                                                                <ItemsControl ItemsSource="{Binding CustomButtons, RelativeSource={RelativeSource Mode=TemplatedParent}}" ItemTemplate="{Binding CustomButtonTemplate, RelativeSource={RelativeSource Mode=TemplatedParent}}" ItemTemplateSelector="{Binding CustomButtonTemplateSelector, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger.Setters>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
