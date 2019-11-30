@@ -65,7 +65,7 @@ Available for .Net Framework, .Net Core and .Net Standard*
 		- Static If methods with object-generic delegates have been replaced by ones with new non-generic delegates.
 	- Misc:
 		- The resources are now available from the new Resources static class.
-		- The Microsoft.Shell namespace members are now available from the version 1.1.0 and later of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/
+		- The Microsoft.Shell namespace members are now available from the version 1.1.0 and later of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native
 		- The WinCopies.Util.Commands.ApplicationCommands.CloseWindow is now obsolete. Please use the System.Windows.Input.ApplicationCommands.Close command instead.
 
 - Addings:
@@ -140,7 +140,7 @@ Available for .Net Framework, .Net Core and .Net Standard*
 - Misc:
 	- ReadOnlyObservableCollection's CollectionChanging event has now the protected access modifier.
 	- Some code now uses the 'in' parameter modifier.
-	- The dependency package System.Windows.Interactivity.WPF has been replaced by the Microsoft.Xaml.Behaviors.Wpf package.
+	- The dependency package System.Windows.Interactivity.WPF has been replaced by the https://www.nuget.org/packages/Microsoft.Xaml.Behaviors.Wpf package.
 	- Move resources from Generic.xaml to assembly's resource file.
 	- Update doc.
 

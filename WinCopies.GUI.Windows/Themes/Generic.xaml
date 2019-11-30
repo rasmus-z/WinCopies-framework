@@ -427,27 +427,7 @@
                                                 </Setter>
                                             </DataTrigger>
 
-                                            <DataTrigger>
-                                                <DataTrigger.Binding>
-                                                    <Binding Path="CustomButtonsSource" RelativeSource="{RelativeSource Mode=TemplatedParent}">
-                                                        <Binding.Converter>
-                                                            <dataConverters:ConverterArray />
-                                                        </Binding.Converter>
-                                                        <Binding.ConverterParameter>
-                                                            <dataConverters:ConverterArrayParameter >
-                                                                <dataConverters:ConverterArrayParameter.Converters>
-                                                                    <x:Array Type="{x:Type IValueConverter}" >
-                                                                        <dataConverters:IsNullConverter />
-                                                                        <dataConverters:ReverseBooleanConverter />
-                                                                    </x:Array>
-                                                                </dataConverters:ConverterArrayParameter.Converters>
-                                                            </dataConverters:ConverterArrayParameter>
-                                                        </Binding.ConverterParameter>
-                                                    </Binding>
-                                                </DataTrigger.Binding>
-
-                                                <DataTrigger.Value>true</DataTrigger.Value>
-
+                                            <DataTrigger Binding="{Binding CustomButtonsSource, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={dataConverters:IsNullConverter}}" Value="false">
                                                 <DataTrigger.Setters>
                                                     <Setter Property="Template">
                                                         <Setter.Value>
