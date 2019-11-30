@@ -1,6 +1,21 @@
-﻿/*
- * Authors: Khun Ly, Pierre Sprimont
- */
+﻿/* Copyright © Pierre Sprimont, 2019
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * Authors: Khun Ly, Pierre Sprimont */
 
 using Newtonsoft.Json.Linq;
 using System;
@@ -12,95 +27,94 @@ namespace WinCopies.Data
 {
     public static class ReaderToEntityMapper
     {
-        public static T ReaderTo<T>(IDataReader reader)
+
+        public static T ReadTo<T>(Func<ReaderToEntityMapperAttribute, string, object> getValueDelegate)
            where T : class, new()
         {
+            var result = new T();
 
-            T result = new T(); // Activator.CreateInstance<T>();
-
-            SqlReaderToEntityMapperAttribute readerToEntityMapperAttribute = null;
-
-            PropertyInfo[] properties = typeof(T).GetProperties();
-
-            object value = null;
-
-            foreach (PropertyInfo prop in properties)
-            {
-
-                readerToEntityMapperAttribute = prop.GetCustomAttribute<SqlReaderToEntityMapperAttribute>();
-
-                value = reader[readerToEntityMapperAttribute == null ? prop.Name : readerToEntityMapperAttribute.TableColumnName];
-
-                if (value == DBNull.Value)
-
-                    value = null;
-
-                if (prop.PropertyType.IsAssignableFrom(value?.GetType()))
-
-                    prop.SetValue(result, readerToEntityMapperAttribute.Converter == null ? value : readerToEntityMapperAttribute.Converter.Convert(value, prop.PropertyType, readerToEntityMapperAttribute.ConverterParameter, readerToEntityMapperAttribute.ConverterCultureInfo));
-
-            }
+            ReadTo(result, getValueDelegate);
 
             return result;
         }
 
-        //public static T ReaderTo<T>(XmlDocument xmlDoc)
-        //   where T : class, new()
-        //{
-
-        //    T result = new T(); // Activator.CreateInstance<T>();
-
-        //    ReaderToEntityMapperAttribute readerToEntityMapperAttribute = null;
-
-        //    PropertyInfo[] properties = typeof(T).GetProperties();
-
-        //    object value = null;
-
-        //    foreach (PropertyInfo prop in properties)
-        //    {
-        //        readerToEntityMapperAttribute = prop.GetCustomAttribute<ReaderToEntityMapperAttribute>();
-
-        //        value = reader[readerToEntityMapperAttribute == null ? prop.Name : readerToEntityMapperAttribute.TableColumnName];
-
-        //        if (value == DBNull.Value)
-
-        //            value = null;
-
-        //        if (prop.PropertyType.IsAssignableFrom(value?.GetType()))
-
-        //            prop.SetValue(result, readerToEntityMapperAttribute.Converter == null ? value : readerToEntityMapperAttribute.Converter.Convert(value, prop.PropertyType, readerToEntityMapperAttribute.ConverterParameter, readerToEntityMapperAttribute.ConverterCultureInfo));
-
-        //    }
-
-        //    return result;
-        //}
-
-        public static T ReaderTo<T>(JObject jObject)
-           where T : class, new()
+        public static void ReadTo<T>(T obj, Func<ReaderToEntityMapperAttribute, string, object> getValueDelegate)
         {
 
-            T result = new T(); // Activator.CreateInstance<T>();
-
-            ReaderToEntityMapperAttribute readerToEntityMapperAttribute = null;
+            ReaderToEntityMapperAttribute readerToEntityMapperAttribute;
 
             PropertyInfo[] properties = typeof(T).GetProperties();
 
-            object value = null;
+            object value;
 
             foreach (PropertyInfo prop in properties)
             {
 
                 readerToEntityMapperAttribute = prop.GetCustomAttribute<ReaderToEntityMapperAttribute>();
 
-                value = jObject[prop.Name];
+                value = getValueDelegate(readerToEntityMapperAttribute, prop.Name);
 
-                if (prop.PropertyType.IsAssignableFrom(value?.GetType()))
+                if (value == null ? prop.PropertyType.IsClass || prop.PropertyType.IsInterface : prop.PropertyType.IsAssignableFrom(value.GetType()))
 
-                    prop.SetValue(result, readerToEntityMapperAttribute.Converter == null ? value : readerToEntityMapperAttribute.Converter.Convert(value, prop.PropertyType, readerToEntityMapperAttribute.ConverterParameter, readerToEntityMapperAttribute.ConverterCultureInfo));
+                    prop.SetValue(obj, readerToEntityMapperAttribute.Converter == null ? value : readerToEntityMapperAttribute.Converter.Convert(value, prop.PropertyType, readerToEntityMapperAttribute.ConverterParameter, readerToEntityMapperAttribute.ConverterCultureInfo));
 
             }
+        }
+
+        public static T ReadTo<T>(IDataReader reader)
+           where T : class, new()
+        {
+
+            var result = new T();
+
+            ReadTo(result, reader);
 
             return result;
+
         }
+
+        public static void ReadTo<T>(T obj, IDataReader reader) => ReadTo(obj, (ReaderToEntityMapperAttribute readerToEntityMapperAttribute, string propName) =>
+        {
+
+            object value = reader[readerToEntityMapperAttribute?.TableFieldName ?? propName];
+
+            return value == DBNull.Value ? null : value;
+
+        });
+
+        public static T ReadTo<T>(XmlNode xmlNode)
+           where T : class, new()
+        {
+
+            var result = new T();
+
+            ReadTo(result, xmlNode);
+
+            return result;
+
+        }
+
+        public static void ReadTo<T>(T obj, XmlNode xmlNode) => ReadTo(obj, (ReaderToEntityMapperAttribute readerToEntityMapperAttribute, string propName) =>
+        {
+
+            object value = xmlNode[readerToEntityMapperAttribute?.TableFieldName ?? propName];
+
+            return value == DBNull.Value ? null : value;
+
+        });
+
+        public static T ReadTo<T>(JObject jObject)
+           where T : class, new()
+        {
+
+            var result = new T();
+
+            ReadTo(result, jObject);
+
+            return result;
+
+        }
+
+        public static void ReadTo<T>(T obj, JObject jObject) => ReadTo(obj, (ReaderToEntityMapperAttribute readerToEntityMapperAttribute, string propName) => jObject[propName]);
     }
 }

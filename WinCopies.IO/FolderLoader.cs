@@ -1,111 +1,144 @@
-﻿#region "Imports"
-
-
-
-#region ".NET"
+﻿/* Copyright © Pierre Sprimont, 2019
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Reflection;
+using System.Linq;
+using System.Security;
 using System.Windows;
 using WinCopies.Util;
 
-#endregion
-
-#region "WinCopies"
-
-// using WinCopies.IO;
-
-#endregion
-
-
-#endregion
+using static WinCopies.Util.Util;
+using IFCT = WinCopies.Util.Util.ComparisonType;
+using IfCM = WinCopies.Util.Util.ComparisonMode;
+using IfComp = WinCopies.Util.Util.Comparison;
+using static WinCopies.IO.FolderLoader;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
 
-    /// <summary>
-    /// Provides a background process that can be used to load items of a folder.
-    /// </summary>
-    public class FolderLoader : BrowsableObjectInfoItemsLoader
+    public interface IFolderLoader : IFileSystemObjectLoader
     {
+
+        FolderLoaderFileSystemWatcher FileSystemWatcher { get; }
+
+    }
+
+    internal static class FolderLoader
+
+    {
+
+        internal static bool HandleIOException(Exception ex) => ex.Is(false, typeof(IOException), typeof(UnauthorizedAccessException), typeof(SecurityException));
+
+    }
+
+    /// <summary>
+    /// Provides a background process that can be used to load items of a folder. See the Remarks section.
+    /// </summary>
+    /// <remarks>
+    /// This loader is not designed for <see cref="ShellObjectInfo"/> that have their <see cref="FileSystemObject.FileType"/> property set up with an other value than <see cref="FileType.Folder"/>, <see cref="FileType.Drive"/> or <see cref="FileType.SpecialFolder"/>, even if they can be browsable (e.g. <see cref="FileType.Archive"/>). If the file type of the given <see cref="BrowsableObjectInfoLoader.Path"/> is not supported by this loader, you'll have to use a specific loader or to inherit from this loader.
+    /// </remarks>
+    public class FolderLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory>, IFolderLoader where TPath : ShellObjectInfo where TItems : FileSystemObjectInfo where TSubItems : FileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory, IShellObjectInfoFactory where TItemsFactory : BrowsableObjectInfoFactory
+    {
+
+        public override bool NeedsObjectsOrValuesReconstruction => true;
+
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new FolderLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(null, FileTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
 
         // todo: to turn on ShellObjectWatcher for better compatibility
 
-        public FolderLoaderFileSystemWatcher FileSystemWatcher { get; private set; } = null;
+#pragma warning disable CS0649 // Set up using reflection
+        private FolderLoaderFileSystemWatcher _fileSystemWatcher;
+#pragma warning restore CS0649
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
-        /// </summary>
-        public FolderLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes)
-
+        public FolderLoaderFileSystemWatcher FileSystemWatcher
         {
+            get => _fileSystemWatcher ?? (FileSystemWatcher = GetFolderLoaderFileSystemWatcher()); private set
+            {
 
+                if (IsBusy)
+
+                    throw new InvalidOperationException("The items loader is busy.");
+
+                value.Created += FileSystemWatcher_Created;
+
+                value.Renamed += FileSystemWatcher_Renamed;
+
+                value.Deleted += FileSystemWatcher_Deleted;
+
+                _fileSystemWatcher = value;
+
+            }
         }
 
-        protected override void Init()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FolderLoader"/> class.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileTypes">The file types to load.</param>
+        public FolderLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FolderLoader"/> class using a custom comparer.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+        /// <param name="fileTypes">The file types to load.</param>
+        public FolderLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, fileTypes, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) { }
+
+        protected override void OnPathChanging( BrowsableObjectTreeNode< TPath, TItems, TFactory > path)
         {
 
-            if (Path == null)
+            if (path is null)
 
-                FileSystemWatcher = null;
+                return;
 
-            else
+            FileSystemWatcher.EnableRaisingEvents = false;
+
+            FileSystemWatcher.Path = null;
+
+            if (Path is null) return;
+
+            if (If(IFCT.Or, IfCM.Logical, IfComp.NotEqual, path.Value.FileType, FileType.Folder, FileType.Drive, FileType.SpecialFolder))
+
+                throw new ArgumentException("'Path' isn't a folder, a drive or a special folder. 'Path': " + path.ToString());
+
+            if ((Path.Value.FileType == FileType.Drive && new DriveInfo(Path.Value.Path).IsReady) || Path.Value.ShellObject.IsFileSystemObject)
 
             {
 
-                if (!(Path is ShellObjectInfo _path))
+                FileSystemWatcher.Path = Path.Value.Path;
 
-                    throw new ArgumentException("'Path' isn't a ShellObjectInfo. 'Path' is " + Path.ToString());
-
-                else if (_path.FileType != FileType.Folder && _path.FileType != FileType.Drive && _path.FileType != FileType.SpecialFolder)
-
-                    throw new ArgumentException("'Path' isn't a folder, a drive or a special folder. 'Path': " + _path.ToString());
-
-                if ((((ShellObjectInfo)Path).FileType == FileType.Folder || ((ShellObjectInfo)Path).FileType == FileType.SpecialFolder) && ((ShellObjectInfo)Path).ShellObject.IsFileSystemObject && FileSystemWatcher == null)
-
-                {
-
-                    try
-                    {
-
-                        FileSystemWatcher = GetFolderLoaderFileSystemWatcher();
-
-                        if ((((ShellObjectInfo)Path).FileType == FileType.Drive && new DriveInfo(((ShellObjectInfo)Path).Path).IsReady) || (((ShellObjectInfo)Path).FileType != FileType.Drive && ((ShellObjectInfo)Path).ShellObject.IsFileSystemObject))
-
-                        {
-
-                            FileSystemWatcher.Path = Path.Path;
-
-                            FileSystemWatcher.EnableRaisingEvents = true;
-
-                            FileSystemWatcher.Created += FileSystemWatcher_Created;
-
-                            FileSystemWatcher.Renamed += FileSystemWatcher_Renamed;
-
-                            FileSystemWatcher.Deleted += FileSystemWatcher_Deleted;
-
-                        }
-
-                    }
-
-                    catch { }
-
-                }
+                FileSystemWatcher.EnableRaisingEvents = true;
 
             }
 
         }
 
         /// <summary>
-        /// <para>Gets the <see cref="FolderLoaderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoItemsLoader.Path"/> property.</para>
-        /// <para>When substituted in a derived class, provides a custom <see cref="FolderLoaderFileSystemWatcher"/>.</para>
+        /// <para>Gets the <see cref="FolderLoaderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoLoader.Path"/> property.</para>
+        /// <para>When overridden in a derived class, provides a custom <see cref="FolderLoaderFileSystemWatcher"/>.</para>
         /// </summary>
         /// <returns>An instance of the <see cref="FolderLoaderFileSystemWatcher"/> class.</returns>
         protected virtual FolderLoaderFileSystemWatcher GetFolderLoaderFileSystemWatcher() => new FolderLoaderFileSystemWatcher();
@@ -113,11 +146,11 @@ namespace WinCopies.IO
         /// <summary>
         /// Frees all resources used by this <see cref="FolderLoader"/>.
         /// </summary>
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
 
         {
 
-            base.Dispose();
+            base.Dispose(disposing);
 
             if (FileSystemWatcher != null)
 
@@ -141,35 +174,28 @@ namespace WinCopies.IO
                 try
                 {
 
-                    Path.items.Add(OnAddingNewBrowsableObjectInfo(ShellObject.FromParsingName(path), path));
+                    // todo: may not work with ShellObjectWatcher
+
+                    Path.Insert( Path.Count, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>( (TItems)Path.Factory.GetBrowsableObjectInfo(path, FileType.File, SpecialFolder.OtherFolderOrFile, ShellObject.FromParsingName(path), ShellObjectInfo.DefaultShellObjectDeepClone), (TItemsFactory) Path.Factory.DeepClone()));
 
                 }
 #if DEBUG
+#pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception ex) { Debug.WriteLine(ex.Message); }
+#pragma warning restore CA1031 // Do not catch general exception types
 #else
             catch { }
 #endif
 
-                Path.items.Sort(comp.GetInstance());
+                // todo:
+
+                //if (FileSystemObjectComparer != null)
+
+                //    Path.Items.Sort( 0, Path.Items.Count,     FileSystemObjectComparer);
+
             }
 
         }
-
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo)
-
-        {
-
-            if (browsableObjectInfo is BrowsableObjectInfo _browsableObjectInfo)
-
-                _browsableObjectInfo.Parent = Path;
-
-            return browsableObjectInfo;
-
-        }
-
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(ShellObject shellObject, string path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).GetBrowsableObjectInfo(shellObject, path));
-
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path) => OnAddingNewBrowsableObjectInfo(((ShellObjectInfo)Path).GetBrowsableObjectInfo(path.ShellObject, path.Path, path.FileType, ShellObjectInfo.GetFileType(path.Path, path.ShellObject).specialFolder));
 
         protected virtual void OnShellObjectRenamed(string oldPath, string newPath)
 
@@ -177,7 +203,7 @@ namespace WinCopies.IO
 
             if (!Application.Current.Dispatcher.CheckAccess())
 
-                Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectRenamed(oldPath, newPath));
+                _ = Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectRenamed(oldPath, newPath));
 
             else
             {
@@ -196,17 +222,17 @@ namespace WinCopies.IO
 
             if (!Application.Current.Dispatcher.CheckAccess())
 
-                Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectDeleted(path));
+                _ = Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectDeleted(path));
 
             else
 
-                for (int i = 0; i < Path.items.Count; i++)
+                for (int i = 0; i < Path.Count; i++)
 
-                    if (Path.items[i].Path == path)
+                    if (Path[i].Value.Path == path)
 
                     {
 
-                        Path.items.RemoveAt(i);
+                        Path.RemoveAt(i);
 
                         return;
 
@@ -220,28 +246,53 @@ namespace WinCopies.IO
 
         private void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e) => OnShellObjectDeleted(e.FullPath);
 
-        protected override void OnDoWork(object sender, DoWorkEventArgs e)
+        protected override void OnDoWork(DoWorkEventArgs e)
+
         {
 
-            base.OnDoWork(sender, e);
+            if (FileTypes == FileTypes.None) return;
 
-            List<IFileSystemObject> paths = new List<IFileSystemObject>();
+#if DEBUG
 
-            var comp = FolderLoader.comp.GetInstance();
+            Debug.WriteLine("Dowork event started.");
 
-            void AddPath(ref PathInfo pathInfo)
+            Debug.WriteLine(FileTypes);
+
+            try
+            {
+
+                Debug.WriteLine("Path == null: " + (Path == null).ToString());
+
+                Debug.WriteLine("Path.Path: " + Path?. Value. Path);
+
+                Debug.WriteLine("Path.ShellObject: " + (Path as IShellObjectInfo)?.ShellObject.ToString());
+
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception) { }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+#endif
+
+            var paths = new ArrayBuilder<PathInfo>();
+
+            void AddPath(ref string path, FileType fileType, ShellObject _shellObject)
 
             {
 
-                if (pathInfo.Path.EndsWith(".lnk"))
+#if DEBUG
+
+                if (path.EndsWith(".lnk"))
 
                     Debug.WriteLine("");
 
-                if (pathInfo.FileType == FileType.None || (pathInfo.FileType != FileType.SpecialFolder && FileTypes != FileTypesFlags.All && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
+#endif
+
+                if (fileType == FileType.Other || (fileType != FileType.SpecialFolder && FileTypes != GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(fileType)))) return;
 
                 // We only make a normalized path if we add the path to the paths to load.
 
-                if (pathInfo.Path.StartsWith("::"))
+                if (path.StartsWith("::"))
 
                 {
 
@@ -257,9 +308,9 @@ namespace WinCopies.IO
 
                     //        path = knownFolder.Path;
 
-                    //        if (pathInfo.Path.Contains("\\"))
+                    //        if (pathInfo.Path.Contains(IO.Path.PathSeparator))
 
-                    //            path += pathInfo.Path.Substring(pathInfo.Path.IndexOf('\\')) + 1;
+                    //            path += pathInfo.Path.Substring(pathInfo.Path.IndexOf(IO.Path.PathSeparator)) + 1;
 
                     //    }
 
@@ -267,25 +318,25 @@ namespace WinCopies.IO
 
                     //catch (ShellException) { }
 
-                    string path = null /*= Path.Name*/;
+                    var browsableObjectInfo = (IBrowsableObjectInfo)Path;
 
-                    IBrowsableObjectInfo browsableObjectInfo = Path;
+                    IBrowsableObjectInfo newPath;
 
                     path = browsableObjectInfo.Name;
 
                     browsableObjectInfo = browsableObjectInfo.Parent;
 
-                    while (browsableObjectInfo != null) 
+                    while (browsableObjectInfo != null)
 
                     {
 
-                        path = browsableObjectInfo.Name + "\\" + path;
+                        path = browsableObjectInfo.Name + IO.Path.PathSeparator + path;
 
-                        browsableObjectInfo = browsableObjectInfo.Parent;
+                        newPath = browsableObjectInfo.Parent;
+
+                        browsableObjectInfo.Dispose();
 
                     }
-
-                    pathInfo.Path = path;
 
                 }
 
@@ -293,9 +344,9 @@ namespace WinCopies.IO
 
                 //string path = pathInfo.Path;
 
-                //if (path.Contains("\\"))
+                //if (path.Contains(IO.Path.PathSeparator))
 
-                //    path = path.Substring(0, path.IndexOf("\\"));
+                //    path = path.Substring(0, path.IndexOf(IO.Path.PathSeparator));
 
                 //foreach (PropertyInfo prop in props)
 
@@ -320,62 +371,48 @@ namespace WinCopies.IO
 
                 //    }
 
-                pathInfo.Normalized_Path = IO.Path.GetNormalizedPath(pathInfo.Path);
-
-                paths.Add(pathInfo);
+                paths.AddLast(new PathInfo(path, path.RemoveAccents(), fileType, _shellObject, ShellObjectInfo.DefaultShellObjectDeepClone));
 
             }
 
-            void AddDirectory(PathInfo pathInfo)
-
-            {
+            void AddDirectory(string path, ShellObject _shellObject) =>
 
                 // if (FileTypes.HasFlag(FileTypesFlags.All) || (FileTypes.HasFlag(FileTypesFlags.Folder) && System.IO.Path.GetPathRoot(pathInfo.Path) != pathInfo.Path) || (FileTypes.HasFlag(FileTypesFlags.Drive) && System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path))
 
-                pathInfo.FileType = pathInfo.ShellObject.IsFileSystemObject ? System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path ? FileType.Drive : FileType.Folder : FileType.SpecialFolder;
+                AddPath(ref path, _shellObject.IsFileSystemObject ? System.IO.Path.GetPathRoot(path) == path ? FileType.Drive : FileType.Folder : FileType.SpecialFolder, _shellObject);
 
-                AddPath(ref pathInfo);
-
-            }
-
-            void AddFile(PathInfo pathInfo, bool isLink)
-
-            {
-
-                pathInfo.FileType = isLink
-                    ? IO.FileType.Link
-                    : ArchiveLoader.IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
+            void AddFile(string path, ShellObject _shellObject) =>
 
                 // We only make a normalized path if we add the path to the paths to load.
 
-                AddPath(ref pathInfo);
-
-            }
+                AddPath(ref path, _shellObject.IsLink
+                    ? FileType.Link
+                    : IO.Path.IsSupportedArchiveFormat(System.IO.Path.GetExtension(path)) ? FileType.Archive : FileType.File, _shellObject);
 
             try
             {
 
-                if (((ShellObjectInfo)Path).ShellObject.IsFileSystemObject)
+                if (Path.Value.ShellObject.IsFileSystemObject)
 
                 {
 
-                    string[] directories = Directory.GetDirectories(Path.Path);
+                    string[] directories = Directory.GetDirectories(Path.Value.Path);
 
                     ShellObject shellObject = null;
 
                     foreach (string directory in directories)
 
-                        // if (CheckFilter(directory))
+                        if (CheckFilter(directory))
 
-                        AddDirectory(new PathInfo() { Path = directory, ShellObject = ShellObject.FromParsingName(directory) });
+                            AddDirectory(directory, ShellObject.FromParsingName(directory));
 
-                    string[] files = Directory.GetFiles(Path.Path);
+                    string[] files = Directory.GetFiles(Path.Value.Path);
 
                     foreach (string file in files)
 
                         if (CheckFilter(file))
 
-                            AddFile(new PathInfo() { Path = file, ShellObject = shellObject = ShellObject.FromParsingName(file) }, shellObject.IsLink);
+                            AddFile(file, (shellObject = ShellObject.FromParsingName(file)));
 
                 }
 
@@ -387,7 +424,7 @@ namespace WinCopies.IO
 
                     //PathInfo pathInfo;
 
-                    foreach (ShellObject so in (ShellContainer)((ShellObjectInfo)Path).ShellObject)
+                    foreach (ShellObject so in (ShellContainer)Path.Value.ShellObject)
 
                         //#if DEBUG
 
@@ -403,13 +440,13 @@ namespace WinCopies.IO
 
                         //#endif
 
-                        if (so is ShellFile)
+                        if (so is ShellFile shellFile)
 
-                            AddFile(new PathInfo() { Path = ((ShellFile)so).Path, ShellObject = so }, so.IsLink);
+                            AddFile(shellFile.Path, shellFile);
 
-                        else if (so is ShellLink)
+                        else if (so is ShellLink shellLink)
 
-                            AddFile(new PathInfo() { Path = ((ShellLink)so).Path, ShellObject = so }, so.IsLink);
+                            AddFile(shellLink.Path, shellLink);
 
                         // if (so is FileSystemKnownFolder || so is NonFileSystemKnownFolder || so is ShellNonFileSystemFolder || so is ShellLibrary)
 
@@ -419,13 +456,13 @@ namespace WinCopies.IO
 
                         else
 
-                            AddDirectory(new PathInfo() { Path = so.ParsingName, ShellObject = so });
+                            AddDirectory(so.ParsingName, so);
 
                 }
 
             }
 
-            catch (IOException ex)
+            catch (Exception ex) when (HandleIOException(ex))
             {
 
 #if DEBUG
@@ -434,106 +471,115 @@ namespace WinCopies.IO
 
 #endif
 
-                throw;
+            }
+
+
+
+            Debug.WriteLine("cFileTypes: " + FileTypes.ToString());
+
+
+
+            IEnumerable<PathInfo> pathInfos;
+
+
+
+            if (FileSystemObjectComparer == null)
+
+                pathInfos = (IEnumerable<PathInfo>)paths;
+
+            else
+
+            {
+
+                var _paths = paths.ToList();
+
+                _paths.Sort(FileSystemObjectComparer);
+
+                pathInfos = (IEnumerable<PathInfo>)_paths;
 
             }
 
-            paths.Sort(comp);
+
+
+            PathInfo path_;
 
 
 
-            void reportProgressAndAddNewPathToObservableCollection(PathInfo path_)
+            using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
 
-            {
+
+
+                while (_paths.MoveNext())
+
+                    try
+
+                    {
+
+                        do
+
+                        {
+
+                            path_ = _paths.Current;
 
 #if DEBUG
 
-                Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
-                Debug.WriteLine("path_.Path: " + path_.Path);
-                Debug.WriteLine("path_.Normalized_Path: " + path_.Normalized_Path);
-                Debug.WriteLine("path_.Shell_Object: " + path_.ShellObject);
+                            Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
+                            Debug.WriteLine("path_.Path: " + path_.Path);
+                            Debug.WriteLine("path_.Normalized_Path: " + path_.NormalizedPath);
+                            Debug.WriteLine("path_.Shell_Object: " + path_.ShellObject);
+                            Debug.WriteLine("Path.Factory is null: " + (Path.Factory is null).ToString());
 
 #endif
 
-                var new_Path = path_.ShellObject;
+                            // new_Path.LoadThumbnail();
 
-                // new_Path.LoadThumbnail();
+                            Debug.WriteLine("FileTypes: " + FileTypes.ToString());
 
-                ReportProgress(0, OnAddingNewBrowsableObjectInfo(path_));
+                            ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>( (TItems) Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.FileType, IO.Path.GetSpecialFolder(path_.ShellObject), path_.ShellObject, ShellObjectInfo.DefaultShellObjectDeepClone), (TItemsFactory) Path.Factory.DeepClone()));
 
-#if DEBUG
+                        } while (_paths.MoveNext());
 
-                Debug.WriteLine("Ceci est un " + new_Path.GetType().ToString());
-
-#endif
-
-            }
-
-            foreach (PathInfo path_ in paths)
-
-                reportProgressAndAddNewPathToObservableCollection(path_);
+                    }
+                    catch (Exception ex) when (HandleIOException(ex)) { }
 
         }
 
-        public struct PathInfo : IFileSystemObject
+        protected class PathInfo : IO.PathInfo
 
         {
 
-            public string Path { get; set; }
+            public FileType FileType { get; }
 
-            public string Normalized_Path { get; set; }
+            public ShellObject ShellObject { get; }
 
-            public ShellObject ShellObject { get; set; }
+            public DeepClone<ShellObject> ShellObjectDelegate { get; }
 
-            public string LocalizedName { get => ShellObject.GetDisplayName(DisplayNameType.Default); }
+            /// <summary>
+            /// Gets the localized name of this <see cref="PathInfo"/>.
+            /// </summary>
+            public override string LocalizedName => Name;
 
-            public string Name { get; set; }
+            /// <summary>
+            /// Gets the name of this <see cref="PathInfo"/>.
+            /// </summary>
+            public override string Name => ShellObject.GetDisplayName(DisplayNameType.Default);
 
-            public FileType FileType { get; set; }
-
-        }
-
-        public class comp : Comparer<IFileSystemObject> // Variable locale pour stocker une référence vers l'instance
-
-        {
-
-
-            private static comp instance = null;
-
-            private static readonly object mylock = new object();
-
-            public StringComparer bidule { get; set; } = StringComparer.Create(CultureInfo.CurrentCulture, true);
-
-            // Le constructeur est Private
-            private comp()
+            public PathInfo(string path, string normalizedPath, FileType fileType, ShellObject shellObject, DeepClone<ShellObject> shellObjectDelegate) : base(path, normalizedPath)
             {
-                //
-            }
 
-            // La méthode GetInstance doit être Shared
-            public static comp GetInstance()
-            {
-                if (instance == null)
+                ShellObject = shellObject;
 
-                    lock (mylock)
+                ShellObjectDelegate = shellObjectDelegate;
 
-                        // Si pas d'instance existante on en crée une...
-                        if (instance == null)
-
-                            instance = new comp();
-
-                // On retourne l'instance de Singleton
-                return instance;
+                FileType = fileType;
 
             }
 
-            public override int Compare(IFileSystemObject x, IFileSystemObject y) => x.FileType == y.FileType || (x.FileType == IO.FileType.File && (y.FileType == IO.FileType.Link || y.FileType == IO.FileType.Archive)) || (y.FileType == IO.FileType.File && (x.FileType == IO.FileType.Link || x.FileType == IO.FileType.Archive))
-                    ? bidule.Compare(IO.Path.GetNormalizedPath(x.LocalizedName), IO.Path.GetNormalizedPath(y.LocalizedName))
-                    : (x.FileType == IO.FileType.Folder || x.FileType == IO.FileType.Drive) && (y.FileType == IO.FileType.File || y.FileType == IO.FileType.Archive || y.FileType == IO.FileType.Link)
-                    ? -1
-                    : (x.FileType == IO.FileType.File || x.FileType == IO.FileType.Archive || x.FileType == IO.FileType.Link) && (y.FileType == IO.FileType.Folder || y.FileType == IO.FileType.Drive)
-                    ? 1
-                    : 0;
+            //public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
+            //        ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
+            //        : false;
+
+            //public int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
 
         }
 

@@ -1,39 +1,47 @@
-﻿using System;
+﻿/* Copyright © Pierre Sprimont, 2019
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading;
-using static WinCopies.Util.Generic;
 
 namespace WinCopies.Util
 {
 
     /// <summary>
-    /// <para>FR: Représente un BackgroundWorker qui s'exécute par défaut dans un thread MTA et qui arrête automatiquement l'exécution en arrière-plan lors d'un rapport du progrès.</para>
-    /// <para>EN: Represents a BackgroundWorker that runs in a MTA thread by default and automatically stops on background when reports progress.</para>
+    /// Represents a BackgroundWorker that runs in a MTA thread by default and automatically stops on background when reports progress.
     /// </summary>
-    public class BackgroundWorker : Component
+    public class BackgroundWorker : Component, IBackgroundWorker
     {
 
         /// <summary>
-        /// <para>FR: Cet evènement se produit lorsque le thread d'arrière plan démarre. Placez votre code de traitement ici.</para>
-        /// <para>Gestionnaire d'événement exécuté dans le thread d'arrière plan.</para>
-        /// <para>EN: This event is called when the background thread starts. Put your background working code here.</para>
+        /// <para>This event is called when the background thread starts. Put your background working code here.</para>
         /// <para>The event handler is running in the background thread.</para>
         /// </summary>
         public event DoWorkEventHandler DoWork;
 
         /// <summary>
-        /// <para>FR: Cet évènement se produit lorsque le thread d'arrière plan notifie de la progression.</para>
-        /// <para>Gestionnaire d'événement exécuté dans le thread principal.</para>
-        /// <para>EN: This event is called when the background thread reports progress.</para>
+        /// <para>This event is called when the background thread reports progress.</para>
         /// <para>The event handler is running in the main thread.</para>
         /// </summary>
         public event ProgressChangedEventHandler ProgressChanged;
 
         /// <summary>
-        /// <para>FR: Cet évènement se produit lorsque le thread d'arrière plan est terminé.</para>
-        /// <para>Gestionnaire d'événement exécuté dans le thread d'arrière plan.</para>
-        /// <para>EN: This event is called when the background thread has finished working.</para>
+        /// <para>This event is called when the background thread has finished working.</para>
         /// <para>The event handler is running in the background thread.</para>
         /// </summary>
         public event RunWorkerCompletedEventHandler RunWorkerCompleted;
@@ -42,64 +50,48 @@ namespace WinCopies.Util
 
         private Thread _Thread = null;
 
-        private ApartmentState _ApartmentState = ApartmentState.MTA;
+        private readonly ApartmentState _ApartmentState = ApartmentState.MTA;
 
-        private SynchronizationContext _SyncContext;
+        private readonly SynchronizationContext _SyncContext;
 
-        private ManualResetEvent _event = new ManualResetEvent(true);
+        private readonly ManualResetEvent _event = new ManualResetEvent(true);
 
 
 
         /// <summary>
-        /// <para>FR: Obtient une valeur indiquant si le traitement a été annulé.</para>
-        /// <para>EN: Gets a value that indicates if the working is cancelled.</para>
+        /// Gets a value that indicates whether the working has been cancelled.
         /// </summary>
         public bool IsCancelled { get; private set; } = false;
 
         /// <summary>
-        /// <para>FR: Obtient une valeur indiquant si le thread doit essayer de se terminer avant la fin de ses tâches en arrière-plan.</para>
-        /// <para>EN: Gets a value that indicates if the thread must try to cancel before finished the background tasks.</para>
+        /// Gets a value that indicates whether the thread must try to cancel before finished the background tasks.
         /// </summary>
         public bool CancellationPending { get; private set; } = false;
 
+        ///// <para>FR: Obtient une valeur indiquant si le thread est occupé.</para>
         /// <summary>
-        /// <para>FR: Obtient une valeur indiquant si le thread est occupé.</para>
-        /// <para>EN: Gets a value that indicates if the thread is busy.</para>
+        /// Gets a value that indicates whether the thread is busy.
         /// </summary>
         public bool IsBusy { get; private set; } = false;
 
-        private bool workerReportsProgress = false;
+        private readonly bool workerReportsProgress = false;
 
         /// <summary>
-        /// <para>FR: Obtient ou définit une valeur indiquant si le thread peut notifier de l'avancement.</para>
-        /// <para>EN: Gets or sets a value that indicates if the thread can notify of the progress.</para>
+        /// Gets or sets a value that indicates whether the thread can notify of the progress.
         /// </summary>
         public bool WorkerReportsProgress
         {
 
             get => workerReportsProgress;
 
-            set
-
-            {
-
-                if (IsBusy)
-
-                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
-
-                else
-
-                    workerReportsProgress = value;
-
-            }
+            set => this.SetBackgroundWorkerProperty(nameof(WorkerReportsProgress), nameof(workerReportsProgress), value, typeof(BackgroundWorker), true);
 
         }
 
-        private bool workerSupportsCancellation = false;
+        private readonly bool workerSupportsCancellation = false;
 
         /// <summary>
-        /// <para>FR: Obtient ou définit une valeur indiquant si le thread supporte l'annulation.</para>
-        /// <para>EN: Gets or sets a value that indicates if the thread supports the cancellation.</para>
+        /// Gets or sets a value that indicates whether the thread supports the cancellation.
         /// </summary>
         public bool WorkerSupportsCancellation
 
@@ -107,31 +99,17 @@ namespace WinCopies.Util
 
             get => workerSupportsCancellation;
 
-            set
-
-            {
-
-                if (IsBusy)
-
-                    throw new InvalidOperationException(BackgroundWorkerIsBusy);
-
-                else
-
-                    workerSupportsCancellation = true;
-
-            }
+            set => this.SetBackgroundWorkerProperty(nameof(WorkerReportsProgress), nameof(workerSupportsCancellation), value, typeof(BackgroundWorker), true);
 
         }
 
         /// <summary>
-        /// <para>FR: Obtient le progrès actuel du traitement en pourcents.</para>
-        /// <para>EN: Gets the current progress of the working in percent.</para>
+        /// Gets the current progress of the working in percent.
         /// </summary>
         public int Progress { get; private set; } = 0;
 
         /// <summary>
-        /// <para>FR: Obtient l'<see cref="System.Threading. ApartmentState"/> de ce thread.</para>
-        /// <para>EN: Gets the <see cref="System.Threading.ApartmentState"/> of this thread.</para>
+        /// Gets the <see cref="System.Threading.ApartmentState"/> of this thread.
         /// </summary>
         public ApartmentState ApartmentState
         {
@@ -141,25 +119,17 @@ namespace WinCopies.Util
             set
             {
 
-                if (IsBusy)
-
-                    // todo:
-
-                    throw new InvalidOperationException("Le thread est déjà en cours d'exécution ; son ApartmentState ne peut pas encore changer.");
-
-                else if (_ApartmentState == value)
+                if (_ApartmentState == value)
 
                     return;
 
-                // todo:
-
                 else if (value == ApartmentState.Unknown)
 
-                    throw new ArgumentException(string.Format("La valeur {0} ne peut pas être sélectionnée pour un ApartmentState d'un {1}.", ApartmentState.Unknown.GetType().FullName, typeof(BackgroundWorker).FullName));
+                    // todo:
 
-                else
+                    throw new ArgumentException(string.Format("The {0} value is not valid for the {1} class.", nameof(ApartmentState.Unknown), nameof(BackgroundWorker)));
 
-                    _ApartmentState = value;
+                _ = this.SetBackgroundWorkerProperty(nameof(ApartmentState), nameof(_ApartmentState), value, typeof(BackgroundWorker), true);
 
             }
 
@@ -168,8 +138,7 @@ namespace WinCopies.Util
 
 
         /// <summary>
-        /// <para>FR: Construit un <see cref="BackgroundWorker"/>.</para>
-        /// <para>EN: Initializes a new instance of the <see cref="BackgroundWorker"/> class.</para>
+        /// Initializes a new instance of the <see cref="BackgroundWorker"/> class.
         /// </summary>
         public BackgroundWorker() => _SyncContext = SynchronizationContext.Current ?? new SynchronizationContext();
         // {
@@ -183,12 +152,10 @@ namespace WinCopies.Util
         // }
 
         /// <summary>
-        /// <para>FR: Construit un <see cref="BackgroundWorker"/> avec un <see cref="System.Threading.ApartmentState"/> donné.</para>
-        /// <para>EN: Initializes a new instance of the <see cref="BackgroundWorker"/> class with a given <see cref="System.Threading.ApartmentState"/>.</para>
+        /// Initializes a new instance of the <see cref="BackgroundWorker"/> class with a given <see cref="System.Threading.ApartmentState"/>.
         /// </summary>
         /// <param name="apartmentState">
-        /// <para>FR: <see cref="System.Threading.ApartmentState"/> dans lequel initialiser le thread.</para>
-        /// <para>EN: <see cref="System.Threading.ApartmentState"/> in which initialize the thread.</para>
+        /// The <see cref="System.Threading.ApartmentState"/> in which to initialize the thread.
         /// </param>
         public BackgroundWorker(ApartmentState apartmentState)
         {
@@ -203,13 +170,8 @@ namespace WinCopies.Util
             _SyncContext = SynchronizationContext.Current ?? new SynchronizationContext();
         }
 
-
-
-
-
         /// <summary>
-        /// <para>FR: Ré-initialise les variables locales.</para>
-        /// <para>EN: Re-initializes the local variables.</para>
+        /// Re-initializes the local variables.
         /// </summary>
         private void Reset(bool isCancelled)
         {
@@ -217,30 +179,25 @@ namespace WinCopies.Util
 
             IsCancelled = isCancelled;
 
-            IsBusy = false;
-
             if (!isCancelled)
 
                 Progress = 0;
 
             _Thread = null;
+
+            IsBusy = false;
         }
 
-        // DoWorkEventArgs e = null;
-
         /// <summary>
-        /// <para>FR: Démarre le traitement.</para>
-        /// <para>EN: Starts the working.</para>
+        /// Starts the working.
         /// </summary>
         public void RunWorkerAsync() => RunWorkerAsync(null);
 
         /// <summary>
-        /// <para>FR: Démarre le traitement avec un argument personnalisé.</para>
-        /// <para>EN: Starts the working with a custom parameter.</para>
+        /// Starts the working with a custom parameter.
         /// </summary>
         /// <param name="argument">
-        /// <para>FR: Argument passé au traitement.</para>
-        /// <para>EN: Argument given for the working.</para>
+        /// Argument given for the working.
         /// </param>
         public void RunWorkerAsync(object argument)
         {
@@ -249,7 +206,7 @@ namespace WinCopies.Util
 
                 // todo:
 
-                throw new InvalidOperationException("Le BackgroundWorker est déjà en cours d'exécution.");
+                throw new InvalidOperationException( Resources.ExceptionMessages. BackgroundWorkerIsBusy);
 
             Reset(false);
 
@@ -259,11 +216,10 @@ namespace WinCopies.Util
 
             //Exception error = null;
 
-            var e = new DoWorkEventArgs(argument);
-
-            _Thread = new Thread(() => ThreadStart(e));
-
-            _Thread.IsBackground = true;
+            _Thread = new Thread(() => ThreadStart(new DoWorkEventArgs(argument)))
+            {
+                IsBackground = true
+            };
 
             _Thread.SetApartmentState(_ApartmentState);
 
@@ -272,16 +228,14 @@ namespace WinCopies.Util
         }
 
         /// <summary>
-        /// <para>FR: Point d'entré du thread.</para>
-        /// <para>EN: Entry point of the thread.</para>
+        /// Entry point of the thread.
         /// </summary>
-        // /// <param name="argument">Argument du thread.</param>
         private void ThreadStart(DoWorkEventArgs e)
         {
 
 
 
-            // Dim cancelled As Boolean = False
+            bool isCancelled = false;
 
             Exception error = null;
 
@@ -303,25 +257,29 @@ namespace WinCopies.Util
 
                 error = ex;
 
+                if (ex is ThreadAbortException)
+
+                    isCancelled = true;
+
             }
 
-            _SyncContext.Send(ThreadCompleted, new ValueTuple<object, Exception, bool>(e.Result, error, IsCancelled || CancellationPending || e.Cancel));
+            isCancelled = isCancelled || IsCancelled || CancellationPending || e.Cancel;
+
+            Reset(isCancelled);
+
+            _SyncContext.Send(ThreadCompleted, new ValueTuple<object, Exception, bool>(e.Result, error, isCancelled));
 
         }
 
         /// <summary>
-        /// <para>FR: Cette méthode est appelée lorsque le thread est terminé.</para>
-        /// <para>EN: This method is called when the thread has finished.</para>
+        /// The method that is called when the thread has finished.
         /// </summary>
-        // /// <param name="result">Objet résultat du traitement.</param>
-        // /// <param name="error">Erreur éventuelle. <c>null</c> si pas d'erreur.</param>
-        // /// <param name="cancel">Indique si le thread à été annulé ou non.</param>
         private void ThreadCompleted(object args)
         {
 
             (object result, Exception ex, bool isCancelled) = (ValueTuple<object, Exception, bool>)args;
 
-            RunWorkerCompletedEventArgs e = new RunWorkerCompletedEventArgs(result, ex, isCancelled);
+            var e = new RunWorkerCompletedEventArgs(result, ex, isCancelled);
 
             // IsBusy = false;
 
@@ -329,34 +287,42 @@ namespace WinCopies.Util
 
             // IsCancelled = r.Item3;    
 
-            Reset(isCancelled);
-
             RunWorkerCompleted?.Invoke(this, e);
 
         }
 
         /// <summary>
-        /// <para>FR: Annule le traitement en cours de manière asynchrone.</para>
-        /// <para>EN: Cancels the working asynchronously.</para>
+        /// Cancels the working asynchronously with a custom cancellation info.
         /// </summary>
-        public void CancelAsync() => Cancel(false);
+        /// <param name="stateInfo">A custom cancellation info.</param>
+        public void CancelAsync(object stateInfo) => Cancel(false, stateInfo);
 
         /// <summary>
-        /// <para>FR: Annule le traitement en cours.</para>
-        /// <para>EN: Cancels the working.</para>
+        /// Cancels the working using a custom cancellation info.
         /// </summary>
-        public void Cancel() => Cancel(true);
+        /// <param name="stateInfo">A custom cancellation info.</param>
+        public void Cancel(object stateInfo) => Cancel(true, stateInfo);
 
+        /// <summary>
+        /// Cancels the working asynchronously.
+        /// </summary>
+        public void CancelAsync() => Cancel(false, null);
 
+        /// <summary>
+        /// Cancels the working.
+        /// </summary>
+        public void Cancel() => Cancel(true, null);
 
-        private void Cancel(bool abort)
+        private void Cancel(bool abort, object stateInfo)
         {
 
             if (!WorkerSupportsCancellation)
 
                 // todo:
 
-                throw new InvalidOperationException("Ce traitement ne supporte pas l'annulation.");
+                //Ce traitement ne supporte pas l'annulation.
+
+                throw new InvalidOperationException("This BackgroundWorker does not support cancellation.");
 
 
 
@@ -366,91 +332,115 @@ namespace WinCopies.Util
 
 
 
-            CancellationPending = true;
-
-
-
             if (abort)
-            {
 
-                _Thread.Abort();
+                _Thread.Abort(stateInfo);
 
-                ThreadCompleted(new ValueTuple<object, Exception, bool>(null, null, true));
+            //ThreadCompleted(new ValueTuple<object, Exception, bool>(null, null, true));
 
-            }
+            else
+
+                CancellationPending = true;
 
         }
 
         /// <summary>
-        /// <para>FR: Délégué pour rapporter de la progression.</para>
-        /// <para>EN: Delegate for progress reportting.</para>
+        /// Delegate for progress reportting.
         /// </summary>
         /// <param name="args">
-        /// <para>FR: Argument de l'évènement.</para>
-        /// <para>EN: Event argument.</para>
+        /// Event argument.
         /// </param>
         private void OnProgressChanged(object args) => ProgressChanged?.Invoke(this, args as ProgressChangedEventArgs);
 
         /// <summary>
-        /// <para>FR: Notifie de la progession.</para>
-        /// <para>EN: Notifies of the progress.</para>
+        /// Notifies of the progress.
         /// </summary>
         /// <param name="percentProgress">
-        /// <para>FR: Pourcentage de progression.</para>
-        /// <para>EN: Progress percentage.</para>
+        /// Progress percentage.
         /// </param>
         public void ReportProgress(int percentProgress) => ReportProgress(percentProgress, null);
 
         /// <summary>
-        /// <para>FR: Notifie de la pogression.</para>
-        /// <para>EN: Notifies of the progress.</para>
+        /// Notifies of the progress.
         /// </summary>
         /// <param name="percentProgress">
-        /// <para>FR: Pourcentage de progression.</para>
-        /// <para>EN: Progress percentage.</para>
+        /// Progress percentage.
         /// </param>
         /// <param name="userState">
-        /// <para>FR: Objet utilisateur.</para>
-        /// <para>EN: User object.</para>
+        /// User object.
         /// </param>
         public void ReportProgress(int percentProgress, object userState)
         {
 
             if (!WorkerReportsProgress)
 
-                throw new InvalidOperationException("Ce BackgroundWorker ne permet pas de notifier de la progression.");
+                //Ce BackgroundWorker ne permet pas de notifier de la progression.
+
+                throw new InvalidOperationException("This BackgroundWorker does not support progression notification.");
 
             Progress = percentProgress;
 
-            ProgressChangedEventArgs e = new ProgressChangedEventArgs(Progress, userState);
+            var e = new ProgressChangedEventArgs(Progress, userState);
 
             _SyncContext.Send(OnProgressChanged, e);
 
         }
 
+        /// <summary>
+        /// Suspends the current thread.
+        /// </summary>
         public void Suspend()
 
         {
 
-            // to suspend thread.
-            _event.Reset();
+            _ = _event.Reset();
 
-            _event.WaitOne();
+            _ = _event.WaitOne();
 
         }
 
+        /// <summary>
+        /// Resumes the current thread.
+        /// </summary>
         public void Resume() =>
 
-            //to resume thread
             _event.Set();
 
+        /// <summary>
+        /// Gets a value that indicates whether the current <see cref="BackgroundWorker"/> is disposed.
+        /// </summary>
+        public bool IsDisposed { get; private set; }
+
+        /// <summary>
+        /// Releases resources used by the <see cref="BackgroundWorker"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
+        public new void Dispose() => base.Dispose();
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="BackgroundWorker"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="BackgroundWorker"/> is busy and does not support cancellation.</exception>
         protected override void Dispose(bool disposing)
 
         {
 
+            if (IsBusy)
+
+                //    throw new InvalidOperationException(BackgroundWorkerIsBusy);
+
+                Cancel(true, null);
+
             base.Dispose(disposing);
 
+            if (IsDisposed)
+
+                return;
+
             _event.Dispose();
+
+            IsDisposed = true;
 
         }
 

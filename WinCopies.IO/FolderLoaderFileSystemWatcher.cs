@@ -1,9 +1,28 @@
-﻿using System;
+﻿/* Copyright © Pierre Sprimont, 2019
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+using System;
 using System.IO;
+using WinCopies.Util;
+using IDisposable = WinCopies.Util.IDisposable;
 
 namespace WinCopies.IO
 {
-    public class FolderLoaderFileSystemWatcher : IDisposable
+    public class FolderLoaderFileSystemWatcher : IDeepCloneable, IDisposable
     {
 
         /// <summary>
@@ -32,6 +51,26 @@ namespace WinCopies.IO
         /// </summary>
         public FolderLoaderFileSystemWatcher() => Init();
 
+        public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the FileSystemWatcher property.
+
+        protected virtual void OnDeepClone(FolderLoaderFileSystemWatcher folderLoaderFileSystemWatcher) { }
+
+        protected virtual FolderLoaderFileSystemWatcher DeepCloneOverride() => new FolderLoaderFileSystemWatcher();
+
+        public object DeepClone()
+
+        {
+
+            ((IDisposable)this).ThrowIfDisposingOrDisposed();
+
+            FolderLoaderFileSystemWatcher folderLoaderFileSystemWatcher = DeepCloneOverride();
+
+            OnDeepClone(folderLoaderFileSystemWatcher);
+
+            return folderLoaderFileSystemWatcher;
+
+        }
+
         protected virtual void Init()
 
         {
@@ -46,10 +85,28 @@ namespace WinCopies.IO
 
         }
 
+        public bool IsDisposing { get; private set; }
+
+        public bool IsDisposed { get; private set; }
+
         /// <summary>
         /// Frees all resources used by the <see cref="FileSystemWatcher"/> property.
         /// </summary>
-        public virtual void Dispose() => FileSystemWatcher.Dispose();
+        public void Dispose()
+
+        {
+
+            IsDisposing = true;
+
+            DisposeOverride();
+
+            IsDisposed = true;
+
+            IsDisposing = false;
+
+        }
+
+        protected virtual void DisposeOverride() => FileSystemWatcher.Dispose();
 
     }
 }

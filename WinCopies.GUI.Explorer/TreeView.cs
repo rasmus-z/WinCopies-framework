@@ -1,4 +1,21 @@
-﻿using System;
+﻿/* Copyright © Pierre Sprimont, 2019
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -74,7 +91,7 @@ namespace WinCopies.GUI.Explorer
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
 
-            if (SelectedItem is IBrowsableObjectInfo browsableObjectInfo)
+            if (SelectedItem is Explorer.IBrowsableObjectInfo browsableObjectInfo)
 
             {
 
@@ -82,7 +99,7 @@ namespace WinCopies.GUI.Explorer
 
                 SetValue(CanDeletePropertyKey, true);
 
-                if (browsableObjectInfo is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject)
+                if (browsableObjectInfo is IShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject.IsFileSystemObject)
 
                 {
 
@@ -117,7 +134,7 @@ namespace WinCopies.GUI.Explorer
 
             ExplorerControl explorerControl = (sender as ExplorerControl)?.GetParent<ExplorerControl>(false);
 
-            explorerControl?.RenameAction?.Invoke(explorerControl.TreeView.SelectedItem as IBrowsableObjectInfo, e.Parameter as string);
+            explorerControl?.RenameAction?.Invoke(explorerControl.TreeView.SelectedItem as Explorer.IBrowsableObjectInfo, e.Parameter as string);
 
         }
 
@@ -130,7 +147,7 @@ namespace WinCopies.GUI.Explorer
 
             ExplorerControl explorerControl = (sender as ExplorerControl)?.GetParent<ExplorerControl>(false);
 
-            explorerControl?.DeleteAction?.Invoke(new IBrowsableObjectInfo[] { explorerControl.TreeView.SelectedItem as IBrowsableObjectInfo });
+            explorerControl?.DeleteAction?.Invoke(new Explorer.IBrowsableObjectInfo[] { explorerControl.TreeView.SelectedItem as Explorer.IBrowsableObjectInfo });
 
         }
 

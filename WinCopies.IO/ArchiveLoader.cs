@@ -1,8 +1,19 @@
-﻿#region "Imports"
-
-
-
-#region ".NET"
+﻿/* Copyright © Pierre Sprimont, 2019
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using SevenZip;
 using System;
@@ -11,89 +22,40 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-
-#endregion
-
-#region "WinCopies"
-
-// using WinCopies.IO;
-
-#endregion
-
-#endregion
+using System.Security;
+using WinCopies.Util;
+using static WinCopies.Util.Util;
+using static WinCopies.IO.FolderLoader;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
 
-    public class ArchiveLoader : BrowsableObjectInfoItemsLoader, INotifyPropertyChanged
+    // todo: does not work with encrypted archives
+
+    public class ArchiveLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory> where TPath : ArchiveItemInfoProvider where TItems : ArchiveItemInfo where TSubItems : ArchiveItemInfo where TFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory where TItemsFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory
     {
 
-        private static Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();
-
-        public static ReadOnlyDictionary<InArchiveFormat, string[]> InArchiveFormats { get; }
-
-        // public new event PropertyChangedEventHandler PropertyChanged;
-
-        static ArchiveLoader()
-
-        {
-
-            // todo: to add the other 'in' archive formats
-
-            dic.Add(InArchiveFormat.Zip, new string[] { ".zip" });
-
-            dic.Add(InArchiveFormat.SevenZip, new string[] { ".7z" });
-
-            dic.Add(InArchiveFormat.Arj, new string[] { ".arj" });
-
-            dic.Add(InArchiveFormat.BZip2, new string[] { ".bz2", ".tar", ".xz" });
-
-            dic.Add(InArchiveFormat.Cab, new string[] { ".cab" });
-
-            dic.Add(InArchiveFormat.Chm, new string[] { ".chm" });
-
-            dic.Add(InArchiveFormat.Compound, new string[] { ".cfb" });
-
-            dic.Add(InArchiveFormat.Cpio, new string[] { ".cpio" });
-
-            dic.Add(InArchiveFormat.CramFS, null);
-
-            dic.Add(InArchiveFormat.Deb, new string[] { ".deb", ".udeb" });
-
-            dic.Add(InArchiveFormat.Dmg, new string[] { ".dmg" });
-
-            dic.Add(InArchiveFormat.Elf, new string[] { "", ".axf", ".bin", ".elf", ".o", ".prx", ".puff", ".ko", ".mod", ".so" });
-
-            dic.Add(InArchiveFormat.Fat, null);
-
-            dic.Add(InArchiveFormat.Flv, new string[] { ".flv" });
-
-            dic.Add(InArchiveFormat.GZip, new string[] { ".gz" });
-
-            dic.Add(InArchiveFormat.Hfs, new string[] { ".hfs" });
-
-            dic.Add(InArchiveFormat.Iso, new string[] { ".iso" });
-
-            dic.Add(InArchiveFormat.Lzh, new string[] { ".lzh" });
-
-            dic.Add(InArchiveFormat.Lzma, new string[] { "lzma" });
-
-            dic.Add(InArchiveFormat.Lzma86, null);
-
-            dic.Add(InArchiveFormat.Lzw, new string[] { ".lzw" });
-
-            dic.Add(InArchiveFormat.MachO, new string[] { "", ".o", ".dylib", ".bundle" });
-
-            InArchiveFormats = new ReadOnlyDictionary<InArchiveFormat, string[]>(dic);
-
-        }
+        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new ArchiveLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, FileTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class.
+        /// Initializes a new instance of the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> class.
         /// </summary>
-        public ArchiveLoader(bool workerReportsProgress, bool workerSupportsCancellation, FileTypesFlags fileTypes) : base(workerReportsProgress, workerSupportsCancellation, fileTypes) { }
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileTypes">The file types to load.</param>
+        public ArchiveLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) { }
 
-        protected override void Init()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> class using a custom comparer.
+        /// </summary>
+        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+        /// <param name="fileTypes">The file types to load.</param>
+        public ArchiveLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, fileTypes, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) { }
+
+        protected override void OnPathChanging( BrowsableObjectTreeNode< TPath, TItems, TFactory > path )
 
         {
 
@@ -107,17 +69,8 @@ namespace WinCopies.IO
 
             // }
 
-            IBrowsableObjectInfo _path = Path as ShellObjectInfo;
-
-            if (_path == null)
-
-                _path = Path as ArchiveItemInfo;
-
-            if (_path == null)
-
-                throw new ArgumentException("'Path' is null or isn't a ShellObjectInfo or an ArchiveItemInfo.");
-
-            else if (_path.FileType != FileType.Folder && _path.FileType != IO.FileType.Archive)
+            /*else*/
+            if (!(path is null) && path.Value.FileType != FileType.Archive)
 
                 throw new ArgumentException("'Path' is not an Archive or a Folder.");
 
@@ -127,27 +80,37 @@ namespace WinCopies.IO
 
         // protected override void OnProgressChanged(object sender, ProgressChangedEventArgs e) => PathsOverride.Add((ArchiveItemInfo)e.UserState);
 
-        public static bool IsSupportedArchiveFormat(string extension)
+        protected override void OnDoWork(DoWorkEventArgs e)
 
         {
 
-            foreach (KeyValuePair<InArchiveFormat, string[]> value in InArchiveFormats)
+            if (FileTypes == FileTypes.None) return;
 
-                if (value.Value != null)
+            //else if (FileTypes.HasFlag(GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
 
-                    foreach (string _extension in value.Value)
+            //    throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
 
-                        if (_extension == extension)
+#if DEBUG
 
-                            return true;
+            Debug.WriteLine("Dowork event started.");
 
-            return false;
+            Debug.WriteLine(FileTypes);
 
-        }
+            try
+            {
 
-        public virtual void OnDoWork()
+                Debug.WriteLine("Path == null: " + (Path == null).ToString());
 
-        {
+                Debug.WriteLine("Path.Path: " + Path?. Value. Path);
+
+                Debug.WriteLine("Path.ShellObject: " + (Path as IShellObjectInfo)?.ShellObject.ToString());
+
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception) { }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+#endif
 
 #if DEBUG
 
@@ -159,185 +122,174 @@ namespace WinCopies.IO
 
             //List<FolderLoader.IPathInfo> files = new List<FolderLoader.IPathInfo>();
 
-            List<IFileSystemObject> paths = new List<IFileSystemObject>();
-
-            FolderLoader.comp comp = FolderLoader.comp.GetInstance();
+            var paths = new ArrayBuilder<PathInfo>();
 
 #if DEBUG
 
             Debug.WriteLine("Path == null: " + (Path == null).ToString());
 
-            Debug.WriteLine("Path.Path: " + Path.Path);
+            Debug.WriteLine("Path.Path: " + Path.Value.Path);
 
-            if (Path is ShellObjectInfo) Debug.WriteLine("Path.ShellObject: " + ((ShellObjectInfo)Path).ShellObject.ToString());
+            if (Path is IShellObjectInfo) Debug.WriteLine("Path.ShellObject: " + ((IShellObjectInfo)Path).ShellObject.ToString());
 
 #endif
 
             // ShellObjectInfo archiveShellObject = Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject;
 
-            string archiveFileName = (Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject).Path;
+            string archiveFileName = (Path is IShellObjectInfo ? (IShellObjectInfo)Path : ((IArchiveItemInfo)Path).ArchiveShellObject).Path;
 
-            using (FileStream archiveFileStream = new FileStream(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            try
+
             {
 
-                //try
-                //{
-
-                // archiveShellObject.ArchiveFileStream = archiveFileStream;
-
-                using (SevenZipExtractor archiveExtractor = new SevenZipExtractor(archiveFileStream))
+                using (var archiveFileStream = new FileStream(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                 {
 
-                    void AddPath(ref PathInfo pathInfo)
+                    //try
+                    //{
 
+                    // archiveShellObject.ArchiveFileStream = archiveFileStream;
+
+                    using (var archiveExtractor = new SevenZipExtractor(archiveFileStream))
                     {
 
-                        if (pathInfo.FileType == FileType.None || (FileTypes != FileTypesFlags.All && !FileTypes.HasFlag(FileTypeToFileTypeFlags(pathInfo.FileType)))) return;
-
-                        // We only make a normalized path if we add the path to the paths to load.
-
-                        pathInfo.Normalized_Path = IO.Path.GetNormalizedPath(pathInfo.Path);
-
-                        paths.Add(pathInfo);
-
-                    }
-
-                    void AddDirectory(PathInfo pathInfo)
-
-                    {
-
-                        // if (FileTypes.HasFlag(FileTypesFlags.All) || (FileTypes.HasFlag(FileTypesFlags.Folder) && System.IO.Path.GetPathRoot(pathInfo.Path) != pathInfo.Path) || (FileTypes.HasFlag(FileTypesFlags.Drive) && System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path))
-
-                        pathInfo.FileType = FileType.Folder;
-
-                        AddPath(ref pathInfo);
-
-                    }
-
-                    void AddFile(PathInfo pathInfo)
-
-                    {
-
-                        pathInfo.FileType = pathInfo.Path.Substring(pathInfo.Path.Length).EndsWith(".lnk")
-                            ? FileType.Link
-                            : IsSupportedArchiveFormat(System.IO.Path.GetExtension(pathInfo.Path)) ? FileType.Archive : FileType.File;
-
-                        // We only make a normalized path if we add the path to the paths to load.
-
-                        AddPath(ref pathInfo);
-
-                    }
-
-                    ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
-
-                    string fileName = "";
-
-                    string relativePath = Path is ShellObjectInfo ? "" : Path.Path.Substring(archiveFileName.Length + 1);
-
-                    PathInfo path;
-
-                    foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
-
-                        Debug.WriteLine(archiveFileInfo.FileName);
-
-                    void addPath(ArchiveFileInfo archiveFileInfo)
-
-                    {
-
-                        if (archiveFileInfo.FileName.StartsWith(relativePath) && archiveFileInfo.FileName.Length > relativePath.Length)
+                        void AddPath(ref string _path, FileType fileType, ref ArchiveFileInfo? archiveFileInfo)
 
                         {
 
-                            fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
+                            if (fileType == FileType.Other || (FileTypes != GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(fileType)))) return;
 
-                            if (fileName.StartsWith("\\"))
+                            // We only make a normalized path if we add the path to the paths to load.
 
-                                fileName = fileName.Substring(1);
+                            string __path = string.Copy(_path) ; 
 
-                            if (fileName.Contains("\\"))
-
-                                fileName = fileName.Substring(0, fileName.IndexOf("\\"));
-
-                            /*if (!archiveFileInfo.FileName.Substring(archiveFileInfo.FileName.Length).Contains("\\"))*/
-
-                            // {
-
-                            foreach (IFileSystemObject pathInfo in paths)
-
-                                if (pathInfo.Path == fileName)
-
-                                    return;
-
-                            path = new PathInfo() { Path = fileName };
-
-                            if (fileName.ToLower() == archiveFileInfo.FileName.ToLower())
-
-                            {
-
-                                path.ArchiveFileInfo = archiveFileInfo;
-
-                                if (archiveFileInfo.IsDirectory)
-
-                                    AddDirectory(path);
-
-                                else if (CheckFilter(archiveFileInfo.FileName))
-
-                                    AddFile(path);
-
-                            }
-
-                            else
-
-                                AddDirectory(path);
-
-                            // }
+                            paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), fileType, archiveFileInfo, _archiveFileInfo =>     ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(_archiveFileInfo, __path)));
 
                         }
 
-                    }
+                        void AddDirectory(string _path, ArchiveFileInfo? archiveFileInfo) =>
 
-                    foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
+                            // if (FileTypes.HasFlag(FileTypesFlags.All) || (FileTypes.HasFlag(FileTypesFlags.Folder) && System.IO.Path.GetPathRoot(pathInfo.Path) != pathInfo.Path) || (FileTypes.HasFlag(FileTypesFlags.Drive) && System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path))
 
-                    {
+                            AddPath(ref _path, FileType.Folder, ref archiveFileInfo);
 
-                        // _path = archiveFileInfo.FileName.Replace('/', '\\');
+                        void AddFile(string _path, ArchiveFileInfo? archiveFileInfo) =>
 
-                        addPath(archiveFileInfo);
+                            // We only make a normalized path if we add the path to the paths to load.
 
-                    }
+                            AddPath(ref _path, _path.Substring(_path.Length).EndsWith(".lnk")
+                                ? FileType.Link
+                                : IO.Path.IsSupportedArchiveFormat(System.IO.Path.GetExtension(_path)) ? FileType.Archive : FileType.File, ref archiveFileInfo);
 
-                    //if (Path is ArchiveItemInfo)
+                        System.Collections.ObjectModel.ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
 
-                    //{
+                        string fileName = "";
 
-                    //    if (relativePath != "")
+                        string relativePath = Path is IShellObjectInfo ? "" : Path.Value.Path.Substring(archiveFileName.Length + 1);
 
-                    //        relativePath = "\\";
-
-                    //    relativePath += ((ArchiveItemInfo)Path).Path/*.Replace('/', '\\')*/;
-
-                    //}
+                        // PathInfo path;
 
 #if DEBUG
 
-                    Debug.WriteLine(relativePath);
+                        foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
+
+                            Debug.WriteLine(archiveFileInfo.FileName);
 
 #endif
 
+                        void addPath(ArchiveFileInfo archiveFileInfo)
+
+                        {
+
+                            if (archiveFileInfo.FileName.StartsWith(relativePath) && archiveFileInfo.FileName.Length > relativePath.Length)
+
+                            {
+
+                                fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
+
+                                if (fileName.StartsWith(IO.Path.PathSeparator))
+
+                                    fileName = fileName.Substring(1);
+
+                                if (fileName.Contains(IO.Path.PathSeparator))
+
+                                    fileName = fileName.Substring(0, fileName.IndexOf(IO.Path.PathSeparator));
+
+                                /*if (!archiveFileInfo.FileName.Substring(archiveFileInfo.FileName.Length).Contains(IO.Path.PathSeparator))*/
+
+                                // {
+
+                                foreach (IFileSystemObject pathInfo in (IEnumerable<IFileSystemObject>) paths)
+
+                                    if (pathInfo.Path == fileName)
+
+                                        return;
+
+                                if (fileName.ToLower() == archiveFileInfo.FileName.ToLower())
+
+                                {
+
+                                    if (archiveFileInfo.IsDirectory)
+
+                                        AddDirectory(fileName, archiveFileInfo);
+
+                                    else if (CheckFilter(archiveFileInfo.FileName))
+
+                                        AddFile(fileName, archiveFileInfo);
+
+                                }
+
+                                else
+
+                                    AddDirectory(fileName, archiveFileInfo);
+
+                                // }
+
+                            }
+
+                        }
+
+                        foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
+
+                            // _path = archiveFileInfo.FileName.Replace('/', IO.Path.PathSeparator);
+
+                            addPath(archiveFileInfo);
+
+                        //if (Path is ArchiveItemInfo)
+
+                        //{
+
+                        //    if (relativePath != "")
+
+                        //        relativePath = IO.Path.PathSeparator;
+
+                        //    relativePath += ((ArchiveItemInfo)Path).Path/*.Replace('/', IO.Path.PathSeparator)*/;
+
+                        //}
+
+#if DEBUG
+
+                        Debug.WriteLine(relativePath);
+
+#endif
+
+                    }
+
+                    //}
+
+                    //catch (Exception)
+
+                    //{
+
+                    //    paths = null;
+
+                    //    return;
+
+                    //}
                 }
 
-                //}
-
-                //catch (Exception)
-
-                //{
-
-                //    paths = null;
-
-                //    return;
-
-                //}
             }
+            catch (Exception ex) when (ex.Is(false, typeof(IOException), typeof(SecurityException), typeof(UnauthorizedAccessException), typeof(SevenZipException))) { return; }
 
             // for (int i = 0; i < paths.Count; i++)
 
@@ -355,7 +307,23 @@ namespace WinCopies.IO
 
             // }
 
-            paths.Sort(comp);
+            IEnumerable<PathInfo> pathInfos;
+
+            if (FileSystemObjectComparer == null)
+
+                pathInfos = (IEnumerable<PathInfo>)paths;
+
+            else
+
+            {
+
+                var sortedPaths = paths.ToList();
+
+                sortedPaths.Sort(FileSystemObjectComparer);
+
+                pathInfos = (IEnumerable<PathInfo>)paths;
+
+            }
 
             // for (int i = 0; i < files.Count; i++)
 
@@ -377,23 +345,21 @@ namespace WinCopies.IO
 
 
 
-            void reportProgressAndAddNewPathToObservableCollection(PathInfo path)
+#if DEBUG
+
+            void reportProgress(PathInfo path)
 
             {
 
-#if DEBUG
-
                 Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
                 Debug.WriteLine("path_.Path: " + path.Path);
-                Debug.WriteLine("path_.Normalized_Path: " + path.Normalized_Path);
+                Debug.WriteLine("path_.Normalized_Path: " + path.NormalizedPath);
                 // Debug.WriteLine("path_.Shell_Object: " + path.ArchiveShellObject);
-
-#endif
 
                 // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;
                 // new_Path.LoadThumbnail();
 
-                ReportProgress(0, OnAddingNewBrowsableObjectInfo(path));
+                ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>(    (TItems)Path.Factory.GetBrowsableObjectInfo(Path.Value.Path + IO.Path.PathSeparator + path.Path, path.FileType, Path.Value.ArchiveShellObject, path.ArchiveFileInfo, archiveFileInfo => ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(archiveFileInfo, Path.Value.ArchiveShellObject.Path)), (TItemsFactory) Path.Factory.DeepClone()));
 
                 // #if DEBUG
 
@@ -403,11 +369,44 @@ namespace WinCopies.IO
 
             }
 
+#endif
+
             // this._Paths = new ObservableCollection<IBrowsableObjectInfo>();
 
-            foreach (PathInfo path_ in paths)
 
-                reportProgressAndAddNewPathToObservableCollection(path_);
+
+            PathInfo path_;
+
+
+
+            using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
+
+                while (_paths.MoveNext())
+
+                    try
+
+                    {
+
+                        do
+
+                        {
+
+                            path_ = _paths.Current;
+
+#if DEBUG
+
+                            reportProgress(path_);
+
+#else
+
+                            ReportProgress(0, ((IArchiveItemInfoProvider)Path).Factory.GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + IO.Path.PathSeparator + path.Path, path.FileType));
+
+#endif
+
+                        } while (_paths.MoveNext());
+
+                    }
+                    catch (Exception ex) when (HandleIOException(ex)) { }
 
             //foreach (FolderLoader.PathInfo path_ in files)
 
@@ -415,45 +414,42 @@ namespace WinCopies.IO
 
         }
 
-        protected override void OnDoWork(object sender, DoWorkEventArgs e) => OnDoWork();
-
-        protected virtual IBrowsableObjectInfo OnAddingNewBrowsableObjectInfo(PathInfo path)
+        protected class PathInfo : IO.PathInfo
 
         {
 
-            IBrowsableObjectInfo browsableObjectInfo = ((IArchiveItemInfoProvider)Path).GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + "\\" + path.Path, path.FileType);
+            public FileType FileType { get; }
 
-            if (browsableObjectInfo is BrowsableObjectInfo _browsableObjectInfo)
+            public ArchiveFileInfo? ArchiveFileInfo { get; }
 
-                _browsableObjectInfo.Parent = Path;
-
-            return browsableObjectInfo;
-
-        }
-
-        // todo: really needed? :
-
-        public struct PathInfo : IFileSystemObject
-
-        {
+            public DeepClone<ArchiveFileInfo?> ArchiveFileInfoDelegate { get; }
 
             /// <summary>
-            /// Gets the path of this <see cref="PathInfo"/>.
+            /// Gets the localized name of this <see cref="PathInfo"/>.
             /// </summary>
-            public string Path { get; set; }
-
-            public string Normalized_Path { get; set; }
-
-            public ArchiveFileInfo? ArchiveFileInfo { get; set; }
-
-            public string LocalizedName => Path;
-
-            public string Name { get; set; }
+            public override string LocalizedName => Name;
 
             /// <summary>
-            /// Gets the file type of this <see cref="PathInfo"/>.
+            /// Gets the name of this <see cref="PathInfo"/>.
             /// </summary>
-            public FileType FileType { get; set; }
+            public override string Name => System.IO.Path.GetFileName(Path);
+
+            public PathInfo(string path, string normalizedPath, FileType fileType, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) : base(path, normalizedPath)
+            {
+
+                ArchiveFileInfo = archiveFileInfo;
+
+                ArchiveFileInfoDelegate = archiveFileInfoDelegate;
+
+                FileType = fileType;
+
+            }
+
+            //public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
+            //        ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
+            //        : false;
+
+            //public int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
 
         }
 
