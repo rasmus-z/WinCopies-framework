@@ -9,7 +9,7 @@ README
 Usage notes
 -----------
 
-This framework is currently still on development and *should not* be used in a production environment, even for the code on the master branch, except for the WinCopies.Util package on the master branch, which is in release version and can be used in a production environment.
+This framework is currently still in development. Only the code on the master branch (starting to the 2.0 release of the WinCopies framework) and the packages that are built from that code are currently released.
 
 License
 -------
