@@ -35,7 +35,7 @@ namespace WinCopies.Util.Data
 
         public object Parameter { get; set; }
 
-        public ConverterArrayParameter() { } 
+        public ConverterArrayParameter() { }
 
         public ConverterArrayParameter(IEnumerable<IValueConverter> converters, object parameter)
 
@@ -58,7 +58,7 @@ namespace WinCopies.Util.Data
 
         public IList<object> Parameters { get; set; }
 
-        public ConverterArrayMultiParametersParameter() { } 
+        public ConverterArrayMultiParametersParameter() { }
 
         public ConverterArrayMultiParametersParameter(IList<IValueConverter> converters, IList<object> parameters)
         {
@@ -366,4 +366,4 @@ namespace WinCopies.Util.Data
     }
 }
 
- #endif
+#endif

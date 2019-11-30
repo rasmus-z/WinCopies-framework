@@ -26,6 +26,7 @@ using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
 using System.Windows.Controls;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace WinCopies.GUI.Windows.Dialogs
 {
@@ -64,11 +65,24 @@ namespace WinCopies.GUI.Windows.Dialogs
         public DefaultButton DefaultButton { get => (DefaultButton)GetValue(DefaultButtonProperty); set => SetValue(DefaultButtonProperty, value); }
 
         /// <summary>
-        /// Indentifies the <see cref="CustomButtons"/> dependency property.
+        /// Indentifies the <see cref="CustomButtonsSource"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty CustomButtonsProperty = DependencyProperty.Register(nameof(CustomButtons), typeof(IEnumerable<WinCopies.GUI.Controls.Models.ButtonModel>), typeof(DialogWindow), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DialogWindow)d).OnCustomButtonsChanged((IEnumerable<Controls.Models.ButtonModel>)e.OldValue, (IEnumerable<Controls.Models.ButtonModel>)e.NewValue)));
+        public static readonly DependencyProperty CustomButtonsSourceProperty = DependencyProperty.Register(nameof(CustomButtonsSource), typeof(IEnumerable), typeof(DialogWindow), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DialogWindow)d).OnCustomButtonsSourceChanged((IEnumerable)e.OldValue, (IEnumerable)e.NewValue)));
 
-        public IEnumerable<Controls.Models.ButtonModel> CustomButtons { get => (IEnumerable<Controls.Models.ButtonModel>)GetValue(CustomButtonsProperty); set => SetValue(CustomButtonsProperty, value); }
+        public IEnumerable CustomButtonsSource { get => (IEnumerable<Controls.Models.ButtonModel>)GetValue(CustomButtonsSourceProperty); set => SetValue(CustomButtonsSourceProperty, value); }
+
+        public ItemCollection CustomButtons
+        {
+            get
+            {
+
+                if (!(DialogButton is null) || !(CustomButtonsSource is null))
+
+                    return null;
+
+                return ((ItemsControl)Template.FindName("PART_ItemsControl", this)).Items;
+            }
+        }
 
         /// <summary>
         /// Indentifies the <see cref="CustomButtonTemplate"/> dependency property.
@@ -138,7 +152,12 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         // ActionCommand = new WinCopies.Util.DelegateCommand(ActionCommandMethod);
 
-        public DialogWindow(string title) => Title = title;
+        public DialogWindow(string title)
+        {
+            Title = title;
+
+            OnDialogButtonChanged(null, DialogButton);
+        }
 
         //public override void OnApplyTemplate()
         //{
@@ -203,9 +222,9 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             if (DefaultButton != DefaultButton.None) throw new InvalidOperationException($"{nameof(DefaultButton)} must be set to {nameof(DefaultButton.None)} in order to perform this action.");
 
-            if (!(CustomButtons is null)) throw new InvalidOperationException("CustomButtons is not null.");
+            if (!(CustomButtonsSource is null)) throw new InvalidOperationException("CustomButtonsSource is not null.");
 
-            if (CommandBindings.Count > 0) throw new InvalidOperationException("This dialog already has command bindings.");
+            CommandBindings.Clear();
 
             if (!(newValue is null))
 
@@ -429,7 +448,7 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         }
 
-        protected virtual void OnCustomButtonsChanged(IEnumerable<Controls.Models.ButtonModel> oldValue, IEnumerable<Controls.Models.ButtonModel> newValue)
+        protected virtual void OnCustomButtonsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
 
         {
 
@@ -516,7 +535,14 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         {
 
-            DialogResult = dialogResult;
+            try
+
+            {
+
+                DialogResult = dialogResult;
+
+            }
+            catch (InvalidOperationException ex) when (ex.HResult == -2146233079) { }
 
             MessageBoxResult = messageBoxResult;
 

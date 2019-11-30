@@ -113,9 +113,25 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\WinCopies.GUI.Models.Net4.8\WinCopies.GUI.Models.Net4.8.csproj">
+      <Project>{31C5F3CF-A8FA-43E0-9041-3C61ED9E45A1}</Project>
+      <Name>WinCopies.GUI.Models.Net4.8</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj">
       <Project>{8917a829-3028-4118-a1a2-798e80ca73c8}</Project>
       <Name>WinCopies.GUI.Net4.8</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\WinCopies.GUI.Templates.Net4.8\WinCopies.GUI.Templates.Net4.8.csproj">
+      <Project>{e571ba05-3b35-4852-a9fc-98f5a289b35a}</Project>
+      <Name>WinCopies.GUI.Templates.Net4.8</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\WinCopies.GUI.Windows.Net4.8\WinCopies.GUI.Windows.Net4.8.csproj">
+      <Project>{3c641513-6fc6-438e-916b-7f35262a3678}</Project>
+      <Name>WinCopies.GUI.Windows.Net4.8</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj">
+      <Project>{53801D23-7375-4E30-A5A7-27623E950554}</Project>
+      <Name>WinCopies.Util.Net4.8</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

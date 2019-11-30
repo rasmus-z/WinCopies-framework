@@ -187,6 +187,10 @@
       <Project>{31c5f3cf-a8fa-43e0-9041-3c61ed9e45a1}</Project>
       <Name>WinCopies.GUI.Models.Net4.8</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WinCopies.GUI.Templates.Net4.8\WinCopies.GUI.Templates.Net4.8.csproj">
+      <Project>{e571ba05-3b35-4852-a9fc-98f5a289b35a}</Project>
+      <Name>WinCopies.GUI.Templates.Net4.8</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj">
       <Project>{53801D23-7375-4E30-A5A7-27623E950554}</Project>
       <Name>WinCopies.Util.Net4.8</Name>

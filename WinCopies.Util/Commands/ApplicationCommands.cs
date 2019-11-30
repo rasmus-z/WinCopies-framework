@@ -63,8 +63,9 @@ namespace WinCopies.Util.Commands
         /// <summary>
         /// Gets the <b>CloseWindow</b> command.
         /// </summary>
+        [Obsolete("This command is obsolete and will be removed in later versions. Please use the System.Windows.Input.ApplicationCommands.Close command instead.")]
         public static RoutedUICommand CloseWindow { get; } = new RoutedUICommand(Generic.CloseWindow, nameof(CloseWindow), typeof(ApplicationCommands), new InputGestureCollection() { new KeyGesture(Key.F4, ModifierKeys.Alt) });
-
+        
         /// <summary>
         /// Gets the <b>DeselectAll</b> command.
         /// </summary>

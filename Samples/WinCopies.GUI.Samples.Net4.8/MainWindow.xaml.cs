@@ -29,7 +29,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WinCopies.GUI.Controls.Models;
 using WinCopies.GUI.Windows.Dialogs;
+using WinCopies.Util;
 
 namespace WinCopies.GUI.Samples
 {
@@ -54,7 +56,59 @@ namespace WinCopies.GUI.Samples
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            new DialogWindow() { ShowHelpButtonAsCommandButton = true }.Show();
+            DialogWindow[] dialogWindows = { new DialogWindow() { ShowHelpButton = true },
+            new DialogWindow() { ShowHelpButton = true },
+            new DialogWindow() { ShowHelpButtonAsCommandButton = true },
+            new DialogWindow() { ShowHelpButtonAsCommandButton = true },
+            new DialogWindow() { DialogButton = DialogButton.YesNoCancel, DefaultButton = DefaultButton.Cancel, ShowHelpButtonAsCommandButton = true },
+            new DialogWindow() { DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1"), new ButtonModel("Button2") } } };
+
+            int i = 0;
+
+            dialogWindows[0].Closed += (object _sender, EventArgs _e) => OnDialogWindowClosed(dialogWindows, i);
+
+            dialogWindows[0].Show();
+        }
+
+        private void OnDialogWindowClosed(DialogWindow[] dialogWindows, int i)
+        {
+
+            i++;
+
+            if (i == dialogWindows.Length)
+
+                return;
+
+            if (i % 2 == 0)
+
+            {
+
+                dialogWindows[i].Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
+
+                dialogWindows[i].Show();
+
+            }
+
+            else
+
+            {
+
+                dialogWindows[i].Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
+
+                dialogWindows[i].ShowDialog();
+
+            }
+
+        }
+
+        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

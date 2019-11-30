@@ -41,6 +41,7 @@ Available for .Net Framework, .Net Core and .Net Standard*
 		- ReadOnlyObservableCollection:
 			- The ReadOnlyObservableCollection classes:
 				- Now have the Serializable attribute.
+	- The ConverterArrayParameter and ConverterArrayMultiParametersParameter classes can now be used in XAML.
 
 - Obsolete items:
 	- Classes and interfaces:
@@ -64,6 +65,7 @@ Available for .Net Framework, .Net Core and .Net Standard*
 	- Misc:
 		- The resources are now available from the new Resources static class.
 		- The Microsoft.Shell namespace members are now available from the version 1.1.0 and later of the following NuGet package: https://www.nuget.org/packages/WinCopies.WindowsAPICodePack.Win32Native/
+		- The WinCopies.Util.Commands.ApplicationCommands.CloseWindow is now obsolete. Please use the System.Windows.Input.ApplicationCommands.Close command instead.
 
 - Addings:
 	- Classes:
@@ -169,6 +171,11 @@ First release
 
 WinCopies.GUI.Templates (2.0)
 -----------------------------
+
+First release
+
+WinCopies.GUI.Windows (2.0)
+---------------------------
 
 First release
 
