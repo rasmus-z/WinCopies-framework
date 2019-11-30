@@ -30,29 +30,13 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Templates", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Templates.Net4.8", "WinCopies.GUI.Templates.Net4.8\WinCopies.GUI.Templates.Net4.8.csproj", "{E571BA05-3B35-4852-A9FC-98F5A289B35A}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO", "WinCopies.IO\WinCopies.IO.shproj", "{5C6A8E8F-21AB-4C80-B898-5FB090CB72BD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.IO.Net4.8", "WinCopies.IO.Net4.8\WinCopies.IO.Net4.8.csproj", "{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO.FileProcesses", "WinCopies.IO.FileProcesses\WinCopies.IO.FileProcesses.shproj", "{ACEEF113-2233-4C78-B0F2-87D104BAA60C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.IO.FilesProcesses.Net4.8", "WinCopies.IO.FilesProcesses.Net4.8\WinCopies.IO.FilesProcesses.Net4.8.csproj", "{892E0A63-8519-4CE0-A3F8-2390A6F8D3E0}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI", "WinCopies.GUI\WinCopies.GUI.shproj", "{3AAF402A-7C4A-455F-8F42-6F4F13C5E185}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Net4.8", "WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj", "{8917A829-3028-4118-A1A2-798E80CA73C8}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Controls", "WinCopies.GUI.Controls\WinCopies.GUI.Controls.shproj", "{E29D62DD-F194-439F-8F63-48F09DE9F20D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Controls.Net4.8", "WinCopies.GUI.Controls.Net4.8\WinCopies.GUI.Controls.Net4.8.csproj", "{8D43C369-3D12-4536-8249-5BBA3B69B417}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Windows", "WinCopies.GUI.Windows\WinCopies.GUI.Windows.shproj", "{3FA63940-0513-455D-A3D1-FBA954C22869}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Windows.Net4.8", "WinCopies.GUI.Windows.Net4.8\WinCopies.GUI.Windows.Net4.8.csproj", "{3C641513-6FC6-438E-916B-7F35262A3678}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Explorer", "WinCopies.GUI.Explorer\WinCopies.GUI.Explorer.shproj", "{DA1E9BD1-1AA5-4CCF-8079-E7591AE8EC62}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Explorer.Net4.8", "WinCopies.GUI.Explorer.Net4.8\WinCopies.GUI.Explorer.Net4.8.csproj", "{0E581431-EE4E-4A47-8D7B-B18FF4F34E79}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Util.NetCore3.0", "WinCopies.Util.NetCore3.0\WinCopies.Util.NetCore3.0.csproj", "{72713C39-9F83-48CC-8FC4-71145B081B04}"
 EndProject
@@ -64,7 +48,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Samples.Net4.
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		WinCopies.GUI.Explorer\WinCopies.GUI.Explorer.projitems*{0e581431-ee4e-4a47-8d7b-b18ff4f34e79}*SharedItemsImports = 4
 		WinCopies.Data\WinCopies.Data.projitems*{0ea8f0f5-12a8-4f14-bf17-5422e25ed835}*SharedItemsImports = 13
 		WinCopies.GUI.Templates\WinCopies.GUI.Templates.projitems*{1af939a9-d753-48e4-b114-fb59e5f3f7fb}*SharedItemsImports = 13
 		WinCopies.GUI.Models\WinCopies.GUI.Models.projitems*{31c5f3cf-a8fa-43e0-9041-3c61ed9e45a1}*SharedItemsImports = 4
@@ -75,16 +58,9 @@ Global
 		WinCopies.Data\WinCopies.Data.projitems*{4178eaa3-ff93-4234-bf86-5e88d5b063b7}*SharedItemsImports = 4
 		WinCopies.Util\WinCopies.Util.projitems*{53801d23-7375-4e30-a5a7-27623e950554}*SharedItemsImports = 4
 		WinCopies.GUI.ViewModels\WinCopies.GUI.ViewModels.projitems*{589fcd51-85a1-46ff-ab94-3cdd133f92de}*SharedItemsImports = 13
-		WinCopies.IO\WinCopies.IO.projitems*{5c6a8e8f-21ab-4c80-b898-5fb090cb72bd}*SharedItemsImports = 13
 		WinCopies.GUI\WinCopies.GUI.projitems*{8917a829-3028-4118-a1a2-798e80ca73c8}*SharedItemsImports = 4
-		WinCopies.IO.FileProcesses\WinCopies.IO.FileProcesses.projitems*{892e0a63-8519-4ce0-a3f8-2390a6f8d3e0}*SharedItemsImports = 4
-		WinCopies.GUI.Controls\WinCopies.GUI.Controls.projitems*{8d43c369-3d12-4536-8249-5bba3b69b417}*SharedItemsImports = 4
 		WinCopies.GUI.Models\WinCopies.GUI.Models.projitems*{a43aee04-0665-4d64-a4b9-7ff1e471bf29}*SharedItemsImports = 13
-		WinCopies.IO.FileProcesses\WinCopies.IO.FileProcesses.projitems*{aceef113-2233-4c78-b0f2-87d104baa60c}*SharedItemsImports = 13
-		WinCopies.IO\WinCopies.IO.projitems*{c7de5838-3c6e-41b8-8fd1-9d0fbeb8e7ac}*SharedItemsImports = 4
-		WinCopies.GUI.Explorer\WinCopies.GUI.Explorer.projitems*{da1e9bd1-1aa5-4ccf-8079-e7591ae8ec62}*SharedItemsImports = 13
 		WinCopies.Util\WinCopies.Util.projitems*{e2160f13-964f-409c-9a4f-1fdbbda1b76c}*SharedItemsImports = 13
-		WinCopies.GUI.Controls\WinCopies.GUI.Controls.projitems*{e29d62dd-f194-439f-8f63-48f09de9f20d}*SharedItemsImports = 13
 		WinCopies.GUI.Templates\WinCopies.GUI.Templates.projitems*{e571ba05-3b35-4852-a9fc-98f5a289b35a}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -134,22 +110,6 @@ Global
 		{E571BA05-3B35-4852-A9FC-98F5A289B35A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E571BA05-3B35-4852-A9FC-98F5A289B35A}.Release|x64.ActiveCfg = Release|Any CPU
 		{E571BA05-3B35-4852-A9FC-98F5A289B35A}.Release|x64.Build.0 = Release|Any CPU
-		{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}.Debug|x64.ActiveCfg = Debug|x64
-		{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}.Debug|x64.Build.0 = Debug|x64
-		{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}.Release|x64.ActiveCfg = Release|x64
-		{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}.Release|x64.Build.0 = Release|x64
-		{892E0A63-8519-4CE0-A3F8-2390A6F8D3E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{892E0A63-8519-4CE0-A3F8-2390A6F8D3E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{892E0A63-8519-4CE0-A3F8-2390A6F8D3E0}.Debug|x64.ActiveCfg = Debug|x64
-		{892E0A63-8519-4CE0-A3F8-2390A6F8D3E0}.Debug|x64.Build.0 = Debug|x64
-		{892E0A63-8519-4CE0-A3F8-2390A6F8D3E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{892E0A63-8519-4CE0-A3F8-2390A6F8D3E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{892E0A63-8519-4CE0-A3F8-2390A6F8D3E0}.Release|x64.ActiveCfg = Release|x64
-		{892E0A63-8519-4CE0-A3F8-2390A6F8D3E0}.Release|x64.Build.0 = Release|x64
 		{8917A829-3028-4118-A1A2-798E80CA73C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8917A829-3028-4118-A1A2-798E80CA73C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8917A829-3028-4118-A1A2-798E80CA73C8}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -158,14 +118,6 @@ Global
 		{8917A829-3028-4118-A1A2-798E80CA73C8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8917A829-3028-4118-A1A2-798E80CA73C8}.Release|x64.ActiveCfg = Release|Any CPU
 		{8917A829-3028-4118-A1A2-798E80CA73C8}.Release|x64.Build.0 = Release|Any CPU
-		{8D43C369-3D12-4536-8249-5BBA3B69B417}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D43C369-3D12-4536-8249-5BBA3B69B417}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D43C369-3D12-4536-8249-5BBA3B69B417}.Debug|x64.ActiveCfg = Debug|x64
-		{8D43C369-3D12-4536-8249-5BBA3B69B417}.Debug|x64.Build.0 = Debug|x64
-		{8D43C369-3D12-4536-8249-5BBA3B69B417}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D43C369-3D12-4536-8249-5BBA3B69B417}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8D43C369-3D12-4536-8249-5BBA3B69B417}.Release|x64.ActiveCfg = Release|x64
-		{8D43C369-3D12-4536-8249-5BBA3B69B417}.Release|x64.Build.0 = Release|x64
 		{3C641513-6FC6-438E-916B-7F35262A3678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3C641513-6FC6-438E-916B-7F35262A3678}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C641513-6FC6-438E-916B-7F35262A3678}.Debug|x64.ActiveCfg = Debug|x64
@@ -174,14 +126,6 @@ Global
 		{3C641513-6FC6-438E-916B-7F35262A3678}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3C641513-6FC6-438E-916B-7F35262A3678}.Release|x64.ActiveCfg = Release|x64
 		{3C641513-6FC6-438E-916B-7F35262A3678}.Release|x64.Build.0 = Release|x64
-		{0E581431-EE4E-4A47-8D7B-B18FF4F34E79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E581431-EE4E-4A47-8D7B-B18FF4F34E79}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E581431-EE4E-4A47-8D7B-B18FF4F34E79}.Debug|x64.ActiveCfg = Debug|x64
-		{0E581431-EE4E-4A47-8D7B-B18FF4F34E79}.Debug|x64.Build.0 = Debug|x64
-		{0E581431-EE4E-4A47-8D7B-B18FF4F34E79}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E581431-EE4E-4A47-8D7B-B18FF4F34E79}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0E581431-EE4E-4A47-8D7B-B18FF4F34E79}.Release|x64.ActiveCfg = Release|x64
-		{0E581431-EE4E-4A47-8D7B-B18FF4F34E79}.Release|x64.Build.0 = Release|x64
 		{72713C39-9F83-48CC-8FC4-71145B081B04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{72713C39-9F83-48CC-8FC4-71145B081B04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72713C39-9F83-48CC-8FC4-71145B081B04}.Debug|x64.ActiveCfg = Debug|Any CPU
