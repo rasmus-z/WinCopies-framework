@@ -42,6 +42,7 @@ Available for .Net Framework, .Net Core and .Net Standard*
 			- The ReadOnlyObservableCollection classes:
 				- Now have the Serializable attribute.
 	- The ConverterArrayParameter and ConverterArrayMultiParametersParameter classes can now be used in XAML.
+	- The IsNullConverter now supports setting the parameter of the binding to true to get a reversed boolean.
 
 - Obsolete items:
 	- Classes and interfaces:
@@ -53,14 +54,14 @@ Available for .Net Framework, .Net Core and .Net Standard*
 		- (I)ReadOnlyArrayList
 		- The Generic class is being replaced by the Resources class and will be removed in later versions.
 	- Extension methods:
-		- static bool ContainsOneValue(this IEnumerable array, Comparison<object> comparison, out bool containsMoreThanOneValue, params object[] values) IEnumerable extension method (replaced by ContainsOneValue(this IEnumerable array, WinCopies.Collections.Comparison comparison, out bool containsMoreThanOneValue, params object[] values)).
+		- static bool ContainsOneValue(this IEnumerable array, Comparison<object\> comparison, out bool containsMoreThanOneValue, params object[] values) IEnumerable extension method (replaced by ContainsOneValue(this IEnumerable array, WinCopies.Collections.Comparison comparison, out bool containsMoreThanOneValue, params object[] values)).
 		- static object GetNumValue(this Enum @enum, string enumName) Enum extension method. Replaced by:
 			- GetNumValue(this Enum @enum)
 			- WinCopies.Util.GetNumValue(Type enumType, string fieldName)
-		- static bool Contains(this string s, IEqualityComparer<char> comparer, string value) (replaced by Contains(this string s, string value, IEqualityComparer<char> comparer)).
-		- static bool Contains(this string s, char value, IEqualityComparer<char> comparer, out int index) (replaced by array-common methods).
+		- static bool Contains(this string s, IEqualityComparer<char\> comparer, string value) (replaced by Contains(this string s, string value, IEqualityComparer<char\> comparer)).
+		- static bool Contains(this string s, char value, IEqualityComparer<char\> comparer, out int index) (replaced by array-common methods).
 	- Util methods:
-		- static (bool propertyChanged, object oldValue) SetPropertyWhenNotBusy<T>(T bgWorker, string propertyName, string fieldName, object newValue, Type declaringType, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet, bool throwIfBusy = true) where T : IBackgroundWorker, INotifyPropertyChanged (replaced by the WinCopies.Util.Extensions.SetBackgroundWorkerProperty method overloads).
+		- static (bool propertyChanged, object oldValue) SetPropertyWhenNotBusy<T\>(T bgWorker, string propertyName, string fieldName, object newValue, Type declaringType, BindingFlags bindingFlags = DefaultBindingFlagsForPropertySet, bool throwIfBusy = true) where T : IBackgroundWorker, INotifyPropertyChanged (replaced by the WinCopies.Util.Extensions.SetBackgroundWorkerProperty method overloads).
 		- Static If methods with object-generic delegates have been replaced by ones with new non-generic delegates.
 	- Misc:
 		- The resources are now available from the new Resources static class.
@@ -114,7 +115,7 @@ Available for .Net Framework, .Net Core and .Net Standard*
 			- Extension methods for LinkedLists
 			- Extension methods for setting properties in BackgroundWorkers with an is-busy check.
 			- Extension method for throwing if an object that implements IDisposable is disposing or disposed.
-			- AsObjectEnumerable extension method to yield return items from an IEnumerable as items of an IEnumerable<T>.
+			- AsObjectEnumerable extension method to yield return items from an IEnumerable as items of an IEnumerable<T\>.
 			- FirstOrDefault IEnumerable extension method. This is a generic method that looks for the first item of the given generic type parameter. If none item is found, the method returns the default value for the given generic type parameter.
 			- LastOrDefault IEnumerable extension method. Same method as the FirstOrDefault method but to get the last item of an IEnumerable instead of the first one.
 		- Misc:

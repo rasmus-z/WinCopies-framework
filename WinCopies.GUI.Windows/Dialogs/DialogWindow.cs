@@ -71,18 +71,22 @@ namespace WinCopies.GUI.Windows.Dialogs
 
         public IEnumerable CustomButtonsSource { get => (IEnumerable<Controls.Models.ButtonModel>)GetValue(CustomButtonsSourceProperty); set => SetValue(CustomButtonsSourceProperty, value); }
 
-        public ItemCollection CustomButtons
-        {
-            get
-            {
+        //public ItemCollection CustomButtons
+        //{
+        //    get
+        //    {
 
-                if (!(DialogButton is null) || !(CustomButtonsSource is null))
+        //        if (!(DialogButton is null) || !(CustomButtonsSource is null))
 
-                    return null;
+        //            return null;
 
-                return ((ItemsControl)Template.FindName("PART_ItemsControl", this)).Items;
-            }
-        }
+        //        ApplyTemplate();
+
+        //        OnApplyTemplate();
+
+        //        return ((ItemsControl)Template?.FindName("PART_ItemsControl", this))?.Items;
+        //    }
+        //}
 
         /// <summary>
         /// Indentifies the <see cref="CustomButtonTemplate"/> dependency property.

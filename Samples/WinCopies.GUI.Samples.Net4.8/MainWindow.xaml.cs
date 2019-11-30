@@ -56,59 +56,79 @@ namespace WinCopies.GUI.Samples
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            DialogWindow[] dialogWindows = { new DialogWindow() { ShowHelpButton = true },
-            new DialogWindow() { ShowHelpButton = true },
-            new DialogWindow() { ShowHelpButtonAsCommandButton = true },
-            new DialogWindow() { ShowHelpButtonAsCommandButton = true },
-            new DialogWindow() { DialogButton = DialogButton.YesNoCancel, DefaultButton = DefaultButton.Cancel, ShowHelpButtonAsCommandButton = true },
-            new DialogWindow() { DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1"), new ButtonModel("Button2") } } };
+            Action<string> action = s => MessageBox.Show($"You clicked the Button{s}!");
 
-            int i = 0;
+            ICommand command = new AttachedCommandBehavior.DelegateCommand<string>() { CanExecuteDelegate = s => true, ExecuteDelegate = s => action(s) };
 
-            dialogWindows[0].Closed += (object _sender, EventArgs _e) => OnDialogWindowClosed(dialogWindows, i);
+            RoutedCommand routedCommand = new RoutedUICommand("ButtonCommand", "ButtonCommand", typeof(MainWindow));
 
-            dialogWindows[0].Show();
-        }
+            Func<WinCopies.GUI.Windows.Dialogs.DialogWindow>[] dialogWindows = { () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { ShowHelpButton = true },
+            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { ShowHelpButton = true },
+            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { ShowHelpButtonAsCommandButton = true },
+            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { ShowHelpButtonAsCommandButton = true },
+            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { DialogButton = DialogButton.YesNoCancel, DefaultButton = DefaultButton.Cancel, ShowHelpButtonAsCommandButton = true },
+            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1") { CommandParameter = "1", Command = command }, new ButtonModel("Button2") { CommandParameter = "2", Command = command } } },
+            () => { var _dialogWindow = new WinCopies.GUI.Windows.Dialogs.DialogWindow() { DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1") { CommandParameter = "1", Command = routedCommand }, new ButtonModel("Button2") { CommandParameter = "2", Command = routedCommand } } };
 
-        private void OnDialogWindowClosed(DialogWindow[] dialogWindows, int i)
-        {
+                _dialogWindow.CommandBindings.Add(new CommandBinding(routedCommand, (object _sender, ExecutedRoutedEventArgs _e) => MessageBox.Show($"You clicked the Button{ (string) _e.Parameter}!")));
 
-            i++;
-
-            if (i == dialogWindows.Length)
-
-                return;
-
-            if (i % 2 == 0)
-
-            {
-
-                dialogWindows[i].Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
-
-                dialogWindows[i].Show();
+                return _dialogWindow;
 
             }
+        };
 
-            else
+        int i = 0;
 
-            {
+        WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[0]();
 
-                dialogWindows[i].Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
+        dialogWindow.Closed += (object _sender, EventArgs _e) => OnDialogWindowClosed(dialogWindows, i);
 
-                dialogWindows[i].ShowDialog();
-
-            }
-
+        dialogWindow.Show();
         }
 
-        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+    private void OnDialogWindowClosed(Func<WinCopies.GUI.Windows.Dialogs.DialogWindow>[] dialogWindows, int i)
+    {
+
+        i++;
+
+        if (i == dialogWindows.Length)
+
+            return;
+
+        if (i % 2 == 0)
+
         {
-            e.CanExecute = true;
+
+            WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[i]();
+
+            dialogWindow.Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
+
+            dialogWindow.Show();
+
         }
 
-        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        else
+
         {
-            this.Close();
+
+            WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[i]();
+
+            dialogWindow.Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
+
+            dialogWindow.ShowDialog();
+
         }
+
     }
+
+    private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+    {
+        e.CanExecute = true;
+    }
+
+    private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        this.Close();
+    }
+}
 }

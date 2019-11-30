@@ -23,13 +23,16 @@ using System.Windows.Data;
 
 namespace WinCopies.Util.Data
 {
-    [ValueConversion(typeof(object), typeof(bool))] 
+    /// <summary>
+    /// Determines whether an object is null. You can set to <see langword="true"/> the parameter of the <see cref="Binding"/> that will use this converter to get a reversed <see cref="bool"/>.
+    /// </summary>
+    [ValueConversion(typeof(object), typeof(bool))]
     public class IsNullConverter : ConverterBase
     {
-        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value is null;
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) => parameter is bool _parameter && _parameter == true ? !( value is null) : value is null ; 
 
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }
 
- #endif
+#endif
