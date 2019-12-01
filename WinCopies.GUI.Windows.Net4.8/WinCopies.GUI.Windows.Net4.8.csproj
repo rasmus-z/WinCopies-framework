@@ -181,6 +181,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj">
