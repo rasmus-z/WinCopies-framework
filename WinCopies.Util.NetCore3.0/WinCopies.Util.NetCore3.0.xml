@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>WinCopies.Util.NetCore3.0</name>
+        <name>WinCopies.Util</name>
     </assembly>
     <members>
         <member name="T:WinCopies.Util.Properties.Resources">
@@ -2325,8 +2325,8 @@
             <typeparam name="T">The type of elements in the collection.</typeparam>
             <remarks>
             <para>In many cases the data that you work with is a collection of objects. For example, a common scenario in data binding is to use an <see cref="!:ItemsControl"/> such as a <see cref="!:ListBox"/>, <see cref="!:ListView"/>, or <see cref="!:TreeView"/> to display a collection of records.</para>
-            <para>You can enumerate over any collection that implements the <see cref="T:System.Collections.IEnumerable"/> interface. However, to set up dynamic bindings so that insertions or deletions in the collection update the UI automatically, the collection must implement the <see cref="T:WinCopies.Collections.DotNetFix.INotifyCollectionChanged"/> interface. This interface exposes the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event, an event that should be raised whenever the underlying collection changes.</para>
-            <para>WPF provides the <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/> class, which is a built-in implementation of a data collection that implements the <see cref="T:WinCopies.Collections.DotNetFix.INotifyCollectionChanged"/> interface.</para>
+            <para>You can enumerate over any collection that implements the <see cref="T:System.Collections.IEnumerable"/> interface. However, to set up dynamic bindings so that insertions or deletions in the collection update the UI automatically, the collection must implement the <see cref="T:System.Collections.Specialized.INotifyCollectionChanged"/> interface. This interface exposes the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event, an event that should be raised whenever the underlying collection changes.</para>
+            <para>WPF provides the <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/> class, which is a built-in implementation of a data collection that implements the <see cref="T:System.Collections.Specialized.INotifyCollectionChanged"/> interface.</para>
             <para>Before implementing your own collection, consider using <see cref="T:System.Collections.ObjectModel.ObservableCollection`1"/> or one of the existing collection classes, such as <see cref="T:System.Collections.Generic.List`1"/>, <see cref="T:System.Collections.ObjectModel.Collection`1"/>, and <see cref="T:System.ComponentModel.BindingList`1"/>, among many others. If you have an advanced scenario and want to implement your own collection, consider using <see cref="T:System.Collections.IList"/>, which provides a non-generic collection of objects that can be individually accessed by index. Implementing <see cref="T:System.Collections.IList"/> provides the best performance with the data binding engine.</para>
             <para>Notes: To fully support transferring data values from binding source objects to binding targets, each object in your collection that supports bindable properties must implement an appropriate property changed notification mechanism such as the <see cref="T:System.ComponentModel.INotifyPropertyChanged"/> interface.</para>
             <para>For more information, see "Binding to Collections" in the Data Binding Overview article at: https://docs.microsoft.com/en-us/dotnet/framework/wpf/data/data-binding-overview?view=netframework-4.8</para>
