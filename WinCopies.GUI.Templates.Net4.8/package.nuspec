@@ -17,9 +17,9 @@
 -->
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <!--*-->
-    <description>WinCopies framework utilities</description>
+    <description>Templates for the WinCopies framework</description>
     <!--*-->
-    <releaseNotes>https://github.com/pierresprim/WinCopies-framework/blob/master/Changelog.md</releaseNotes>
+    <releaseNotes>See https://github.com/pierresprim/WinCopies-framework/blob/master/Changelog.md</releaseNotes>
     <copyright>Copyright © 2019 Pierre Sprimont</copyright>
     <tags>
     </tags>
