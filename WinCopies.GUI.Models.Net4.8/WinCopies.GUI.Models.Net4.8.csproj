@@ -46,6 +46,12 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.Models.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CodeAnalysis, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeAnalysis.Common.3.3.1\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
@@ -116,7 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj">
-      <Project>{8917a829-3028-4118-a1a2-798e80ca73c8}</Project>
+      <Project>{05604b7e-804c-46e5-83ff-fbd09b80d655}</Project>
       <Name>WinCopies.GUI.Net4.8</Name>
     </ProjectReference>
     <ProjectReference Include="..\WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj">
@@ -128,6 +134,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="README.md" />
+    <None Include="WinCopies.GUI.Models.snk" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.9.8\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />

@@ -71,6 +71,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.Windows.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CodeAnalysis, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeAnalysis.Common.3.3.1\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
@@ -182,19 +188,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="README.md" />
+    <None Include="WinCopies.GUI.Windows.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj">
-      <Project>{8917a829-3028-4118-a1a2-798e80ca73c8}</Project>
+      <Project>{05604b7e-804c-46e5-83ff-fbd09b80d655}</Project>
       <Name>WinCopies.GUI.Net4.8</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WinCopies.GUI.Models.Net4.8\WinCopies.GUI.Models.Net4.8.csproj">
-      <Project>{31c5f3cf-a8fa-43e0-9041-3c61ed9e45a1}</Project>
-      <Name>WinCopies.GUI.Models.Net4.8</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WinCopies.GUI.Templates.Net4.8\WinCopies.GUI.Templates.Net4.8.csproj">
-      <Project>{e571ba05-3b35-4852-a9fc-98f5a289b35a}</Project>
-      <Name>WinCopies.GUI.Templates.Net4.8</Name>
     </ProjectReference>
     <ProjectReference Include="..\WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj">
       <Project>{53801d23-7375-4e30-a5a7-27623e950554}</Project>

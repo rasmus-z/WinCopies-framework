@@ -69,7 +69,7 @@ namespace WinCopies.GUI.Windows.Dialogs
         /// </summary>
         public static readonly DependencyProperty CustomButtonsSourceProperty = DependencyProperty.Register(nameof(CustomButtonsSource), typeof(IEnumerable), typeof(DialogWindow), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DialogWindow)d).OnCustomButtonsSourceChanged((IEnumerable)e.OldValue, (IEnumerable)e.NewValue)));
 
-        public IEnumerable CustomButtonsSource { get => (IEnumerable<Controls.Models.ButtonModel>)GetValue(CustomButtonsSourceProperty); set => SetValue(CustomButtonsSourceProperty, value); }
+        public IEnumerable CustomButtonsSource { get => (IEnumerable)GetValue(CustomButtonsSourceProperty); set => SetValue(CustomButtonsSourceProperty, value); }
 
         //public ItemCollection CustomButtons
         //{

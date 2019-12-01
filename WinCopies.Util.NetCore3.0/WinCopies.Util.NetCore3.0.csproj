@@ -18,6 +18,10 @@
     <PackageProjectUrl>https://wincopies.com/wincopies/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/pierresprim/WinCopies-framework.git</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
+    <LangVersion>8.0</LangVersion>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.Util.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

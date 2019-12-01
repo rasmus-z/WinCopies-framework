@@ -38,6 +38,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,6 +48,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AttachedCommandBehavior, Version=3.1.0.0, Culture=neutral, PublicKeyToken=96599f0dfaf8a712, processorArchitecture=MSIL">
@@ -135,7 +141,7 @@
       <Name>WinCopies.GUI.Models.Net4.8</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj">
-      <Project>{8917a829-3028-4118-a1a2-798e80ca73c8}</Project>
+      <Project>{05604b7e-804c-46e5-83ff-fbd09b80d655}</Project>
       <Name>WinCopies.GUI.Net4.8</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\WinCopies.GUI.Templates.Net4.8\WinCopies.GUI.Templates.Net4.8.csproj">
