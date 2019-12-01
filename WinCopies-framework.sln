@@ -46,6 +46,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Samples.Net4.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Net4.8", "WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj", "{05604B7E-804C-46E5-83FF-FBD09B80D655}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Data.NetCore3.0", "WinCopies.Data.NetCore3.0\WinCopies.Data.NetCore3.0.csproj", "{2010DB68-3F30-4EC4-BFF7-07124A8C893E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Data.NetStandard2.0", "WinCopies.Data.NetStandard2.0\WinCopies.Data.NetStandard2.0.csproj", "{C646B40C-D352-421C-BD67-7F185C543A9A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		WinCopies.GUI\WinCopies.GUI.projitems*{05604b7e-804c-46e5-83ff-fbd09b80d655}*SharedItemsImports = 4
@@ -150,6 +154,22 @@ Global
 		{05604B7E-804C-46E5-83FF-FBD09B80D655}.Release|Any CPU.Build.0 = Release|Any CPU
 		{05604B7E-804C-46E5-83FF-FBD09B80D655}.Release|x64.ActiveCfg = Release|Any CPU
 		{05604B7E-804C-46E5-83FF-FBD09B80D655}.Release|x64.Build.0 = Release|Any CPU
+		{2010DB68-3F30-4EC4-BFF7-07124A8C893E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2010DB68-3F30-4EC4-BFF7-07124A8C893E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2010DB68-3F30-4EC4-BFF7-07124A8C893E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2010DB68-3F30-4EC4-BFF7-07124A8C893E}.Debug|x64.Build.0 = Debug|Any CPU
+		{2010DB68-3F30-4EC4-BFF7-07124A8C893E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2010DB68-3F30-4EC4-BFF7-07124A8C893E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2010DB68-3F30-4EC4-BFF7-07124A8C893E}.Release|x64.ActiveCfg = Release|Any CPU
+		{2010DB68-3F30-4EC4-BFF7-07124A8C893E}.Release|x64.Build.0 = Release|Any CPU
+		{C646B40C-D352-421C-BD67-7F185C543A9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C646B40C-D352-421C-BD67-7F185C543A9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C646B40C-D352-421C-BD67-7F185C543A9A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C646B40C-D352-421C-BD67-7F185C543A9A}.Debug|x64.Build.0 = Debug|Any CPU
+		{C646B40C-D352-421C-BD67-7F185C543A9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C646B40C-D352-421C-BD67-7F185C543A9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C646B40C-D352-421C-BD67-7F185C543A9A}.Release|x64.ActiveCfg = Release|Any CPU
+		{C646B40C-D352-421C-BD67-7F185C543A9A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

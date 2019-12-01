@@ -1,54 +1,30 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <RootNamespace>WinCopies.Util</RootNamespace>
-    <Product>WinCopies framework</Product>
-    <Description>WinCopies framework utilities</Description>
-    <PackageId>WinCopies.Util</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageReleaseNotes>See the change log.</PackageReleaseNotes>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>WinCopies.Data</RootNamespace>
+    <AssemblyName>WinCopies.Data</AssemblyName>
     <Version>2.0.0</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Khun Ly, Pierre Sprimont</Authors>
     <Company>WinCopies</Company>
-    <Authors>Pierre Sprimont</Authors>
-    <AssemblyName>WinCopies.Util</AssemblyName>
+    <Product>WinCopies framework</Product>
+    <Description>Provides some utilities to interact with data sources.</Description>
     <Copyright>Copyright © 2019 Pierre Sprimont</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://wincopies.com/wincopies/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/pierresprim/WinCopies-framework.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <LangVersion>8.0</LangVersion>
+    <PackageReleaseNotes>See the change log.</PackageReleaseNotes>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>WinCopies.Util.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>C:\Users\pierr\source\repositories\WinCopies-framework\WinCopies.Util.NetCore3.0\WinCopies.Util.NetCore3.0.xml</DocumentationFile>
+    <AssemblyOriginatorKeyFile>WinCopies.Data.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\Users\pierr\source\repositories\WinCopies-framework\WinCopies.Util.NetCore3.0\WinCopies.Util.xml</DocumentationFile>
+    <DocumentationFile>C:\Users\pierr\source\repositories\WinCopies-framework\WinCopies.Data.NetStandard2.0\WinCopies.Data.NetStandard2.0.xml</DocumentationFile>
+    <DefineConstants>TRACE;NETSTANDARD</DefineConstants>
   </PropertyGroup>
-
-  <Import Project="..\WinCopies.Util\WinCopies.Util.projitems" Label="Shared" />
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\LICENSE">
@@ -98,6 +74,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="6.0.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinCopies.Util.NetStandard2.0\WinCopies.Util.NetStandard2.0.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\WinCopies.Data\WinCopies.Data.projitems" Label="Shared" />
 
 </Project>

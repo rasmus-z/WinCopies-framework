@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>WinCopies.Util.NetStandard2.0</name>
+        <name>WinCopies.Util</name>
     </assembly>
     <members>
         <member name="T:WinCopies.Util.Properties.Resources">

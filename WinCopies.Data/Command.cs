@@ -42,7 +42,7 @@ namespace WinCopies.Data
 
         }
 
-        private void Init(string query) => Query = IsNullEmptyOrWhiteSpace(query) ? throw new ArgumentException(string.Format(Util.Generic.StringParameterEmptyOrWhiteSpaces, nameof(query))) : query;
+        private void Init(string query) => Query = IsNullEmptyOrWhiteSpace(query) ? throw new ArgumentException(string.Format(Util .Resources.ExceptionMessages. StringParameterEmptyOrWhiteSpaces, nameof(query))) : query;
 
     }
 }

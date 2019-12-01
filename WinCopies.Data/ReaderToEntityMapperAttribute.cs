@@ -23,7 +23,20 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+#if NETFRAMEWORK
 using System.Windows.Data;
+#else
+namespace WinCopies.Data
+{
+    public interface IValueConverter
+    {
+        object Convert(object value, Type targetType, object parameter, CultureInfo culture);
+
+        object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture);
+    }
+}
+#endif
 
 namespace WinCopies.Data
 {

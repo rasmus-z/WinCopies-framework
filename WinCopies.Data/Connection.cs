@@ -34,12 +34,28 @@ namespace WinCopies.Data
 
         private readonly string _connectionString;
 
+#if NETSTANDARD
+
+        public Connection(string connectionString, DbProviderFactory factory)
+
+        {
+
+            _factory = factory;
+
+            _connectionString = connectionString;
+
+        }
+
+#else
+
         public Connection(string connectionString, string invariantName)
         {
             _factory = DbProviderFactories.GetFactory(invariantName);
 
             _connectionString = connectionString;
         }
+
+#endif
 
         private IDbConnection CreateConnection()
         {
