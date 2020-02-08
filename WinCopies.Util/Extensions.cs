@@ -35,9 +35,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 #endif
 using WinCopies.Collections;
-#if NETFRAMEWORK
-using static WinCopies.Util.Generic;
-#endif
 using IList = System.Collections.IList;
 using static WinCopies.Util.Util;
 using WinCopies.Collections.DotNetFix;

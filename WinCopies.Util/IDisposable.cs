@@ -1,4 +1,4 @@
-﻿/* Copyright © Pierre Sprimont, 2019
+﻿/* Copyright © Pierre Sprimont, 2020
  *
  * This file is part of the WinCopies Framework.
  *
@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace WinCopies.Util
 {
-    public interface IDisposable : System.IDisposable
+    public interface IDisposable : WinCopies.Util.DotNetFix.IDisposable
     {
 
         bool IsDisposing { get; }
@@ -31,4 +31,18 @@ namespace WinCopies.Util
         bool IsDisposed { get; }
 
     }
+}
+
+namespace WinCopies.Util.DotNetFix
+
+{
+
+    public interface IDisposable : System.IDisposable
+
+    {
+
+        bool IsDisposed { get; }
+
+    }
+
 }

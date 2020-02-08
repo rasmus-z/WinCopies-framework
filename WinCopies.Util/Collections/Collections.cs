@@ -1,4 +1,4 @@
-﻿/* Copyright © Pierre Sprimont, 2019
+﻿/* Copyright © Pierre Sprimont, 2020
  *
  * This file is part of the WinCopies Framework.
  *
@@ -19,12 +19,157 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IDisposable = WinCopies.Util.DotNetFix.IDisposable;
 
 namespace WinCopies.Collections
 {
+
+    public interface IUIntIndexedCollection
+
+    {
+
+        object this[uint index] { get; }
+
+        uint Count { get; }
+
+    }
+
+    public interface IUIntIndexedCollection<T> : IUIntIndexedCollection
+    {
+
+        T this[uint index] { get; }
+
+    }
+
+    public abstract class UIntIndexedCollectionEnumeratorBase : IDisposable
+
+    {
+
+        protected internal IUIntIndexedCollection UIntIndexedCollection { get; private set; }
+        protected internal uint? Index { get; set; } = null;
+        protected internal Func<bool> MoveNextMethod { get; set; }
+
+        public UIntIndexedCollectionEnumeratorBase(IUIntIndexedCollection uintIndexedCollection)
+        {
+            UIntIndexedCollection = uintIndexedCollection;
+
+            MoveNextMethod = () => UIntIndexedCollectionEnumerator.MoveNextMethod(this);
+        }
+
+        #region IDisposable Support
+        public bool IsDisposed { get; private set; } = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                if (disposing)
+                {
+
+                    UIntIndexedCollection = null;
+
+                    Index = null;
+
+                }
+
+                IsDisposed = true;
+            }
+        }
+
+        public void Dispose() => Dispose(true);
+
+        public virtual bool MoveNext() => MoveNextMethod();
+
+        public virtual void Reset()
+        {
+            Index = null;
+
+            MoveNextMethod = () => UIntIndexedCollectionEnumerator.MoveNextMethod(this);
+        }
+        #endregion
+    }
+
+    public sealed class UIntIndexedCollectionEnumerator : UIntIndexedCollectionEnumeratorBase, IEnumerator
+
+    {
+
+        public static Func<UIntIndexedCollectionEnumeratorBase, bool> MoveNextMethod => (UIntIndexedCollectionEnumeratorBase e) =>
+        {
+
+            if (e.UIntIndexedCollection.Count > 0)
+
+            {
+
+                e.Index = 0;
+
+                e.MoveNextMethod = () =>
+                {
+
+                    if (e.Index < e.UIntIndexedCollection.Count - 1)
+
+                    {
+
+                        e.Index++;
+
+                        return true;
+
+                    }
+
+                    else return false;
+
+                };
+
+                return true;
+
+            }
+
+            else return false;
+
+        };
+
+        public object Current
+        {
+            get
+            {
+                Debug.Assert(Index.HasValue, "_index does not have value.");
+
+                return UIntIndexedCollection[Index.Value];
+            }
+        }
+
+        public UIntIndexedCollectionEnumerator(IUIntIndexedCollection uintIndexedCollection) : base(uintIndexedCollection)
+        {
+
+        }
+
+    }
+
+    public sealed class UIntIndexedCollectionEnumerator<T> : UIntIndexedCollectionEnumeratorBase, IEnumerator<T>
+
+    {
+
+        public T Current
+        {
+            get
+            {
+                Debug.Assert(Index.HasValue, "_index does not have value.");
+
+                return ((IUIntIndexedCollection<T>)UIntIndexedCollection)[Index.Value];
+            }
+        }
+
+        object IEnumerator.Current => Current;
+
+        public UIntIndexedCollectionEnumerator(IUIntIndexedCollection<T> uintIndexedCollection) : base(uintIndexedCollection)
+        {
+
+        }
+    }
+}
 
     //public interface IList : System.Collections. IList, ICollection, IEnumerable
 
@@ -97,5 +242,3 @@ namespace WinCopies.Collections
 
 
     //}
-
-}

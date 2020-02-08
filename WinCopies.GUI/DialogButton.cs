@@ -21,37 +21,37 @@ namespace WinCopies.GUI.Windows.Dialogs
     {
 
         /// <summary>
-        /// This field correspond to the Win32 MB_OK flag.
+        /// This field corresponds to the Win32 MB_OK flag.
         /// </summary>
         OK = 0x00000000,
 
         /// <summary>
-        /// This field correspond to the Win32 MB_OKCANCEL flag.
+        /// This field corresponds to the Win32 MB_OKCANCEL flag.
         /// </summary>
         OKCancel = 0x00000001,
 
         /// <summary>
-        /// This field correspond to the Win32 MB_ABORTRETRYIGNORE flag.
+        /// This field corresponds to the Win32 MB_ABORTRETRYIGNORE flag.
         /// </summary>
         AbortRetryIgnore = 0x000002,
 
         /// <summary>
-        /// This field correspond to the Win32 MB_YESNOCANCEL flag.
+        /// This field corresponds to the Win32 MB_YESNOCANCEL flag.
         /// </summary>
         YesNoCancel = 0x000003,
 
         /// <summary>
-        /// This field correspond to the Win32 MB_YESNO flag.
+        /// This field corresponds to the Win32 MB_YESNO flag.
         /// </summary>
         YesNo = 0x000004,
 
         /// <summary>
-        /// This field correspond to the Win32 MB_RETRYCANCEL flag.
+        /// This field corresponds to the Win32 MB_RETRYCANCEL flag.
         /// </summary>
         RetryCancel = 0x000005,
 
         /// <summary>
-        /// This field correspond to the Win32 MB_CANCELTRYCONTINUE flag.
+        /// This field corresponds to the Win32 MB_CANCELTRYCONTINUE flag.
         /// </summary>
         CancelTryContinue = 0x000006,
 

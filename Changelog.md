@@ -6,10 +6,24 @@ The WinCopies® software framework
 CHANGELOG
 =========
 
-Please note that some changes may not appear in the Change Log.
-
 Updates
 -------
+
+02/08/2020 2.1
+==============
+
+WinCopies.Util (2.1)
+--------------------
+
+Available for .Net Framework, .Net Core and .Net Standard*
+
+- Addings:
+	- Interfaces:
+		- IUIntIndexedCollection and IUIntIndexedCollection<T\>
+		- UIntIndexedCollectionEnumeratorBase, UIntIndexedCollectionEnumerator and UIntIndexedCollectionEnumerator<T\>
+		- WinCopies.Util.DotNetFix.IDisposable
+
+\* Some features are not available in the .Net Core and .Net Standard versions since these frameworks do not have the same structure as the .Net Framework. New packages that include these features will be released later.
 
 2.0
 ===
