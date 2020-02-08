@@ -16,9 +16,10 @@
     <PackageProjectUrl>https://wincopies.com/wincopies/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/pierresprim/WinCopies-framework.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>See the change log.</PackageReleaseNotes>
+    <PackageReleaseNotes>See https://github.com/pierresprim/WinCopies-framework/blob/master/Changelog.md</PackageReleaseNotes>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.Data.snk</AssemblyOriginatorKeyFile>
+    <PackageId>WinCopies.Data.NetStandard</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
