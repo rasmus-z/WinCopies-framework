@@ -17,6 +17,9 @@ WinCopies.Util (2.1)
 
 Available for .Net Framework, .Net Core and .Net Standard*
 
+- Existing items behavior updates:
+	- This assembly now targets the 4.7.2 version of the .Net Framework instead of version 4.8 for the .Net Framework version of this assembly.
+
 - Addings:
 	- Interfaces:
 		- IUIntIndexedCollection and IUIntIndexedCollection<T\>

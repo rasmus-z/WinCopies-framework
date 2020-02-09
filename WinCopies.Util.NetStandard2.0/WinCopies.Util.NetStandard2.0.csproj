@@ -20,6 +20,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>WinCopies.Util.NetStandard</PackageId>
     <Description>WinCopies framework utilities</Description>
+    <PackageTags>WinCopies</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
