@@ -120,12 +120,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj">
-      <Project>{53801d23-7375-4e30-a5a7-27623e950554}</Project>
-      <Name>WinCopies.Util.Net4.8</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="package.nuspec" />
     <None Include="packages.config" />
@@ -144,6 +138,12 @@
     <Analyzer Include="..\packages\Microsoft.NetCore.Analyzers.2.9.8\analyzers\dotnet\cs\Microsoft.NetCore.CSharp.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.8\analyzers\dotnet\cs\Microsoft.NetFramework.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.8\analyzers\dotnet\cs\Microsoft.NetFramework.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WinCopies.Util.Net4.7.2\WinCopies.Util.Net4.7.2.csproj">
+      <Project>{53801d23-7375-4e30-a5a7-27623e950554}</Project>
+      <Name>WinCopies.Util.Net4.7.2</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\WinCopies.GUI\WinCopies.GUI.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

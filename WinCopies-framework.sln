@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Changelog.md = Changelog.md
+		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
 	EndProjectSection
 EndProject
@@ -15,8 +16,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Data.Net4.8", "WinCopies.Data.Net4.8\WinCopies.Data.Net4.8.csproj", "{4178EAA3-FF93-4234-BF86-5E88D5B063B7}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Util", "WinCopies.Util\WinCopies.Util.shproj", "{E2160F13-964F-409C-9A4F-1FDBBDA1B76C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Util.Net4.8", "WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj", "{53801D23-7375-4E30-A5A7-27623E950554}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Models", "WinCopies.GUI.Models\WinCopies.GUI.Models.shproj", "{A43AEE04-0665-4D64-A4B9-7FF1E471BF29}"
 EndProject
@@ -46,9 +45,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Samples.Net4.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.GUI.Net4.8", "WinCopies.GUI.Net4.8\WinCopies.GUI.Net4.8.csproj", "{05604B7E-804C-46E5-83FF-FBD09B80D655}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Data.NetCore3.0", "WinCopies.Data.NetCore3.0\WinCopies.Data.NetCore3.0.csproj", "{2010DB68-3F30-4EC4-BFF7-07124A8C893E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Data.NetCore3.0", "WinCopies.Data.NetCore3.0\WinCopies.Data.NetCore3.0.csproj", "{2010DB68-3F30-4EC4-BFF7-07124A8C893E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Data.NetStandard2.0", "WinCopies.Data.NetStandard2.0\WinCopies.Data.NetStandard2.0.csproj", "{C646B40C-D352-421C-BD67-7F185C543A9A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Data.NetStandard2.0", "WinCopies.Data.NetStandard2.0\WinCopies.Data.NetStandard2.0.csproj", "{C646B40C-D352-421C-BD67-7F185C543A9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.Util.Net4.7.2", "WinCopies.Util.Net4.7.2\WinCopies.Util.Net4.7.2.csproj", "{53801D23-7375-4E30-A5A7-27623E950554}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -82,14 +83,6 @@ Global
 		{4178EAA3-FF93-4234-BF86-5E88D5B063B7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4178EAA3-FF93-4234-BF86-5E88D5B063B7}.Release|x64.ActiveCfg = Release|Any CPU
 		{4178EAA3-FF93-4234-BF86-5E88D5B063B7}.Release|x64.Build.0 = Release|Any CPU
-		{53801D23-7375-4E30-A5A7-27623E950554}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{53801D23-7375-4E30-A5A7-27623E950554}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{53801D23-7375-4E30-A5A7-27623E950554}.Debug|x64.ActiveCfg = Debug|x64
-		{53801D23-7375-4E30-A5A7-27623E950554}.Debug|x64.Build.0 = Debug|x64
-		{53801D23-7375-4E30-A5A7-27623E950554}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{53801D23-7375-4E30-A5A7-27623E950554}.Release|Any CPU.Build.0 = Release|Any CPU
-		{53801D23-7375-4E30-A5A7-27623E950554}.Release|x64.ActiveCfg = Release|x64
-		{53801D23-7375-4E30-A5A7-27623E950554}.Release|x64.Build.0 = Release|x64
 		{31C5F3CF-A8FA-43E0-9041-3C61ED9E45A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31C5F3CF-A8FA-43E0-9041-3C61ED9E45A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31C5F3CF-A8FA-43E0-9041-3C61ED9E45A1}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -170,6 +163,14 @@ Global
 		{C646B40C-D352-421C-BD67-7F185C543A9A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C646B40C-D352-421C-BD67-7F185C543A9A}.Release|x64.ActiveCfg = Release|Any CPU
 		{C646B40C-D352-421C-BD67-7F185C543A9A}.Release|x64.Build.0 = Release|Any CPU
+		{53801D23-7375-4E30-A5A7-27623E950554}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53801D23-7375-4E30-A5A7-27623E950554}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53801D23-7375-4E30-A5A7-27623E950554}.Debug|x64.ActiveCfg = Debug|x64
+		{53801D23-7375-4E30-A5A7-27623E950554}.Debug|x64.Build.0 = Debug|x64
+		{53801D23-7375-4E30-A5A7-27623E950554}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53801D23-7375-4E30-A5A7-27623E950554}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53801D23-7375-4E30-A5A7-27623E950554}.Release|x64.ActiveCfg = Release|x64
+		{53801D23-7375-4E30-A5A7-27623E950554}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

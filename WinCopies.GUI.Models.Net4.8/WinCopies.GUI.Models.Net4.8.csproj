@@ -127,9 +127,9 @@
       <Project>{05604b7e-804c-46e5-83ff-fbd09b80d655}</Project>
       <Name>WinCopies.GUI.Net4.8</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj">
+    <ProjectReference Include="..\WinCopies.Util.Net4.7.2\WinCopies.Util.Net4.7.2.csproj">
       <Project>{53801d23-7375-4e30-a5a7-27623e950554}</Project>
-      <Name>WinCopies.Util.Net4.8</Name>
+      <Name>WinCopies.Util.Net4.7.2</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

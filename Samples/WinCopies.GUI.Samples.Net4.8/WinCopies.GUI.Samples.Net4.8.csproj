@@ -190,9 +190,9 @@
       <Project>{3c641513-6fc6-438e-916b-7f35262a3678}</Project>
       <Name>WinCopies.GUI.Windows.Net4.8</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\WinCopies.Util.Net4.8\WinCopies.Util.Net4.8.csproj">
-      <Project>{53801D23-7375-4E30-A5A7-27623E950554}</Project>
-      <Name>WinCopies.Util.Net4.8</Name>
+    <ProjectReference Include="..\..\WinCopies.Util.Net4.7.2\WinCopies.Util.Net4.7.2.csproj">
+      <Project>{53801d23-7375-4e30-a5a7-27623e950554}</Project>
+      <Name>WinCopies.Util.Net4.7.2</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

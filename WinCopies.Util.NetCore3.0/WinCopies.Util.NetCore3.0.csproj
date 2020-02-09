@@ -8,12 +8,12 @@
     <PackageId>WinCopies.Util.NetCore</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReleaseNotes>See https://github.com/pierresprim/WinCopies-framework/blob/master/Changelog.md</PackageReleaseNotes>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Company>WinCopies</Company>
     <Authors>Pierre Sprimont</Authors>
     <AssemblyName>WinCopies.Util</AssemblyName>
-    <Copyright>Copyright © 2019 Pierre Sprimont</Copyright>
+    <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://wincopies.com/wincopies/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/pierresprim/WinCopies-framework.git</RepositoryUrl>
