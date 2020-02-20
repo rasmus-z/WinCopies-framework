@@ -28,7 +28,7 @@ using IDisposable = WinCopies.Util.DotNetFix.IDisposable;
 namespace WinCopies.Collections
 {
 
-    public interface IUIntIndexedCollection
+    public interface IUIntIndexedCollection : IEnumerable, IDisposable
 
     {
 
@@ -38,20 +38,22 @@ namespace WinCopies.Collections
 
     }
 
-    public interface IUIntIndexedCollection<T> : IUIntIndexedCollection
+    public interface IUIntIndexedCollection<T> : IUIntIndexedCollection, IEnumerable<T>, IDisposable
     {
 
         T this[uint index] { get; }
 
     }
 
+    // todo: check if the given collection implements the WinCopies.DotNetFix.IDisposable (or WinCopies.IDisposable) interface and, if yes, check the given collection is not disposed (or disposing) in the Current property and in the MoveNext method.
+
     public abstract class UIntIndexedCollectionEnumeratorBase : IDisposable
 
     {
 
         protected internal IUIntIndexedCollection UIntIndexedCollection { get; private set; }
-        protected internal uint? Index { get; set; } = null;
-        protected internal Func<bool> MoveNextMethod { get; set; }
+        protected internal uint? Index { get; internal set; } = null;
+        protected internal Func<bool> MoveNextMethod { get; internal set; }
 
         public UIntIndexedCollectionEnumeratorBase(IUIntIndexedCollection uintIndexedCollection)
         {
