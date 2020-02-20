@@ -28,38 +28,50 @@ using IDisposable = WinCopies.Util.DotNetFix.IDisposable;
 namespace WinCopies.Collections
 {
 
-    public interface IUIntIndexedCollection : IEnumerable, IDisposable
+    public interface IReadOnlyUIntIndexedCollection : IEnumerable
 
     {
-
-        object this[uint index] { get; }
 
         uint Count { get; }
 
     }
+    
+    public interface IReadOnlyUIntIndexedCollection<T> : IReadOnlyUIntIndexedCollection, IEnumerable<T>
+    
+    {
+        
+        
+        
+    }
+    
+    public interface IReadOnlyUIntIndexedList : IReadOnlyUIntIndexedCollection
+    
+    {
 
-    public interface IUIntIndexedCollection<T> : IUIntIndexedCollection, IEnumerable<T>, IDisposable
+        object this[uint index] { get; }
+        
+    }
+
+    public interface IReadOnlyUIntIndexedList<T> : IReadOnlyUIntIndexedCollection<T>
     {
 
         T this[uint index] { get; }
 
     }
 
-    // todo: check if the given collection implements the WinCopies.DotNetFix.IDisposable (or WinCopies.IDisposable) interface and, if yes, check the given collection is not disposed (or disposing) in the Current property and in the MoveNext method.
-
-    public abstract class UIntIndexedCollectionEnumeratorBase : IDisposable
+    public abstract class UIntIndexedListEnumeratorBase : IDisposable
 
     {
 
-        protected internal IUIntIndexedCollection UIntIndexedCollection { get; private set; }
-        protected internal uint? Index { get; internal set; } = null;
-        protected internal Func<bool> MoveNextMethod { get; internal set; }
+        protected internal IReadOnlyUIntIndexedList InnerList { get; private set; }
+        protected internal uint? Index { get; set; } = null;
+        protected internal Func<bool> MoveNextMethod { get; set; }
 
-        public UIntIndexedCollectionEnumeratorBase(IUIntIndexedCollection uintIndexedCollection)
+        public UIntIndexedListEnumeratorBase(IUIntIndexedList uintIndexedList)
         {
-            UIntIndexedCollection = uintIndexedCollection;
+            UIntIndexedList = uintIndexedList;
 
-            MoveNextMethod = () => UIntIndexedCollectionEnumerator.MoveNextMethod(this);
+            MoveNextMethod = () => UIntIndexedListEnumerator.MoveNextMethod(this);
         }
 
         #region IDisposable Support
@@ -72,7 +84,7 @@ namespace WinCopies.Collections
                 if (disposing)
                 {
 
-                    UIntIndexedCollection = null;
+                    UIntIndexedList = null;
 
                     Index = null;
 
@@ -90,19 +102,19 @@ namespace WinCopies.Collections
         {
             Index = null;
 
-            MoveNextMethod = () => UIntIndexedCollectionEnumerator.MoveNextMethod(this);
+            MoveNextMethod = () => UIntIndexedListEnumerator.MoveNextMethod(this);
         }
         #endregion
     }
 
-    public sealed class UIntIndexedCollectionEnumerator : UIntIndexedCollectionEnumeratorBase, IEnumerator
+    public sealed class UIntIndexedListEnumerator : UIntIndexedListEnumeratorBase, IEnumerator
 
     {
 
-        public static Func<UIntIndexedCollectionEnumeratorBase, bool> MoveNextMethod => (UIntIndexedCollectionEnumeratorBase e) =>
+        public static Func<UIntIndexedListEnumeratorBase, bool> MoveNextMethod => (UIntIndexedListEnumeratorBase e) =>
         {
 
-            if (e.UIntIndexedCollection.Count > 0)
+            if (e.UIntIndexedList.Count > 0)
 
             {
 
@@ -111,7 +123,7 @@ namespace WinCopies.Collections
                 e.MoveNextMethod = () =>
                 {
 
-                    if (e.Index < e.UIntIndexedCollection.Count - 1)
+                    if (e.Index < e.UIntIndexedList.Count - 1)
 
                     {
 
@@ -139,18 +151,18 @@ namespace WinCopies.Collections
             {
                 Debug.Assert(Index.HasValue, "_index does not have value.");
 
-                return UIntIndexedCollection[Index.Value];
+                return UIntIndexedList[Index.Value];
             }
         }
 
-        public UIntIndexedCollectionEnumerator(IUIntIndexedCollection uintIndexedCollection) : base(uintIndexedCollection)
+        public UIntIndexedListEnumerator(IUIntIndexedList uintIndexedList) : base(uintIndexedList)
         {
 
         }
 
     }
 
-    public sealed class UIntIndexedCollectionEnumerator<T> : UIntIndexedCollectionEnumeratorBase, IEnumerator<T>
+    public sealed class UIntIndexedListEnumerator<T> : UIntIndexedListEnumeratorBase, IEnumerator<T>
 
     {
 
@@ -160,13 +172,13 @@ namespace WinCopies.Collections
             {
                 Debug.Assert(Index.HasValue, "_index does not have value.");
 
-                return ((IUIntIndexedCollection<T>)UIntIndexedCollection)[Index.Value];
+                return ((IUIntIndexedList<T>)UIntIndexedList)[Index.Value];
             }
         }
 
         object IEnumerator.Current => Current;
 
-        public UIntIndexedCollectionEnumerator(IUIntIndexedCollection<T> uintIndexedCollection) : base(uintIndexedCollection)
+        public UIntIndexedListEnumerator(IUIntIndexedList<T> uintIndexedList) : base(uintIndexedList)
         {
 
         }

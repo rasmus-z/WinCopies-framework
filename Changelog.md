@@ -9,6 +9,23 @@ CHANGELOG
 Updates
 -------
 
+???? 3.0
+========
+
+WinCopies.Util (3.0)
+--------------------
+
+- Existing items behavior updates:
+	- The IUIntIndexedCollection interface is now designed like the .Net IReadOnlyCollection and is now called IReadOnlyUIntIndexedCollection.
+
+- Addings:
+	- Interfaces:
+		- IReadOnlyUIntIndexedList and IReadOnlyUIntIndexedList<T\>
+
+- Removals:
+	- Interfaces:
+		- IUIntIndexedCollection<T\>
+
 02/09/2020 2.1
 ==============
 
