@@ -11,6 +11,11 @@ Usage notes
 
 This framework is currently still in development. Only the code on the master branch (starting to the 2.0 release of the WinCopies framework) and the packages that are built from that code are currently released.
 
+Contributing
+------------
+
+Any contributor to this project has to read [this code of conduct](https://github.com/pierresprim/WinCopies-framework/blob/master/CODE_OF_CONDUCT.md) before contributing and has to follow the rules described in it for any contribution to this project.
+
 License
 -------
 
