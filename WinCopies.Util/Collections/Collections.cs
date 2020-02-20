@@ -36,7 +36,15 @@ namespace WinCopies.Collections
 
     }
     
-    public interface IReadOnlyUIntIndexedList : IUIntIndexedCollection
+    public interface IReadOnlyUIntIndexedCollection<T> : IReadOnlyUIntIndexedCollection, IEnumerable<T>
+    
+    {
+        
+        
+        
+    }
+    
+    public interface IReadOnlyUIntIndexedList : IReadOnlyUIntIndexedCollection
     
     {
 
@@ -44,7 +52,7 @@ namespace WinCopies.Collections
         
     }
 
-    public interface IReadOnlyUIntIndexedList<T> : IUIntIndexedCollection, IEnumerable<T>
+    public interface IReadOnlyUIntIndexedList<T> : IReadOnlyUIntIndexedCollection<T>
     {
 
         T this[uint index] { get; }
