@@ -28,7 +28,7 @@ using IDisposable = WinCopies.Util.DotNetFix.IDisposable;
 namespace WinCopies.Collections
 {
 
-    public interface IUIntIndexedCollection
+    public interface IUIntIndexedCollection : IEnumerable
 
     {
 
@@ -38,7 +38,7 @@ namespace WinCopies.Collections
 
     }
 
-    public interface IUIntIndexedCollection<T> : IUIntIndexedCollection
+    public interface IUIntIndexedCollection<T> : IUIntIndexedCollection, IEnumerable<T>
     {
 
         T this[uint index] { get; }
