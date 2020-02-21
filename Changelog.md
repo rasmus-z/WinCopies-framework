@@ -9,22 +9,18 @@ CHANGELOG
 Updates
 -------
 
-???? 3.0
+???? 2.2
 ========
 
-WinCopies.Util (3.0)
+WinCopies.Util (2.2)
 --------------------
 
 - Existing items behavior updates:
-	- The IUIntIndexedCollection interface is now designed like the .Net IReadOnlyCollection and is now called IReadOnlyUIntIndexedCollection.
+	- The interfaces and enumerators of the WinCopies.Collections namespace for uint-indexed collections have been replaced by the new interfaces for uint-indexed collections in the WinCopies.Collections.DotNetFix namespace and are now obsoletes.
 
 - Addings:
 	- Interfaces:
-		- IReadOnlyUIntIndexedList and IReadOnlyUIntIndexedList<T\>
-
-- Removals:
-	- Interfaces:
-		- IUIntIndexedCollection<T\>
+		- New interfaces for uint-indexed collections, partially designed like the .Net collection interfaces (WinCopies.Collections.DotNetFix namespace).
 
 02/09/2020 2.1
 ==============
