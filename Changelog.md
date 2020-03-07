@@ -21,6 +21,8 @@ WinCopies.Util (2.2)
 - Addings:
 	- Interfaces:
 		- New interfaces for uint-indexed collections, partially designed like the .Net collection interfaces (WinCopies.Collections.DotNetFix namespace).
+	- Extension and static methods:
+		- Fix #2
 
 02/09/2020 2.1
 ==============

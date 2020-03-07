@@ -2,10 +2,10 @@
 <package>
   <metadata>
     <!--*-->
-    <id>WinCopies.Data</id>
+    <id>WinCopies.Data.Shared</id>
     <!--*-->
     <version>2.0.0</version>
-    <title>WinCopies.Data</title>
+    <title>WinCopies.Data.Shared</title>
     <!--*-->
     <authors>Khun Ly, Pierre Sprimont</authors>
     <owners>Pierre Sprimont</owners>
@@ -28,7 +28,7 @@
       <dependency id="Microsoft.SourceLink.Common" version="1.0.0" />
       <dependency id="Microsoft.SourceLink.GitHub" version="1.0.0" />
       <dependency id="Newtonsoft.Json" version="6.0.1" />
-      <dependency id="WinCopies.Util" version="2.0.0" />
+      <dependency id="WinCopies.Util.Shared" version="2.0.0" />
     </dependencies>
   </metadata>
 </package>

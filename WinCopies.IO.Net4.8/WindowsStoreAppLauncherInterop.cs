@@ -2,15 +2,15 @@
 //using System;
 //using System.Collections.Generic;
 //using System.Linq; 
-//using WinCopies.Util;
+//using WinCopies.Util.Shared;
 //using Windows.Foundation;
 //using Windows.Storage;
 //using Windows.System;
 
-//using static WinCopies.IO.Registry;
-//using static WinCopies.Util.Generic;
+//using static WinCopies.IO.Shared.Registry;
+//using static WinCopies.Util.Shared.Generic;
 
-//namespace WinCopies.IO
+//namespace WinCopies.IO.Shared
 //{
 //    public class WindowsStoreAppLauncherInterop
 //    {

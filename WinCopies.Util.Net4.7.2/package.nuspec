@@ -2,10 +2,10 @@
 <package>
   <metadata>
     <!--*-->
-    <id>WinCopies.Util</id>
+    <id>WinCopies.Util.Shared</id>
     <!--*-->
     <version>2.1.0</version>
-    <title>WinCopies.Util</title>
+    <title>WinCopies.Util.Shared</title>
     <!--*-->
     <authors>Pierre Sprimont</authors>
     <owners>Pierre Sprimont</owners>

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinCopies.IO.FilesProcesses
+namespace WinCopies.IO.Shared.FilesProcesses
 {
    public class FileSystemInfoWithExceptionsCollection : IList<FileSystemInfo>, ICollection<FileSystemInfo>, IEnumerable<FileSystemInfo>, IEnumerable, IList, ICollection, IReadOnlyList<FileSystemInfo>, IReadOnlyCollection<FileSystemInfo>, INotifyCollectionChanged, INotifyPropertyChanged
     {

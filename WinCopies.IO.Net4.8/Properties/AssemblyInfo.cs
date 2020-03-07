@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("WinCopies.IO")]
+[assembly: AssemblyTitle("WinCopies.IO.Shared")]
 [assembly: AssemblyDescription("WinCopies framework Windows® shell interoperability assembly for basic i/o operations")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]

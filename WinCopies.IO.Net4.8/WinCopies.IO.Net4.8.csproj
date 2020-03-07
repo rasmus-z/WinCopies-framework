@@ -15,8 +15,8 @@
     <ProjectGuid>{C7DE5838-3C6E-41B8-8FD1-9D0FBEB8E7AC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WinCopies.IO</RootNamespace>
-    <AssemblyName>WinCopies.IO</AssemblyName>
+    <RootNamespace>WinCopies.IO.Shared</RootNamespace>
+    <AssemblyName>WinCopies.IO.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>8.0</LangVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Debug\WinCopies.IO.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\WinCopies.IO.Shared.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,7 +52,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>..\bin\x64\Debug\WinCopies.IO.xml</DocumentationFile>
+    <DocumentationFile>..\bin\x64\Debug\WinCopies.IO.Shared.xml</DocumentationFile>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -185,12 +185,12 @@
     <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.7\analyzers\dotnet\cs\Microsoft.NetFramework.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WinCopies.Util.Net4.7.2\WinCopies.Util.Net4.7.2.csproj">
+    <ProjectReference Include="..\WinCopies.Util.Shared.Net4.7.2\WinCopies.Util.Shared.Net4.7.2.csproj">
       <Project>{53801d23-7375-4e30-a5a7-27623e950554}</Project>
-      <Name>WinCopies.Util.Net4.8</Name>
+      <Name>WinCopies.Util.Shared.Net4.8</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\WinCopies.IO\WinCopies.IO.projitems" Label="Shared" />
+  <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

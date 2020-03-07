@@ -17,8 +17,8 @@
     <ProjectGuid>{4178EAA3-FF93-4234-BF86-5E88D5B063B7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WinCopies.Data</RootNamespace>
-    <AssemblyName>WinCopies.Data</AssemblyName>
+    <RootNamespace>WinCopies.Data.Shared</RootNamespace>
+    <AssemblyName>WinCopies.Data.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -34,7 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\WinCopies.Data.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\WinCopies.Data.Shared.xml</DocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
@@ -47,13 +47,13 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>8.0</LangVersion>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\Release\WinCopies.Data.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\WinCopies.Data.Shared.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>WinCopies.Data.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>WinCopies.Data.Shared.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CodeAnalysis, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -132,16 +132,16 @@
     <None Include="package.nuspec" />
     <None Include="packages.config" />
     <None Include="README.md" />
-    <None Include="WinCopies.Data.snk" />
+    <None Include="WinCopies.Data.Shared.snk" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.9.8\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.9.8\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WinCopies.Util.Net4.7.2\WinCopies.Util.Net4.7.2.csproj">
+    <ProjectReference Include="..\WinCopies.Util.Shared.Net4.7.2\WinCopies.Util.Shared.Net4.7.2.csproj">
       <Project>{53801d23-7375-4e30-a5a7-27623e950554}</Project>
-      <Name>WinCopies.Util.Net4.7.2</Name>
+      <Name>WinCopies.Util.Shared.Net4.7.2</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -201,7 +201,7 @@
       <Version>6.0.1</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="..\WinCopies.Data\WinCopies.Data.projitems" Label="Shared" />
+  <Import Project="..\WinCopies.Data.Shared\WinCopies.Data.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

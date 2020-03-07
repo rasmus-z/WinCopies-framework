@@ -1,4 +1,4 @@
-﻿WinCopies-framework (WinCopies.Data package)
+﻿WinCopies-framework (WinCopies.Data.Shared package)
 ============================================
 
 The WinCopies® software framework

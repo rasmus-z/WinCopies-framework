@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.Shared
 {
     public interface IPathModifier
     {

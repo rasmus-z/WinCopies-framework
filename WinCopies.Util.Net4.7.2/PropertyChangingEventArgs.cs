@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WinCopies.Util
+namespace WinCopies.Util.Shared
 {
     public class PropertyChangingEventArgs : System.ComponentModel.PropertyChangingEventArgs
     {

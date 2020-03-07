@@ -1,6 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.Shared
 {
 
     //public class KnownFolder : IShellObject

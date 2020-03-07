@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace WinCopies.Util
+namespace WinCopies.Util.Shared
 {
     internal static class PropertyChangedHelper
     {

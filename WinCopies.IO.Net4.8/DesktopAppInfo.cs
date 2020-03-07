@@ -2,9 +2,9 @@
 //using System;
 //using System.Collections.Generic;
 //using System.Diagnostics;
-//using static WinCopies.IO.Registry;
+//using static WinCopies.IO.Shared.Registry;
 
-//namespace WinCopies.IO
+//namespace WinCopies.IO.Shared
 //{
 //    //public abstract class AppInfo
 

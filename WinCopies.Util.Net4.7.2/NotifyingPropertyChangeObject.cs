@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Reflection;
 
-namespace WinCopies.Util
+namespace WinCopies.Util.Shared
 {
     public abstract class NotifyingPropertyChangeObject : INotifyPropertyChanging, INotifyPropertyChanged
     {
