@@ -9,20 +9,15 @@ CHANGELOG
 Updates
 -------
 
-???? 2.2
-========
+???? 2.2.0-preview3
+===================
 
-WinCopies.Util (2.2)
---------------------
+- .Net Core and .Net Standard are now supported.
 
-- Existing items behavior updates:
-	- The interfaces and enumerators of the WinCopies.Collections namespace for uint-indexed collections have been replaced by the new interfaces for uint-indexed collections in the WinCopies.Collections.DotNetFix namespace and are now obsoletes.
+WinCopies.Data (2.2.0-preview2)
+-------------------------------
 
-- Addings:
-	- Interfaces:
-		- New interfaces for uint-indexed collections, partially designed like the .Net collection interfaces (WinCopies.Collections.DotNetFix namespace).
-	- Extension and static methods:
-		- Fix #2
+- Package now depends on Newtonsoft.Json v9.0.1
 
 02/09/2020 2.1
 ==============

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <Import Project="..\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="WinCopies.WindowsAPICodePack.ShellExtensions" Version="2.0.0-preview2" />
+    <PackageReference Include="WinCopies.Util.Desktop">
+      <Version>2.2.0-preview2</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinCopies.GUI\WinCopies.GUI.csproj" />
+  </ItemGroup>
+
+</Project>

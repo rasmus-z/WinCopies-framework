@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.0;net472;netstandard2.1</TargetFrameworks>
+    <Description>WinCopies framework's data handling package.</Description>
+    <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
+    <PackageTags>WinCopies, Data</PackageTags>
+    <DocumentationFile>WinCopies.Data.xml</DocumentationFile>
+    <VersionPrefix>2.2.0</VersionPrefix>
+    <VersionSuffix>preview3</VersionSuffix>
+  </PropertyGroup>
+
+  <Import Project="..\WinCopies.Data.Shared\WinCopies.Data.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="WinCopies.Util">
+      <Version>2.2.0-preview2</Version>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

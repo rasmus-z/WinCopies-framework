@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.0;net472;netstandard2.1</TargetFrameworks>
+    <Description>WinCopies framework Windows® shell interoperability assembly for i/o operations oriented for file processes</Description>
+    <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
+    <PackageTags>WinCopies, IO</PackageTags>
+    <DocumentationFile>WinCopies.IO.FileProcesses.xml</DocumentationFile>
+    <VersionPrefix>2.2.0</VersionPrefix>
+    <VersionSuffix>preview3</VersionSuffix>
+  </PropertyGroup>
+
+  <Import Project="..\WinCopies.IO.FileProcesses.Shared\WinCopies.IO.FileProcesses.Shared.projitems" Label="Shared" />
+
+</Project>
