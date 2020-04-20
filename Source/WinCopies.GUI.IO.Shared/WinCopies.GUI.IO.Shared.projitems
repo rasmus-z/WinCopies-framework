@@ -18,5 +18,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExplorerControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlListView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlListViewItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlTreeViewItem.cs" />
   </ItemGroup>
 </Project>

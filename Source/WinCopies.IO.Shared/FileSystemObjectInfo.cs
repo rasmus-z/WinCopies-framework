@@ -46,9 +46,9 @@ namespace WinCopies.IO
         public static FileSystemObjectInfoComparer<IFileSystemObjectInfo> GetDefaultComparer() => new FileSystemObjectInfoComparer<IFileSystemObjectInfo>();
 
         /// <summary>
-        /// Compares the current object to a given <see cref="FileSystemObjectInfo{TItems, TFactory}"/>.
+        /// Compares the current object to a given <see cref="FileSystemObjectInfo"/>.
         /// </summary>
-        /// <param name="fileSystemObjectInfo">The <see cref="FileSystemObjectInfo{TItems, TFactory}"/> to compare with.</param>
+        /// <param name="fileSystemObjectInfo">The <see cref="FileSystemObjectInfo"/> to compare with.</param>
         /// <returns>The comparison result. See <see cref="IComparable{T}.CompareTo(T)"/> for more details.</returns>
         public virtual int CompareTo(IFileSystemObjectInfo fileSystemObjectInfo) => GetDefaultComparer().Compare(this, fileSystemObjectInfo);
 
@@ -69,15 +69,15 @@ namespace WinCopies.IO
                 : false;
 
         /// <summary>
-        /// Gets an hash code for this <see cref="FileSystemObjectInfo{TItems, TFactory}"/>.
+        /// Gets an hash code for this <see cref="FileSystemObjectInfo"/>.
         /// </summary>
         /// <returns>The hash code of the <see cref="FileType"/> and the <see cref="FileSystemObject.Path"/> property.</returns>
         public override int GetHashCode() => FileType.GetHashCode() ^ Path.ToLower().GetHashCode();
 
         /// <summary>
-        /// Gets a string representation of this <see cref="FileSystemObjectInfo{TItems, TFactory}"/>.
+        /// Gets a string representation of this <see cref="FileSystemObjectInfo"/>.
         /// </summary>
-        /// <returns>The <see cref="FileSystemObject.LocalizedName"/> of this <see cref="FileSystemObjectInfo{TItems, TFactory}"/>.</returns>
+        /// <returns>The <see cref="FileSystemObject.LocalizedName"/> of this <see cref="FileSystemObjectInfo"/>.</returns>
         public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
 
         /// <summary>

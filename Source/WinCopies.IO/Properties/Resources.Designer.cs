@@ -88,11 +88,29 @@ namespace WinCopies.IO.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must end with &apos;{1}&apos;.
+        /// </summary>
+        internal static string PathMustEndWithFileName {
+            get {
+                return ResourceManager.GetString("PathMustEndWithFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Registry key does not exist. Path: {0}..
         /// </summary>
         internal static string RegistryKeyNotExists {
             get {
                 return ResourceManager.GetString("RegistryKeyNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; can&apos;t be a SpecialFolder..
+        /// </summary>
+        internal static string SpecialFolderError {
+            get {
+                return ResourceManager.GetString("SpecialFolderError", resourceCulture);
             }
         }
     }

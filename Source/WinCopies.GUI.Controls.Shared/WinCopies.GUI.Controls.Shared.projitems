@@ -11,6 +11,9 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Label.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Link.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LinkRun.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LinkUnderliningMode.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">

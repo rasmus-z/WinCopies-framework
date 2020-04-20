@@ -7,6 +7,12 @@
   <Import Project="..\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
+    <PackageReference Include="WinCopies.Util.Desktop">
+      <Version>2.2.0-preview2</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\WinCopies.GUI.Controls\WinCopies.GUI.Controls.csproj" />
     <ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />
   </ItemGroup>

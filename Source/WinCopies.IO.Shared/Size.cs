@@ -16,6 +16,8 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Buffers;
+using System.Security.Cryptography;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
@@ -80,67 +82,121 @@ namespace WinCopies.IO
     {
 
         /// <summary>
-        /// The value as numeric.
+        /// The numeric value in bytes.
         /// </summary>
-        public double Value { get; }
+        public ulong ValueInBytes { get; }
 
-        /// <summary>
-        /// Returns the size value in given unit.
-        /// </summary>
-        /// <param name="unit">The unit to which one return the size</param>
-        /// <returns>The size as the given unit</returns>
-        public double GetValueInUnit(ByteUnit unit) => unit == Unit
-                ? Value
-                : unit < Unit ? Value * Math.Pow(1024, Unit - unit) : Value / Math.Pow(1024, unit - Unit);
+        public float GetFloatValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
+                ? ValueInBytes
+                : (float)ValueInBytes / Math.Pow(1024f, (float)unit);
 
-        public static double GetValueInUnit(double valueInBytes, ByteUnit unit) => valueInBytes / Math.Pow(1024, (double)unit);
+        public double GetDoubleValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
+                ? ValueInBytes
+                : (double)ValueInBytes / Math.Pow(1024d, (double)unit);
+
+        public decimal GetDecimalValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
+                ? ValueInBytes
+                : (decimal)ValueInBytes / Math.Pow(1024m, (decimal)unit);
+
+        public float GetFloatValueInUnit() => GetFloatValueInUnit(Unit);
+
+        public double GetDoubleValueInUnit() => GetDoubleValueInUnit(Unit);
+
+        public decimal GetDecimalValueInUnit() => GetDecimalValueInUnit(Unit);
+
+        //public static ulong GetValueInUnit(ulong valueInBytes, ByteUnit unit) => valueInBytes / Math.Pow(1024, (ulong)unit);
+
+        private ByteUnit? _unit;
 
         /// <summary>
         /// The unit of this <see cref="Size"/>.
         /// </summary>
-        public ByteUnit Unit { get; }
+        public ByteUnit Unit
+        {
+            get
+            {
+
+                if (_unit is null)
+
+                {
+
+                    ushort unit;
+
+                    ushort newUnit = 0;
+
+                    float value;
+
+                    var newValue = (float)ValueInBytes;
+
+                    do
+                    {
+
+                        unit = newUnit;
+
+                        newUnit++;
+
+                        value = newValue;
+
+                        newValue /= 1024;
+
+                    } while (newValue > 1 && Enum.IsDefined(typeof(ByteUnit), newUnit));
+
+                    _unit = (ByteUnit)unit;
+
+                }
+
+                return _unit.Value;
+
+            }
+        }
 
         // public Speed() { Size = 0; Unit = Unit.Byte; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Size"/> structure without performing value check for the unit given. For value checking initialization of the <see cref="Size"/> structure, see the <see cref="Size.Create(double)"/> function.
-        /// </summary>
-        /// <param name="value">The value as numeric of the size</param>
-        /// <param name="sizeUnit">The unit of the size</param>
-        public Size(double value, ByteUnit sizeUnit)
-
+        public Size(in ulong valueInBytes)
         {
+            ValueInBytes = valueInBytes;
 
-            Value = value;
-
-            Unit = sizeUnit;
-
+            _unit = null;
         }
 
-        /// <summary>
-        /// Create a new <see cref="Size"/> object with the value given in bytes.
-        /// </summary>
-        /// <param name="valueInBytes">Value in bytes of the size</param>
-        /// <returns>A new <see cref="Size"/> object with the value given in bytes</returns>
-        public static Size Create(double valueInBytes)
-
+        public override bool Equals(object obj)
         {
+            if (obj is Size size) return size == this;
 
-            var unit = (ByteUnit)Math.Abs(Math.Log(valueInBytes, 1024));
+            if (IsNumber(obj))
 
-            return new Size(GetValueInUnit(valueInBytes, unit), unit);
+            {
 
+                if (obj is sbyte sb) return sb == this;
+
+                if (obj is byte b) return b == this;
+
+                if (obj is short s) return s == this;
+
+                if (obj is ushort us) return us == this;
+
+                if (obj is int i) return i == this;
+
+                if (obj is uint ui) return ui == this;
+
+                if (obj is long l) return l == this;
+
+                if (obj is ulong ul) return ul == this;
+
+                if (obj is float f) return f == this;
+
+                if (obj is decimal d) return d == this;
+
+                if (obj is double _d) return _d == this;
+
+            }
+
+            return false;
         }
 
-        public override bool Equals(object obj) => IsNumber(obj)
-                ? obj.GetType() == typeof(decimal)
-                    ? (decimal)GetValueInUnit(ByteUnit.Byte) == (decimal)obj
-                    : GetValueInUnit(ByteUnit.Byte) == (double)obj
-                : obj is Size ? this == (Size)obj : false;
+        public override int GetHashCode() => ValueInBytes.GetHashCode();
 
-        public override int GetHashCode() => Unit.GetHashCode() ^ Value.GetHashCode();
-
-        public static string GetDisplaySizeUnit(ByteUnit unit)
+        public static string GetDisplaySizeUnit(in ByteUnit unit)
 
 #if NETFRAMEWORK
             
@@ -195,20 +251,20 @@ namespace WinCopies.IO
             }
             
 #else
-            
+
             => unit switch
-        {
-            ByteUnit.Byte => "B",
-            ByteUnit.KibiByte => "KiB",
-            ByteUnit.MebiByte => "MiB",
-            ByteUnit.GibiByte => "GiB",
-            ByteUnit.TebiByte => "TiB",
-            ByteUnit.PebiByte => "PiB",
-            ByteUnit.ExbiByte => "EiB",
-            ByteUnit.ZebiByte => "ZiB",
-            ByteUnit.YobiByte => "YiB",
-            _ => throw new ArgumentOutOfRangeException(nameof(unit), unit, $"{nameof(unit)} must be a value defined in the {nameof(ByteUnit)} enumeration."),
-        };
+            {
+                ByteUnit.Byte => "B",
+                ByteUnit.KibiByte => "KiB",
+                ByteUnit.MebiByte => "MiB",
+                ByteUnit.GibiByte => "GiB",
+                ByteUnit.TebiByte => "TiB",
+                ByteUnit.PebiByte => "PiB",
+                ByteUnit.ExbiByte => "EiB",
+                ByteUnit.ZebiByte => "ZiB",
+                ByteUnit.YobiByte => "YiB",
+                _ => throw new ArgumentOutOfRangeException(nameof(unit), unit, $"{nameof(unit)} must be a value defined in the {nameof(ByteUnit)} enumeration."),
+            };
 
 #endif
 
@@ -216,556 +272,729 @@ namespace WinCopies.IO
         /// Returns a string with the size value and unit.
         /// </summary>
         /// <returns>A string with the size value and unit</returns>
-        public override string ToString() => $"{Value} {GetDisplaySizeUnit(Unit)}";
+        public override string ToString() => $"{GetFloatValueInUnit(Unit)} {GetDisplaySizeUnit(Unit)}";
 
-#region Size operators
+        #region Size operators
 
-#region Equality operators 
+        #region Equality operators 
 
-#region Size operators
+        #region Size operators
 
         /// <summary>
-        /// Checks if s1 is less than s2.
+        /// Checks if <paramref name="s1"/> is less than <paramref name="s2"/>.
         /// </summary>
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
-        /// <returns><see langword="true"/> if s1 is less than s2, <see langword="false"/> in the other way</returns>
-        public static bool operator <(Size s1, Size s2) => s1.GetValueInUnit(ByteUnit.Byte) < s2.GetValueInUnit(ByteUnit.Byte);
+        /// <returns><see langword="true"/> if <paramref name="s1"/> is less than <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
+        public static bool operator <(in Size s1, in Size s2) => s1.Unit < s2.Unit ? true : s1.ValueInBytes < s2.ValueInBytes;
 
         /// <summary>
-        /// Checkes if s1 is greater than s2.
+        /// Checkes if <paramref name="s1"/> is greater than <paramref name="s2"/>.
         /// </summary>
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
-        /// <returns><see langword="true"/> if s1 is greater than s2, <see langword="false"/> in the other way</returns>
-        public static bool operator >(Size s1, Size s2) => s1.GetValueInUnit(ByteUnit.Byte) > s2.GetValueInUnit(ByteUnit.Byte);
+        /// <returns><see langword="true"/> if <paramref name="s1"/> is greater than <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
+        public static bool operator >(in Size s1, in Size s2) => s1.Unit > s2.Unit ? true : s1.ValueInBytes > s2.ValueInBytes;
 
         /// <summary>
-        /// Checks if s1 is less than or equal to s2.
+        /// Checks if <paramref name="s1"/> is less than or equal to <paramref name="s2"/>.
         /// </summary>
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
-        /// <returns><see langword="true"/> if s1 is less than or equal to s2, <see langword="false"/> in the other way</returns>
-        public static bool operator <=(Size s1, Size s2) => s1.GetValueInUnit(ByteUnit.Byte) <= s2.GetValueInUnit(ByteUnit.Byte);
+        /// <returns><see langword="true"/> if <paramref name="s1"/> is less than or equal to <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
+        public static bool operator <=(in Size s1, in Size s2) => !(s1 > s2);
 
         /// <summary>
-        /// Checks if s1 is greater than or equal to s2.
+        /// Checks if <paramref name="s1"/> is greater than or equal to <paramref name="s2"/>.
         /// </summary>
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
-        /// <returns><see langword="true"/> if s1 is greater than or equal to s2, <see langword="false"/> in the other way</returns>
-        public static bool operator >=(Size s1, Size s2) => s1.GetValueInUnit(ByteUnit.Byte) >= s2.GetValueInUnit(ByteUnit.Byte);
+        /// <returns><see langword="true"/> if <paramref name="s1"/> is greater than or equal to <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
+        public static bool operator >=(in Size s1, in Size s2) => !(s1 < s2);
 
         /// <summary>
-        /// Checks if s1 equals s2.
+        /// Checks if <paramref name="s1"/> equals <paramref name="s2"/>.
         /// </summary>
-        /// <remarks>This comparison method is based on size value, as like as for other structure types.</remarks>
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
-        /// <returns><see langword="true"/> if s1 is equal to s2, <see langword="false"/> in the other way</returns>
-        public static bool operator ==(Size s1, Size s2) => s1.GetValueInUnit(ByteUnit.Byte) == s2.GetValueInUnit(ByteUnit.Byte);
+        /// <returns><see langword="true"/> if <paramref name="s1"/> is equal to <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
+        public static bool operator ==(in Size s1, in Size s2) => s1.Unit != s2.Unit ? false : s1.ValueInBytes == s2.ValueInBytes;
 
         /// <summary>
-        /// Checks if s1 doesn't equal s2.
+        /// Checks if <paramref name="s1"/> doesn't equal s2.
         /// </summary>
-        /// <remarks>This comparison method is based on the size value, as like as for other structure types.</remarks>
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
-        /// <returns><see langword="true"/> if s1 is not equal to s2, <see langword="false"/> in the other way</returns>
-        public static bool operator !=(Size s1, Size s2) => s1.GetValueInUnit(ByteUnit.Byte) != s2.GetValueInUnit(ByteUnit.Byte);
+        /// <returns><see langword="true"/> if <paramref name="s1"/> is not equal to <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
+        public static bool operator !=(in Size s1, in Size s2) => !(s1 == s2);
 
-#endregion
-
-
-
-#region Size, numeric operators
-
-#region int operators
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="i">The <see cref="int"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser than i, <see langword="false"/> if s equals or is greather than i.</returns>
-        /// <remarks>i must be in byte unit.</remarks>
-        public static bool operator <(Size s, int i) => s.GetValueInUnit(ByteUnit.Byte) < i;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="i">The <see cref="int"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather than i, <see langword="false"/> if s equals or is lesser than i.</returns>
-        /// <remarks>i must be in byte unit.</remarks>
-        public static bool operator >(Size s, int i) => s.GetValueInUnit(ByteUnit.Byte) > i;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="i">The <see cref="int"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser or equals i, <see langword="false"/> if s is greather than i.</returns>
-        /// <remarks>i must be in byte unit.</remarks>
-        public static bool operator <=(Size s, int i) => s.GetValueInUnit(ByteUnit.Byte) <= i;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="i">The <see cref="int"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather or equals i, <see langword="false"/> if s is lesser than i.</returns>
-        /// <remarks>i must be in byte unit.</remarks>
-        public static bool operator >=(Size s, int i) => s.GetValueInUnit(ByteUnit.Byte) >= i;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="i">The <see cref="int"/> to compare.</param>
-        /// <returns><see langword="true"/> if s equals i, <see langword="false"/> in the other way.</returns>
-        /// <remarks>i must be in byte unit.</remarks>
-        public static bool operator ==(Size s, int i) => s.GetValueInUnit(ByteUnit.Byte) == i;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="i">The <see cref="int"/> to compare.</param>
-        /// <returns><see langword="true"/> if s doesn't equal i, <see langword="false"/> in the other way.</returns>
-        /// <remarks>i must be in byte unit.</remarks>
-        public static bool operator !=(Size s, int i) => s.GetValueInUnit(ByteUnit.Byte) != i;
-
-#endregion
+        #endregion
 
 
 
-#region long operators
+        #region Size, numeric operators
 
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="l">The <see cref="long"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser than l, <see langword="false"/> if s equals or is greather than l.</returns>
-        /// <remarks>l must be in byte unit.</remarks>
-        public static bool operator <(Size s, long l) => s.GetValueInUnit(ByteUnit.Byte) < l;
+        #region sbyte operators
 
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="l">The <see cref="long"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather than l, <see langword="false"/> if s equals or is lesser than l.</returns>
-        /// <remarks>l must be in byte unit.</remarks>
-        public static bool operator >(Size s, long l) => s.GetValueInUnit(ByteUnit.Byte) > l;
+        public static bool operator <(in Size s, in sbyte b) => b <= 0 ? false : s.ValueInBytes < (ulong)b;
 
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="l">The <see cref="long"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser or equals l, <see langword="false"/> if s is greather than l.</returns>
-        /// <remarks>l must be in byte unit.</remarks>
-        public static bool operator <=(Size s, long l) => s.GetValueInUnit(ByteUnit.Byte) <= l;
+        public static bool operator >(in Size s, in sbyte b) => b < 0 || (b == 0 && s.ValueInBytes != 0) ? true : s.ValueInBytes > (ulong)b;
 
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="l">The <see cref="long"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather or equals l, <see langword="false"/> if s is lesser than l.</returns>
-        /// <remarks>l must be in byte unit.</remarks>
-        public static bool operator >=(Size s, long l) => s.GetValueInUnit(ByteUnit.Byte) >= l;
+        public static bool operator <=(in Size s, in sbyte b) => !(s > b);
 
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="l">The <see cref="long"/> to compare.</param>
-        /// <returns><see langword="true"/> if s equals l, <see langword="false"/> in the other way.</returns>
-        /// <remarks>l must be in byte unit.</remarks>
-        public static bool operator ==(Size s, long l) => s.GetValueInUnit(ByteUnit.Byte) == l;
+        public static bool operator >=(in Size s, in sbyte b) => !(s < b);
 
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="l">The <see cref="long"/> to compare.</param>
-        /// <returns><see langword="true"/> if s doesn't equal l, <see langword="false"/> in the other way.</returns>
-        /// <remarks>l must be in byte unit.</remarks>
-        public static bool operator !=(Size s, long l) => s.GetValueInUnit(ByteUnit.Byte) != l;
+        public static bool operator ==(in Size s, in sbyte b) => b < 0 || (b == 0 && s.ValueInBytes != 0) ? false : s.ValueInBytes == (ulong)b;
 
-#endregion
+        public static bool operator !=(in Size s, in sbyte b) => !(s == b);
+
+        #endregion
 
 
 
-#region short operators
+        #region byte operators
+
+        public static bool operator <(in Size s, in byte b) => s.ValueInBytes < (ulong)b;
+
+        public static bool operator >(in Size s, in byte b) => s.ValueInBytes > (ulong)b;
+
+        public static bool operator <=(in Size s, in byte b) => s.ValueInBytes <= (ulong)b;
+
+        public static bool operator >=(in Size s, in byte b) => s.ValueInBytes >= (ulong)b;
+
+        public static bool operator ==(in Size s, in byte b) => s.ValueInBytes == (ulong)b;
+
+        public static bool operator !=(in Size s, in byte b) => s.ValueInBytes != (ulong)b;
+
+        #endregion
+
+
+
+        #region short operators
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="short"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
         /// <param name="short">The <see cref="short"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser than @short, <see langword="false"/> if s equals or is greather than @short.</returns>
-        /// <remarks>@short must be in byte unit.</remarks>
-        public static bool operator <(Size s, short @short) => s.GetValueInUnit(ByteUnit.Byte) < @short;
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less than <paramref name="short"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="short"/> must be in byte unit.</remarks>
+        public static bool operator <(in Size s, in short @short) => @short <= 0 ? false : s.ValueInBytes < (ulong)@short;
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="short"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
         /// <param name="short">The <see cref="short"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather than @short, <see langword="false"/> if s equals or is lesser than @short.</returns>
-        /// <remarks>@short must be in byte unit.</remarks>
-        public static bool operator >(Size s, short @short) => s.GetValueInUnit(ByteUnit.Byte) > @short;
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater than <paramref name="short"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="short"/> must be in byte unit.</remarks>
+        public static bool operator >(in Size s, in short @short) => @short < 0 || (@short == 0 && s.ValueInBytes != 0) ? true : s.ValueInBytes > (ulong)@short;
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="short"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
         /// <param name="short">The <see cref="short"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser or equals @short, <see langword="false"/> if s is greather than @short.</returns>
-        /// <remarks>@short must be in byte unit.</remarks>
-        public static bool operator <=(Size s, short @short) => s.GetValueInUnit(ByteUnit.Byte) <= @short;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="short"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="@short">The <see cref="short"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather or equals @short, <see langword="false"/> if s is lesser than @short.</returns>
-        /// <remarks>@short must be in byte unit.</remarks>
-        public static bool operator >=(Size s, short @short) => s.GetValueInUnit(ByteUnit.Byte) >= @short;
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less or equals <paramref name="short"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="short"/> must be in byte unit.</remarks>
+        public static bool operator <=(in Size s, in short @short) => !(s > @short);
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="short"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
         /// <param name="short">The <see cref="short"/> to compare.</param>
-        /// <returns><see langword="true"/> if s equals @short, <see langword="false"/> in the other way.</returns>
-        /// <remarks>@short must be in byte unit.</remarks>
-        public static bool operator ==(Size s, short @short) => s.GetValueInUnit(ByteUnit.Byte) == @short;
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater or equals <paramref name="short"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="short"/> must be in byte unit.</remarks>
+        public static bool operator >=(in Size s, in short @short) => !(s < @short);
 
         /// <summary>
         /// Compares a <see cref="Size"/> to a <see cref="short"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
         /// <param name="short">The <see cref="short"/> to compare.</param>
-        /// <returns><see langword="true"/> if s doesn't equal @short, <see langword="false"/> in the other way.</returns>
-        /// <remarks>@short must be in byte unit.</remarks>
-        public static bool operator !=(Size s, short @short) => s.GetValueInUnit(ByteUnit.Byte) != @short;
-
-#endregion
-
-
-
-#region float operators
+        /// <returns><see langword="true"/> if <paramref name="s"/> equals <paramref name="short"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="short"/> must be in byte unit.</remarks>
+        public static bool operator ==(in Size s, in short @short) => @short < 0 || (@short == 0 && s.ValueInBytes != 0) ? false : s.ValueInBytes == (ulong)@short;
 
         /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// Compares a <see cref="Size"/> to a <see cref="short"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="f">The <see cref="float"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser than f, <see langword="false"/> if s equals or is greather than f.</returns>
-        /// <remarks>f must be in byte unit.</remarks>
-        public static bool operator <(Size s, float f) => s.GetValueInUnit(ByteUnit.Byte) < f;
+        /// <param name="short">The <see cref="short"/> to compare.</param>
+        /// <returns><see langword="true"/> if s doesn't equal <paramref name="short"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="short"/> must be in byte unit.</remarks>
+        public static bool operator !=(in Size s, in short @short) => !(s == @short);
+
+        #endregion
+
+
+
+        #region ushort operators
+
+        public static bool operator <(in Size s, in ushort @short) => s.ValueInBytes < (ulong)@short;
+
+        public static bool operator >(in Size s, in ushort @short) => s.ValueInBytes > (ulong)@short;
+
+        public static bool operator <=(in Size s, in ushort @short) => s.ValueInBytes <= (ulong)@short;
+
+        public static bool operator >=(in Size s, in ushort @short) => s.ValueInBytes >= (ulong)@short;
+
+        public static bool operator ==(in Size s, in ushort @short) => s.ValueInBytes == (ulong)@short;
+
+        public static bool operator !=(in Size s, in ushort @short) => s.ValueInBytes != (ulong)@short;
+
+        #endregion
+
+
+
+        #region int operators
 
         /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="f">The <see cref="float"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather than f, <see langword="false"/> if s equals or is lesser than f.</returns>
-        /// <remarks>f must be in byte unit.</remarks>
-        public static bool operator >(Size s, float f) => s.GetValueInUnit(ByteUnit.Byte) > f;
+        /// <param name="i">The <see cref="int"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less than <paramref name="i"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="i"/> must be in byte unit.</remarks>
+        public static bool operator <(in Size s, in int i) => i <= 0 ? false : s.ValueInBytes < (ulong)i;
 
         /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="f">The <see cref="float"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser or equals f, <see langword="false"/> if s is greather than f.</returns>
-        /// <remarks>f must be in byte unit.</remarks>
-        public static bool operator <=(Size s, float f) => s.GetValueInUnit(ByteUnit.Byte) <= f;
+        /// <param name="i">The <see cref="int"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater than <paramref name="i"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="i"/> must be in byte unit.</remarks>
+        public static bool operator >(in Size s, in int i) => i < 0 || (i == 0 && s.ValueInBytes != 0) ? true : s.ValueInBytes > (ulong)i;
 
         /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="f">The <see cref="float"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather or equals f, <see langword="false"/> if s is lesser than f.</returns>
-        /// <remarks>f must be in byte unit.</remarks>
-        public static bool operator >=(Size s, float f) => s.GetValueInUnit(ByteUnit.Byte) >= f;
+        /// <param name="i">The <see cref="int"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less or equals i, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="i"/> must be in byte unit.</remarks>
+        public static bool operator <=(in Size s, in int i) => !(s > i);
 
         /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="f">The <see cref="float"/> to compare.</param>
-        /// <returns><see langword="true"/> if s equals f, <see langword="false"/> in the other way.</returns>
-        /// <remarks>f must be in byte unit.</remarks>
-        public static bool operator ==(Size s, float f) => s.GetValueInUnit(ByteUnit.Byte) == f;
+        /// <param name="i">The <see cref="int"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater or equals i, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="i"/> must be in byte unit.</remarks>
+        public static bool operator >=(in Size s, in int i) => !(s < i);
 
         /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="f">The <see cref="float"/> to compare.</param>
-        /// <returns><see langword="true"/> if s doesn't equal f, <see langword="false"/> in the other way.</returns>
-        /// <remarks>f must be in byte unit.</remarks>
-        public static bool operator !=(Size s, float f) => s.GetValueInUnit(ByteUnit.Byte) != f;
-
-#endregion
-
-
-
-#region double operators
+        /// <param name="i">The <see cref="int"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> equals i, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="i"/> must be in byte unit.</remarks>
+        public static bool operator ==(in Size s, in int i) => i < 0 || (i == 0 && s.ValueInBytes != 0) ? false : s.ValueInBytes == (ulong)i;
 
         /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
+        /// Compares a <see cref="Size"/> to a <see cref="int"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="double"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser than d, <see langword="false"/> if s equals or is greather than d.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator <(Size s, double d) => s.GetValueInUnit(ByteUnit.Byte) < d;
+        /// <param name="i">The <see cref="int"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> doesn't equal <paramref name="i"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="i"/> must be in byte unit.</remarks>
+        public static bool operator !=(in Size s, in int i) => !(s == i);
+
+        #endregion
+
+
+
+        #region uint operators
+
+        public static bool operator <(in Size s, in uint i) => s.ValueInBytes < (ulong)i;
+
+        public static bool operator >(in Size s, in uint i) => s.ValueInBytes > (ulong)i;
+
+        public static bool operator <=(in Size s, in uint i) => s.ValueInBytes <= (ulong)i;
+
+        public static bool operator >=(in Size s, in uint i) => s.ValueInBytes >= (ulong)i;
+
+        public static bool operator ==(in Size s, in uint i) => s.ValueInBytes == (ulong)i;
+
+        public static bool operator !=(in Size s, in uint i) => s.ValueInBytes != (ulong)i;
+
+        #endregion
+
+
+
+        #region long operators
 
         /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
+        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
         /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="double"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather than d, <see langword="false"/> if s equals or is lesser than d.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator >(Size s, double d) => s.GetValueInUnit(ByteUnit.Byte) > d;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="double"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser or equals d, <see langword="false"/> if s is greather than d.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator <=(Size s, double d) => s.GetValueInUnit(ByteUnit.Byte) <= d;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="double"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather or equals d, <see langword="false"/> if s is lesser than d.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator >=(Size s, double d) => s.GetValueInUnit(ByteUnit.Byte) >= d;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="double"/> to compare.</param>
-        /// <returns><see langword="true"/> if s equals d, <see langword="false"/> in the other way.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator ==(Size s, double d) => s.GetValueInUnit(ByteUnit.Byte) == d;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="double"/> to compare.</param>
-        /// <returns><see langword="true"/> if s doesn't equal d, <see langword="false"/> in the other way.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator !=(Size s, double d) => s.GetValueInUnit(ByteUnit.Byte) != d;
-
-#endregion
-
-
-
-#region decimal operators
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="decimal"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser than d, <see langword="false"/> if s equals or is greather than d.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator <(Size s, decimal d) => (decimal)s.GetValueInUnit(ByteUnit.Byte) < d;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="decimal"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather than d, <see langword="false"/> if s equals or is lesser than d.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator >(Size s, decimal d) => (decimal)s.GetValueInUnit(ByteUnit.Byte) > d;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="decimal"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is lesser or equals d, <see langword="false"/> if s is greather than d.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator <=(Size s, decimal d) => (decimal)s.GetValueInUnit(ByteUnit.Byte) <= d;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="decimal"/> to compare.</param>
-        /// <returns><see langword="true"/> if s is greather or equals d, <see langword="false"/> if s is lesser than d.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator >=(Size s, decimal d) => (decimal)s.GetValueInUnit(ByteUnit.Byte) >= d;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="decimal"/> to compare.</param>
-        /// <returns><see langword="true"/> if s equals d, <see langword="false"/> in the other way.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator ==(Size s, decimal d) => (decimal)s.GetValueInUnit(ByteUnit.Byte) == d;
-
-        /// <summary>
-        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <param name="d">The <see cref="decimal"/> to compare.</param>
-        /// <returns><see langword="true"/> if s doesn't equal d, <see langword="false"/> in the other way.</returns>
-        /// <remarks>d must be in byte unit.</remarks>
-        public static bool operator !=(Size s, decimal d) => (decimal)s.GetValueInUnit(ByteUnit.Byte) != d;
-
-#endregion
-
-#endregion
-
-
-
-#region Numeric, Size operators
-
-#region int operators
-
-        public static bool operator <(int i, Size s) => i < s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator >(int i, Size s) => i > s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator <=(int i, Size s) => i <= s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator >=(int i, Size s) => i >= s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator ==(int i, Size s) => i == s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator !=(int i, Size s) => i != s.GetValueInUnit(ByteUnit.Byte);
-
-#endregion
-
-
-
-#region long operators
-
-        /// <summary>
-        /// Compares a <see cref="long"/> to a <see cref="Size"/> value.
-        /// </summary>
         /// <param name="l">The <see cref="long"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less than <paramref name="l"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="l"/> must be in byte unit.</remarks>
+        public static bool operator <(in Size s, in long l) => l <= 0 ? false : s.ValueInBytes < (ulong)l;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
+        /// </summary>
         /// <param name="s">The <see cref="Size"/> to compare.</param>
-        /// <returns><see langword="true"/> if l is lesser than s, <see langword="false"/> if l equals or is greather than s.</returns>
-        /// <remarks>l must be in byte unit.</remarks>
-        public static bool operator <(long l, Size s) => l < s.GetValueInUnit(ByteUnit.Byte);
+        /// <param name="l">The <see cref="long"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater than <paramref name="l"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="l"/> must be in byte unit.</remarks>
+        public static bool operator >(in Size s, in long l) => l < 0 || (l == 0 && s.ValueInBytes != 0) ? true : s.ValueInBytes > (ulong)l;
 
-        public static bool operator >(long l, Size s) => l > s.GetValueInUnit(ByteUnit.Byte);
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="l">The <see cref="long"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less or equals <paramref name="l"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="l"/> must be in byte unit.</remarks>
+        public static bool operator <=(in Size s, in long l) => !(s > l);
 
-        public static bool operator <=(long l, Size s) => l <= s.GetValueInUnit(ByteUnit.Byte);
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="l">The <see cref="long"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater or equals <paramref name="l"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="l"/> must be in byte unit.</remarks>
+        public static bool operator >=(in Size s, in long l) => !(s < l);
 
-        public static bool operator >=(long l, Size s) => l >= s.GetValueInUnit(ByteUnit.Byte);
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="l">The <see cref="long"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> equals <paramref name="l"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="l"/> must be in byte unit.</remarks>
+        public static bool operator ==(in Size s, in long l) => l < 0 || (l == 0 && s.ValueInBytes != 0) ? false : s.ValueInBytes == (ulong)l;
 
-        public static bool operator ==(long l, Size s) => l == s.GetValueInUnit(ByteUnit.Byte);
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="long"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="l">The <see cref="long"/> to compare.</param>
+        /// <returns><see langword="true"/> if s doesn't equal <paramref name="l"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="l"/> must be in byte unit.</remarks>
+        public static bool operator !=(in Size s, in long l) => !(s == l);
 
-        public static bool operator !=(long l, Size s) => l != s.GetValueInUnit(ByteUnit.Byte);
-
-#endregion
-
-
-
-#region short operators
-
-        public static bool operator <(short @short, Size s) => @short < s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator >(short @short, Size s) => @short > s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator <=(short @short, Size s) => @short <= s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator >=(short @short, Size s) => @short >= s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator ==(short @short, Size s) => @short == s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator !=(short @short, Size s) => @short != s.GetValueInUnit(ByteUnit.Byte);
-
-#endregion
-
-
-
-#region float operators
-
-        public static bool operator <(float f, Size s) => f < s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator >(float f, Size s) => f > s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator <=(float f, Size s) => f <= s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator >=(float f, Size s) => f >= s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator ==(float f, Size s) => f == s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator !=(float f, Size s) => f != s.GetValueInUnit(ByteUnit.Byte);
-
-#endregion
+        #endregion
 
 
 
-#region double operators
+        #region ulong operators
 
-        public static bool operator <(double d, Size s) => d < s.GetValueInUnit(ByteUnit.Byte);
+        public static bool operator <(in Size s, in ulong l) => s.ValueInBytes < l;
 
-        public static bool operator >(double d, Size s) => d > s.GetValueInUnit(ByteUnit.Byte);
+        public static bool operator >(in Size s, in ulong l) => s.ValueInBytes > l;
 
-        public static bool operator <=(double d, Size s) => d <= s.GetValueInUnit(ByteUnit.Byte);
+        public static bool operator <=(in Size s, in ulong l) => s.ValueInBytes <= l;
 
-        public static bool operator >=(double d, Size s) => d >= s.GetValueInUnit(ByteUnit.Byte);
+        public static bool operator >=(in Size s, in ulong l) => s.ValueInBytes >= l;
 
-        public static bool operator ==(double d, Size s) => d == s.GetValueInUnit(ByteUnit.Byte);
+        public static bool operator ==(in Size s, in ulong l) => s.ValueInBytes == l;
 
-        public static bool operator !=(double d, Size s) => d != s.GetValueInUnit(ByteUnit.Byte);
+        public static bool operator !=(in Size s, in ulong l) => s.ValueInBytes != l;
 
-#endregion
-
-
-
-#region decimal operators
-
-        public static bool operator <(decimal d, Size s) => d < (decimal)s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator >(decimal d, Size s) => d > (decimal)s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator <=(decimal d, Size s) => d <= (decimal)s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator >=(decimal d, Size s) => d >= (decimal)s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator ==(decimal d, Size s) => d == (decimal)s.GetValueInUnit(ByteUnit.Byte);
-
-        public static bool operator !=(decimal d, Size s) => d != (decimal)s.GetValueInUnit(ByteUnit.Byte);
-
-#endregion
-
-#endregion
-
-#endregion
+        #endregion
 
 
 
-#region Arithmetic operators
+        #region float operators
 
-#region Size operators
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="f">The <see cref="float"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less than <paramref name="f"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="f"/> must be in byte unit.</remarks>
+        public static bool operator <(in Size s, in float f) => (float)s.ValueInBytes < f;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="f">The <see cref="float"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater than <paramref name="f"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="f"/> must be in byte unit.</remarks>
+        public static bool operator >(in Size s, in float f) => (float)s.ValueInBytes > f;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="f">The <see cref="float"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less or equals <paramref name="f"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="f"/> must be in byte unit.</remarks>
+        public static bool operator <=(in Size s, in float f) => (float)s.ValueInBytes <= f;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="f">The <see cref="float"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater or equals <paramref name="f"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="f"/> must be in byte unit.</remarks>
+        public static bool operator >=(in Size s, in float f) => (float)s.ValueInBytes >= f;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="f">The <see cref="float"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> equals <paramref name="f"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="f"/> must be in byte unit.</remarks>
+        public static bool operator ==(in Size s, in float f) => (float)s.ValueInBytes == f;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="float"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="f">The <see cref="float"/> to compare.</param>
+        /// <returns><see langword="true"/> if s doesn't equal <paramref name="f"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="f"/> must be in byte unit.</remarks>
+        public static bool operator !=(in Size s, in float f) => (float)s.ValueInBytes != f;
+
+        #endregion
+
+
+
+        #region double operators
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="double"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less than <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator <(in Size s, in double d) => (double)s.ValueInBytes < d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="double"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater than <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator >(in Size s, in double d) => (double)s.ValueInBytes > d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="double"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less or equals <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator <=(in Size s, in double d) => (double)s.ValueInBytes <= d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="double"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater or equals <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator >=(in Size s, in double d) => (double)s.ValueInBytes >= d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="double"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> equals <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator ==(in Size s, in double d) => (double)s.ValueInBytes == d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="double"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="double"/> to compare.</param>
+        /// <returns><see langword="true"/> if s doesn't equal <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator !=(in Size s, in double d) => (double)s.ValueInBytes != d;
+
+        #endregion
+
+
+
+        #region decimal operators
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="decimal"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less than <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator <(in Size s, in decimal d) => (decimal)s.ValueInBytes < d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="decimal"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater than <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator >(in Size s, in decimal d) => (decimal)s.ValueInBytes > d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="decimal"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is less or equals <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator <=(in Size s, in decimal d) => (decimal)s.ValueInBytes <= d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="decimal"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> is greater or equals <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator >=(in Size s, in decimal d) => (decimal)s.ValueInBytes >= d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="decimal"/> to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="s"/> equals <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator ==(in Size s, in decimal d) => (decimal)s.ValueInBytes == d;
+
+        /// <summary>
+        /// Compares a <see cref="Size"/> to a <see cref="decimal"/> value.
+        /// </summary>
+        /// <param name="s">The <see cref="Size"/> to compare.</param>
+        /// <param name="d">The <see cref="decimal"/> to compare.</param>
+        /// <returns><see langword="true"/> if s doesn't equal <paramref name="d"/>, otherwise <see langword="false"/>.</returns>
+        /// <remarks><paramref name="d"/> must be in byte unit.</remarks>
+        public static bool operator !=(in Size s, in decimal d) => (decimal)s.ValueInBytes != d;
+
+        #endregion
+
+        #endregion
+
+
+
+        #region Numeric, Size operators
+
+        #region sbyte operators
+
+        public static bool operator <(in sbyte b, in Size s) => b < 0 || (b == 0 && s.ValueInBytes != 0) ? true : (ulong)b < s.ValueInBytes;
+
+        public static bool operator >(in sbyte b, in Size s) => b <= 0 ? false : (ulong)b > s.ValueInBytes;
+
+        public static bool operator <=(in sbyte b, in Size s) => !(b > s);
+
+        public static bool operator >=(in sbyte b, in Size s) => !(b < s);
+
+        public static bool operator ==(in sbyte b, in Size s) => b < 0 || (b == 0 && s.ValueInBytes != 0) ? false : (ulong)b == s.ValueInBytes;
+
+        public static bool operator !=(in sbyte b, in Size s) => !(b == s);
+
+        #endregion
+
+
+
+        #region byte operators
+
+        public static bool operator <(in byte b, in Size s) => (ulong)b < s.ValueInBytes;
+
+        public static bool operator >(in byte b, in Size s) => (ulong)b > s.ValueInBytes;
+
+        public static bool operator <=(in byte b, in Size s) => (ulong)b <= s.ValueInBytes;
+
+        public static bool operator >=(in byte b, in Size s) => (ulong)b >= s.ValueInBytes;
+
+        public static bool operator ==(in byte b, in Size s) => (ulong)b == s.ValueInBytes;
+
+        public static bool operator !=(in byte b, in Size s) => (ulong)b != s.ValueInBytes;
+
+        #endregion
+
+
+
+        #region short operators
+
+        public static bool operator <(in short @short, in Size s) => @short < 0 || (@short == 0 && s.ValueInBytes != 0) ? true : (ulong)@short < s.ValueInBytes;
+
+        public static bool operator >(in short @short, in Size s) => @short <= 0 ? false : (ulong)@short > s.ValueInBytes;
+
+        public static bool operator <=(in short @short, in Size s) => !(@short > s);
+
+        public static bool operator >=(in short @short, in Size s) => !(@short < s);
+
+        public static bool operator ==(in short @short, in Size s) => @short < 0 || (@short == 0 && s.ValueInBytes != 0) ? false : (ulong)@short == s.ValueInBytes;
+
+        public static bool operator !=(in short @short, in Size s) => !(@short == s);
+
+        #endregion
+
+
+
+        #region ushort operators
+
+        public static bool operator <(in ushort @short, in Size s) => (ulong)@short < s.ValueInBytes;
+
+        public static bool operator >(in ushort @short, in Size s) => (ulong)@short > s.ValueInBytes;
+
+        public static bool operator <=(in ushort @short, in Size s) => (ulong)@short <= s.ValueInBytes;
+
+        public static bool operator >=(in ushort @short, in Size s) => (ulong)@short >= s.ValueInBytes;
+
+        public static bool operator ==(in ushort @short, in Size s) => (ulong)@short == s.ValueInBytes;
+
+        public static bool operator !=(in ushort @short, in Size s) => (ulong)@short != s.ValueInBytes;
+
+        #endregion
+
+
+
+        #region int operators
+
+        public static bool operator <(in int i, in Size s) => i < 0 || (i == 0 && s.ValueInBytes != 0) ? true : (ulong)i < s.ValueInBytes;
+
+        public static bool operator >(in int i, in Size s) => i <= 0 ? false : (ulong)i > s.ValueInBytes;
+
+        public static bool operator <=(in int i, in Size s) => !(i > s);
+
+        public static bool operator >=(in int i, in Size s) => !(i < s);
+
+        public static bool operator ==(in int i, in Size s) => i < 0 || (i == 0 && s.ValueInBytes != 0) ? false : (ulong)i == s.ValueInBytes;
+
+        public static bool operator !=(in int i, in Size s) => !(i == s);
+
+        #endregion
+
+
+
+        #region uint operators
+
+        public static bool operator <(in uint i, in Size s) => (ulong)i < s.ValueInBytes;
+
+        public static bool operator >(in uint i, in Size s) => (ulong)i > s.ValueInBytes;
+
+        public static bool operator <=(in uint i, in Size s) => (ulong)i <= s.ValueInBytes;
+
+        public static bool operator >=(in uint i, in Size s) => (ulong)i >= s.ValueInBytes;
+
+        public static bool operator ==(in uint i, in Size s) => (ulong)i == s.ValueInBytes;
+
+        public static bool operator !=(in uint i, in Size s) => (ulong)i != s.ValueInBytes;
+
+        #endregion
+
+
+
+        #region long operators
+
+        public static bool operator <(in long l, in Size s) => l < 0 || (l == 0 && s.ValueInBytes != 0) ? true : (ulong)l < s.ValueInBytes;
+
+        public static bool operator >(in long l, in Size s) => l <= 0 ? false : (ulong)l > s.ValueInBytes;
+
+        public static bool operator <=(in long l, in Size s) => !(l > s);
+
+        public static bool operator >=(in long l, in Size s) => !(l < s);
+
+        public static bool operator ==(in long l, in Size s) => l < 0 || (l == 0 && s.ValueInBytes != 0) ? false : (ulong)l == s.ValueInBytes;
+
+        public static bool operator !=(in long l, in Size s) => !(l == s);
+
+        #endregion
+
+
+
+        #region ulong operators
+
+        public static bool operator <(in ulong l, in Size s) => l < s.ValueInBytes;
+
+        public static bool operator >(in ulong l, in Size s) => l > s.ValueInBytes;
+
+        public static bool operator <=(in ulong l, in Size s) => l <= s.ValueInBytes;
+
+        public static bool operator >=(in ulong l, in Size s) => l >= s.ValueInBytes;
+
+        public static bool operator ==(in ulong l, in Size s) => l == s.ValueInBytes;
+
+        public static bool operator !=(in ulong l, in Size s) => l != s.ValueInBytes;
+
+        #endregion
+
+
+
+        #region float operators
+
+        public static bool operator <(in float f, in Size s) => f < (float)s.ValueInBytes;
+
+        public static bool operator >(in float f, in Size s) => f > (float)s.ValueInBytes;
+
+        public static bool operator <=(in float f, in Size s) => f <= (float)s.ValueInBytes;
+
+        public static bool operator >=(in float f, in Size s) => f >= (float)s.ValueInBytes;
+
+        public static bool operator ==(in float f, in Size s) => f == (float)s.ValueInBytes;
+
+        public static bool operator !=(in float f, in Size s) => f != (float)s.ValueInBytes;
+
+        #endregion
+
+
+
+        #region double operators
+
+        public static bool operator <(in double d, in Size s) => d < (double)s.ValueInBytes;
+
+        public static bool operator >(in double d, in Size s) => d > (double)s.ValueInBytes;
+
+        public static bool operator <=(in double d, in Size s) => d <= (double)s.ValueInBytes;
+
+        public static bool operator >=(in double d, in Size s) => d >= (double)s.ValueInBytes;
+
+        public static bool operator ==(in double d, in Size s) => d == (double)s.ValueInBytes;
+
+        public static bool operator !=(in double d, in Size s) => d != (double)s.ValueInBytes;
+
+        #endregion
+
+
+
+        #region decimal operators
+
+        public static bool operator <(in decimal d, in Size s) => d < (decimal)s.ValueInBytes;
+
+        public static bool operator >(in decimal d, in Size s) => d > (decimal)s.ValueInBytes;
+
+        public static bool operator <=(in decimal d, in Size s) => d <= (decimal)s.ValueInBytes;
+
+        public static bool operator >=(in decimal d, in Size s) => d >= (decimal)s.ValueInBytes;
+
+        public static bool operator ==(in decimal d, in Size s) => d == (decimal)s.ValueInBytes;
+
+        public static bool operator !=(in decimal d, in Size s) => d != (decimal)s.ValueInBytes;
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+
+
+        #region Arithmetic operators
+
+        // todo: modulos?
+
+        #region Size operators
 
         /// <summary>
         /// Returns a <see cref="Size"/> with the addition of <paramref name="s1"/> and <paramref name="s2"/>.
@@ -773,7 +1002,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns>A <see cref="Size"/> with the addition of <paramref name="s1"/> and <paramref name="s2"/>.</returns>
-        public static Size operator +(Size s1, Size s2) => Create(s1.GetValueInUnit(ByteUnit.Byte) + s2.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator +(in Size s1, in Size s2) => new Size(s1.ValueInBytes + s2.ValueInBytes);
 
         /// <summary>
         /// Returns a <see cref="Size"/> with the substraction of <paramref name="s2"/> by <paramref name="s1"/>.
@@ -781,7 +1010,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns>A <see cref="Size"/> with the substraction of <paramref name="s2"/> by <paramref name="s1"/>.</returns>
-        public static Size operator -(Size s1, Size s2) => Create(s1.GetValueInUnit(ByteUnit.Byte) - s2.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator -(in Size s1, in Size s2) => new Size(s1.ValueInBytes - s2.ValueInBytes);
 
         /// <summary>
         /// Returns a <see cref="Size"/> with the multiplication of <paramref name="s1"/> by <paramref name="s2"/>.
@@ -789,7 +1018,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns>A <see cref="Size"/> with the multiplication of <paramref name="s1"/> by <paramref name="s2"/></returns>
-        public static Size operator *(Size s1, Size s2) => Create(s1.GetValueInUnit(ByteUnit.Byte) * s2.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator *(in Size s1, in Size s2) => new Size(s1.ValueInBytes * s2.ValueInBytes);
 
         /// <summary>
         /// Returns a <see cref="Size"/> with the division of <paramref name="s1"/> by <paramref name="s2"/>.
@@ -797,7 +1026,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns>A <see cref="Size"/> with the division of <paramref name="s1"/> by <paramref name="s2"/></returns>
-        public static Size operator /(Size s1, Size s2) => Create(s1.GetValueInUnit(ByteUnit.Byte) / s2.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator /(in Size s1, in Size s2) => new Size(s1.ValueInBytes / s2.ValueInBytes);
 
         /// <summary>
         /// Returns a <see cref="Size"/> with the remainder of <paramref name="s1"/> by <paramref name="s2"/>.
@@ -805,201 +1034,297 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns>A <see cref="Size"/> with the remainder of <paramref name="s1"/> by <paramref name="s2"/></returns>
-        public static Size operator %(Size s1, Size s2) => Create(s1.GetValueInUnit(ByteUnit.Byte) % s2.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator %(in Size s1, in Size s2) => new Size(s1.ValueInBytes % s2.ValueInBytes);
 
-#endregion
+        #endregion
 
 
 
-#region Size, numeric operators
+        #region Size, numeric operators
 
-#region int operators
+        #region sbyte operators
 
-        public static Size operator +(Size s, int i) => Create(s.GetValueInUnit(ByteUnit.Byte) + i);
+        public static Size operator +(in Size s, in sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size(s.ValueInBytes + (ulong)b);
 
-        public static Size operator -(Size s, int i) => Create(s.GetValueInUnit(ByteUnit.Byte) - i);
+        public static Size operator -(in Size s, in sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size(s.ValueInBytes - (ulong)b);
 
-        public static Size operator *(Size s, int i) => Create(s.GetValueInUnit(ByteUnit.Byte) * i);
+        public static Size operator *(in Size s, in sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)b);
 
-        public static Size operator /(Size s, int i) => Create(s.GetValueInUnit(ByteUnit.Byte) / i);
+        public static Size operator /(in Size s, in sbyte b) => b <= 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be greater than 0.") : new Size(s.ValueInBytes / (ulong)b);
 
-        public static Size operator %(Size s, int i) => Create(s.GetValueInUnit(ByteUnit.Byte) % i);
+        // public static Size operator %(in Size s, in sbyte b) => new Size(s.ValueInBytes % (ulong)b);
 
-#endregion
+        #endregion
 
 
 
-#region long operators
+        #region byte operators
 
-        public static Size operator +(Size s, long l) => Create(s.GetValueInUnit(ByteUnit.Byte) + l);
+        public static Size operator +(in Size s, in byte b) => new Size(s.ValueInBytes + (ulong)b);
 
-        public static Size operator -(Size s, long l) => Create(s.GetValueInUnit(ByteUnit.Byte) - l);
+        public static Size operator -(in Size s, in byte b) => new Size(s.ValueInBytes - (ulong)b);
 
-        public static Size operator *(Size s, long l) => Create(s.GetValueInUnit(ByteUnit.Byte) * l);
+        public static Size operator *(in Size s, in byte b) => new Size(s.ValueInBytes * (ulong)b);
 
-        public static Size operator /(Size s, long l) => Create(s.GetValueInUnit(ByteUnit.Byte) / l);
+        public static Size operator /(in Size s, in byte b) => new Size(s.ValueInBytes / (ulong)b);
 
-        public static Size operator %(Size s, long l) => Create(s.GetValueInUnit(ByteUnit.Byte) % l);
+        public static Size operator %(in Size s, in byte b) => new Size(s.ValueInBytes % (ulong)b);
 
-#endregion
+        #endregion
 
 
 
-#region short operators
+        #region short operators
 
-        public static Size operator +(Size s, short @short) => Create(s.GetValueInUnit(ByteUnit.Byte) + @short);
+        public static Size operator +(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size(s.ValueInBytes + (ulong)@short);
 
-        public static Size operator -(Size s, short @short) => Create(s.GetValueInUnit(ByteUnit.Byte) - @short);
+        public static Size operator -(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size(s.ValueInBytes - (ulong)@short);
 
-        public static Size operator *(Size s, short @short) => Create(s.GetValueInUnit(ByteUnit.Byte) * @short);
+        public static Size operator *(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)@short);
 
-        public static Size operator /(Size s, short @short) => Create(s.GetValueInUnit(ByteUnit.Byte) / @short);
+        public static Size operator /(in Size s, in short @short) => @short <= 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short, $"{nameof(@short)} must be greater than 0.") : new Size(s.ValueInBytes / (ulong)@short);
 
-        public static Size operator %(Size s, short @short) => Create(s.GetValueInUnit(ByteUnit.Byte) % @short);
+        // public static Size operator %(in Size s, in short @short) => new Size(s.ValueInBytes % (ulong)@short);
 
-#endregion
+        #endregion
 
 
 
-#region float operators
+        #region ushort operators
 
-        public static Size operator +(Size s, float f) => Create(s.GetValueInUnit(ByteUnit.Byte) + f);
+        public static Size operator +(in Size s, in ushort @short) => new Size(s.ValueInBytes + (ulong)@short);
 
-        public static Size operator -(Size s, float f) => Create(s.GetValueInUnit(ByteUnit.Byte) - f);
+        public static Size operator -(in Size s, in ushort @short) => new Size(s.ValueInBytes - (ulong)@short);
 
-        public static Size operator *(Size s, float f) => Create(s.GetValueInUnit(ByteUnit.Byte) * f);
+        public static Size operator *(in Size s, in ushort @short) => new Size(s.ValueInBytes * (ulong)@short);
 
-        public static Size operator /(Size s, float f) => Create(s.GetValueInUnit(ByteUnit.Byte) / f);
+        public static Size operator /(in Size s, in ushort @short) => new Size(s.ValueInBytes / (ulong)@short);
 
-        public static Size operator %(Size s, float f) => Create(s.GetValueInUnit(ByteUnit.Byte) % f);
+        public static Size operator %(in Size s, in ushort @short) => new Size(s.ValueInBytes % (ulong)@short);
 
-#endregion
+        #endregion
 
 
 
-#region double operators
+        #region int operators
 
-        public static Size operator +(Size s, double d) => Create(s.GetValueInUnit(ByteUnit.Byte) + d);
+        public static Size operator +(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size(s.ValueInBytes + (ulong)i);
 
-        public static Size operator -(Size s, double d) => Create(s.GetValueInUnit(ByteUnit.Byte) - d);
+        public static Size operator -(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size(s.ValueInBytes - (ulong)i);
 
-        public static Size operator *(Size s, double d) => Create(s.GetValueInUnit(ByteUnit.Byte) * d);
+        public static Size operator *(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)i);
 
-        public static Size operator /(Size s, double d) => Create(s.GetValueInUnit(ByteUnit.Byte) / d);
+        public static Size operator /(in Size s, in int i) => i <= 0 ? throw new ArgumentOutOfRangeException(nameof(i),i, $"{nameof(i)} must be greater than 0.") : new Size(s.ValueInBytes / (ulong)i);
 
-        public static Size operator %(Size s, double d) => Create(s.GetValueInUnit(ByteUnit.Byte) % d);
+        // public static Size operator %(in Size s, in int i) => new Size(s.ValueInBytes % (ulong)i);
 
-#endregion
+        #endregion
 
-#endregion
 
 
+        #region uint operators
 
-#region Numeric, Size operators
+        public static Size operator +(in Size s, in uint i) => new Size(s.ValueInBytes + (ulong)i);
 
-#region int operators
+        public static Size operator -(in Size s, in uint i) => new Size(s.ValueInBytes - (ulong)i);
 
-        public static Size operator +(int i, Size s) => Create(i + s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator *(in Size s, in uint i) => new Size(s.ValueInBytes * (ulong)i);
 
-        public static Size operator -(int i, Size s) => Create(i - s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator /(in Size s, in uint i) => new Size(s.ValueInBytes / (ulong)i);
 
-        public static Size operator *(int i, Size s) => Create(i * s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator %(in Size s, in uint i) => new Size(s.ValueInBytes % (ulong)i);
 
-        public static Size operator /(int i, Size s) => Create(i / s.GetValueInUnit(ByteUnit.Byte));
+        #endregion
 
-        public static Size operator %(int i, Size s) => Create(i % s.GetValueInUnit(ByteUnit.Byte));
 
-#endregion
 
+        #region long operators
 
+        public static Size operator +(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size(s.ValueInBytes + (ulong)l);
 
-#region long operators
+        public static Size operator -(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size(s.ValueInBytes - (ulong)l);
 
-        public static Size operator +(long l, Size s) => Create(l + s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator *(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)l);
 
-        public static Size operator -(long l, Size s) => Create(l - s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator /(in Size s, in long l) => l <= 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be greater than 0.") : new Size(s.ValueInBytes / (ulong)l);
 
-        public static Size operator *(long l, Size s) => Create(l * s.GetValueInUnit(ByteUnit.Byte));
+        // public static Size operator %(in Size s, in long l) => new Size(s.ValueInBytes % (ulong)l);
 
-        public static Size operator /(long l, Size s) => Create(l / s.GetValueInUnit(ByteUnit.Byte));
+        #endregion
 
-        public static Size operator %(long l, Size s) => Create(l % s.GetValueInUnit(ByteUnit.Byte));
 
-#endregion
 
+        #region ulong operators
 
+        public static Size operator +(in Size s, in ulong l) => new Size(s.ValueInBytes + l);
 
-#region short operators
+        public static Size operator -(in Size s, in ulong l) => new Size(s.ValueInBytes - l);
 
-        public static Size operator +(short @short, Size s) => Create(@short + s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator *(in Size s, in ulong l) => new Size(s.ValueInBytes * l);
 
-        public static Size operator -(short @short, Size s) => Create(@short - s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator /(in Size s, in ulong l) => new Size(s.ValueInBytes / l);
 
-        public static Size operator *(short @short, Size s) => Create(@short * s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator %(in Size s, in ulong l) => new Size(s.ValueInBytes % l);
 
-        public static Size operator /(short @short, Size s) => Create(@short / s.GetValueInUnit(ByteUnit.Byte));
+        #endregion
 
-        public static Size operator %(short @short, Size s) => Create(@short % s.GetValueInUnit(ByteUnit.Byte));
+        #endregion
 
-#endregion
 
 
+        #region Numeric, Size operators
 
-#region float operators
+        #region sbyte operators
 
-        public static Size operator +(float f, Size s) => Create(f + s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator +(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size((ulong)b + s.ValueInBytes);
 
-        public static Size operator -(float f, Size s) => Create(f - s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator -(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size((ulong)b - s.ValueInBytes);
 
-        public static Size operator *(float f, Size s) => Create(f * s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator *(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be equal or greater than 0.") : b == 0 ? new Size(0) : new Size((ulong)b * s.ValueInBytes);
 
-        public static Size operator /(float f, Size s) => Create(f / s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator /(in sbyte b, in Size s) => b <= 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be greater than 0.") : b == 0 ? s : new Size((ulong)b / s.ValueInBytes);
 
-        public static Size operator %(float f, Size s) => Create(f % s.GetValueInUnit(ByteUnit.Byte));
+        // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
-#endregion
+        #endregion
 
 
 
-#region double operators
+        #region byte operators
 
-        public static Size operator +(double d, Size s) => Create(d + s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator +(in byte b, in Size s) => new Size((ulong)b + s.ValueInBytes);
 
-        public static Size operator -(double d, Size s) => Create(d - s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator -(in byte b, in Size s) => new Size((ulong)b - s.ValueInBytes);
 
-        public static Size operator *(double d, Size s) => Create(d * s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator *(in byte b, in Size s) => new Size((ulong)b * s.ValueInBytes);
 
-        public static Size operator /(double d, Size s) => Create(d / s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator /(in byte b, in Size s) => new Size((ulong)b / s.ValueInBytes);
 
-        public static Size operator %(double d, Size s) => Create(d % s.GetValueInUnit(ByteUnit.Byte));
+        public static Size operator %(in byte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
-#endregion
+        #endregion
 
-#endregion
 
-#endregion
 
+        #region short operators
 
+        public static Size operator +(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size((ulong)@short + s.ValueInBytes);
 
-#region Size operators
+        public static Size operator -(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size((ulong)@short - s.ValueInBytes);
 
-        /// <summary>
-        /// Returns the size.
-        /// </summary>
-        /// <param name="s">Size to return</param>
-        /// <returns>The size value</returns> 
-        public static Size operator +(Size s) => new Size(+s.Value, s.Unit);
+        public static Size operator *(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? new Size(0) : new Size((ulong)@short * s.ValueInBytes);
 
-        /// <summary>
-        /// Returns the size opposite.
-        /// </summary>
-        /// <param name="s">Size for which one return the opposite</param>
-        /// <returns>The opposite of the size value</returns> 
-        public static Size operator -(Size s) => new Size(-s.Value, s.Unit);
+        public static Size operator /(in short @short, in Size s) => @short <= 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be greater than 0.") : @short == 0 ? s : new Size((ulong)@short / s.ValueInBytes);
+
+        // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
+
+        #endregion
+
+
+
+        #region ushort operators
+
+        public static Size operator +(in ushort @short, in Size s) => new Size((ulong)@short + s.ValueInBytes);
+
+        public static Size operator -(in ushort @short, in Size s) => new Size((ulong)@short - s.ValueInBytes);
+
+        public static Size operator *(in ushort @short, in Size s) => new Size((ulong)@short * s.ValueInBytes);
+
+        public static Size operator /(in ushort @short, in Size s) => new Size((ulong)@short / s.ValueInBytes);
+
+        public static Size operator %(in ushort @short, in Size s) => new Size((ulong)@short % s.ValueInBytes);
+
+        #endregion
+
+
+
+        #region int operators
+
+        public static Size operator +(in int i, in Size s) => i< 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size((ulong)i + s.ValueInBytes);
+
+        public static Size operator -(in int i, in Size s) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size((ulong)i - s.ValueInBytes);
+
+        public static Size operator *(in int i, in Size s) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be equal or greater than 0.") : i == 0 ? new Size(0) : new Size((ulong)i * s.ValueInBytes);
+
+        public static Size operator /(in int i, in Size s) => i <= 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be greater than 0.") : i == 0 ? s : new Size((ulong)i / s.ValueInBytes);
+
+        // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
+
+        #endregion
+
+
+
+        #region uint operators
+
+        public static Size operator +(in uint i, in Size s) => new Size((ulong)i + s.ValueInBytes);
+
+        public static Size operator -(in uint i, in Size s) => new Size((ulong)i - s.ValueInBytes);
+
+        public static Size operator *(in uint i, in Size s) => new Size((ulong)i * s.ValueInBytes);
+
+        public static Size operator /(in uint i, in Size s) => new Size((ulong)i / s.ValueInBytes);
+
+        public static Size operator %(in uint i, in Size s) => new Size((ulong)i% s.ValueInBytes);
+
+        #endregion
+
+
+
+        #region long operators
+
+        public static Size operator +(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size((ulong)l + s.ValueInBytes);
+
+        public static Size operator -(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size((ulong)l - s.ValueInBytes);
+
+        public static Size operator *(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? new Size(0) : new Size((ulong)l * s.ValueInBytes);
+
+        public static Size operator /(in long l, in Size s) => l <= 0 ? throw new ArgumentOutOfRangeException(nameof(l),l, $"{nameof(l)} must be greater than 0.") : l == 0 ? s : new Size((ulong)l / s.ValueInBytes);
+
+        // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
+
+        #endregion
+
+
+
+        #region ulong operators
+
+        public static Size operator +(in ulong l, in Size s) => new Size((ulong)l + s.ValueInBytes);
+
+        public static Size operator -(in ulong l, in Size s) => new Size((ulong)l - s.ValueInBytes);
+
+        public static Size operator *(in ulong l, in Size s) => new Size((ulong)l * s.ValueInBytes);
+
+        public static Size operator /(in ulong l, in Size s) => new Size((ulong)l / s.ValueInBytes);
+
+        public static Size operator %(in ulong l, in Size s) => new Size((ulong)l% s.ValueInBytes);
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+
+
+        //#region Size operators
+
+        ///// <summary>
+        ///// Returns the size.
+        ///// </summary>
+        ///// <param name="s">Size to return</param>
+        ///// <returns>The size value</returns> 
+        //public static Size operator +(Size s) => new Size(+s.ValueInBytes, s.Unit);
+
+        ///// <summary>
+        ///// Returns the size opposite.
+        ///// </summary>
+        ///// <param name="s">Size for which one return the opposite</param>
+        ///// <returns>The opposite of the size value</returns> 
+        //public static Size operator -(Size s) => new Size(-s.ValueInBytes, s.Unit);
 
         //public static Size operator ~(Size s) => new Size(~s.GetValueInUnit(s.Unit), s.Unit); 
 
-#endregion
+        //#endregion
 
 
 
@@ -1009,44 +1334,64 @@ namespace WinCopies.IO
 
 
 
-#region Cast operators
+        #region Cast operators
 
-#region Size to numeric value
+        #region Numeric value to Size
 
-        public static explicit operator Size(int i) => Create(i);
+        public static explicit operator Size(sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? new Size(0UL) : new Size((ulong)b);
 
-        /// <summary>
-        /// Converts a <see cref="long"/> value to a <see cref="Size"/> value.
-        /// </summary>
-        /// <param name="i">The <see cref="long"/> to convert.</param>
-        public static explicit operator Size(long l) => Create(l);
+        public static explicit operator Size(byte b) => new Size((ulong)b);
 
-        public static explicit operator Size(short @short) => Create(@short);
+        public static explicit operator Size(short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? new Size(0UL) : new Size((ulong)@short);
 
-        public static explicit operator Size(float f) => Create(f);
+        public static explicit operator Size(ushort @short) => new Size(@short);
 
-        public static explicit operator Size(double d) => Create(d);
+        public static explicit operator Size(int i) => i< 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i== 0 ? new Size(0UL) : new Size((ulong)i);
 
-#endregion
+        public static explicit operator Size(uint i) => new Size(i);
 
-        public static explicit operator int(Size s) => (int)s.GetValueInUnit(ByteUnit.Byte);
+        ///// <summary>
+        ///// Converts a <see cref="long"/> value to a <see cref="Size"/> value.
+        ///// </summary>
+        ///// <param name="i">The <see cref="long"/> to convert.</param>
+        public static explicit operator Size(long l) => l< 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l== 0 ? new Size(0UL) : new Size((ulong)l);
 
-        /// <summary>
-        /// Converts a <see cref="Size"/> value to a <see cref="long"/> value.
-        /// </summary>
-        /// <param name="s">The <see cref="Size"/> to convert.</param>
-        public static explicit operator long(Size s) => (long)s.GetValueInUnit(ByteUnit.Byte);
+        public static explicit operator Size(ulong l) => new Size(l);
 
-        public static explicit operator short(Size s) => (short)s.GetValueInUnit(ByteUnit.Byte);
+        #endregion
 
-        public static explicit operator float(Size s) => (float)s.GetValueInUnit(ByteUnit.Byte);
+        #region Size to numeric value
 
-        public static explicit operator double(Size s) => s.GetValueInUnit(ByteUnit.Byte);
+        public static explicit operator sbyte(Size s) => (sbyte)s.ValueInBytes;
 
-        public static explicit operator decimal(Size s) => (decimal)s.GetValueInUnit(ByteUnit.Byte);
+        public static explicit operator byte(Size s) => (byte)s.ValueInBytes;
 
-#endregion
+        public static explicit operator short(Size s) => (short)s.ValueInBytes;
 
-#endregion
+        public static explicit operator ushort(Size s) => (ushort)s.ValueInBytes;
+
+        public static explicit operator int(Size s) => (int)s.ValueInBytes;
+
+        public static explicit operator uint(Size s) => (uint)s.ValueInBytes;
+
+        ///// <summary>
+        ///// Converts a <see cref="Size"/> value to a <see cref="long"/> value.
+        ///// </summary>
+        ///// <param name="s">The <see cref="Size"/> to convert.</param>
+        public static explicit operator long(Size s) => (long)s.ValueInBytes;
+
+        public static explicit operator ulong(Size s) => (ulong)s.ValueInBytes;
+
+        public static explicit operator float(Size s) => (float)s.ValueInBytes;
+
+        public static explicit operator double(Size s) => (double) s.ValueInBytes;
+
+        public static explicit operator decimal(Size s) => (decimal)s.ValueInBytes;
+
+        #endregion
+
+        #endregion
+
+        #endregion
     }
 }

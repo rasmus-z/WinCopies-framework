@@ -19,4 +19,16 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type local:Link}" BasedOn="{StaticResource {x:Type Label}}" >
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template" >
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Link}">
+                    <local:LinkRun Uri="{TemplateBinding Uri}" UnderliningMode="{TemplateBinding UnderliningMode}" NormalForeground="{TemplateBinding NormalForeground}" HighlightedForeground="{TemplateBinding HighlightedForeground}" ActiveForeground="{TemplateBinding ActiveForeground}" SeenForeground="{TemplateBinding SeenForeground}" Seen="{TemplateBinding Seen}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

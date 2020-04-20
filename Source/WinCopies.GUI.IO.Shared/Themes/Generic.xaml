@@ -3,31 +3,41 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:WinCopies.GUI.IO"
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
+    xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
     >
-    <!--<Style TargetType="{x:Type local:ExplorerControl}">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary>
+            <!--Data converters-->
+
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        </ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="{x:Type local:ExplorerControl}">
         <Setter Property="Template">
-            <Setter.Value>-->
-    <DataTemplate DataType="{x:Type local:BrowsableObjectInfo}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid Grid.ColumnSpan="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <TextBox />
-                <Button Grid.Column="1" />
-            </Grid>
-            <TreeView ItemsSource="{Binding TreeViewItems}">
-                <TreeView.ItemTemplate>
-                    <DataTemplate DataType="{x:Type local:BrowsableObjectInfo}">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ExplorerControl}">
+                    <!--<DataTemplate DataType="{x:Type local:BrowsableObjectInfo}">-->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.ColumnSpan="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding Path}" />
+                            <Button Grid.Column="1" />
+                        </Grid>
+                        <TreeView ItemsSource="{Binding TreeViewItems}">
+                            <!--<TreeView.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:BrowsableObjectInfoViewModel}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto" />
@@ -37,14 +47,222 @@
                             <controls:Label Content="{Binding Name}" />
                         </Grid>
                     </DataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-            <ListView Grid.Column="1" />
+                </TreeView.ItemTemplate>-->
+                        </TreeView>
+                        <local:ExplorerControlListView Grid.Column="1" />
+                    </Grid>
+                </ControlTemplate>
+                <!--</DataTemplate>-->
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:ExplorerControlTreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="32" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding Icon, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                        <controls:Label Grid.Column="1" Content="{Binding Header, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                    </Grid>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:ExplorerControlListView}" BasedOn="{StaticResource {x:Type ListView}}">
+        <Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeThreeListViewItemTemplate}" />
+        <Setter Property="ItemsPanel">
+
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=Self}}" Value="{x:Static local:ViewStyle.SizeOne}">
+                <Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeOneListViewItemTemplate}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=Self}}" Value="{x:Static local:ViewStyle.SizeTwo}">
+                <Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeTwoListViewItemTemplate}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=Self}}" Value="{x:Static local:ViewStyle.SizeFour}">
+                <Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeFourListViewItemTemplate}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ViewStyle, RelativeSource={RelativeSource Mode=Self}}" Value="{x:Static local:ViewStyle.Tiles}">
+                <Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeOneListViewItemTemplate}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <DataTemplate x:Key="ExplorerControlSizeOneListViewItemTemplate">
+        <local:ExplorerControlListViewItem>
+            <StackPanel Orientation="Horizontal" Height="16" Width="300" >
+                <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                <Image Source="{Binding SmallIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" Height="16" Style="{StaticResource ExplorerControlImageStyle}" />
+                <!--, Converter={local:ImageSourceConverter}}-->
+                <TextBlock TextWrapping="Wrap" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
+            </StackPanel>
+        </local:ExplorerControlListViewItem>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ExplorerControlSizeTwoListViewItemContentTemplate">
+        <Grid Width="75" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="48" />
+                <RowDefinition MaxHeight="32" />
+            </Grid.RowDefinitions>
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+            <Image Grid.Row="1" Source="{Binding MediumIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" VerticalAlignment="Bottom" Style="{StaticResource ExplorerControlImageStyle}" />
+            <TextBlock Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Top" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
         </Grid>
     </DataTemplate>
-    <!--</Setter.Value>
-        </Setter>
-    </Style>-->
+
+    <DataTemplate x:Key="ExplorerControlSizeThreeListViewItemContentTemplate" x:Shared="false" >
+        <Grid Width="100">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="96" />
+                <RowDefinition MaxHeight="32" />
+            </Grid.RowDefinitions>
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+            <Image Grid.Row="1" Source="{Binding LargeIcon, RelativeSource={RelativeSource Mode=TemplatedParent}}" VerticalAlignment="Bottom" Style="{StaticResource ExplorerControlImageStyle}" />
+            <!--, Converter={local:ImageSourceConverter}}-->
+            <TextBlock Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ExplorerControlSizeFourListViewItemContentTemplate" x:Shared="false">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="256" />
+                <RowDefinition MaxHeight="32" />
+            </Grid.RowDefinitions>
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+            <Image Grid.Row="1" Source="{Binding ExtraLargeBitmapSource}" Style="{StaticResource ExplorerControlImageStyle}" />
+            <!--, Converter={local:ImageSourceConverter}}-->
+            <TextBlock Grid.Row="2" TextWrapping="Wrap" TextAlignment="Center" Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ExplorerControlListListViewItemContentTemplate" x:Shared="false">
+        <StackPanel Orientation="Horizontal" >
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ListViewItem}}}" IsChecked="{Binding IsSelected}" />
+            <Image Source="{Binding SmallBitmapSource}" Height="16" Width="16" Style="{StaticResource ExplorerControlImageStyle}" />
+            <!--, Converter={local:ImageSourceConverter}}-->
+            <TextBlock Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ExplorerControlTilesListViewItemContentTemplate" x:Shared="false">
+        <StackPanel Orientation="Horizontal" >
+            <CheckBox Visibility="{Binding IsCheckBoxEnabled, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ListViewItem}}}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
+            <Image Source="{Binding MediumBitmapSource}" Height="48" Width="48" >
+                <Image.Opacity>
+                    <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
+                        <Binding />
+                        <Binding Path="FileSystemInfoProperties.Attributes" />
+                        <Binding Path="ShowHiddenItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}" />
+                        <Binding Path="ShowSystemItems" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}" />
+                    </MultiBinding>
+                </Image.Opacity>
+            </Image>
+            <!--, Converter={local:ImageSourceConverter}}-->
+            <StackPanel Margin="10,0,0,0">
+                <TextBlock Style="{StaticResource ExplorerControlListViewItemTextBlockStyle}" />
+                <controls:Label Padding="0" Content="{Binding ShellObject.Properties.System.ItemTypeText.ValueAsObject}" Foreground="Gray" />
+                <controls:Label Padding="0" Content="{Binding ShellObject.Properties.System.Size.ValueAsObject}" Foreground="Gray" />
+            </StackPanel>
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- todo: merged style to avoid the ancestor reference in binding?-->
+    <Style x:Key="ExplorerControlListViewItemTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+        <Setter Property="Text" Value="{Binding ItemName, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+        <Setter Property="ToolTip" Value="{Binding ItemName, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlListView}}}" Value="{x:Static controls:LinkUnderliningMode.AlwaysUnderline}" >
+                <Setter Property="TextDecorations" >
+                    <Setter.Value>
+                        <TextDecorationCollection>
+                            <!--todo: to put in style resources-->
+                            <TextDecoration Location="Underline" />
+                        </TextDecorationCollection>
+                    </Setter.Value>
+                </Setter>
+            </DataTrigger>
+
+            <MultiDataTrigger >
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlListView}}}" Value="{x:Static controls:LinkUnderliningMode.UnderlineWhenMouseOverOrFocused}" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Mode=Self}}" Value="true" />
+                </MultiDataTrigger.Conditions>
+
+                <Setter Property="TextDecorations" >
+                    <Setter.Value>
+                        <TextDecorationCollection>
+                            <!--todo: to put in style resources-->
+                            <TextDecoration Location="Underline" />
+                        </TextDecorationCollection>
+                    </Setter.Value>
+                </Setter>
+            </MultiDataTrigger>
+
+            <MultiDataTrigger >
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlListView}}}" Value="{x:Static controls:LinkUnderliningMode.UnderlineWhenMouseOverOrFocused}" />
+                    <Condition Binding="{Binding IsFocused, RelativeSource={RelativeSource Mode=Self}}" Value="true" />
+                </MultiDataTrigger.Conditions>
+
+                <Setter Property="TextDecorations" >
+                    <Setter.Value>
+                        <TextDecorationCollection>
+                            <!--todo: to put in style resources-->
+                            <TextDecoration Location="Underline" />
+                        </TextDecorationCollection>
+                    </Setter.Value>
+                </Setter>
+            </MultiDataTrigger>
+
+            <MultiDataTrigger >
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding UnderliningMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControlListView}}}" Value="{x:Static controls:LinkUnderliningMode.UnderlineWhenNotMouseOverNorFocused}" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Mode=Self}}" Value="false" />
+                    <Condition Binding="{Binding IsFocused, RelativeSource={RelativeSource Mode=Self}}" Value="false" />
+                </MultiDataTrigger.Conditions>
+
+                <Setter Property="TextDecorations" >
+                    <Setter.Value>
+                        <TextDecorationCollection>
+                            <!--todo: to put in style resources-->
+                            <TextDecoration Location="Underline" />
+                        </TextDecorationCollection>
+                    </Setter.Value>
+                </Setter>
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ExplorerControlImageStyle" TargetType="Image">
+        <!--<Setter Property="Opacity">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource FileSystemInfoAttributesToOpacityConverter}" >
+                    <Binding Path="FileAttributes" RelativeSource="{RelativeSource Mode=TemplatedParent}" />
+                    <Binding Path="FileAttributesToShow" RelativeSource="{RelativeSource Mode=TemplatedParent}" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>-->
+
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding HasTransparency}">
+                <Setter Property="Opacity" Value="0.5" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <!--<Style TargetType="{x:Type local:CustomControl1}">
         <Setter Property="Template">
             <Setter.Value>

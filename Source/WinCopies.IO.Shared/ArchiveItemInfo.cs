@@ -132,7 +132,7 @@ namespace WinCopies.IO
 
                 // todo:
 
-                throw new ArgumentException("'fileType' can't be a SpecialFolder.");
+                throw new ArgumentException(string.Format(Properties.Resources.SpecialFolderError, nameof(fileType)));
 
             ArchiveFileInfo = archiveFileInfo;
 
@@ -140,7 +140,7 @@ namespace WinCopies.IO
 
                 // todo:
 
-                throw new ArgumentException($"'{nameof(path)}' must end with '{nameof(ArchiveFileInfo.Value.FileName)}'");
+                throw new ArgumentException(string.Format(Properties.Resources.PathMustEndWithFileName, nameof(path), nameof(ArchiveFileInfo.Value.FileName)));
 
             ArchiveShellObject = archiveShellObject;
 
@@ -225,18 +225,18 @@ namespace WinCopies.IO
 
 #if DEBUG
 
-                        Debug.WriteLine("Dowork event started.");
+                        // Debug.WriteLine("Dowork event started.");
 
-                        Debug.WriteLine(FileTypes);
+                        // Debug.WriteLine(FileTypes);
 
                         try
                         {
 
                             Debug.WriteLine("Path == null: " + (Path == null).ToString());
 
-                            Debug.WriteLine("Path.Path: " + Path?. Value. Path);
+                            Debug.WriteLine("Path: " + Path);
 
-                            Debug.WriteLine("Path.ShellObject: " + (Path as IShellObjectInfo)?.ShellObject.ToString());
+                            Debug.WriteLine("ShellObject: " + ArchiveShellObject.ToString());
 
                         }
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -247,7 +247,7 @@ namespace WinCopies.IO
 
 #if DEBUG
 
-                        Debug.WriteLine("Dowork event started.");
+                        // Debug.WriteLine("Dowork event started.");
 
 #endif
 
@@ -261,9 +261,9 @@ namespace WinCopies.IO
 
                         Debug.WriteLine("Path == null: " + (Path == null).ToString());
 
-                        Debug.WriteLine("Path.Path: " + Path.Value.Path);
+                        Debug.WriteLine("Path: " + Path);
 
-                        if (Path is IShellObjectInfo) Debug.WriteLine("Path.ShellObject: " + ((IShellObjectInfo)Path).ShellObject.ToString());
+                        Debug.WriteLine("ShellObject: " + ArchiveShellObject.ToString());
 
 #endif
 
@@ -466,8 +466,8 @@ namespace WinCopies.IO
                         {
 
                             Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
-                            Debug.WriteLine("path_.Path: " + path.Path);
-                            Debug.WriteLine("path_.Normalized_Path: " + path.NormalizedPath);
+                            Debug.WriteLine("path_.Path: " + Path);
+                            //Debug.WriteLine("path_.Normalized_Path: " + path.NormalizedPath);
                             // Debug.WriteLine("path_.Shell_Object: " + path.ArchiveShellObject);
 
                             // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;

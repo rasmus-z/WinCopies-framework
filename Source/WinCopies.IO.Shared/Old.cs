@@ -3683,3 +3683,2643 @@
 //    }
 
 //}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using SevenZip;
+//using System;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+
+//    /// <summary>
+//    /// A factory to create new <see cref="ArchiveItemInfo"/>s.
+//    /// </summary>
+//    public interface IArchiveItemInfoFactory : IBrowsableObjectInfoFactory
+//    {
+
+//        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate);
+
+//    }
+
+//    /// <summary>
+//    /// A factory for creating new <see cref="ShellObjectInfo"/>s.
+//    /// </summary>
+//    public class ArchiveItemInfoFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory
+//    {
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="ArchiveItemInfoFactory"/> class.
+//        /// </summary>
+//        public ArchiveItemInfoFactory() : base() { }
+
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) => new ArchiveItemInfo(path, fileType, archiveShellObject, archiveFileInfo, archiveFileInfoDelegate);
+
+//        protected override BrowsableObjectInfoFactory DeepCloneOverride() => new ArchiveItemInfoFactory();
+
+//    }
+
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using SevenZip;
+//using System;
+//using System.Collections.Generic;
+//using System.Collections.ObjectModel;
+//using System.ComponentModel;
+//using System.Diagnostics;
+//using System.IO;
+//using System.Security;
+//using WinCopies.Util;
+//using static WinCopies.Util.Util;
+//using static WinCopies.IO.FolderLoader;
+//using WinCopies.Collections;
+
+//namespace WinCopies.IO
+//{
+
+//    // todo: does not work with encrypted archives
+
+//    public class ArchiveLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory> where TPath : ArchiveItemInfoProvider where TItems : ArchiveItemInfo where TSubItems : ArchiveItemInfo where TFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory where TItemsFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory
+//    {
+
+//        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new ArchiveLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, FileTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> class.
+//        /// </summary>
+//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//        /// <param name="fileTypes">The file types to load.</param>
+//        public ArchiveLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) { }
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> class using a custom comparer.
+//        /// </summary>
+//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+//        /// <param name="fileTypes">The file types to load.</param>
+//        public ArchiveLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, fileTypes, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) { }
+
+//        protected override void OnPathChanging( BrowsableObjectTreeNode< TPath, TItems, TFactory > path )
+
+//        {
+
+//            // if ((path is ShellObjectInfo && ((ShellObjectInfo)path).FileType == FileTypes.Archive) || path is ArchiveItemInfo)
+
+//            // {
+
+//            // this.path = path;
+
+//            // PropertyChanged?.Invoke(this, new WinCopies.Util.PropertyChangedEventArgs(nameof(Path), null, path));
+
+//            // }
+
+//            /*else*/
+//            if (!(path is null) && path.Value.FileType != FileType.Archive)
+
+//                throw new ArgumentException("'Path' is not an Archive or a Folder.");
+
+//            // _Paths = new ObservableCollection<IBrowsableObjectInfo>();
+
+//        }
+
+//        // protected override void OnProgressChanged(object sender, ProgressChangedEventArgs e) => PathsOverride.Add((ArchiveItemInfo)e.UserState);
+
+//        protected override void OnDoWork(DoWorkEventArgs e)
+
+//        {
+
+//            if (FileTypes == FileTypes.None) return;
+
+//            //else if (FileTypes.HasFlag(GetAllEnumFlags<FileTypes>()) && FileTypes.HasMultipleFlags())
+
+//            //    throw new InvalidOperationException("FileTypes cannot have the All flag in combination with other flags.");
+
+//#if DEBUG
+
+//            Debug.WriteLine("Dowork event started.");
+
+//            Debug.WriteLine(FileTypes);
+
+//            try
+//            {
+
+//                Debug.WriteLine("Path == null: " + (Path == null).ToString());
+
+//                Debug.WriteLine("Path.Path: " + Path?. Value. Path);
+
+//                Debug.WriteLine("Path.ShellObject: " + (Path as IShellObjectInfo)?.ShellObject.ToString());
+
+//            }
+//#pragma warning disable CA1031 // Do not catch general exception types
+//            catch (Exception) { }
+//#pragma warning restore CA1031 // Do not catch general exception types
+
+//#endif
+
+//#if DEBUG
+
+//            Debug.WriteLine("Dowork event started.");
+
+//#endif
+
+//            //List<FolderLoader.IPathInfo> directories = new List<FolderLoader.IPathInfo>();
+
+//            //List<FolderLoader.IPathInfo> files = new List<FolderLoader.IPathInfo>();
+
+//            var paths = new ArrayBuilder<PathInfo>();
+
+//#if DEBUG
+
+//            Debug.WriteLine("Path == null: " + (Path == null).ToString());
+
+//            Debug.WriteLine("Path.Path: " + Path.Value.Path);
+
+//            if (Path is IShellObjectInfo) Debug.WriteLine("Path.ShellObject: " + ((IShellObjectInfo)Path).ShellObject.ToString());
+
+//#endif
+
+//            // ShellObjectInfo archiveShellObject = Path is ShellObjectInfo ? (ShellObjectInfo)Path : ((ArchiveItemInfo)Path).ArchiveShellObject;
+
+//            string archiveFileName = (Path is IShellObjectInfo ? (IShellObjectInfo)Path : ((IArchiveItemInfo)Path).ArchiveShellObject).Path;
+
+//            try
+
+//            {
+
+//#if NETFRAMEWORK
+
+//                using (var archiveFileStream = new FileStream(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+
+//                using (var archiveExtractor = new SevenZipExtractor(archiveFileStream))
+
+//                {
+
+//#else
+
+//                using var archiveFileStream = new FileStream(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
+//                using var archiveExtractor = new SevenZipExtractor(archiveFileStream);
+
+//#endif
+
+//                //try
+//                //{
+
+//                // archiveShellObject.ArchiveFileStream = archiveFileStream;
+//                void AddPath(ref string _path, FileType fileType, ref ArchiveFileInfo? archiveFileInfo)
+
+//                {
+
+//                    if (fileType == FileType.Other || (FileTypes != GetAllEnumFlags<FileTypes>() && !FileTypes.HasFlag(FileTypeToFileTypeFlags(fileType)))) return;
+
+//                    // We only make a normalized path if we add the path to the paths to load.
+
+//                    string __path = string.Copy(_path);
+
+//                    paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), fileType, archiveFileInfo, _archiveFileInfo => ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(_archiveFileInfo, __path)));
+
+//                }
+
+//                void AddDirectory(string _path, ArchiveFileInfo? archiveFileInfo) =>
+
+//                    // if (FileTypes.HasFlag(FileTypesFlags.All) || (FileTypes.HasFlag(FileTypesFlags.Folder) && System.IO.Path.GetPathRoot(pathInfo.Path) != pathInfo.Path) || (FileTypes.HasFlag(FileTypesFlags.Drive) && System.IO.Path.GetPathRoot(pathInfo.Path) == pathInfo.Path))
+
+//                    AddPath(ref _path, FileType.Folder, ref archiveFileInfo);
+
+//                void AddFile(string _path, ArchiveFileInfo? archiveFileInfo) =>
+
+//                    // We only make a normalized path if we add the path to the paths to load.
+
+//                    AddPath(ref _path, _path.Substring(_path.Length).EndsWith(".lnk")
+//                        ? FileType.Link
+//                        : IO.Path.IsSupportedArchiveFormat(System.IO.Path.GetExtension(_path)) ? FileType.Archive : FileType.File, ref archiveFileInfo);
+
+//                System.Collections.ObjectModel.ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
+
+//                string fileName = "";
+
+//                string relativePath = Path is IShellObjectInfo ? "" : Path.Value.Path.Substring(archiveFileName.Length + 1);
+
+//                // PathInfo path;
+
+//#if DEBUG
+
+//                        foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
+
+//                            Debug.WriteLine(archiveFileInfo.FileName);
+
+//#endif
+
+//                void addPath(ArchiveFileInfo archiveFileInfo)
+
+//                {
+
+//                    if (archiveFileInfo.FileName.StartsWith(relativePath) && archiveFileInfo.FileName.Length > relativePath.Length)
+
+//                    {
+
+//                        fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
+
+//                        if (fileName.StartsWith(IO.Path.PathSeparator))
+
+//                            fileName = fileName.Substring(1);
+
+//                        if (fileName.Contains(IO.Path.PathSeparator))
+
+//                            fileName = fileName.Substring(0, fileName.IndexOf(IO.Path.PathSeparator));
+
+//                        /*if (!archiveFileInfo.FileName.Substring(archiveFileInfo.FileName.Length).Contains(IO.Path.PathSeparator))*/
+
+//                        // {
+
+//                        foreach (IFileSystemObject pathInfo in (IEnumerable<IFileSystemObject>)paths)
+
+//                            if (pathInfo.Path == fileName)
+
+//                                return;
+
+//                        if (fileName.ToLower() == archiveFileInfo.FileName.ToLower())
+
+//                        {
+
+//                            if (archiveFileInfo.IsDirectory)
+
+//                                AddDirectory(fileName, archiveFileInfo);
+
+//                            else if (CheckFilter(archiveFileInfo.FileName))
+
+//                                AddFile(fileName, archiveFileInfo);
+
+//                        }
+
+//                        else
+
+//                            AddDirectory(fileName, archiveFileInfo);
+
+//                        // }
+
+//                    }
+
+//                }
+
+//                foreach (ArchiveFileInfo archiveFileInfo in archiveFileData)
+
+//                    // _path = archiveFileInfo.FileName.Replace('/', IO.Path.PathSeparator);
+
+//                    addPath(archiveFileInfo);
+
+//#if NETFRAMEWORK
+
+//                }
+
+//#endif
+
+//            }
+
+//            catch (Exception ex) when (ex.Is(false, typeof(IOException), typeof(SecurityException), typeof(UnauthorizedAccessException), typeof(SevenZipException))) { return; }
+
+//            // for (int i = 0; i < paths.Count; i++)
+
+//            // {
+
+//            // PathInfo directory = (PathInfo)paths[i];
+
+//            // string CurrentFile_Normalized = "";
+
+//            // CurrentFile_Normalized = Util.GetNormalizedPath(directory.Path);
+
+//            // directory.Normalized_Path = CurrentFile_Normalized;
+
+//            // paths[i] = directory;
+
+//            // }
+
+//            IEnumerable<PathInfo> pathInfos;
+
+//            if (FileSystemObjectComparer == null)
+
+//                pathInfos = (IEnumerable<PathInfo>)paths;
+
+//            else
+
+//            {
+
+//                var sortedPaths = paths.ToList();
+
+//                sortedPaths.Sort(FileSystemObjectComparer);
+
+//                pathInfos = (IEnumerable<PathInfo>)paths;
+
+//            }
+
+//            // for (int i = 0; i < files.Count; i++)
+
+//            // {
+
+//            // var file = (PathInfo)files[i];
+
+//            // string CurrentFile_Normalized = "";
+
+//            // CurrentFile_Normalized = FolderLoader.PathInfo.NormalizePath(file.Path);
+
+//            // file.Normalized_Path = CurrentFile_Normalized;
+
+//            // files[i] = file;
+
+//            // }
+
+//            // files.Sort(comp);
+
+
+
+//#if DEBUG
+
+//            void reportProgress(PathInfo path)
+
+//            {
+
+//                Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
+//                Debug.WriteLine("path_.Path: " + path.Path);
+//                Debug.WriteLine("path_.Normalized_Path: " + path.NormalizedPath);
+//                // Debug.WriteLine("path_.Shell_Object: " + path.ArchiveShellObject);
+
+//                // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;
+//                // new_Path.LoadThumbnail();
+
+//                ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>(    (TItems)Path.Factory.GetBrowsableObjectInfo(Path.Value.Path + IO.Path.PathSeparator + path.Path, path.FileType, Path.Value.ArchiveShellObject, path.ArchiveFileInfo, archiveFileInfo => ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(archiveFileInfo, Path.Value.ArchiveShellObject.Path)), (TItemsFactory) Path.Factory.DeepClone()));
+
+//                // #if DEBUG
+
+//                // Debug.WriteLine("Ceci est un " + new_Path.GetType().ToString());
+
+//                // #endif
+
+//            }
+
+//#endif
+
+//            // this._Paths = new ObservableCollection<IBrowsableObjectInfo>();
+
+
+
+//            PathInfo path_;
+
+
+
+//#if NETFRAMEWORK
+
+//            using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
+
+//#else
+
+//            using IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator();
+
+//#endif
+
+//            while (_paths.MoveNext())
+
+//                try
+
+//                {
+
+//                    do
+
+//                    {
+
+//                        path_ = _paths.Current;
+
+//#if DEBUG
+
+//                            reportProgress(path_);
+
+//#else
+
+//                        ReportProgress(0, ((IArchiveItemInfoProvider)Path).Factory.GetBrowsableObjectInfo(((IArchiveItemInfoProvider)Path).ArchiveShellObject, path.ArchiveFileInfo, Path.Path + IO.Path.PathSeparator + path.Path, path.FileType));
+
+//#endif
+
+//                    } while (_paths.MoveNext());
+
+//                }
+//                catch (Exception ex) when (HandleIOException(ex)) { }
+
+//            //foreach (FolderLoader.PathInfo path_ in files)
+
+//            //    reportProgressAndAddNewPathToObservableCollection(path_);
+
+//        }
+
+//        protected class PathInfo : IO.PathInfo
+
+//        {
+
+//            public FileType FileType { get; }
+
+//            public ArchiveFileInfo? ArchiveFileInfo { get; }
+
+//            public DeepClone<ArchiveFileInfo?> ArchiveFileInfoDelegate { get; }
+
+//            /// <summary>
+//            /// Gets the localized name of this <see cref="PathInfo"/>.
+//            /// </summary>
+//            public override string LocalizedName => Name;
+
+//            /// <summary>
+//            /// Gets the name of this <see cref="PathInfo"/>.
+//            /// </summary>
+//            public override string Name => System.IO.Path.GetFileName(Path);
+
+//            public PathInfo(string path, string normalizedPath, FileType fileType, ArchiveFileInfo? archiveFileInfo, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate) : base(path, normalizedPath)
+//            {
+
+//                ArchiveFileInfo = archiveFileInfo;
+
+//                ArchiveFileInfoDelegate = archiveFileInfoDelegate;
+
+//                FileType = fileType;
+
+//            }
+
+//            //public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
+//            //        ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
+//            //        : false;
+
+//            //public int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
+
+//        }
+
+//    }
+
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System;
+//using System.Collections.Generic;
+//using System.Collections.ObjectModel;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+
+//namespace WinCopies.IO
+//{
+
+//    /// <summary>
+//    /// Provides a base class for <see cref="BrowsableObjectInfo"/> factories.
+//    /// </summary>
+//    public abstract class BrowsableObjectInfoFactory /*: IBrowsableObjectInfoFactory*/
+
+//    {
+
+//        //public static bool ValidatePropertySet(IBrowsableObjectInfoFactory factory) => factory.Loader?.IsBusy == false;
+
+//        //public static void ThrowOnInvalidPropertySet(IBrowsableObjectInfoFactory factory)
+
+//        //{
+
+//        //    if ( factory.Loader?.IsBusy == true)
+
+//        //        throw new InvalidOperationException($"The Path's ItemsLoader of the current {nameof(BrowsableObjectInfoFactory)} is busy.");
+
+//        //}
+
+//        public IBrowsableObjectInfo Path { get; }
+
+//        //protected virtual void OnDeepClone(BrowsableObjectInfoFactory factory) { }
+
+//        //protected abstract BrowsableObjectInfoFactory DeepCloneOverride();
+
+//        //public virtual object DeepClone()
+
+//        //{
+
+//        //    BrowsableObjectInfoFactory browsableObjectInfoFactory = DeepCloneOverride();
+
+//        //    OnDeepClone(browsableObjectInfoFactory);
+
+//        //    return browsableObjectInfoFactory;
+
+//        //}
+
+//        ///// <summary>
+//        ///// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
+//        ///// </summary>
+//        //public virtual bool NeedsObjectsOrValuesReconstruction => false;
+
+//    }
+
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System;
+//using System.Collections.Generic;
+//using System.ComponentModel;
+//using System.Diagnostics;
+//using System.Threading;
+//using System.Threading.Tasks;
+//using WinCopies.Collections;
+//using WinCopies.Util;
+
+//using IDisposable = WinCopies.Util.IDisposable;
+
+//namespace WinCopies.IO
+//{
+
+//    //    /// <summary>
+//    //    /// Provides a base class for <see cref="IBrowsableObjectInfo"/> loading. See the Remarks section.
+//    //    /// </summary>
+//    //    /// <remarks>This class provides the <see cref="PathOverride"/> protected property. This property is for interoperability with generic classes based on this one. You should override this property in order to seal it.</remarks>
+//    //    public abstract class BrowsableObjectInfoLoader : IBrowsableObjectInfoLoader/*, IBackgroundWorker2*/
+
+//    //    {
+
+//    //#pragma warning disable IDE0069 // Disposed in the Dispose method overrides.
+//    //        private readonly BackgroundWorker backgroundWorker = new BackgroundWorker();
+//    //#pragma warning restore IDE0069
+//    //#pragma warning disable CS0649 // Set up using reflection
+//    //        private readonly IFileSystemObjectComparer<IFileSystemObject> _fileSystemObjectComparer;
+//    //        private readonly IEnumerable<string> _filter;
+//    //#pragma warning restore CS0649
+
+//    //        public IFileSystemObjectComparer<IFileSystemObject> FileSystemObjectComparer { get => _fileSystemObjectComparer; set => this.SetBackgroundWorkerProperty(nameof(FileSystemObjectComparer), nameof(_fileSystemObjectComparer), value, typeof(BrowsableObjectInfoLoader), true); }
+
+//    //        //public void changePath(IBrowsableObjectInfo newValue)
+
+//    //        //{
+
+
+
+//    //        //}
+
+//    //        //protected virtual BrowsableObjectInfo PathOverride { get => _path; set => _path = value; }
+
+//    //        public IEnumerable<string> Filter { get => _filter; set => this.SetBackgroundWorkerProperty(nameof(Filter), nameof(_filter), value, typeof(BrowsableObjectInfoLoader), true); }
+
+//    //        /// <summary>
+//    //        /// Gets a value that indicates whether the thread is busy.
+//    //        /// </summary>
+//    //        public bool IsBusy => backgroundWorker.IsBusy;
+
+//    //        /// <summary>
+//    //        /// Gets or sets a value that indicates whether the thread can notify of the progress.
+//    //        /// </summary>
+//    //        public bool WorkerReportsProgress { get => backgroundWorker.WorkerReportsProgress; set => backgroundWorker.WorkerReportsProgress = value; }
+
+//    //        /// <summary>
+//    //        /// Gets or sets a value that indicates whether the thread supports cancellation.
+//    //        /// </summary>
+//    //        public bool WorkerSupportsCancellation { get => backgroundWorker.WorkerSupportsCancellation; set => backgroundWorker.WorkerSupportsCancellation = value; }
+
+//    //        /// <summary>
+//    //        /// Gets the <see cref="System.Threading.ApartmentState"/> of this thread.
+//    //        /// </summary>
+//    //        public ApartmentState ApartmentState { get => backgroundWorker.ApartmentState; set => backgroundWorker.ApartmentState = value; }
+
+//    //        /// <summary>
+//    //        /// Gets a value that indicates whether the thread must try to cancel before finished the background tasks.
+//    //        /// </summary>
+//    //        public bool CancellationPending => backgroundWorker.CancellationPending;
+
+//    //        /// <summary>
+//    //        /// Gets a value that indicates whether the working has been cancelled.
+//    //        /// </summary>
+//    //        public bool IsCancelled => backgroundWorker.IsCancelled;
+
+//    //        /// <summary>
+//    //        /// Gets the current progress of the working in percent.
+//    //        /// </summary>
+//    //        public int Progress => backgroundWorker.Progress;
+
+//    //        /// <summary>
+//    //        /// Gets or sets the <see cref="ISite"/> associated with the <see cref="IComponent"/>.
+//    //        /// </summary>
+//    //        /// <value>The <see cref="ISite"/> object associated with the component; or <see langword="null"/>, if the component does not have a site.</value>
+//    //        /// <remarks>Sites can also serve as a repository for container-specific, per-component information, such as the component name.</remarks>
+//    //        public ISite Site { get => backgroundWorker.Site; set => backgroundWorker.Site = value; }
+
+//    //        /// <summary>
+//    //        /// <para>Called when the background thread starts. Put your background working code here.</para>
+//    //        /// <para>The event handler is running in the background thread.</para>
+//    //        /// </summary>
+//    //        public event DoWorkEventHandler DoWork;
+
+//    //        /// <summary>
+//    //        /// <para>Called when the background thread reports progress.</para>
+//    //        /// <para>The event handler is running in the main thread.</para>
+//    //        /// </summary>
+//    //        public event ProgressChangedEventHandler ProgressChanged;
+
+//    //        /// <summary>
+//    //        /// <para>Called when the background thread has finished working.</para>
+//    //        /// <para>The event handler is running in the background thread.</para>
+//    //        /// </summary>
+//    //        public event RunWorkerCompletedEventHandler RunWorkerCompleted;
+
+//    //        /// <summary>
+//    //        /// Represents the method that handles the <see cref="Disposed"/> event of a component.
+//    //        /// </summary>
+//    //        /// <remarks>When you create a <see cref="Disposed"/> delegate, you identify the method that handles the event. To associate the event with your event handler, add an instance of the delegate to the event. The event handler is called whenever the event occurs, unless you remove the delegate. For more information about event handler delegates, see <a href="https://docs.microsoft.com/en-us/dotnet/standard/events/index?view=netframework-4.8">Handling and Raising Events</a>.</remarks>
+//    //        public event EventHandler Disposed;
+
+//    //        /// <summary>
+//    //        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> class.
+//    //        /// </summary>
+//    //        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//    //        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//    //        protected BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation) : this(workerReportsProgress, workerSupportsCancellation, new FileSystemObjectComparer<IFileSystemObject>()) { }
+
+//    //        /// <summary>
+//    //        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> class using a custom comparer.
+//    //        /// </summary>
+//    //        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//    //        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//    //        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+//    //        protected BrowsableObjectInfoLoader(bool workerReportsProgress, bool workerSupportsCancellation, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer)
+//    //        {
+
+//    //            WorkerReportsProgress = workerReportsProgress;
+
+//    //            WorkerSupportsCancellation = workerSupportsCancellation;
+
+//    //            FileSystemObjectComparer = fileSystemObjectComparer;
+
+//    //            ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
+
+//    //            backgroundWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => ProgressChanged(this, e);
+
+//    //            DoWork += (object sender, DoWorkEventArgs e) => OnDoWork(e);
+
+//    //            backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => DoWork(this, e);
+
+//    //            RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => OnRunWorkerCompleted(e);
+
+//    //            backgroundWorker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => RunWorkerCompleted(this, e);
+
+//    //            backgroundWorker.Disposed += (object sender, EventArgs e) => Disposed?.Invoke(this, e);
+
+//    //        }
+
+//    //        public bool IsDisposing { get; internal set; }
+
+//    //        public bool IsDisposed { get; internal set; }
+
+//    //        /// <summary>
+//    //        /// This method does anything because it is designed for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation, and is here for overriding only. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
+//    //        /// </summary>
+//    //        /// <param name="browsableObjectInfoLoader">The cloned <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/>.</param>
+//    //        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
+//    //        protected virtual void OnDeepClone(BrowsableObjectInfoLoader browsableObjectInfoLoader, bool? preserveIds) { }
+
+//    //        /// <summary>
+//    //        /// When overridden in a derived class, gets a deep clone of this <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/>. The <see cref="OnDeepClone(BrowsableObjectInfoLoader{TPath}, bool)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride(bool)"/>, you'll have to override this method if your class has to reinitialize members.
+//    //        /// </summary>
+//    //        /// <param name="preserveIds">Whether to preserve IDs, if any, or to create new IDs.</param>
+//    //        protected abstract BrowsableObjectInfoLoader DeepCloneOverride(bool? preserveIds);
+
+//    //        public object DeepClone(bool? preserveIds)
+
+//    //        {
+
+//    //            ((IDisposable)this).ThrowIfDisposingOrDisposed();
+
+//    //            BrowsableObjectInfoLoader browsableObjectInfoLoader = DeepCloneOverride(preserveIds);
+
+//    //            OnDeepClone(browsableObjectInfoLoader, preserveIds);
+
+//    //            return browsableObjectInfoLoader;
+
+//    //        }
+
+//    //        public virtual bool NeedsObjectsOrValuesReconstruction => FileSystemObjectComparer.NeedsObjectsOrValuesReconstruction;
+
+//    //        public virtual bool CheckFilter(string path)
+
+//    //        {
+
+//    //            if (Filter is null) return true;
+
+//    //            foreach (string filter in Filter)
+
+//    //                if (!IO.Path.MatchToFilter(path, filter)) return false;
+
+//    //            return true;
+
+//    //        }
+
+//    //        /// <summary>
+//    //        /// Notifies of the progress.
+//    //        /// </summary>
+//    //        /// <param name="percentProgress">
+//    //        /// Progress percentage.
+//    //        /// </param>
+//    //        public void ReportProgress(int percentProgress) => backgroundWorker.ReportProgress(percentProgress);
+
+//    //        /// <summary>
+//    //        /// Notifies of the progress.
+//    //        /// </summary>
+//    //        /// <param name="percentProgress">
+//    //        /// Progress percentage.
+//    //        /// </param>
+//    //        /// <param name="userState">
+//    //        /// User object.
+//    //        /// </param>
+//    //        public void ReportProgress(int percentProgress, object userState) => backgroundWorker.ReportProgress(percentProgress, userState);
+
+//    //        public static FileTypes FileTypeToFileTypeFlags(FileType fileType)
+
+//    //        {
+
+//    //            fileType.ThrowIfNotValidEnumValue();
+
+//    //            if (fileType == FileType.SpecialFolder) throw new ArgumentException("'" + nameof(fileType) + "' must be None, Folder, File, Drive, Link or Archive. '" + nameof(fileType) + "' is " + fileType.ToString() + ".");
+
+//    //            switch (fileType)
+
+//    //            {
+
+//    //                case FileType.Other:
+
+//    //                    return FileTypes.None;
+
+//    //                case FileType.Folder:
+
+//    //                    return FileTypes.Folder;
+
+//    //                case FileType.File:
+
+//    //                    return FileTypes.File;
+
+//    //                case FileType.Drive:
+
+//    //                    return FileTypes.Drive;
+
+//    //                case FileType.Link:
+
+//    //                    return FileTypes.Link;
+
+//    //                case FileType.Archive:
+
+//    //                    return FileTypes.Archive;
+
+//    //                default:
+
+//    //                    // This point should never be reached.
+
+//    //                    throw new NotImplementedException();
+
+//    //            }
+
+//    //        }
+
+//    //        /// <summary>
+//    //        /// When overridden in a derived class, provides a handler for the <see cref="DoWork"/> event.
+//    //        /// </summary>
+//    //        /// <param name="e">Event args for the current event</param>
+//    //        protected abstract void OnDoWork(DoWorkEventArgs e);
+
+//    //        // /// <summary>
+//    //        // /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class with an <see cref="IBrowsableObjectInfo"/>.
+//    //        // /// </summary>
+//    //        // /// <param name="path">The path from which load items.</param>
+//    //        // public BrowsableObjectInfoItemsLoader(IBrowsableObjectInfo path) { path.ItemsLoader = this; }
+
+//    //        /// <summary>
+//    //        /// Loads the items of the <see cref="IBrowsableObjectInfoLoader.Path"/> object.
+//    //        /// </summary>
+//    //        public virtual void LoadItems() => OnDoWork(new DoWorkEventArgs(null));
+
+//    //        /// <summary>
+//    //        /// Loads the items of the <see cref="IBrowsableObjectInfoLoader.Path"/> object asynchronously.
+//    //        /// </summary>
+//    //        public virtual void LoadItemsAsync() => backgroundWorker.RunWorkerAsync();
+
+//    //        /// <summary>
+//    //        /// Cancels the working asynchronously.
+//    //        /// </summary>
+//    //        public void CancelAsync(object stateInfo) => backgroundWorker.CancelAsync(stateInfo);
+
+//    //        public void CancelAsync() => CancelAsync(null);
+
+//    //        /// <summary>
+//    //        /// Cancels the working.
+//    //        /// </summary>
+//    //        public void Cancel(object stateInfo) => backgroundWorker.Cancel(stateInfo);
+
+//    //        public void Cancel() => Cancel(null);
+
+//    //        /// <summary>
+//    //        /// Suspends the current thread.
+//    //        /// </summary>
+//    //        public void Suspend() => backgroundWorker.Suspend();
+
+//    //        /// <summary>
+//    //        /// Resumes the current thread.
+//    //        /// </summary>
+//    //        public void Resume() => backgroundWorker.Resume();
+
+//    //        IBrowsableObjectInfo Path => PathOverride;
+
+//    //        /// <summary>
+//    //        /// This property is only itented for use in this class and in classes that derive directly from this class and sould be sealed in derived classes and not used directly. You can use the <see cref="Path"/> property instead.
+//    //        /// </summary>
+//    //        /// <seealso cref="Path"/>
+//    //        protected abstract IBrowsableObjectInfo PathOverride { get; set; }
+
+//    //#pragma warning disable CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
+//    //        /// <summary>
+//    //        /// Disposes the current <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/>.
+//    //        /// </summary>
+//    //        public void Dispose() => Dispose(false);
+
+//    //        /// <summary>
+//    //        /// Disposes the current <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/>.
+//    //        /// </summary>
+//    //        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is busy and does not support cancellation.</exception>
+//    //        public void Dispose(bool disposePath)
+
+//    //        {
+
+//    //            IsDisposing = true;
+
+//    //            Dispose(true, disposePath);
+
+//    //            GC.SuppressFinalize(this);
+
+//    //            IsDisposed = true;
+
+//    //            IsDisposing = false;
+
+//    //        }
+
+//    //        ///// <summary>
+//    //        ///// Disposes the current <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> and optionally disposes the related <see cref="Path"/>.
+//    //        ///// </summary>
+//    //        ///// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is busy and does not support cancellation.</exception>
+//    //        //protected sealed override void DisposeOverride(bool disposing) => Dispose(disposing, false);
+
+//    //        /// <summary>
+//    //        /// Disposes the current <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> and optionally disposes the related <see cref="Path"/>.
+//    //        /// </summary>
+//    //        /// <param name="disposePath">Whether to dispose the related <see cref="Path"/>. If this parameter is set to <see langword="true"/>, the <see cref="IBrowsableObjectInfo.ItemsLoader"/>s of the parent and childs of the related <see cref="Path"/> will be disposed recursively.</param>
+//    //        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is busy and does not support cancellation.</exception>
+//    //        protected virtual void Dispose(bool disposing, bool disposePath)
+
+//    //        {
+
+//    //            // base.DisposeOverride(disposing);
+
+//    //            if (disposePath)
+
+//    //                PathOverride.Dispose();
+
+//    //            if (disposing)
+
+//    //                PathOverride = null;
+
+//    //        }
+
+//    //        protected abstract void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e);
+//    //        protected abstract void OnAddingPath(IBrowsableObjectInfo path);
+//    //        protected abstract void OnProgressChanged(ProgressChangedEventArgs e);
+
+//    //#pragma warning restore CA1063 // Implement IDisposable Correctly: Implementation of IDisposable is enhanced for this class.
+
+//    //        /// <summary>
+//    //        /// Disposes the current <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> and optionally disposes the related <see cref="Path"/>.
+//    //        /// </summary>
+//    //        /// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is busy and does not support cancellation.</exception>
+//    //        protected virtual void DisposeOverride(bool disposing) => backgroundWorker.Dispose();
+
+//    //        ~BrowsableObjectInfoLoader()
+
+//    //        {
+
+//    //            DisposeOverride(false);
+
+//    //        }
+
+//    //    }
+
+//    public abstract class BrowsableObjectInfoLoader<TPath, TItems> : IBrowsableObjectInfoLoader<TPath,TItems> where TPath : BrowsableObjectInfo where TItems : BrowsableObjectInfo 
+//    {
+//        public IFileSystemObjectComparer<TItems> FileSystemObjectComparer { get ; set ; }
+
+//        //public void changePath(IBrowsableObjectInfo newValue)
+
+//        //{
+
+
+
+//        //}
+
+//        //protected virtual BrowsableObjectInfo PathOverride { get => _path; set => _path = value; }
+
+//        public IEnumerable<IBrowsableObjectInfoLoaderFilter> Filter { get ; set ; }
+
+//        public TPath Path { get; }
+
+//        protected System.Collections.Generic.LinkedList<TItems> Items { get; }
+
+//        ///// <summary>
+//        ///// This method does anything because it is designed for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation, and is here for overriding only. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
+//        ///// </summary>
+//        ///// <param name="browsableObjectInfoLoader">The cloned <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/>.</param>
+//        //protected virtual void OnDeepClone(BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> browsableObjectInfoLoader) { }
+
+//        ///// <summary>
+//        ///// When overridden in a derived class, gets a deep clone of this <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/>. The <see cref="OnDeepClone(BrowsableObjectInfoLoader{TPath, TItems, TFactory})"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
+//        ///// </summary>
+//        //protected abstract BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride();
+
+//        //public object DeepClone()
+
+//        //{
+
+//        //    Util.Util.throw
+
+//        //    ((IDisposable)this).ThrowIfDisposingOrDisposed();
+
+//        //    BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> browsableObjectInfoLoader = DeepCloneOverride();
+
+//        //    OnDeepClone(browsableObjectInfoLoader);
+
+//        //    return browsableObjectInfoLoader;
+
+//        //}
+
+//        //public virtual bool NeedsObjectsOrValuesReconstruction => FileSystemObjectComparer.NeedsObjectsOrValuesReconstruction;
+
+//        public virtual bool CheckFilter(string path)
+
+//        {
+
+//            if (Filter is null) return true;
+
+//            foreach (string filter in Filter)
+
+//                if (!IO.Path.MatchToFilter(path, filter)) return false;
+
+//            return true;
+
+//        }
+
+//        public static FileTypes FileTypeToFileTypeFlags(FileType fileType)
+
+//        {
+
+//            fileType.ThrowIfNotValidEnumValue();
+
+//            if (fileType == FileType.SpecialFolder) throw new ArgumentException("'" + nameof(fileType) + "' must be None, Folder, File, Drive, Link or Archive. '" + nameof(fileType) + "' is " + fileType.ToString() + ".");
+
+//#if NETFRAMEWORK
+
+//            switch (fileType)
+//            {
+//                case FileType.Other:
+//                    return FileTypes.None;
+//                case FileType.Folder:
+//                    return FileTypes.Folder;
+//                case FileType.File:
+//                    return FileTypes.File;
+//                case FileType.Drive:
+//                    return FileTypes.Drive;
+//                case FileType.Link:
+//                    return FileTypes.Link;
+//                case FileType.Archive:
+//                    return FileTypes.Archive;
+//                default:
+//                    throw new NotImplementedException(); // This point should never be reached.
+//            };
+
+//#else
+
+//            return fileType switch
+//            {
+//                FileType.Other => FileTypes.None,
+//                FileType.Folder => FileTypes.Folder,
+//                FileType.File => FileTypes.File,
+//                FileType.Drive => FileTypes.Drive,
+//                FileType.Link => FileTypes.Link,
+//                FileType.Archive => FileTypes.Archive,
+//                _ => throw new NotImplementedException() // This point should never be reached.
+//            };
+
+//#endif
+//        }
+
+//        // /// <summary>
+//        // /// Initializes a new instance of the <see cref="BrowsableObjectInfoItemsLoader"/> class with an <see cref="IBrowsableObjectInfo"/>.
+//        // /// </summary>
+//        // /// <param name="path">The path from which load items.</param>
+//        // public BrowsableObjectInfoItemsLoader(IBrowsableObjectInfo path) { path.ItemsLoader = this; }
+
+//        public abstract IList<TItems> PreloadItems();
+
+//        ///// <summary>
+//        ///// Loads the items of the <see cref="IBrowsableObjectInfoLoader.Path"/> object.
+//        ///// </summary>
+//        public abstract void LoadItems();
+
+//        /// <summary>
+//        /// Suspends the current thread.
+//        /// </summary>
+//        public abstract void Suspend();
+
+//        /// <summary>
+//        /// Resumes the current thread.
+//        /// </summary>
+//        public abstract void Resume();
+
+//        /// <summary>
+//        /// Cancels the current thread.
+//        /// </summary>
+//        public abstract void Cancel();
+
+//        //IBrowsableObjectInfo Path => PathOverride;
+
+//        ///// <summary>
+//        ///// This property is only itented for use in this class and in classes that derive directly from this class and sould be sealed in derived classes and not used directly. You can use the <see cref="Path"/> property instead.
+//        ///// </summary>
+//        ///// <seealso cref="Path"/>
+//        //protected abstract IBrowsableObjectInfo PathOverride { get; set; }
+
+//        ///// <summary>
+//        ///// Disposes the current <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/>.
+//        ///// </summary>
+//        ///// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is busy and does not support cancellation.</exception>
+//        //public void Dispose()
+
+//        //{
+
+//        //    IsDisposing = true;
+
+//        //    Dispose(true);
+
+//        //    GC.SuppressFinalize(this);
+
+//        //    IsDisposed = true;
+
+//        //    IsDisposing = false;
+
+//        //}
+
+//        ///// <summary>
+//        ///// Disposes the current <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> and optionally disposes the related <see cref="Path"/>.
+//        ///// </summary>
+//        ///// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is busy and does not support cancellation.</exception>
+//        //protected sealed override void DisposeOverride(bool disposing) => Dispose(disposing, false);
+
+//        ///// <summary>
+//        ///// Disposes the current <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> and optionally disposes the related <see cref="Path"/>.
+//        ///// </summary>
+//        ///// <exception cref="InvalidOperationException">This <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is busy and does not support cancellation.</exception>
+//        //protected virtual void Dispose(bool disposing)
+
+//        //{
+
+//        //    // base.DisposeOverride(disposing);
+
+//        //    backgroundWorker.Dispose();
+
+//        //    if (disposing)
+
+//        //        Path = null;
+
+//        //}
+
+//        //protected abstract void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e);
+
+//        // protected abstract void OnAddingPath(IBrowsableObjectInfo path);
+
+//        //protected abstract void OnProgressChanged(ProgressChangedEventArgs e);
+
+//        //#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+//        //        ~BrowsableObjectInfoLoader()
+//        //#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+//        //        {
+
+//        //            Dispose(false);
+
+//        //        }
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> class.
+//        /// </summary>
+//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//        protected BrowsableObjectInfoLoader(BrowsableObjectTreeNode path, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) { }
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> class using a custom comparer.
+//        /// </summary>
+//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+//        protected BrowsableObjectInfoLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation)
+
+//        {
+
+//            WorkerReportsProgress = workerReportsProgress;
+
+//            WorkerSupportsCancellation = workerSupportsCancellation;
+
+//            FileSystemObjectComparer = fileSystemObjectComparer;
+
+//            ProgressChanged += (object sender, ProgressChangedEventArgs e) => OnProgressChanged(e);
+
+//            backgroundWorker.ProgressChanged += (object sender, ProgressChangedEventArgs e) => ProgressChanged(this, e);
+
+//            DoWork += (object sender, DoWorkEventArgs e) => OnDoWork(e);
+
+//            backgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => DoWork(this, e);
+
+//            RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => OnRunWorkerCompleted(e);
+
+//            backgroundWorker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => RunWorkerCompleted(this, e);
+
+//            backgroundWorker.Disposed += (object sender, EventArgs e) => Disposed?.Invoke(this, e);
+
+//            // todo: internal set because this is an initialization
+
+//            Path = path;
+
+//        }
+
+//        // protected IPathModifier<TPath, TItems> PathModifier { get; private set; }
+
+//        private BrowsableObjectTreeNode<TPath, TItems, TFactory> _path;
+
+//        ///// <summary>
+//        ///// This property is here only for interoperability with the non-generic base class <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> and is only intented for use in the <see cref="BrowsableObjectInfoLoader{TPath}"/> generic class and should not be used directly.
+//        ///// </summary>
+//        ///// <seealso cref="BrowsableObjectInfoLoader.Path"/>
+//        ///// <seealso cref="BrowsableObjectInfoLoader{TPath}.Path"/>
+//        //protected sealed override IBrowsableObjectInfo PathOverride { get => Path; set => Path = (TPath) value; } 
+
+//        IBrowsableObjectTreeNode<TPath, TItems> IBrowsableObjectInfoLoader<TPath, TItems>.Path => Path;
+
+//        /// <summary>
+//        /// Gets the path from which to load the items.
+//        /// </summary>
+//        public BrowsableObjectTreeNode<TPath, TItems, TFactory> Path
+//        {
+//            get => _path; set
+
+//            {
+
+//                if (IsBusy)
+
+//                    throw new InvalidOperationException("The items loader is busy.");
+
+//                if (!(value?.ItemsLoader is null))
+
+//                    throw new InvalidOperationException("The given path has already been added to an items loader.");
+
+//                OnPathChanging(value);
+
+//                if (_path is object)
+
+//                    _path.ItemsLoader = null;
+
+//                _path = value;
+
+//                if (value is object)
+
+//                    value.ItemsLoader = this;
+
+//                OnPathChanged(value);
+
+//            }
+//        }
+
+//        //protected void Reset()
+
+//        //{
+
+//        //    if (object.ReferenceEquals(_path, null)) return;
+
+//        //    if (!_path.IsBrowsable)
+
+//        //        throw new InvalidOperationException(string.Format(Generic.NotBrowsableObject, _path.FileType.ToString(), _path.ToString()));
+
+//        //    else if (IsBusy)
+
+//        //        Cancel();
+
+//        //    Path. ItemCollection.Clear();
+
+//        //}
+
+//        protected virtual void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e) => Path.AreItemsLoaded = true;
+
+//        protected virtual void OnProgressChanged(ProgressChangedEventArgs e)
+//        {
+
+//            Debug.WriteLine("e.UserState is BrowsableObjectTreeNode<TItems, TSubItems, TFactory>: " + (e.UserState is BrowsableObjectTreeNode<TItems, TSubItems, TFactory>).ToString());
+
+//            Debug.WriteLine("e.UserState.GetType(): " + e.UserState.GetType().ToString());
+
+//            try
+//            {
+
+//                if (e.UserState is ITreeNode item)
+
+//                    Path.Insert(Path.Count, (ReadOnlyTreeNode<TItems>)item);
+
+//                Debug.WriteLine("azerty: " + Path.Count);
+
+//            }
+//            catch (Exception ex) { Debug.WriteLine("azerty: " + ex.Message); }
+
+//        }
+
+//        /// <summary>
+//        /// Provides ability for classes that derive from this one to do operations when the path is changing.
+//        /// </summary>
+//        /// <param name="path">The new path to set the <see cref="Path"/> property with.</param>
+//        protected virtual void OnPathChanging(BrowsableObjectTreeNode<TPath, TItems, TFactory> path) { }
+
+//        protected virtual void OnPathChanged(BrowsableObjectTreeNode<TPath, TItems, TFactory> path) { }
+
+//    }
+
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System.Collections.Generic;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+
+//    public interface IFileSystemObjectLoader : IBrowsableObjectInfoLoader
+//    {
+
+//        FileTypes FileTypes { get; set; }
+
+//    }
+
+//    public abstract class FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory> : BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory>, IFileSystemObjectLoader where TPath : FileSystemObjectInfo where TItems : FileSystemObjectInfo where TSubItems : FileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory
+//    {
+
+//        private readonly FileTypes _fileTypes = Util.Util.GetAllEnumFlags<FileTypes>();
+
+//        public FileTypes FileTypes { get => _fileTypes; set => this.SetBackgroundWorkerProperty(nameof(FileTypes), nameof(_fileTypes), value, typeof(FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory>), true); }
+
+//        protected FileSystemObjectLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) { }
+
+//        protected FileSystemObjectLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, IFileSystemObjectComparer<IFileSystemObject> browsableObjectInfoComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, browsableObjectInfoComparer, workerReportsProgress, workerSupportsCancellation) => _fileTypes = fileTypes;
+
+//    }
+//}
+
+/* Copyright © Pierre Sprimont, 2020
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+
+//    ///// <summary>
+//    ///// Provides common properties for <see cref="IBrowsableObjectInfo"/> factories.
+//    ///// </summary>
+//    //public interface IBrowsableObjectInfoFactory /*: IDeepCloneable*/
+
+//    //{
+
+//    //    // TODO:
+
+//    //    // IBackgroundWorker Loader { get; }
+
+//    //}
+
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using WinCopies.Collections;
+//using WinCopies.Util;
+//using IDisposable = WinCopies.Util.IDisposable;
+
+//namespace WinCopies.IO
+//{
+
+//    public interface IBrowsableObjectInfoLoaderFilter
+//    {
+
+//        string FileName { get; }
+
+//    }
+
+//    public class BrowsableObjectInfoLoaderFilter : IBrowsableObjectInfoLoaderFilter
+//    {
+
+//        public string FileName { get; }
+
+//        public BrowsableObjectInfoLoaderFilter(string fileName) => FileName = fileName;
+
+//    }
+
+//    ///// <summary>
+//    ///// Represents a loader that can be used to load <see cref="IBrowsableObjectInfo"/>. Note: An <see cref="InvalidOperationException"/> is thrown when the <see cref="System.IDisposable.Dispose"/> method is called if this <see cref="IBrowsableObjectInfoLoader{T}"/> is busy and does not support cancellation.
+//    ///// </summary>
+//    public interface IBrowsableObjectInfoLoader<TPath, TItems> /* : IBackgroundWorker, IDeepCloneable, IDisposable*/ where TPath : IBrowsableObjectInfo where TItems : IBrowsableObjectInfo
+
+//    {
+
+//        IFileSystemObjectComparer<TItems> FileSystemObjectComparer { get; set; }
+
+//        IEnumerable<IBrowsableObjectInfoLoaderFilter> Filter { get; set; }
+
+//        TPath Path { get; }
+
+//        //bool CheckFilter(string path);
+
+//        int PreloadItems();
+
+//        void LoadItems();
+
+//    }
+
+//    //public interface IBrowsableObjectInfoLoader<TPath, TItems> : IBrowsableObjectInfoLoader where TPath : IBrowsableObjectInfo where TItems : IBrowsableObjectInfo
+
+//    //{
+
+//    //    IBrowsableObjectTreeNode<TPath, TItems> Path { get; }
+
+//    //}
+
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using Microsoft.Win32;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+//    public interface IRegistryItemInfoFactory : IBrowsableObjectInfoFactory
+//    {
+
+//        IBrowsableObjectInfo GetBrowsableObjectInfo();
+
+//        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate);
+
+//        IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath);
+
+//        IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, string valueName);
+
+//        IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName);
+
+//    }
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using Microsoft.WindowsAPICodePack.Shell;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+//    /// <summary>
+//    /// A factory to create new <see cref="IBrowsableObjectInfo"/>s.
+//    /// </summary>
+//    public interface IShellObjectInfoFactory : IBrowsableObjectInfoFactory
+//    {
+
+//        IArchiveItemInfoFactory ArchiveItemInfoFactory { get; }
+
+//        /// <summary>
+//        /// Gets a new <see cref="IBrowsableObjectInfo"/> that represents the given <see cref="ShellObject"/> and path.
+//        /// </summary>
+//        /// <param name="shellObject">The <see cref="ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
+//        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
+//        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, ShellObject shellObject, DeepClone<ShellObject> shellObjectDelegate);
+
+//    }
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Management;
+//using System.Text;
+//using System.Threading.Tasks;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+
+//    public interface IWMIItemInfoFactory : IBrowsableObjectInfoFactory
+//    {
+
+//        IWMIItemInfoFactoryOptions Options { get; }
+
+//        /// <summary>
+//        /// Gets a new instance of the <see cref="IBrowsableObjectInfo"/> class.
+//        /// </summary>
+//        /// <returns>A new instance of the <see cref="IBrowsableObjectInfo"/> class.</returns>
+//        IBrowsableObjectInfo GetBrowsableObjectInfo();
+
+//        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate);
+
+//        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType);
+
+//    }
+
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using Microsoft.Win32;
+//using System;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+
+//    public class RegistryItemInfoFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory
+//    {
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="RegistryItemInfoFactory"/> class.
+//        /// </summary>
+//        public RegistryItemInfoFactory() : base() { }
+
+//        protected override BrowsableObjectInfoFactory DeepCloneOverride() => new RegistryItemInfoFactory();
+
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => new RegistryItemInfo();
+
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate) => new RegistryItemInfo(registryKey, registryKeyDelegate);
+
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath) => new RegistryItemInfo(registryKeyPath);
+
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, string valueName) => new RegistryItemInfo(registryKey, registryKeyDelegate, valueName);
+
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string registryKeyPath, string valueName) => new RegistryItemInfo(registryKeyPath, valueName);
+
+//    }
+
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System;
+//using System.Collections.Generic;
+//using System.ComponentModel;
+//using System.Reflection;
+//using System.Security;
+
+//using Microsoft.Win32;
+//using WinCopies.Collections;
+//using WinCopies.Util;
+//using static WinCopies.Util.Util;
+
+//namespace WinCopies.IO
+//{
+
+//    [Flags]
+//    public enum RegistryItemTypes
+
+//    {
+
+//        None = 0,
+
+//        RegistryKey = 1,
+
+//        RegistryValue = 2
+
+//    }
+
+//    public interface IRegistryKeyLoader : IBrowsableObjectInfoLoader
+//    {
+
+//        RegistryItemTypes RegistryItemTypes { get; set; }
+
+//    }
+
+//    public class RegistryKeyLoader: BrowsableObjectInfoLoader, IRegistryKeyLoader where TPath : RegistryItemInfo where TItems : RegistryItemInfo where TSubItems : RegistryItemInfo where TFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory where TItemsFactory : BrowsableObjectInfoFactory, IRegistryItemInfoFactory
+//    {
+
+//        //protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, RegistryItemTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
+
+//        private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
+
+//        public RegistryItemTypes RegistryItemTypes
+//        {
+
+//            get => _registryItemTypes;
+
+//            set => _ = this.SetBackgroundWorkerProperty(nameof(RegistryItemTypes), nameof(_registryItemTypes), value, typeof(RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>), true);
+
+//        }
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TSubItems, TFactory, TItemsFactory}"/> class.
+//        /// </summary>
+//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//        /// <param name="registryItemTypes">The registry item types to load.</param>
+//        public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, RegistryItemTypes registryItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, registryItemTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) => RegistryItemTypes = registryItemTypes;
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TSubItems, TFactory, TItemsFactory}"/> class using a custom comparer.
+//        /// </summary>
+//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+//        /// <param name="registryItemTypes">The registry item types to load.</param>
+//        public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, RegistryItemTypes registryItemTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) => _registryItemTypes = registryItemTypes;
+
+//        //public override bool CheckFilter(string path)
+
+//        //{
+
+//        //    if (Filter == null) return true;
+
+//        //    foreach (string filter in Filter)
+
+//        //    {
+
+//        //        bool checkFilters(string[] filters)
+
+//        //        {
+
+//        //            foreach (string _filter in filters)
+
+//        //            {
+
+//        //                if ( string.IsNullOrEmpty( _filter ) ) continue;
+
+//        //                if (path.Length >= _filter.Length && path.Contains(_filter))
+
+//        //                    path = path.Substring(path.IndexOf(_filter) + _filter.Length);
+
+//        //                else return false;
+
+//        //            }
+
+//        //            return true;
+
+//        //        }
+
+//        //        return checkFilters(filter.Split('*'));
+
+//        //    }
+
+//        //    return true;
+
+//        //}
+
+//        protected override void OnDoWork(DoWorkEventArgs e)
+//        {
+
+//            if (RegistryItemTypes == RegistryItemTypes.None)
+
+//                return;
+
+//            // todo: 'if' to remove if not necessary:
+
+//            // if (Path is IRegistryItemInfo registryItemInfo)
+
+//            // {
+
+//            var paths = new ArrayBuilder<PathInfo>();
+
+//            PathInfo pathInfo;
+
+//            void checkAndAppend(string pathWithoutName, string name, bool isValue)
+
+//            {
+
+//                string path = pathWithoutName + IO.Path.PathSeparator + name;
+
+//                if (CheckFilter(path))
+
+//                    _ = paths.AddLast(pathInfo = new PathInfo(path, path.RemoveAccents(), name, null, RegistryItemInfo.DefaultRegistryKeyDeepClone, isValue));
+
+//            }
+
+//            switch (Path.Value.RegistryItemType)
+
+//            {
+
+//                case RegistryItemType.RegistryRoot:
+
+//                    if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryKey))
+
+//                    {
+
+//                        FieldInfo[] _registryKeyFields = typeof(Microsoft.Win32.Registry).GetFields();
+
+//                        string name;
+
+//                        foreach (FieldInfo fieldInfo in _registryKeyFields)
+
+//                        {
+
+//                            name = ((RegistryKey)fieldInfo.GetValue(null)).Name;
+
+//                            checkAndAppend(name, name, false);
+
+//                        }
+
+//                    }
+
+//                    break;
+
+//                case RegistryItemType.RegistryKey:
+
+//                    string[] items;
+
+//                    if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryKey))
+
+//                        try
+
+//                        {
+
+//                            items = Path.Value.RegistryKey.GetSubKeyNames();
+
+//                            foreach (string item in items)
+
+//                                checkAndAppend(item.Substring(0, item.LastIndexOf(IO.Path.PathSeparator)), item.Substring(item.LastIndexOf(IO.Path.PathSeparator) + 1), false);
+
+//                        }
+
+//                        catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
+
+//                    if (RegistryItemTypes.HasFlag(RegistryItemTypes.RegistryValue))
+
+//                        try
+
+//                        {
+
+//                            items = Path.Value.RegistryKey.GetValueNames();
+
+//                            foreach (string item in items)
+
+//                                checkAndAppend(Path.Value.RegistryKey.Name, item, true);
+
+//                        }
+
+//                        catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
+
+//                    break;
+
+//            }
+
+
+
+//            IEnumerable<PathInfo> pathInfos;
+
+
+
+//            if (FileSystemObjectComparer == null)
+
+//                pathInfos = (IEnumerable<PathInfo>)paths;
+
+//            else
+
+//            {
+
+//                var _paths = paths.ToList();
+
+//                _paths.Sort(FileSystemObjectComparer);
+
+//                pathInfos = (IEnumerable<PathInfo>)_paths;
+
+//            }
+
+
+
+//            using IEnumerator<PathInfo> pathsEnum = pathInfos.GetEnumerator();
+
+//            while (pathsEnum.MoveNext())
+
+//                try
+
+//                {
+
+//                    do
+
+//                        ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>((TItems)(pathsEnum.Current.IsValue ? ((IRegistryItemInfoFactory)Path.Factory).GetBrowsableObjectInfo(pathsEnum.Current.Path.Substring(0, pathsEnum.Current.Path.Length - pathsEnum.Current.Name.Length - 1 /* We remove one more character to remove the backslash between the registry key path and the registry key value name. */ ), pathsEnum.Current.Name) : Path.Factory.GetBrowsableObjectInfo(pathsEnum.Current.Path)), (TItemsFactory)Path.Factory.DeepClone()));
+
+//                    while (pathsEnum.MoveNext());
+
+//                }
+
+//                catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { }
+
+
+
+//            // }
+
+//        }
+
+//        protected class PathInfo : IO.PathInfo
+//        {
+
+//            /// <summary>
+//            /// Gets the localized name of this <see cref="PathInfo"/>.
+//            /// </summary>
+//            public override string LocalizedName => Name;
+
+//            /// <summary>
+//            /// Gets the name of this <see cref="PathInfo"/>.
+//            /// </summary>
+//            public override string Name { get; }
+
+//            public bool IsValue { get; }
+
+//            public RegistryKey RegistryKey { get; }
+
+//            public DeepClone<RegistryKey> RegistryKeyDelegate { get; }
+
+//            public PathInfo(string path, string normalizedPath, string name, RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, bool isValue) : base(path, normalizedPath)
+//            {
+
+//                Name = name;
+
+//                RegistryKey = registryKey;
+
+//                RegistryKeyDelegate = registryKeyDelegate;
+
+//                IsValue = isValue;
+
+//            }
+//        }
+//    }
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using Microsoft.WindowsAPICodePack.Shell;
+//using System;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+
+//    // todo: create a read-only wrapper for shellobjectinfo
+
+//    /// <summary>
+//    /// A factory to create new <see cref="ShellObjectInfo"/>s.
+//    /// </summary>
+//    public class ShellObjectInfoFactory : BrowsableObjectInfoFactory, IShellObjectInfoFactory
+//    {
+
+//        /// <summary>
+//        /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
+//        /// </summary>
+//        public override bool NeedsObjectsOrValuesReconstruction => ArchiveItemInfoFactory?.NeedsObjectsOrValuesReconstruction == true;
+
+//        public IArchiveItemInfoFactory ArchiveItemInfoFactory { get; }
+
+//        // IArchiveItemInfoFactory IShellObjectInfoFactory.ArchiveItemInfoFactory => ArchiveItemInfoFactory;
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="ShellObjectInfoFactory"/> class.
+//        /// </summary>
+//        public ShellObjectInfoFactory() : this(null) { }
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
+//        /// </summary>
+//        /// <param name="archiveItemInfoFactory">The <see cref="ArchiveItemInfoFactory"/> this factory will use for creating new items.</param>
+//        public ShellObjectInfoFactory(ArchiveItemInfoFactory archiveItemInfoFactory) : base() => ArchiveItemInfoFactory = archiveItemInfoFactory;
+
+//        /// <summary>
+//        /// Gets a new <see cref="ShellObjectInfo"/> that represents the given <see cref="ShellObject"/>, path, <see cref="FileType"/> and <see cref="SpecialFolder"/>.
+//        /// </summary>
+//        /// <param name="path">The path of this <see cref="ShellObjectInfo"/>.</param>
+//        /// <param name="fileType">The file type of the new item.</param>
+//        /// <param name="specialFolder">The special folder type of the new item.</param>
+//        /// <param name="shellObjectDelegate">The delegate that will be used by the <see cref="BrowsableObjectInfo.DeepClone()"/> method by this factory and the new item's <see cref="IDeepCloneable.DeepClone"/> method for creating new items.</param>
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, FileType fileType, SpecialFolder specialFolder, ShellObject shellObject, DeepClone<ShellObject> shellObjectDelegate) => new ShellObjectInfo(path, fileType, specialFolder, shellObject, shellObjectDelegate);
+
+//        protected override BrowsableObjectInfoFactory DeepCloneOverride() => new ShellObjectInfoFactory((ArchiveItemInfoFactory)ArchiveItemInfoFactory?.DeepClone());
+
+//    }
+
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System;
+//using System.Management;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+
+//    public class WMIItemInfoFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory // where TItems : BrowsableObjectInfo, IWMIItemInfo
+//    {
+
+//        /// <summary>
+//        /// Gets a value that indicates whether this object needs to reconstruct objects on deep cloning.
+//        /// </summary>
+//        public override bool NeedsObjectsOrValuesReconstruction => !(Options is null);
+
+//        protected override BrowsableObjectInfoFactory DeepCloneOverride() => new WMIItemInfoFactory((WMIItemInfoFactoryOptions)Options?.DeepClone());
+
+//        private WMIItemInfoFactoryOptions _options;
+
+//        public WMIItemInfoFactoryOptions Options
+//        {
+
+//            get => _options; set
+//            {
+
+//                // ThrowOnInvalidPropertySet(this);
+
+//                _options.Factory = null;
+
+//                value.Factory = this;
+
+//                _options = value;
+
+//            }
+
+//        }
+
+//        IWMIItemInfoFactoryOptions IWMIItemInfoFactory.Options => _options;
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="WMIItemInfoFactory"/> class.
+//        /// </summary>
+//        public WMIItemInfoFactory() : base() { }
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="WMIItemInfoFactory"/> class using custom options.
+//        /// </summary>
+//        public WMIItemInfoFactory(WMIItemInfoFactoryOptions options) : base() => _options = options;
+
+//        /// <summary>
+//        /// Gets a new instance of the <see cref="WMIItemInfo"/> class.
+//        /// </summary>
+//        /// <returns>A new instance of the <see cref="WMIItemInfo"/> class.</returns>
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo() => new WMIItemInfo();
+
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(path, wmiItemType, new ManagementObject(new ManagementScope(path, _options?.ConnectionOptions is null ? null : WMIItemInfo.DefaultConnectionOptionsDeepClone(_options?.ConnectionOptions, null)), new ManagementPath(path), _options?.ObjectGetOptions is null ? null : WMIItemInfo.DefaultObjectGetOptionsDeepClone(_options?.ObjectGetOptions)), _managementObject => _managementObject is ManagementClass managementClass ? WMIItemInfo.DefaultManagementClassDeepCloneDelegate(managementClass, null) : _managementObject is ManagementObject __managementObject ? WMIItemInfo.DefaultManagementObjectDeepClone(__managementObject, null) : throw new ArgumentException("The given object must be a ManagementClass or a ManagementObject.", "managementObject"));
+
+//        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate) => new WMIItemInfo(path, wmiItemType, managementObject, managementObjectDelegate);
+//    }
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Management;
+//using System.Text;
+//using System.Threading.Tasks;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+//    public interface IWMIItemInfoFactoryOptions : IDeepCloneable
+//    {
+
+//        IWMIItemInfoFactory Factory { get; }
+
+//        ConnectionOptions ConnectionOptions { get; set; }
+
+//        ObjectGetOptions ObjectGetOptions { get; set; }
+
+//        EnumerationOptions EnumerationOptions { get; set; }
+
+//    }
+
+//    public class WMIItemInfoFactoryOptions : IWMIItemInfoFactoryOptions
+//    {
+
+//        public IWMIItemInfoFactory Factory { get; internal set; }
+
+//        private ConnectionOptions _connectionOptions;
+
+//        private readonly DeepClone<ConnectionOptions> _connectionOptionsDelegate;
+
+//        /// <summary>
+//        /// Gets or sets options for the WMI connections.
+//        /// </summary>
+//        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader{T}"/> is busy.</exception>
+//        protected virtual ConnectionOptions ConnectionOptionsOverride { get => _connectionOptions; set => _connectionOptions = value; }
+
+//        /// <summary>
+//        /// Gets or sets options for the WMI connections.
+//        /// </summary>
+//        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader{T}"/> is busy.</exception>
+//        public ConnectionOptions ConnectionOptions
+//        {
+//            get => ConnectionOptionsOverride; set
+//            {
+
+//                if (!(Factory is null))
+
+//                    // BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory);
+
+//                ConnectionOptionsOverride = value;
+
+//            }
+//        }
+
+//        private ObjectGetOptions _objectGetOptions;
+
+//        private readonly DeepClone<ObjectGetOptions> _objectGetOptionsDelegate;
+
+//        /// <summary>
+//        /// Gets or sets options for getting management objects.
+//        /// </summary>
+//        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader{T}"/> is busy.</exception>
+//        protected virtual ObjectGetOptions ObjectGetOptionsOverride
+//        {
+//            get => _objectGetOptions; set =>
+
+//                // if (!(Factory is null))
+
+//                // BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory);
+
+//                _objectGetOptions = value;
+//        }
+
+//        /// <summary>
+//        /// Gets or sets options for getting management objects.
+//        /// </summary>
+//        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader{T}"/> is busy.</exception>
+//        public ObjectGetOptions ObjectGetOptions
+
+//        {
+
+//            get => ObjectGetOptionsOverride; set =>
+
+//                // if (!(Factory is null))
+
+//                // BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory);
+
+//                ObjectGetOptionsOverride = value;
+
+//        }
+
+//        private EnumerationOptions _enumerationOptions;
+
+//        private readonly DeepClone<EnumerationOptions> _enumerationOptionsDelegate;
+
+//        /// <summary>
+//        /// Gets or sets options for management objects.
+//        /// </summary>
+//        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader{T}"/> is busy.</exception>
+//        protected virtual EnumerationOptions EnumerationOptionsOverride { get => _enumerationOptions; set => _enumerationOptions = value; }
+
+//        /// <summary>
+//        /// Gets or sets options for management objects.
+//        /// </summary>
+//        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IBrowsableObjectInfoLoader{T}"/> is busy.</exception>
+//        public virtual EnumerationOptions EnumerationOptions
+//        {
+//            get => EnumerationOptionsOverride; set =>
+
+//                // if (!(Factory is null))
+
+//                // BrowsableObjectInfoFactory.ThrowOnInvalidPropertySet(Factory);
+
+//                EnumerationOptionsOverride = value;
+//        }
+
+//        public bool NeedsObjectsOrValuesReconstruction => true;
+
+//        public WMIItemInfoFactoryOptions() : this(null, null, null) { }
+
+//        public WMIItemInfoFactoryOptions(DeepClone<ConnectionOptions> connectionOptions, DeepClone<ObjectGetOptions> objectGetOptions, DeepClone<EnumerationOptions> enumerationOptions)
+
+//        {
+
+//            _connectionOptionsDelegate = connectionOptions;
+
+//            _connectionOptions = connectionOptions?.Invoke(null);
+
+//            _objectGetOptionsDelegate = objectGetOptions;
+
+//            _objectGetOptions = objectGetOptions?.Invoke(null);
+
+//            _enumerationOptionsDelegate = enumerationOptions;
+
+//            _enumerationOptions = enumerationOptions?.Invoke(null);
+
+//        }
+
+//        protected virtual void OnDeepClone(WMIItemInfoFactoryOptions wMIItemInfoFactoryOptions) { }
+
+//        protected virtual WMIItemInfoFactoryOptions DeepCloneOverride() => new WMIItemInfoFactoryOptions(_connectionOptionsDelegate, _objectGetOptionsDelegate, _enumerationOptionsDelegate);
+
+//        public object DeepClone()
+
+//        {
+
+//            WMIItemInfoFactoryOptions options = DeepCloneOverride();
+
+//            OnDeepClone(options);
+
+//            return options;
+
+//        }
+
+//    }
+//}
+
+///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+//using System;
+//using System.Collections.Generic;
+//using System.ComponentModel;
+//using System.Management;
+//using System.Threading;
+//using WinCopies.Collections;
+//using WinCopies.Util;
+
+//namespace WinCopies.IO
+//{
+//    public interface IWMILoader : IBrowsableObjectInfoLoader
+//    {
+
+//        /// <summary>
+//        /// Gets or sets the WMI item types to load.
+//        /// </summary>
+//        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="IWMILoader"/> is busy.</exception>
+//        WMIItemTypes WMIItemTypes { get; set; }
+
+//    }
+
+//    /// <summary>
+//    /// A class for easier <see cref="ManagementBaseObject"/> items loading.
+//    /// </summary>
+//    public class WMILoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory>, IWMILoader where TPath : WMIItemInfo where TItems : WMIItemInfo where TSubItems : WMIItemInfo where TFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory where TItemsFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
+//    {
+
+//        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new WMILoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, WMIItemTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
+
+//        private readonly WMIItemTypes _wmiItemTypes;
+
+//        /// <summary>
+//        /// Gets or sets the WMI item types to load.
+//        /// </summary>
+//        /// <exception cref="InvalidOperationException">Exception thrown when this property is set while the <see cref="WMILoader{TPath, TItems, TSubItems, TFactory}"/> is busy.</exception>
+//        public WMIItemTypes WMIItemTypes { get => _wmiItemTypes; set => this.SetBackgroundWorkerProperty(nameof(WMIItemTypes), nameof(_wmiItemTypes), value, typeof(WMILoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>), true); }
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> class.
+//        /// </summary>
+//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//        /// <param name="wmiItemTypes">The WMI item types to load.</param>
+//        public WMILoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, WMIItemTypes wmiItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, wmiItemTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) { }
+
+//        /// <summary>
+//        /// Initializes a new instance of the <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> class using a custom comparer.
+//        /// </summary>
+//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+//        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+//        /// <param name="wmiItemTypes">The WMI item types to load.</param>
+//        public WMILoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, WMIItemTypes wmiItemTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) => _wmiItemTypes = wmiItemTypes;
+
+//        //public override bool CheckFilter(string path) => throw new NotImplementedException();
+
+//        protected override void OnDoWork(DoWorkEventArgs e)
+//        {
+
+//            var paths = new ArrayBuilder<PathInfo>();
+
+//            string _path;
+
+//            bool dispose = false;
+
+//            // #pragma warning disable IDE0019 // Pattern Matching
+//            var managementClass = Path.Value.ManagementObject as ManagementClass;
+//            // #pragma warning restore IDE0019 // Pattern Matching
+
+//            if (managementClass == null)
+
+//            {
+
+//                dispose = true;
+
+//                // #pragma warning disable IDE0067 // Dispose objects before losing scope
+//                managementClass = new ManagementClass(new ManagementScope(Path.Value.Path, Path.Factory.Options?.ConnectionOptions), new ManagementPath(Path.Value.Path), Path.Factory.Options?.ObjectGetOptions);
+//                // #pragma warning restore IDE0067 // Dispose objects before losing scope
+
+//            }
+
+//            if (Path.Value.WMIItemType == WMIItemType.Namespace)
+
+//            {
+
+//                // managementClass = Path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
+
+//                if (WMIItemTypes.HasFlag(WMIItemTypes.Namespace))
+
+//                    try
+//                    {
+
+//                        managementClass.Get();
+
+//                        using ManagementObjectCollection.ManagementObjectEnumerator instances = (Path.Factory.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(Path.Factory.Options?.EnumerationOptions)).GetEnumerator();
+//                        ManagementBaseObject instance;
+
+//                        while (instances.MoveNext())
+
+//                            try
+
+//                            {
+
+//                                do
+
+//                                {
+
+//                                    instance = instances.Current;
+
+//                                    _path = WMIItemInfo.GetPath(instance, WMIItemType.Namespace);
+
+//                                    if (CheckFilter(_path))
+
+//                                        _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Namespace), WMIItemType.Namespace, instance, managementBaseObject => WMIItemInfo.DefaultManagementObjectDeepClone(managementBaseObject as ManagementClass ?? throw new NotSupportedException("The object is not a ManagementObject."), null)));
+
+//                                }
+
+//                                while (instances.MoveNext());
+
+//                            }
+
+//                            // #pragma warning disable CA1031 // Do not catch general exception types
+//                            catch (Exception ex) when (!(ex is ThreadAbortException)) { }
+
+//                    }
+
+//                    // #pragma warning disable CA1031 // Do not catch general exception types
+//                    catch (Exception ex) when (!(ex is ThreadAbortException)) { }
+//                // #pragma warning restore CA1031 // Do not catch general exception types
+
+//                if (WMIItemTypes.HasFlag(WMIItemTypes.Class))
+
+//                    try
+
+//                    {
+
+//                        // MessageBox.Show(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length));
+//                        // managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path.Substring(0, Path.Path.Length - ":__NAMESPACE".Length)), Path.Factory?.Options?.ObjectGetOptions);
+
+//                        //#if DEBUG
+//                        //                        if (Path.Path.Contains("CIM"))
+
+//                        //                            MessageBox.Show(instances.Count.ToString());
+//                        //#endif
+
+//                        ManagementBaseObject instance;
+
+//                        using ManagementObjectCollection.ManagementObjectEnumerator instances = (Path.Factory?.Options?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(Path.Factory?.Options?.EnumerationOptions)).GetEnumerator();
+//                        while (instances.MoveNext())
+
+//                            try
+
+//                            {
+
+//                                do
+
+//                                {
+
+//                                    instance = instances.Current;
+
+//                                    _path = WMIItemInfo.GetPath(instance, WMIItemType.Class);
+
+//                                    if (CheckFilter(_path))
+
+//                                        _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Class), WMIItemType.Class, instance, managementBaseObject => WMIItemInfo.DefaultManagementObjectDeepClone(managementBaseObject as ManagementClass ?? throw new NotSupportedException("The object is not a ManagementObject."), null)));
+
+//                                } while (instances.MoveNext());
+
+//                            }
+
+//#pragma warning disable CA1031 // Do not catch general exception types
+//                            catch (Exception ex) when (!(ex is ThreadAbortException)) { }
+
+//                    }
+
+//#pragma warning disable CA1031 // Do not catch general exception types
+//                    catch (Exception ex) when (!(ex is ThreadAbortException)) { }
+//#pragma warning restore CA1031 // Do not catch general exception types
+
+//            }
+
+//            else if (Path.Value.WMIItemType == WMIItemType.Class && WMIItemTypes.HasFlag(WMIItemTypes.Instance))
+
+//            {
+
+//                try
+//                {
+
+//                    managementClass.Get();
+
+//                    ManagementBaseObject instance;
+
+//                    using ManagementObjectCollection.ManagementObjectEnumerator instances = (Path.Factory?.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(Path.Factory?.Options?.EnumerationOptions)).GetEnumerator();
+//                    while (instances.MoveNext())
+
+//                        try
+
+//                        {
+
+//                            do
+
+//                            {
+
+//                                instance = instances.Current;
+
+//                                _path = WMIItemInfo.GetPath(instance, WMIItemType.Instance);
+
+//                                if (CheckFilter(_path))
+
+//                                    _ = paths.AddLast(new PathInfo(_path, _path.RemoveAccents(), WMIItemInfo.GetName(instance, WMIItemType.Instance), WMIItemType.Instance, instance, managementBaseObject => WMIItemInfo.DefaultManagementObjectDeepClone(managementBaseObject as ManagementClass ?? throw new NotSupportedException("The object is not a ManagementObject."), null)));
+
+//                            } while (instances.MoveNext());
+
+//                        }
+
+//                        // #pragma warning disable CA1031 // Do not catch general exception types
+//                        catch (Exception ex) when (!(ex is ThreadAbortException)) { }
+//                    // #pragma warning restore CA1031 // Do not catch general exception types
+
+//                }
+
+//                // #pragma warning disable CA1031 // Do not catch general exception types
+//                catch (Exception ex) when (!(ex is ThreadAbortException)) { }
+//                // #pragma warning restore CA1031 // Do not catch general exception types
+
+//                if (dispose)
+
+//                    managementClass.Dispose();
+
+//            }
+
+
+
+//            IEnumerable<PathInfo> pathInfos;
+
+
+
+//            if (FileSystemObjectComparer == null)
+
+//                pathInfos = paths;
+
+//            else
+
+//            {
+
+//                var _paths = paths.ToList();
+
+//                _paths.Sort((System.Collections.Generic.IComparer<PathInfo>)FileSystemObjectComparer);
+
+//                pathInfos = _paths;
+
+//            }
+
+
+
+//            PathInfo path_;
+
+
+
+//            using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
+
+//                while (_paths.MoveNext())
+
+//                    try
+
+//                    {
+
+//                        do
+
+//                        {
+
+//                            path_ = _paths.Current;
+
+//                            // new_Path.LoadThumbnail();
+
+//                            ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>((TItems)(IWMIItemInfo)Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.WMIItemType, path_.ManagementObject, path_.ManagementObjectDelegate /*managementObject => WMIItemInfo.DefaultManagementObjectDeepClone( (ManagementObject) path_.ManagementObject, null )*/), (TItemsFactory)Path.Factory.DeepClone()));
+
+//                        } while (_paths.MoveNext());
+
+//                    }
+
+//#pragma warning disable CA1031 // Do not catch general exception types
+//                    catch (Exception ex) when (!(ex is ThreadAbortException)) { }
+//#pragma warning restore CA1031 // Do not catch general exception types
+
+//        }
+
+//        protected class PathInfo : IO.PathInfo
+//        {
+
+//            /// <summary>
+//            /// Gets the localized name of this <see cref="PathInfo"/>.
+//            /// </summary>
+//            public override string LocalizedName => Name;
+
+//            /// <summary>
+//            /// Gets the name of this <see cref="PathInfo"/>.
+//            /// </summary>
+//            public override string Name { get; }
+
+//            public DeepClone<ManagementBaseObject> ManagementObjectDelegate { get; }
+
+//            public ManagementBaseObject ManagementObject { get; }
+
+//            public WMIItemType WMIItemType { get; }
+
+//            public PathInfo(string path, string normalizedPath, string name, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate) : base(path, normalizedPath)
+//            {
+
+//                Name = name;
+
+//                ManagementObject = managementObject;
+
+//                ManagementObjectDelegate = managementObjectDelegate;
+
+//                WMIItemType = wmiItemType;
+
+//            }
+
+//        }
+
+//    }
+
+//}

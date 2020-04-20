@@ -126,7 +126,13 @@
   <data name="NotValidRegistryKey" xml:space="preserve">
     <value>'{0}' is not a valid registry key.</value>
   </data>
+  <data name="PathMustEndWithFileName" xml:space="preserve">
+    <value>'{0}' must end with '{1}'</value>
+  </data>
   <data name="RegistryKeyNotExists" xml:space="preserve">
     <value>The Registry key does not exist. Path: {0}.</value>
+  </data>
+  <data name="SpecialFolderError" xml:space="preserve">
+    <value>'{0}' can't be a SpecialFolder.</value>
   </data>
 </root>
