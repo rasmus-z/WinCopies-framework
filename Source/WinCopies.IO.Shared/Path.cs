@@ -512,39 +512,39 @@ namespace WinCopies.IO
 
         //        //        }
 
-        /// <summary>
-        /// Returns the <see cref="IO.SpecialFolder"/> value for a given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
-        /// </summary>
-        /// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> from which to return a <see cref="IO.SpecialFolder"/> value.</param>
-        /// <returns>A <see cref="IO.SpecialFolder"/> value that correspond to the given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</returns>
-        public static SpecialFolder GetSpecialFolder(ShellObject shellObject)
+        ///// <summary>
+        ///// Returns the <see cref="IO.SpecialFolder"/> value for a given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.
+        ///// </summary>
+        ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> from which to return a <see cref="IO.SpecialFolder"/> value.</param>
+        ///// <returns>A <see cref="IO.SpecialFolder"/> value that correspond to the given <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/>.</returns>
+        //public static SpecialFolder GetSpecialFolder(ShellObject shellObject)
 
-        {
+        //{
 
-            SpecialFolder? value = null;
+        //    SpecialFolder? value = null;
 
-            PropertyInfo[] knownFoldersProperties = typeof(KnownFolders).GetProperties();
+        //    PropertyInfo[] knownFoldersProperties = typeof(KnownFolders).GetProperties();
 
-            for (int i = 1; i < knownFoldersProperties.Length; i++)
+        //    for (int i = 1; i < knownFoldersProperties.Length; i++)
 
-                // try
-                // {
+        //        // try
+        //        // {
 
-                // for (; i < knownFoldersProperties.Length; i++)
+        //        // for (; i < knownFoldersProperties.Length; i++)
 
-                if (shellObject.ParsingName == knownFoldersProperties[i].Name)
+        //        if (shellObject.ParsingName == knownFoldersProperties[i].Name)
 
-                    value = (SpecialFolder)typeof(SpecialFolder).GetField(knownFoldersProperties[i].Name).GetValue(null);
+        //            value = (SpecialFolder)typeof(SpecialFolder).GetField(knownFoldersProperties[i].Name).GetValue(null);
 
-            // break;
+        //    // break;
 
-            // }
+        //    // }
 
-            // catch (ShellException) { i++; }
+        //    // catch (ShellException) { i++; }
 
-            return value ?? SpecialFolder.OtherFolderOrFile;
+        //    return value ?? SpecialFolder.None;
 
-        }
+        //}
 
         // todo:
 

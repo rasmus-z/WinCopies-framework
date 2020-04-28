@@ -70,10 +70,12 @@ namespace WinCopies.IO
         ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfoLoader{TPath, TItems, TSubItems, TFactory}"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
         //IBrowsableObjectInfoLoader ItemsLoader { get; }
 
-        /// <summary>
-        /// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
+        ///// <summary>
+        ///// Gets the items of this <see cref="IBrowsableObjectInfo"/>.
+        ///// </summary>
+        //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
+
+        IEnumerable<IBrowsableObjectInfo> GetItems();
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
@@ -88,7 +90,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
-        Size Size { get; }
+        Size? Size { get; }
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 

@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;net48</TargetFrameworks>
     <Description>WinCopies framework's assembly for basic i/o operations</Description>
     <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
     <PackageTags>WinCopies, IO</PackageTags>
@@ -27,25 +26,8 @@
     <PackageReference Include="IconExtractor.dll" Version="1.0.2" />
     <PackageReference Include="IconLib" Version="0.74.3" />
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.0-preview2" />
-    <PackageReference Include="WinCopies.Util">
-      <Version>2.2.0-preview2</Version>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.0-preview3" />
+    <PackageReference Include="WinCopies.Util" Version="2.2.0-preview3" />
   </ItemGroup>
 
 </Project>

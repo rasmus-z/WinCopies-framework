@@ -23,26 +23,31 @@ namespace WinCopies.IO
 
     public interface IShellObjectInfo : IArchiveItemInfoProvider
     {
+        Stream ArchiveFileStream { get; }
+
+        void OpenArchive(Stream stream);
+
+        void CloseArchive();
 
         /// <summary>
         /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="IShellObjectInfo"/>.
         /// </summary>
-        ShellObject ShellObject { get; }
+        //ShellObject ShellObject { get; }
 
-        /// <summary>
-        /// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
-        /// </summary>
-        FileSystemInfo FileSystemInfoProperties { get; }
+        ///// <summary>
+        ///// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
+        ///// </summary>
+        //FileSystemInfo FileSystemInfoProperties { get; }
 
-        /// <summary>
-        /// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a drive. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
-        /// </summary>
-        DriveInfo DriveInfoProperties { get; }
+        ///// <summary>
+        ///// Gets a <see cref="DriveInfo"/> object that provides info for drives. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a drive. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
+        ///// </summary>
+        //DriveInfo DriveInfoProperties { get; }
 
-        /// <summary>
-        /// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a system known folder. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
-        /// </summary>
-        IKnownFolder KnownFolderInfo { get; }
+        ///// <summary>
+        ///// Gets a <see cref="IKnownFolder"/> object that provides info for the system known folders. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a system known folder. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
+        ///// </summary>
+        //IKnownFolder KnownFolderInfo { get; }
 
         //private FileStream _archiveFileStream = null;
 
@@ -54,10 +59,10 @@ namespace WinCopies.IO
         ///// </remarks>
         //public FileStream ArchiveFileStream { get => _archiveFileStream; internal set => OnPropertyChanged(nameof(ArchiveFileStream), nameof(_archiveFileStream), value, typeof(IShellObjectInfo)); }
 
-        /// <summary>
-        /// Gets the special folder type of this <see cref="IShellObjectInfo"/>. <see cref="SpecialFolder.OtherFolderOrFile"/> if this <see cref="IShellObjectInfo"/> is a casual file system item.
-        /// </summary>
-        SpecialFolder SpecialFolder { get; }
+        ///// <summary>
+        ///// Gets the special folder type of this <see cref="IShellObjectInfo"/>. <see cref="SpecialFolder.None"/> if this <see cref="IShellObjectInfo"/> is a casual file system item.
+        ///// </summary>
+        //SpecialFolder SpecialFolder { get; }
 
     }
 

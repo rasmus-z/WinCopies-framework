@@ -126,13 +126,7 @@ namespace WinCopies.IO
 
             if (disposing)
 
-            {
-
                 _parent = null;
-
-                _items = null;
-
-            }
 
         }
 
@@ -171,46 +165,36 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
-        public abstract Size Size { get; }
+        public abstract Size? Size { get; }
 
         private IBrowsableObjectInfo _parent = default;
 
-        /// <summary>
-        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
-        /// </summary>
-        public IBrowsableObjectInfo Parent =>
+        ///// <summary>
+        ///// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+        ///// </summary>
+        public abstract IBrowsableObjectInfo Parent { get; }
 
-#if NETFRAMEWORK
+        //        private IReadOnlyCollection<IBrowsableObjectInfo> _items;
 
-                _parent = _parent ?? (_parent = GetParent());
+        //        public IReadOnlyCollection<IBrowsableObjectInfo> Items =>
 
-#else
+        //#if NETFRAMEWORK
 
-                _parent ??= GetParent();
+        //            _items = _items ?? (_items = GetItems());
 
-#endif
+        //#else
 
-        private IReadOnlyCollection<IBrowsableObjectInfo> _items;
+        //            _items ??= GetItems();
 
-        public IReadOnlyCollection<IBrowsableObjectInfo> Items =>
+        //#endif
 
-#if NETFRAMEWORK
+        ///// <summary>
+        ///// When overridden in a derived class, returns the parent of this <see cref="BrowsableObjectInfo"/>.
+        ///// </summary>
+        ///// <returns>The parent of this <see cref="BrowsableObjectInfo"/>.</returns>
+        //protected abstract IBrowsableObjectInfo GetParent();
 
-            _items = _items ?? (_items = GetItems());
-
-#else
-
-            _items ??= GetItems();
-
-#endif
-
-        /// <summary>
-        /// When overridden in a derived class, returns the parent of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        /// <returns>The parent of this <see cref="BrowsableObjectInfo"/>.</returns>
-        protected abstract IBrowsableObjectInfo GetParent();
-
-        protected abstract IReadOnlyCollection<IBrowsableObjectInfo> GetItems();
+        public abstract IEnumerable<IBrowsableObjectInfo> GetItems();
 
         /// <summary>
         /// Gets a value that indicates whether the current object is disposed.

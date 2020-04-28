@@ -55,9 +55,14 @@ namespace WinCopies.IO
         Archive,
 
         /// <summary>
-        /// The item is a special folder (system folder or virtual folder).
+        /// The item is a known folder (system folder or virtual folder).
         /// </summary>
-        SpecialFolder
+        KnownFolder,
+
+        /// <summary>
+        /// The item is a library.
+        /// </summary>
+        Library
     }
 
     /// <summary>
