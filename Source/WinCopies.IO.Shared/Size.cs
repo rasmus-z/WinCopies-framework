@@ -16,8 +16,6 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Buffers;
-using System.Security.Cryptography;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
@@ -88,7 +86,7 @@ namespace WinCopies.IO
 
         public float GetFloatValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
                 ? ValueInBytes
-                : (float)ValueInBytes / Math.Pow(1024f, (float)unit);
+                : (float)ValueInBytes / Util.Math.Pow(1024f, (float)unit);
 
         public double GetDoubleValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
                 ? ValueInBytes
@@ -96,7 +94,7 @@ namespace WinCopies.IO
 
         public decimal GetDecimalValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
                 ? ValueInBytes
-                : (decimal)ValueInBytes / Math.Pow(1024m, (decimal)unit);
+                : (decimal)ValueInBytes / Util.Math.Pow(1024m, (decimal)unit);
 
         public float GetFloatValueInUnit() => GetFloatValueInUnit(Unit);
 

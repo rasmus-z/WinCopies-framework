@@ -40,9 +40,10 @@ using System.Security;
 using static WinCopies.IO.FolderLoader;
 using System.Security.Cryptography;
 using Microsoft.WindowsAPICodePack.Shell;
-using WinCopies.IO.Shared;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using System.Runtime.InteropServices;
+using System.Collections;
+using WinCopies.Linq;
 
 namespace WinCopies.IO
 {
@@ -66,13 +67,36 @@ namespace WinCopies.IO
     public class ArchiveItemInfo/*<TItems, TFactory>*/ : ArchiveItemInfoProvider/*<TItems, TFactory>*/, IArchiveItemInfo // where TItems : BrowsableObjectInfo, IArchiveItemInfo where TFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory
     {
 
+        #region Fields
+
         // public override bool IsRenamingSupported => false;
+
+        private IBrowsableObjectInfo _parent;
+
+        #endregion
 
         #region Properties
 
         //public static ArchiveFileInfoDeepClone DefaultArchiveFileInfoDeepClone { get; } = (ArchiveFileInfo? archiveFileInfo, string archivePath) => archiveFileInfo.HasValue
         //        ? (ArchiveFileInfo?)new SevenZipExtractor(archivePath).ArchiveFileData.First(item => item.FileName.ToLower() == archiveFileInfo.Value.FileName)
         //        : null;
+
+        public override bool IsSpecialItem
+        {
+            get
+            {
+                if (ArchiveFileInfo.HasValue)
+                {
+                    var value = (Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes)ArchiveFileInfo.Value.Attributes;
+
+                    return value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Hidden) || value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.System);
+                }
+
+                else
+
+                    return false;
+            }
+        }
 
         /// <summary>
         /// Gets the localized path of this <see cref="ArchiveItemInfo"/>.
@@ -139,8 +163,6 @@ namespace WinCopies.IO
             }
         }
 
-        private IBrowsableObjectInfo _parent;
-
 #if NETFRAMEWORK
 
         public override IBrowsableObjectInfo Parent => _parent ?? (_parent=GetParent());
@@ -152,6 +174,29 @@ namespace WinCopies.IO
 #endif
 
         #endregion
+
+        private ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, fileType)
+        {
+            ArchiveShellObject = archiveShellObject;
+
+            ArchiveFileInfo = archiveFileInfo;
+        }
+
+        ///// <summary>
+        ///// Loads the items of this <see cref="ArchiveItemInfo"/> using custom worker behavior options.
+        ///// </summary>
+        ///// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        ///// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
+        //public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+
+        ///// <summary>
+        ///// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
+        ///// </summary>
+        ///// <param name="workerReportsProgress">Whether the worker reports progress</param>
+        ///// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
+        //public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
+
+        #region Methods
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
@@ -207,29 +252,6 @@ namespace WinCopies.IO
 
         }
 
-        private ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, fileType)
-        {
-            ArchiveShellObject = archiveShellObject;
-
-            ArchiveFileInfo = archiveFileInfo;
-        }
-
-        ///// <summary>
-        ///// Loads the items of this <see cref="ArchiveItemInfo"/> using custom worker behavior options.
-        ///// </summary>
-        ///// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        ///// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        //public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
-
-        ///// <summary>
-        ///// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
-        ///// </summary>
-        ///// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        ///// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        //public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
-
-        #region Protected methods
-
         private IBrowsableObjectInfo GetParent()
         {
 
@@ -259,9 +281,13 @@ namespace WinCopies.IO
 
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems()
+        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
+
+        public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func) => func is null ? GetArchiveItemInfoItems(null) : GetArchiveItemInfoItems(null).Where(func);
+
+        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
         {
-            var enumerator = new ArchiveItemInfoEnumerator(this);
+            var enumerator = new ArchiveItemInfoEnumerator(this, func);
 
             while (enumerator.MoveNext())
 
@@ -351,9 +377,6 @@ namespace WinCopies.IO
 
         // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
         protected override void Dispose(bool disposing)
         {
 
@@ -365,11 +388,7 @@ namespace WinCopies.IO
 
         }
 
-        #endregion
-
         // public override string ToString() => System.IO.Path.GetFileName(Path);
-
-        #region Private methods
 
         private Icon TryGetIcon(System.Drawing.Size size) =>
 

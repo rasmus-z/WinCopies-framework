@@ -13,20 +13,22 @@
   <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
 
   <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
+    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <!--<PackageReference Include="System.Management" Version="4.7.0" />-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.0'">
-    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />-->
+    <!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0" />-->
     <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
-    <!--<PackageReference Include="System.Management" Version="4.7.0" />-->
+    <!--<PackageReference Include="System.Management" Version="4.6.0" />-->
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="IconExtractor.dll" Version="1.0.2" />
-    <PackageReference Include="IconLib" Version="0.74.3" />
+    <PackageReference Include="WinCopies.IconLib" Version="0.75-rc" />
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.0-preview3" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.0-preview6" />
     <PackageReference Include="WinCopies.Util" Version="2.2.0-preview3" />
   </ItemGroup>
 

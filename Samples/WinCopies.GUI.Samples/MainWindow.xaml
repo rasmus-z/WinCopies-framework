@@ -1,4 +1,4 @@
-﻿ <!-- Copyright © Pierre Sprimont, 2019
+﻿ <!-- Copyright © Pierre Sprimont, 2020
  *
  * This file is part of the WinCopies Framework.
  *
@@ -39,6 +39,10 @@
             <MenuItem Header="File">
                 <MenuItem Header="Open dialog..." Click="Button_Click" />
                 <MenuItem Command="Close" />
+            </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="LabelTest" Click="MenuItem_Click" />
+                <MenuItem Header="ExplorerControlTest" Click="MenuItem_Click_1" />
             </MenuItem>
         </Menu>
         <StackPanel Grid.Row="1">

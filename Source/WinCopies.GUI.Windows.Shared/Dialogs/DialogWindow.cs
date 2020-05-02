@@ -364,7 +364,13 @@ namespace WinCopies.GUI.Windows.Dialogs
 
             if (newValue == DefaultButton.None) return;
 
-            static void throwArgumentException() => throw new ArgumentException("DefaultButton must be included in DialogButton value.");
+#if !NETFRAMEWORK
+
+            static
+
+#endif
+
+                void throwArgumentException() => throw new ArgumentException("DefaultButton must be included in DialogButton value.");
 
             switch (DialogButton)
 

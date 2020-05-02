@@ -10,11 +10,11 @@ using WinCopies.Collections;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 
-namespace WinCopies.IO.Shared
+namespace WinCopies.IO
 {
-    sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>
+    public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>
     {
-        private int _index;
+        private int _index = -1;
 
         private IArchiveItemInfoProvider _archiveItemInfoProvider;
 
@@ -24,11 +24,13 @@ namespace WinCopies.IO.Shared
 
         public ArchiveItemInfo Current => disposedValue ? throw GetExceptionForDispose(false) : _current;
 
-        public ArchiveItemInfoEnumerator(IArchiveItemInfoProvider archiveItemInfoProvider)
+        public Predicate<ArchiveFileInfoEnumeratorStruct> Func { get; }
+
+        public ArchiveItemInfoEnumerator(IArchiveItemInfoProvider archiveItemInfoProvider, Predicate<ArchiveFileInfoEnumeratorStruct> func)
         {
             _archiveItemInfoProvider = archiveItemInfoProvider;
 
-            _index = -1;
+            Func = func;
         }
 
         object IEnumerator.Current => Current;
@@ -157,9 +159,13 @@ namespace WinCopies.IO.Shared
 
                 //#endif
 
-                bool addPath()
+                bool addPath(ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct)
 
                 {
+
+                    if (Func is object && !Func(archiveFileInfoEnumeratorStruct))
+
+                        return false;
 
                     foreach (IFileSystemObject pathInfo in _paths)
 
@@ -202,24 +208,42 @@ namespace WinCopies.IO.Shared
 
                         // {
 
-                        if (addPath())
+                        Action addValue;
+
+                        ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct;
+
+                        if (fileName.ToUpperInvariant() == archiveFileInfo.FileName.ToUpperInvariant())
+
                         {
 
-                            if (fileName.ToUpperInvariant() == archiveFileInfo.FileName.ToUpperInvariant())
+                            archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(archiveFileInfo);
 
-                                //if (archiveFileInfo.IsDirectory)
+                            addValue = () => AddArchiveFileInfo(archiveFileInfoEnumeratorStruct.ArchiveFileInfo.Value);
 
-                                //    AddDirectory(fileName, archiveFileInfo);
+                        }
 
-                                //else /*if (CheckFilter(archiveFileInfo.FileName))*/
+                        else
 
-                                //    AddFile(fileName, archiveFileInfo);
+                        {
 
-                                AddArchiveFileInfo(archiveFileInfo);
+                            archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(fileName);
 
-                            else
+                            addValue = () => AddPath(archiveFileInfoEnumeratorStruct.Path);
 
-                                AddPath(fileName);
+                        }
+
+                        if (addPath(archiveFileInfoEnumeratorStruct))
+                        {
+
+                            //if (archiveFileInfo.IsDirectory)
+
+                            //    AddDirectory(fileName, archiveFileInfo);
+
+                            //else /*if (CheckFilter(archiveFileInfo.FileName))*/
+
+                            //    AddFile(fileName, archiveFileInfo);
+
+                            addValue();
 
                             _index = i;
 

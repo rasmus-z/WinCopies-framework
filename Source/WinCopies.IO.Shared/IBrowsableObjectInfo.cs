@@ -32,6 +32,8 @@ namespace WinCopies.IO
     public interface IBrowsableObjectInfo : IFileSystemObject, /*IDeepCloneable,*/ IDisposable
     {
 
+        bool IsSpecialItem { get; }
+
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
@@ -76,6 +78,8 @@ namespace WinCopies.IO
         //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
 
         IEnumerable<IBrowsableObjectInfo> GetItems();
+
+        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func);
 
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.

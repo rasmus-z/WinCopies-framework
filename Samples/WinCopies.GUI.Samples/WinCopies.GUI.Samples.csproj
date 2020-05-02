@@ -1,19 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\WinCopies.GUI.Controls\WinCopies.GUI.Controls.csproj" />
-    <ProjectReference Include="..\..\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
-    <ProjectReference Include="..\..\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
-    <ProjectReference Include="..\..\WinCopies.GUI.Windows\WinCopies.GUI.Windows.csproj" />
+    <ProjectReference Include="..\..\Source\WinCopies.GUI.Controls\WinCopies.GUI.Controls.csproj" />
+    <ProjectReference Include="..\..\Source\WinCopies.GUI.IO\WinCopies.GUI.IO.csproj" />
+    <ProjectReference Include="..\..\Source\WinCopies.GUI.Models\WinCopies.GUI.Models.csproj" />
+    <ProjectReference Include="..\..\Source\WinCopies.GUI.Templates\WinCopies.GUI.Templates.csproj" />
+    <ProjectReference Include="..\..\Source\WinCopies.GUI.Windows\WinCopies.GUI.Windows.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.AttachedCommandBehavior" Version="3.1.0" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview3" />
   </ItemGroup>
 
   <ItemGroup>

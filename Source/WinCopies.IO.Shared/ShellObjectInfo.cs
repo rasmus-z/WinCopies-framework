@@ -36,10 +36,33 @@ using WinCopies.Collections;
 using Microsoft.WindowsAPICodePack.PropertySystem;
 using Microsoft.WindowsAPICodePack.Shell.Guids;
 using System.Linq;
-using WinCopies.IO.Shared;
+using Microsoft.WindowsAPICodePack.Win32Native.Shell;
+using SevenZip;
+using WinCopies.Linq;
 
 namespace WinCopies.IO
 {
+
+    public struct ArchiveFileInfoEnumeratorStruct
+    {
+        public string Path { get; }
+
+        public ArchiveFileInfo? ArchiveFileInfo { get; }
+
+        public ArchiveFileInfoEnumeratorStruct(string path)
+        {
+            Path = path ?? throw GetArgumentNullException(nameof(path));
+
+            ArchiveFileInfo = null;
+        }
+
+        public ArchiveFileInfoEnumeratorStruct(ArchiveFileInfo archiveFileInfo)
+        {
+            Path = null;
+
+            ArchiveFileInfo = archiveFileInfo;
+        }
+    }
 
     /// <summary>
     /// Represents a file system item.
@@ -47,7 +70,29 @@ namespace WinCopies.IO
     public class ShellObjectInfo/*<TItems, TArchiveItemInfoItems, TFactory>*/ : ArchiveItemInfoProvider/*<TItems, TFactory>*/, IShellObjectInfo // where TItems : BrowsableObjectInfo, IFileSystemObjectInfo where TArchiveItemInfoItems : BrowsableObjectInfo, IArchiveItemInfo where TFactory : BrowsableObjectInfoFactory, IShellObjectInfoFactory
     {
 
+        private IBrowsableObjectInfo _parent;
+
         #region Properties
+
+        public override bool IsSpecialItem
+        {
+            get
+            {
+                var value = ShellObject.Properties.System.FileAttributes.Value;
+
+                if (value.HasValue)
+
+                {
+                    var _value = (Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes)value.Value;
+
+                    return _value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Hidden) || _value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.System);
+                }
+
+                else
+
+                    return false;
+            }
+        }
 
         /// <summary>
         /// The parent <see cref="IShellObjectInfo"/> of the current archive item. If the current <see cref="ShellObjectInfo"/> represents an archive file, this property returns the current <see cref="ShellObjectInfo"/>, or <see langword="null"/> otherwise.
@@ -98,6 +143,34 @@ namespace WinCopies.IO
 
         public bool IsArchiveOpen => ArchiveFileStream is object;
 
+        public override string ItemTypeName => ShellObject.Properties.System.ItemTypeText.Value;
+
+        public override Size? Size
+        {
+            get
+            {
+                ulong? value = ShellObject.Properties.System.Size.Value;
+
+                if (value.HasValue)
+
+                    return new Size(value.Value);
+
+                else
+
+                    return null;
+            }
+        }
+
+#if NETFRAMEWORK
+
+        public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
+
+#else
+
+        public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
+
+#endif
+
         ///// <summary>
         ///// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="ShellObjectInfo"/> is not a folder, a drive or a file.
         ///// </summary>
@@ -121,43 +194,6 @@ namespace WinCopies.IO
         //public SpecialFolder SpecialFolder { get; private set; } = SpecialFolder.None;
 
         #endregion
-
-        public static ShellObjectInfo From(ShellObject shellObject)
-        {
-
-            if (shellObject is ShellFolder shellFolder)
-
-            {
-
-                if (shellFolder is ShellFileSystemFolder shellFileSystemFolder)
-
-                {
-
-                    if (Directory.GetParent(shellFileSystemFolder.Path) is null)
-
-                        return new ShellObjectInfo(shellFileSystemFolder.Path, FileType.Drive, shellObject);
-
-                    return shellFileSystemFolder is FileSystemKnownFolder fileSystemKnownFolder
-                        ? new ShellObjectInfo(fileSystemKnownFolder.Path, FileType.KnownFolder, shellObject)
-                        : new ShellObjectInfo(shellFileSystemFolder.Path, FileType.Folder, shellObject);
-
-                }
-
-                return shellFolder is NonFileSystemKnownFolder nonFileSystemKnownFolder
-                    ? new ShellObjectInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder, shellObject)
-                    : new ShellObjectInfo(((ShellNonFileSystemFolder)shellObject).ParsingName, FileType.Other, shellObject);
-
-            }
-
-            if (shellObject is ShellLink shellLink)
-
-                return new ShellObjectInfo(shellLink.Path, FileType.Link, shellObject);
-
-            var shellFile = (ShellFile)shellObject;
-
-            return new ShellObjectInfo(shellFile.Path, IsSupportedArchiveFormat(System.IO.Path.GetExtension(shellFile.Path)) ? FileType.Archive : shellFile.IsLink ? FileType.Link : System.IO.Path.GetExtension(shellFile.Path) == ".library-ms" ? FileType.Library : FileType.File, shellObject);
-
-        }
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="ShellObjectInfo"/> class with a given <see cref="FileType"/> and <see cref="SpecialFolder"/> using custom factories for <see cref="ShellObjectInfo"/>s and <see cref="ArchiveItemInfo"/>s.
@@ -346,6 +382,51 @@ namespace WinCopies.IO
 
         //}
 
+        #region Methods
+
+        public static ShellObjectInfo From(ShellObject shellObject)
+        {
+
+            if ((shellObject ?? throw GetArgumentNullException(nameof(shellObject))) is ShellFolder shellFolder)
+
+            {
+
+                if (shellFolder is ShellFileSystemFolder shellFileSystemFolder)
+
+                {
+
+                    (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, FileType.KnownFolder) : (shellFileSystemFolder.Path, FileType.Folder);
+
+                    if (Directory.GetParent(path) is null)
+
+                        return new ShellObjectInfo(path, FileType.Drive, shellObject);
+
+                    return new ShellObjectInfo(path, fileType, shellObject);
+
+                }
+
+                if (shellFolder is NonFileSystemKnownFolder nonFileSystemKnownFolder)
+
+                    return new ShellObjectInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder, shellObject);
+
+                else if (shellObject is ShellNonFileSystemFolder)
+
+                    return new ShellObjectInfo(shellObject.ParsingName, FileType.Other, shellObject);
+
+            }
+
+            if (shellObject is ShellLink shellLink)
+
+                return new ShellObjectInfo(shellLink.Path, FileType.Link, shellObject);
+
+            if (shellObject is ShellFile shellFile)
+
+                return new ShellObjectInfo(shellFile.Path, IsSupportedArchiveFormat(System.IO.Path.GetExtension(shellFile.Path)) ? FileType.Archive : shellFile.IsLink ? FileType.Link : System.IO.Path.GetExtension(shellFile.Path) == ".library-ms" ? FileType.Library : FileType.File, shellObject);
+
+            throw new ArgumentException($"The given {nameof(Microsoft.WindowsAPICodePack.Shell.ShellObject)} is not supported.");
+
+        }
+
         public void OpenArchive(Stream stream)
         {
             CloseArchive();
@@ -369,8 +450,6 @@ namespace WinCopies.IO
         /// </summary>
         /// <returns>The <see cref="LocalizedName"/> of this <see cref="ShellObjectInfo"/>.</returns>
         public override string ToString() => string.IsNullOrEmpty(Path) ? ShellObject.GetDisplayName(DisplayNameType.Default) : System.IO.Path.GetFileName(Path);
-
-        #region Protected methods
 
         /// <summary>
         /// Returns the parent of this <see cref="ShellObjectInfo"/>.
@@ -409,10 +488,6 @@ namespace WinCopies.IO
 
         }
 
-        /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
-        /// </summary>
-        /// <param name="disposing">Whether to dispose managed resources.</param>
         protected override void Dispose(bool disposing)
         {
 
@@ -428,16 +503,72 @@ namespace WinCopies.IO
 
                 ShellObject = null;
 
-            //if (ArchiveFileStream != null)
+        }
 
-            //{
+        public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ShellObject> func)
+        {
+            ThrowIfNull(func, nameof(func));
 
-            //    ArchiveFileStream.Dispose();
+            switch (FileType)
+            {
+                case FileType.Drive:
+                case FileType.Folder:
+                case FileType.KnownFolder:
+                case FileType.Library:
+                    return ((IEnumerable<ShellObject>)ShellObject).Where(func).Select(shellObject => From(shellObject));
+                default:
+                    return null;
+            }
+        }
 
-            //    ArchiveFileStream.Close();
+        public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
+        {
+            ThrowIfNull(func, nameof(func));
 
-            //}
+#if NETFRAMEWORK
 
+            switch (FileType)
+            {
+                case FileType.Archive:
+                    return GetArchiveItemInfoItems(func);
+                default:
+                    return null;
+            }
+
+#else
+
+            return FileType switch
+            {
+                FileType.Archive => GetArchiveItemInfoItems(func),
+                _ => null,
+            };
+
+#endif
+        }
+
+        public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func)
+        {
+            switch (FileType)
+            {
+                case FileType.Archive:
+                    return func is null ? GetArchiveItemInfoItems(null) : GetArchiveItemInfoItems(null).Where(func);
+                case FileType.Drive:
+                case FileType.Folder:
+                case FileType.KnownFolder:
+                case FileType.Library:
+                    return func is null ? ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject)) : ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject)).Where(func);
+                default:
+                    return null;
+            }
+        }
+
+        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
+        {
+            var enumerator = new ArchiveItemInfoEnumerator(this, func);
+
+            while (enumerator.MoveNext())
+
+                yield return enumerator.Current;
         }
 
         ///// <summary>
@@ -450,8 +581,6 @@ namespace WinCopies.IO
         ///// Gets a deep clone of this <see cref="BrowsableObjectInfo"/>. The <see cref="OnDeepClone(BrowsableObjectInfo)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
         ///// </summary>
         //protected override BrowsableObjectInfo DeepCloneOverride() => new ShellObjectInfo(Path, FileType, SpecialFolder, _shellObjectDelegate(ShellObject), _shellObjectDelegate);
-
-        #endregion
 
         //private void SetFileSystemInfoProperties(ShellObject shellObject)
         //{
@@ -480,46 +609,7 @@ namespace WinCopies.IO
 
         //}
 
-        public override string ItemTypeName => ShellObject.Properties.System.ItemTypeText.Value;
-
-        public override Size? Size
-        {
-            get
-            {
-                ulong? value = ShellObject.Properties.System.Size.Value;
-
-                if (value.HasValue)
-
-                    return new Size(value.Value);
-
-                else
-
-                    return null;
-            }
-        }
-
-        private IBrowsableObjectInfo _parent;
-
-#if NETFRAMEWORK
-
-        public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
-
-#else
-
-        public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
-
-#endif
-
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => FileType == FileType.Archive ? GetArchiveItemInfoItems() : ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject));
-
-        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems()
-        {
-            var enumerator = new ArchiveItemInfoEnumerator(this);
-
-            while (enumerator.MoveNext())
-
-                yield return enumerator.Current;
-        }
+#endregion
 
         //{
 

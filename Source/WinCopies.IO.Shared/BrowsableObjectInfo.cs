@@ -36,6 +36,8 @@ namespace WinCopies.IO
     public abstract class BrowsableObjectInfo : FileSystemObject, IBrowsableObjectInfo
     {
 
+        public abstract bool IsSpecialItem { get; }
+
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
@@ -104,10 +106,6 @@ namespace WinCopies.IO
 
         //}
 
-        /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
-        /// </summary>
-        /// <param name="disposing">Whether to dispose managed resources.</param>
         protected virtual void Dispose(bool disposing)
 
         {
@@ -124,9 +122,9 @@ namespace WinCopies.IO
 
             //}
 
-            if (disposing)
+            //if (disposing)
 
-                _parent = null;
+            //    _parent = null;
 
         }
 
@@ -167,8 +165,6 @@ namespace WinCopies.IO
         /// </summary>
         public abstract Size? Size { get; }
 
-        private IBrowsableObjectInfo _parent = default;
-
         ///// <summary>
         ///// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
         ///// </summary>
@@ -194,31 +190,28 @@ namespace WinCopies.IO
         ///// <returns>The parent of this <see cref="BrowsableObjectInfo"/>.</returns>
         //protected abstract IBrowsableObjectInfo GetParent();
 
-        public abstract IEnumerable<IBrowsableObjectInfo> GetItems();
+        public IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
+
+        public abstract IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func);
 
         /// <summary>
         /// Gets a value that indicates whether the current object is disposed.
         /// </summary>
         public bool IsDisposed { get; internal set; }
 
-        /// <summary>
-        /// Disposes the current <see cref="IBrowsableObjectInfo"/> and its parent and items recursively.
-        /// </summary>
         public void Dispose()
 
         {
 
-            if (!IsDisposed)
+            if (IsDisposed)
 
-            {
+                return;
 
-                Dispose(true);
+            Dispose(true);
 
-                GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
 
-                IsDisposed = true;
-
-            }
+            IsDisposed = true;
 
         }
 

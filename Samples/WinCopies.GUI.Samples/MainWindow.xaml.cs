@@ -129,5 +129,12 @@ namespace WinCopies.GUI.Samples
         {
             
         }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e) => new Window1().Show();
+
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+            new ExplorerControlTest().Show();
+        }
     }
 }

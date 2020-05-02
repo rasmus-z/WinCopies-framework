@@ -1,4 +1,4 @@
-﻿/* Copyright © Pierre Sprimont, 2019
+﻿/* Copyright © Pierre Sprimont, 2020
  *
  * This file is part of the WinCopies Framework.
  *
@@ -23,10 +23,10 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using Microsoft.WindowsAPICodePack.ShellExtensions;
 using Microsoft.WindowsAPICodePack.COMNative.Shell;
-using WindowUtilities = Microsoft.WindowsAPICodePack.ShellExtensions.WindowUtilities;
+using WindowUtilities = Microsoft.WindowsAPICodePack.Shell.DesktopWindowManager;
 using Microsoft.WindowsAPICodePack.Win32Native;
+using Microsoft.WindowsAPICodePack;
 
 namespace WinCopies.GUI.Windows
 {

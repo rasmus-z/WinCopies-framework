@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <UseWPF>true</UseWPF>
+    <DocumentationFile>WinCopies.GUI.IO.xml</DocumentationFile>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems" Label="Shared" />

@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfoProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectTreeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectInfo.cs" />

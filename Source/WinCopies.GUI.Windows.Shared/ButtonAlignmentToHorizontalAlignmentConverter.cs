@@ -29,14 +29,36 @@ namespace WinCopies.GUI.Windows.Dialogs
         {
             if (value is HorizontalAlignment _value)
 
+#if NETFRAMEWORK
+
+                switch (_value)
+                {
+                    case HorizontalAlignment.Left:
+
+                        return System.Windows.HorizontalAlignment.Left;
+
+                    case HorizontalAlignment.Right:
+
+                        return System.Windows.HorizontalAlignment.Right;
+
+                    default:
+
+                        throw new ArgumentException("Invalid value for HorizontalAlignment.", nameof(value));
+                }
+
+#else
+
                 return _value switch
                 {
                     HorizontalAlignment.Left => System.Windows.HorizontalAlignment.Left,
 
                     HorizontalAlignment.Right => System.Windows.HorizontalAlignment.Right,
 
-                    _ => throw new ArgumentException("Invalid value for HorizontalAlignment."),
+                    _ => throw new ArgumentException("Invalid value for HorizontalAlignment.", nameof(value)),
                 };
+
+#endif
+
             else
 
                 return null;
@@ -46,6 +68,20 @@ namespace WinCopies.GUI.Windows.Dialogs
         {
             if (value is System.Windows.HorizontalAlignment _value)
 
+#if NETFRAMEWORK
+
+                switch (_value)
+                {
+                    case System.Windows.HorizontalAlignment.Left:
+                        return HorizontalAlignment.Left;
+                    case System.Windows.HorizontalAlignment.Right:
+                        return HorizontalAlignment.Right;
+                    default:
+                        throw new ArgumentException("Invalid value for HorizontalAlignment.");
+                }
+
+#else
+
                 return _value switch
                 {
                     System.Windows.HorizontalAlignment.Left => HorizontalAlignment.Left,
@@ -54,6 +90,9 @@ namespace WinCopies.GUI.Windows.Dialogs
 
                     _ => throw new ArgumentException("Invalid value for HorizontalAlignment."),
                 };
+
+#endif
+
             else
 
                 return null;
