@@ -5,6 +5,7 @@
     xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
     xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
     xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util.Desktop"
+    xmlns:icons="clr-namespace:WinCopies.Icons"
     >
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
@@ -31,7 +32,11 @@
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
                 <TextBox Text="{Binding Path}" />
-                <Button Grid.Column="1" />
+                <Button Grid.Column="1">
+                    <Button.Content>
+                        <Image Source=""
+                    </Button.Content>
+                </Button>
             </Grid>
             <TreeView Grid.Row="1" Style="{TemplateBinding TreeViewStyle}">
                 <!--<TreeView.ItemTemplate>
@@ -112,12 +117,14 @@
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="HeaderTemplate" Value="{StaticResource TreeViewItemContentDataTemplate}" />
                     <Setter Property="ItemsSource" Value="{Binding Items}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                 </Style>
             </Setter.Value>
         </Setter>
     </Style>
 
     <Style x:Key="ExplorerControlListViewStyle" TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListBox}}">
+        <Setter Property="Margin" Value="5,0,0,0" />
         <Setter Property="ItemsSource" Value="{Binding Path.Items}" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ItemsPanel">
@@ -131,6 +138,7 @@
             <Setter.Value>
                 <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                     <Setter Property="ContentTemplate" Value="{StaticResource ListViewItemContentDataTemplate}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                 </Style>
             </Setter.Value>
         </Setter>

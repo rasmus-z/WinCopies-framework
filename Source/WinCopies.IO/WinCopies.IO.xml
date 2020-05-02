@@ -492,9 +492,41 @@
             Gets the name of this <see cref="T:WinCopies.IO.IFileSystemObject"/>.
             </summary>
         </member>
+        <member name="T:WinCopies.IO.ArchiveFileInfoEnumeratorStruct">
+            <summary>
+            Represents an archive item. This struct is used in enumeration methods.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ArchiveFileInfoEnumeratorStruct.Path">
+            <summary>
+            Gets the path of the current archive item. This property is set only when <see cref="P:WinCopies.IO.ArchiveFileInfoEnumeratorStruct.ArchiveFileInfo"/> is <see langword="null"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ArchiveFileInfoEnumeratorStruct.ArchiveFileInfo">
+            <summary>
+            Gets the <see cref="T:SevenZip.ArchiveFileInfo"/> that represents the cyrrent archive item. This property is set only when <see cref="P:WinCopies.IO.ArchiveFileInfoEnumeratorStruct.Path"/> is <see langword="null"/>.
+            </summary>
+        </member>
+        <member name="M:WinCopies.IO.ArchiveFileInfoEnumeratorStruct.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ArchiveFileInfoEnumeratorStruct"/> struct with the given path.
+            </summary>
+            <param name="path">The path of the archive item.</param>
+        </member>
+        <member name="M:WinCopies.IO.ArchiveFileInfoEnumeratorStruct.#ctor(SevenZip.ArchiveFileInfo)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.IO.ArchiveFileInfoEnumeratorStruct"/> struct with the given <see cref="T:SevenZip.ArchiveFileInfo"/>.
+            </summary>
+            <param name="path">The <see cref="T:SevenZip.ArchiveFileInfo"/> that represents the archive item.</param>
+        </member>
         <member name="T:WinCopies.IO.ShellObjectInfo">
             <summary>
             Represents a file system item.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellObjectInfo.IsSpecialItem">
+            <summary>
+            When overridden in a derived class, gets a value that indicates whether the current item has particularities.
             </summary>
         </member>
         <member name="P:WinCopies.IO.ShellObjectInfo.ArchiveShellObject">

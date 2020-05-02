@@ -4,6 +4,10 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
+    <DocumentationFile>WinCopies.GUI.Windows.xml</DocumentationFile>
+  </PropertyGroup>
+
   <Import Project="..\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems" Label="Shared" />
 
   <ItemGroup>

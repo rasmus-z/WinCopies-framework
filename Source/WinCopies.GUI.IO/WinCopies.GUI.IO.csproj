@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WinCopies.GUI.Controls\WinCopies.GUI.Controls.csproj" />
+    <ProjectReference Include="..\WinCopies.Icons\WinCopies.GUI.Icons.csproj" />
     <ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />
   </ItemGroup>
 

@@ -11,7 +11,7 @@ using WinCopies.Linq;
 
 namespace WinCopies.GUI.IO
 {
-    public interface IExplorerControlBrowsableObjectInfoViewModel : INotifyPropertyChanged
+    public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon, INotifyPropertyChanged
     {
         BrowsableObjectInfoViewModel BrowsableObjectInfoViewModel { get; }
 
@@ -33,6 +33,10 @@ namespace WinCopies.GUI.IO
 
         public IBrowsableObjectInfoViewModel Path { get => _path; set { _path = value; OnPropertyChanged(nameof(Path)); } }
 
+        private bool _isSelected;
+
+        public bool IsSelected { get => _isSelected;set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
+
         public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path) => Path = path;
 
         //private ViewStyle _viewStyle = ViewStyle.SizeThree;
@@ -44,10 +48,13 @@ namespace WinCopies.GUI.IO
         protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public interface IBrowsableObjectInfoViewModel : IBrowsableObjectInfo, INotifyPropertyChanged
+    public interface IBrowsableObjectInfoViewModelCommon
     {
         bool IsSelected { get; set; }
+    }
 
+    public interface IBrowsableObjectInfoViewModel : IBrowsableObjectInfo, IBrowsableObjectInfoViewModelCommon, INotifyPropertyChanged
+    {
         ObservableCollection<IBrowsableObjectInfoViewModel> Items { get; }
     }
 

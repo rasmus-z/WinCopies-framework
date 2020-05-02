@@ -43,12 +43,25 @@ using WinCopies.Linq;
 namespace WinCopies.IO
 {
 
+    /// <summary>
+    /// Represents an archive item. This struct is used in enumeration methods.
+    /// </summary>
     public struct ArchiveFileInfoEnumeratorStruct
     {
+        /// <summary>
+        /// Gets the path of the current archive item. This property is set only when <see cref="ArchiveFileInfo"/> is <see langword="null"/>.
+        /// </summary>
         public string Path { get; }
 
+        /// <summary>
+        /// Gets the <see cref="SevenZip.ArchiveFileInfo"/> that represents the cyrrent archive item. This property is set only when <see cref="Path"/> is <see langword="null"/>.
+        /// </summary>
         public ArchiveFileInfo? ArchiveFileInfo { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArchiveFileInfoEnumeratorStruct"/> struct with the given path.
+        /// </summary>
+        /// <param name="path">The path of the archive item.</param>
         public ArchiveFileInfoEnumeratorStruct(string path)
         {
             Path = path ?? throw GetArgumentNullException(nameof(path));
@@ -56,6 +69,10 @@ namespace WinCopies.IO
             ArchiveFileInfo = null;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArchiveFileInfoEnumeratorStruct"/> struct with the given <see cref="SevenZip.ArchiveFileInfo"/>.
+        /// </summary>
+        /// <param name="path">The <see cref="SevenZip.ArchiveFileInfo"/> that represents the archive item.</param>
         public ArchiveFileInfoEnumeratorStruct(ArchiveFileInfo archiveFileInfo)
         {
             Path = null;
@@ -74,11 +91,14 @@ namespace WinCopies.IO
 
         #region Properties
 
+        /// <summary>
+        /// When overridden in a derived class, gets a value that indicates whether the current item has particularities.
+        /// </summary>
         public override bool IsSpecialItem
         {
             get
             {
-                var value = ShellObject.Properties.System.FileAttributes.Value;
+                uint? value = ShellObject.Properties.System.FileAttributes.Value;
 
                 if (value.HasValue)
 
@@ -609,7 +629,7 @@ namespace WinCopies.IO
 
         //}
 
-#endregion
+        #endregion
 
         //{
 

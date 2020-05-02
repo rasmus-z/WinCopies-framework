@@ -47,6 +47,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO.FileProcesses.
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO.Shared", "..\Source\WinCopies.IO.Shared\WinCopies.IO.Shared.shproj", "{5C6A8E8F-21AB-4C80-B898-5FB090CB72BD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Icons", "..\Source\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj", "{26823ED2-71FE-4E35-895C-265B5FD3C888}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\Source\WinCopies.Data.Shared\WinCopies.Data.Shared.projitems*{0ea8f0f5-12a8-4f14-bf17-5422e25ed835}*SharedItemsImports = 13
@@ -119,6 +121,10 @@ Global
 		{453179A1-E4DF-4802-8BEB-9A4E7CF42BD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{453179A1-E4DF-4802-8BEB-9A4E7CF42BD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{453179A1-E4DF-4802-8BEB-9A4E7CF42BD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26823ED2-71FE-4E35-895C-265B5FD3C888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26823ED2-71FE-4E35-895C-265B5FD3C888}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26823ED2-71FE-4E35-895C-265B5FD3C888}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26823ED2-71FE-4E35-895C-265B5FD3C888}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
