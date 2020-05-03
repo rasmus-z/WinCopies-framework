@@ -8,6 +8,8 @@
     <DocumentationFile>WinCopies.IO.FileProcesses.xml</DocumentationFile>
     <VersionPrefix>2.2.0</VersionPrefix>
     <VersionSuffix>preview3</VersionSuffix>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.IO.FileProcesses.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.IO.FileProcesses.Shared\WinCopies.IO.FileProcesses.Shared.projitems" Label="Shared" />

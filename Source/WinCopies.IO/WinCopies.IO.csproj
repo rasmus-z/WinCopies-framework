@@ -8,6 +8,8 @@
     <VersionPrefix>2.2.0</VersionPrefix>
     <VersionSuffix>preview3</VersionSuffix>
     <UseWPF>true</UseWPF>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />

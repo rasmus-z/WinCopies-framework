@@ -1,29 +1,57 @@
-﻿using Microsoft.WindowsAPICodePack.Win32Native.Shell;
+﻿using AttachedCommandBehavior;
+using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using WinCopies.IO;
 using WinCopies.Linq;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.IO
 {
     public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon, INotifyPropertyChanged
     {
-        BrowsableObjectInfoViewModel BrowsableObjectInfoViewModel { get; }
 
         ObservableCollection<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
 
+        string Text { get; set; }
+
         IBrowsableObjectInfoViewModel Path { get; set; }
+
+        ICommand GoButtonCommand { get; set; }
+
+        SelectionMode SelectionMode { get; set; }
+
+        bool IsCheckBoxVisible { get; set; }
     }
 
-    public class ExplorerControlBrowsableObjectInfoViewModel : IExplorerControlBrowsableObjectInfoViewModel
+    public class ExplorerControlBrowsableObjectInfoViewModel : ViewModelBase, IExplorerControlBrowsableObjectInfoViewModel
     {
 
-        public BrowsableObjectInfoViewModel BrowsableObjectInfoViewModel { get; }
+        //protected override void OnPropertyChanged(string propertyName, object oldValue, object newValue) => OnPropertyChanged(new WinCopies.Util.Data.PropertyChangedEventArgs(propertyName, oldValue, newValue));
+
+        private SelectionMode _selectionMode = SelectionMode.Extended;
+
+        private bool _isCheckBoxVisible;
+
+        public bool IsCheckBoxVisible { get => _isCheckBoxVisible; set { if (value && _selectionMode == SelectionMode.Single) throw new ArgumentException("Cannot apply the true value for the IsCheckBoxVisible when SelectionMode is set to Single.", nameof(value)); _isCheckBoxVisible = value; OnPropertyChanged(nameof(IsCheckBoxVisible)); } }
+
+        public SelectionMode SelectionMode { get => _selectionMode; set { _selectionMode = value; OnPropertyChanged(nameof(SelectionMode)); } }
+
+        private string _text;
+
+        public string Text { get => _text; set { _text = value; OnPropertyChanged(nameof(Text)); } }
+
+        private ICommand _goButtonCommand;
+
+        public ICommand GoButtonCommand { get => _goButtonCommand; set { _goButtonCommand = value; OnPropertyChanged(nameof(GoButtonCommand)); } }
 
         private ObservableCollection<IBrowsableObjectInfoViewModel> _treeViewItems;
 
@@ -31,21 +59,28 @@ namespace WinCopies.GUI.IO
 
         private IBrowsableObjectInfoViewModel _path;
 
-        public IBrowsableObjectInfoViewModel Path { get => _path; set { _path = value; OnPropertyChanged(nameof(Path)); } }
+        public IBrowsableObjectInfoViewModel Path { get => _path; set { _path = value; OnPropertyChanged(nameof(Path)); OnPathChanged(); } }
+
+        protected virtual void OnPathChanged() => Text = _path.Path;
 
         private bool _isSelected;
 
-        public bool IsSelected { get => _isSelected;set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
+        public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
 
-        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path) => Path = path;
+        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path) : this(path, GoCommand) { }
+
+        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path, ICommand goButtonCommand)
+        {
+            Path = path;
+
+            GoButtonCommand = goButtonCommand;
+        }
+
+        public static DelegateCommand<IExplorerControlBrowsableObjectInfoViewModel> GoCommand { get; } = new DelegateCommand<IExplorerControlBrowsableObjectInfoViewModel>() { CanExecuteDelegate = browsableObjectInfo => true, ExecuteDelegate = browsableObjectInfo => browsableObjectInfo.Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(browsableObjectInfo.Text))) };
 
         //private ViewStyle _viewStyle = ViewStyle.SizeThree;
 
         //public ViewStyle ViewStyle { get => _viewStyle; set { _viewStyle = value; OnPropertyChanged(nameof(ViewStyle)); } }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     public interface IBrowsableObjectInfoViewModelCommon
@@ -58,8 +93,12 @@ namespace WinCopies.GUI.IO
         ObservableCollection<IBrowsableObjectInfoViewModel> Items { get; }
     }
 
-    public class BrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModel
+    public class BrowsableObjectInfoViewModel : ViewModelBase, IBrowsableObjectInfoViewModel
     {
+
+        private Predicate<IBrowsableObjectInfo> _filter;
+
+        public Predicate<IBrowsableObjectInfo> Filter { get => _filter; set { _filter = value; OnPropertyChanged(nameof(Filter)); } }
 
         protected IBrowsableObjectInfo InnerBrowsableObjectInfo { get; }
 
@@ -103,7 +142,7 @@ namespace WinCopies.GUI.IO
                     {
 
                         _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(
-                    InnerBrowsableObjectInfo.GetItems(_browsableObjectInfo => _browsableObjectInfo.IsBrowsable).Select(_browsableObjectInfo => new BrowsableObjectInfoViewModel(_browsableObjectInfo)));
+                    (_filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems(_filter)).Select(_browsableObjectInfo => new BrowsableObjectInfoViewModel(_browsableObjectInfo)));
 
                     }
                     catch (ShellException) { }
@@ -148,12 +187,10 @@ namespace WinCopies.GUI.IO
 
         public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => InnerBrowsableObjectInfo = browsableObjectInfo ?? throw Util.Util.GetArgumentNullException(nameof(browsableObjectInfo));
 
-        protected virtual void OnPropertyChanged(in string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
+        public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, Predicate<IBrowsableObjectInfo> filter) : this(browsableObjectInfo) => _filter = filter;
+        
         public int CompareTo(
 #if !NETFRAMEWORK
             [AllowNull]
@@ -200,5 +237,10 @@ namespace WinCopies.GUI.IO
 
         public static bool operator >=(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.CompareTo(right) >= 0;
         #endregion
+    }
+
+    public class TreeViewBrowsableObjectInfoViewModel : BrowsableObjectInfoViewModel
+    {
+        public TreeViewBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) : base(browsableObjectInfo, _browsableObjectInfo => _browsableObjectInfo.IsBrowsable) { }
     }
 }

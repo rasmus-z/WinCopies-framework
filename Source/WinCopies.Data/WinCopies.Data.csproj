@@ -8,6 +8,8 @@
     <DocumentationFile>WinCopies.Data.xml</DocumentationFile>
     <VersionPrefix>2.2.0</VersionPrefix>
     <VersionSuffix>preview3</VersionSuffix>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.Data.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.Data.Shared\WinCopies.Data.Shared.projitems" Label="Shared" />
@@ -15,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     <PackageReference Include="WinCopies.Util">
-      <Version>2.2.0-preview2</Version>
+      <Version>2.2.0-preview3</Version>
     </PackageReference>
   </ItemGroup>
 

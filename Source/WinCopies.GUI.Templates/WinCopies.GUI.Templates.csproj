@@ -9,13 +9,15 @@
     <VersionPrefix>2.2.0</VersionPrefix>
     <VersionSuffix>preview3</VersionSuffix>
     <UseWPF>true</UseWPF>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.Templates.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
     <PackageReference Include="WinCopies.Util.Desktop">
-      <Version>2.2.0-preview2</Version>
+      <Version>2.2.0-preview3</Version>
     </PackageReference>
   </ItemGroup>
 

@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <UseWPF>true</UseWPF>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.Controls.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
@@ -12,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="WinCopies.Util">
-      <Version>2.2.0-preview2</Version>
+      <Version>2.2.0-preview3</Version>
     </PackageReference>
   </ItemGroup>
 
