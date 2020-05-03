@@ -93,12 +93,28 @@ namespace WinCopies.GUI.IO
         ObservableCollection<IBrowsableObjectInfoViewModel> Items { get; }
     }
 
+    public interface IBrowsableObjectInfoViewModelFactory
+    {
+        IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo);
+    }
+
+    public class TreeViewBrowsableObjectInfoViewModelFactory : IBrowsableObjectInfoViewModelFactory
+    {
+        public static Predicate<IBrowsableObjectInfo> Predicate => _browsableObjectInfo => _browsableObjectInfo.IsBrowsable;
+
+        public IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo, Predicate) { Factory = this }; 
+    }
+
     public class BrowsableObjectInfoViewModel : ViewModelBase, IBrowsableObjectInfoViewModel
     {
 
         private Predicate<IBrowsableObjectInfo> _filter;
 
         public Predicate<IBrowsableObjectInfo> Filter { get => _filter; set { _filter = value; OnPropertyChanged(nameof(Filter)); } }
+
+        private IBrowsableObjectInfoViewModelFactory _factory;
+
+        public IBrowsableObjectInfoViewModelFactory Factory { get => _factory; set { _factory = value; OnPropertyChanged(nameof(_factory)); } } 
 
         protected IBrowsableObjectInfo InnerBrowsableObjectInfo { get; }
 
@@ -142,7 +158,7 @@ namespace WinCopies.GUI.IO
                     {
 
                         _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(
-                    (_filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems(_filter)).Select(_browsableObjectInfo => new BrowsableObjectInfoViewModel(_browsableObjectInfo)));
+                    (_filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems(_filter)).Select(_browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));
 
                     }
                     catch (ShellException) { }
@@ -190,7 +206,7 @@ namespace WinCopies.GUI.IO
         public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => InnerBrowsableObjectInfo = browsableObjectInfo ?? throw Util.Util.GetArgumentNullException(nameof(browsableObjectInfo));
 
         public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, Predicate<IBrowsableObjectInfo> filter) : this(browsableObjectInfo) => _filter = filter;
-        
+
         public int CompareTo(
 #if !NETFRAMEWORK
             [AllowNull]
@@ -237,10 +253,5 @@ namespace WinCopies.GUI.IO
 
         public static bool operator >=(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.CompareTo(right) >= 0;
         #endregion
-    }
-
-    public class TreeViewBrowsableObjectInfoViewModel : BrowsableObjectInfoViewModel
-    {
-        public TreeViewBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) : base(browsableObjectInfo, _browsableObjectInfo => _browsableObjectInfo.IsBrowsable) { }
     }
 }
