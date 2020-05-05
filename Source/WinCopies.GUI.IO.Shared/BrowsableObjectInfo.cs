@@ -1,5 +1,4 @@
-﻿using AttachedCommandBehavior;
-using Microsoft.WindowsAPICodePack.Shell;
+﻿using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using WinCopies.IO;
 using WinCopies.Linq;
+using WinCopies.Util.Commands;
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI.IO
@@ -24,8 +24,6 @@ namespace WinCopies.GUI.IO
         string Text { get; set; }
 
         IBrowsableObjectInfoViewModel Path { get; set; }
-
-        ICommand GoButtonCommand { get; set; }
 
         SelectionMode SelectionMode { get; set; }
 
@@ -49,10 +47,6 @@ namespace WinCopies.GUI.IO
 
         public string Text { get => _text; set { _text = value; OnPropertyChanged(nameof(Text)); } }
 
-        private ICommand _goButtonCommand;
-
-        public ICommand GoButtonCommand { get => _goButtonCommand; set { _goButtonCommand = value; OnPropertyChanged(nameof(GoButtonCommand)); } }
-
         private ObservableCollection<IBrowsableObjectInfoViewModel> _treeViewItems;
 
         public ObservableCollection<IBrowsableObjectInfoViewModel> TreeViewItems { get => _treeViewItems; set { _treeViewItems = value; OnPropertyChanged(nameof(TreeViewItems)); } }
@@ -67,16 +61,20 @@ namespace WinCopies.GUI.IO
 
         public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
 
-        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path) : this(path, GoCommand) { }
-
-        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path, ICommand goButtonCommand)
+        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path)
         {
             Path = path;
 
-            GoButtonCommand = goButtonCommand;
+            ItemClickCommand = new DelegateCommand<IBrowsableObjectInfoViewModel>(browsableObjectInfo => true, browsableObjectInfo => Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(browsableObjectInfo.Path))));
         }
 
-        public static DelegateCommand<IExplorerControlBrowsableObjectInfoViewModel> GoCommand { get; } = new DelegateCommand<IExplorerControlBrowsableObjectInfoViewModel>() { CanExecuteDelegate = browsableObjectInfo => true, ExecuteDelegate = browsableObjectInfo => browsableObjectInfo.Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(browsableObjectInfo.Text))) };
+        public static DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel>(browsableObjectInfo => browsableObjectInfo != null &&     browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo =>browsableObjectInfo.OnGoCommandExecuted());
+
+        protected virtual bool OnGoCommandCanExecute() => true;
+
+        protected virtual void OnGoCommandExecuted() => Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(Text)));
+
+        public DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; } 
 
         //private ViewStyle _viewStyle = ViewStyle.SizeThree;
 
@@ -98,7 +96,7 @@ namespace WinCopies.GUI.IO
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo);
     }
 
-    public class TreeViewBrowsableObjectInfoViewModelFactory : IBrowsableObjectInfoViewModelFactory
+    public class TreeViewItemBrowsableObjectInfoViewModelFactory : IBrowsableObjectInfoViewModelFactory
     {
         public static Predicate<IBrowsableObjectInfo> Predicate => _browsableObjectInfo => _browsableObjectInfo.IsBrowsable;
 

@@ -5,8 +5,6 @@
     <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
     <PackageTags>WinCopies, GUI, WPF</PackageTags>
     <DocumentationFile>WinCopies.GUI.xml</DocumentationFile>
-    <VersionPrefix>2.2.0</VersionPrefix>
-    <VersionSuffix>preview3</VersionSuffix>
     <UseWPF>true</UseWPF>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.snk</AssemblyOriginatorKeyFile>
@@ -15,12 +13,8 @@
   <Import Project="..\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util">
-      <Version>2.2.0-preview3</Version>
-    </PackageReference>
-    <PackageReference Include="WinCopies.Util.Desktop">
-      <Version>2.2.0-preview3</Version>
-    </PackageReference>
+    <PackageReference Include="WinCopies.Util" Version="2.2.0-preview4" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview4" />
   </ItemGroup>
 
 </Project>

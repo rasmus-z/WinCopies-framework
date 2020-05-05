@@ -6,8 +6,6 @@
     <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
     <PackageTags>WinCopies, GUI, WPF, Templates</PackageTags>
     <DocumentationFile>WinCopies.GUI.Templates.xml</DocumentationFile>
-    <VersionPrefix>2.2.0</VersionPrefix>
-    <VersionSuffix>preview3</VersionSuffix>
     <UseWPF>true</UseWPF>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.GUI.Templates.snk</AssemblyOriginatorKeyFile>
@@ -16,9 +14,7 @@
   <Import Project="..\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop">
-      <Version>2.2.0-preview3</Version>
-    </PackageReference>
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview4" />
   </ItemGroup>
 
   <ItemGroup>

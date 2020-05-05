@@ -49,6 +49,11 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO.Shared", "..\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Icons", "..\Source\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj", "{26823ED2-71FE-4E35-895C-265B5FD3C888}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{407A1917-8A20-48AB-AE4D-974D26BB7200}"
+	ProjectSection(SolutionItems) = preProject
+		..\Source\Directory.Build.props = ..\Source\Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\Source\WinCopies.Data.Shared\WinCopies.Data.Shared.projitems*{0ea8f0f5-12a8-4f14-bf17-5422e25ed835}*SharedItemsImports = 13

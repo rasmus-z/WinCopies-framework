@@ -5,8 +5,6 @@
     <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
     <PackageTags>WinCopies, IO</PackageTags>
     <DocumentationFile>WinCopies.IO.xml</DocumentationFile>
-    <VersionPrefix>2.2.0</VersionPrefix>
-    <VersionSuffix>preview3</VersionSuffix>
     <UseWPF>true</UseWPF>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
@@ -31,7 +29,7 @@
     <PackageReference Include="WinCopies.IconLib" Version="0.75-rc" />
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.0-preview6" />
-    <PackageReference Include="WinCopies.Util" Version="2.2.0-preview3" />
+    <PackageReference Include="WinCopies.Util" Version="2.2.0-preview4" />
   </ItemGroup>
 
 </Project>

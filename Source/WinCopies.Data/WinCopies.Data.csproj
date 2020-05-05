@@ -6,8 +6,6 @@
     <Copyright>Copyright © 2020 Pierre Sprimont</Copyright>
     <PackageTags>WinCopies, Data</PackageTags>
     <DocumentationFile>WinCopies.Data.xml</DocumentationFile>
-    <VersionPrefix>2.2.0</VersionPrefix>
-    <VersionSuffix>preview3</VersionSuffix>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.Data.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -16,9 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="WinCopies.Util">
-      <Version>2.2.0-preview3</Version>
-    </PackageReference>
+    <PackageReference Include="WinCopies.Util" Version="2.2.0-preview4" />
   </ItemGroup>
 
 </Project>

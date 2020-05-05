@@ -20,8 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview3" />
-    <PackageReference Include="WinCopies.WindowsAPICodePack.Win32Native" Version="2.0.0-preview6" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview4" />
   </ItemGroup>
 
   <ItemGroup>

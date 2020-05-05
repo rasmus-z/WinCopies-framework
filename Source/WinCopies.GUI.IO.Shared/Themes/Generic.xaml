@@ -6,17 +6,77 @@
     xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
     xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util.Desktop"
     xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
-    xmlns:iconsNamespace="clr-namespace:WinCopies.GUI.Icons;assembly=WinCopies.GUI.Icons"
     xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util.Desktop"
+    xmlns:data="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
     >
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
+            <SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Stroke" Color="#FF818181"/>
+            <SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Fill" Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Stroke" Color="#FF27C7F7"/>
+            <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Fill" Color="#FFCCEEFB"/>
+            <SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Stroke" Color="#FF262626"/>
+            <SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Fill" Color="#FF595959"/>
+            <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Stroke" Color="#FF1CC4F7"/>
+            <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Fill" Color="#FF82DFFB"/>
+            <PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z"/>
+
             <!--Data converters-->
 
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-            <iconsNamespace:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
+            <data:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
+    <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Width" Value="16"/>
+        <Setter Property="Height" Value="16"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <Border Background="Transparent" Height="16" Padding="5,5,5,5" Width="16">
+                        <Path x:Name="ExpandPath" Data="{StaticResource TreeArrow}" Fill="{StaticResource TreeViewItem.TreeArrow.Static.Fill}" Stroke="{StaticResource TreeViewItem.TreeArrow.Static.Stroke}">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="135" CenterY="3" CenterX="3"/>
+                            </Path.RenderTransform>
+                        </Path>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="RenderTransform" TargetName="ExpandPath">
+                                <Setter.Value>
+                                    <RotateTransform Angle="180" CenterY="3" CenterX="3"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Fill" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.Static.Checked.Fill}"/>
+                            <Setter Property="Stroke" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.Static.Checked.Stroke}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Stroke" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Stroke}"/>
+                            <Setter Property="Fill" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Fill}"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="IsChecked" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Stroke" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Checked.Stroke}"/>
+                            <Setter Property="Fill" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Checked.Fill}"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--<Style x:Key="TreeViewItemFocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>-->
 
     <ControlTemplate x:Key="ExplorerControlTemplate" TargetType="{x:Type local:ExplorerControl}">
         <!--<DataTemplate DataType="{x:Type local:BrowsableObjectInfo}">-->
@@ -52,7 +112,7 @@
                     </Button.Content>
                 </Button>
             </Grid>
-            <TreeView Grid.Row="1" Style="{TemplateBinding TreeViewStyle}">
+            <local:ExplorerControlTreeView Grid.Row="1" Style="{TemplateBinding TreeViewStyle}">
                 <!--<TreeView.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:BrowsableObjectInfoViewModel}">
                         <Grid>
@@ -65,7 +125,7 @@
                         </Grid>
                     </DataTemplate>
                 </TreeView.ItemTemplate>-->
-            </TreeView>
+            </local:ExplorerControlTreeView>
             <ListView Grid.Column="1" Grid.Row="1" Style="{TemplateBinding ListViewStyle}">
                 <!--<Style TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListView}}">-->
                 <!--<Setter Property="ItemTemplate" Value="{StaticResource ExplorerControlSizeThreeListViewItemTemplate}" />-->
@@ -100,39 +160,89 @@
         <!--</Setter>-->
     </Style>
 
-    <DataTemplate x:Key="TreeViewItemContentDataTemplate" DataType="{x:Type local:IBrowsableObjectInfoViewModel}" x:Shared="false">
-        <local:ExplorerControlTreeViewItemContent>
-            <local:ExplorerControlTreeViewItemContent.Style>
-                <Style TargetType="{x:Type local:ExplorerControlTreeViewItemContent}" >
+    <DataTemplate x:Key="TreeViewItemHeaderDataTemplate" DataType="{x:Type local:IBrowsableObjectInfoViewModel}" x:Shared="false">
+        <local:ExplorerControlTreeViewItemHeader>
+            <local:ExplorerControlTreeViewItemHeader.Style>
+                <Style TargetType="{x:Type local:ExplorerControlTreeViewItemHeader}" >
                     <Setter Property="Icon" Value="{Binding SmallBitmapSource}" />
                     <Setter Property="ItemName" Value="{Binding LocalizedName}" />
                 </Style>
-            </local:ExplorerControlTreeViewItemContent.Style>
-        </local:ExplorerControlTreeViewItemContent>
+            </local:ExplorerControlTreeViewItemHeader.Style>
+        </local:ExplorerControlTreeViewItemHeader>
     </DataTemplate>
 
     <DataTemplate x:Key="ListViewItemContentDataTemplate" DataType="{x:Type local:IBrowsableObjectInfoViewModel}" x:Shared="false">
-        <local:ExplorerControlListViewItemContent>
+        <local:ExplorerControlListViewItemContent Command="{Binding DataContext.ItemClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" CommandParameter="{Binding}">
             <local:ExplorerControlListViewItemContent.Style>
                 <Style TargetType="{x:Type local:ExplorerControlListViewItemContent}" >
                     <Setter Property="SmallIcon" Value="{Binding SmallBitmapSource}" />
                     <Setter Property="LargeIcon" Value="{Binding LargeBitmapSource}" />
                     <Setter Property="ItemName" Value="{Binding LocalizedName}" />
                     <Setter Property="HasTransparency" Value="{Binding IsSpecialItem}" />
-                    <Setter Property="IsCheckBoxVisible" Value="{Binding IsCheckBoxVisible, RelativeSource={RelativeSource AncestorType={x:Type local:ExplorerControl}}}" />
+                    <Setter Property="IsCheckBoxVisible" Value="{Binding IsCheckBoxVisible, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" />
                 </Style>
             </local:ExplorerControlListViewItemContent.Style>
         </local:ExplorerControlListViewItemContent>
     </DataTemplate>
 
-    <Style x:Key="ExplorerControlTreeViewStyle" TargetType="{x:Type TreeView}" BasedOn="{StaticResource {x:Type TreeView}}">
+    <Style TargetType="{x:Type local:ExplorerControlTreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ExplorerControlTreeViewItem}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MinWidth="19" Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <ToggleButton x:Name="Expander" ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ExpandCollapseToggleStyle}" />
+                        <Button Command="{TemplateBinding Command}" CommandParameter="{TemplateBinding CommandParameter}" CommandTarget="{TemplateBinding CommandTarget}" x:Name="Bd" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Grid.Column="1" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="PART_Header" ContentSource="Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Button>
+                        <ItemsPresenter x:Name="ItemsHost" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="false">
+                            <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="false">
+                            <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="true">
+                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="true"/>
+                                <Condition Property="IsSelectionActive" Value="false"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}}"/>
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ExplorerControlTreeViewStyle" TargetType="{x:Type local:ExplorerControlTreeView}" BasedOn="{StaticResource {x:Type TreeView}}">
         <Setter Property="ItemsSource" Value="{Binding TreeViewItems}" />
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
-                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                    <Setter Property="HeaderTemplate" Value="{StaticResource TreeViewItemContentDataTemplate}" />
+                <Style TargetType="{x:Type local:ExplorerControlTreeViewItem}" BasedOn="{StaticResource {x:Type local:ExplorerControlTreeViewItem}}">
+                    <Setter Property="HeaderTemplate" Value="{StaticResource TreeViewItemHeaderDataTemplate}" />
                     <Setter Property="ItemsSource" Value="{Binding Items}" />
                     <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                    <Setter Property="Command" Value="{Binding DataContext.ItemClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExplorerControl}}}" />
+                    <Setter Property="CommandParameter" Value="{Binding}" />
                 </Style>
             </Setter.Value>
         </Setter>
@@ -161,20 +271,20 @@
     </Style>
 
     <DataTemplate DataType="{x:Type local:IExplorerControlBrowsableObjectInfoViewModel}" x:Shared="false">
-        <local:ExplorerControl Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}" TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}" GoButtonCommand="{Binding GoButtonCommand}" GoButtonCommandParameter="{Binding}" IsCheckBoxVisible="{Binding IsCheckBoxVisible}" />
+        <local:ExplorerControl Path="{Binding Path.Path}" Text="{Binding Text, Mode=TwoWay}" TreeViewStyle="{StaticResource ExplorerControlTreeViewStyle}" ListViewStyle="{StaticResource ExplorerControlListViewStyle}" GoButtonCommand="{x:Static local:ExplorerControlBrowsableObjectInfoViewModel.GoCommand}" GoButtonCommandParameter="{Binding}" IsCheckBoxVisible="{Binding IsCheckBoxVisible}" />
     </DataTemplate>
 
-    <Style TargetType="{x:Type local:ExplorerControlTreeViewItemContent}">
+    <Style TargetType="{x:Type local:ExplorerControlTreeViewItemHeader}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:ExplorerControlTreeViewItemContent}">
+                <ControlTemplate TargetType="{x:Type local:ExplorerControlTreeViewItemHeader}">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="32" />
+                            <ColumnDefinition Width="16" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Image Source="{TemplateBinding Icon}" />
-                        <controls:Label Grid.Column="1" Content="{TemplateBinding ItemName}" />
+                        <controls:Label Grid.Column="1" Content="{TemplateBinding ItemName}" Foreground="{TemplateBinding Foreground}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

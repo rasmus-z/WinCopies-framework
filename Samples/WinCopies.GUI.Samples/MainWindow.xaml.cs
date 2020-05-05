@@ -32,6 +32,7 @@ using System.Windows.Shapes;
 using WinCopies.GUI.Controls.Models;
 using WinCopies.GUI.Windows.Dialogs;
 using WinCopies.Util;
+using WinCopies.Util.Commands;
 
 namespace WinCopies.GUI.Samples
 {
@@ -58,7 +59,7 @@ namespace WinCopies.GUI.Samples
         {
             static void action(string s) => MessageBox.Show($"You clicked the Button{s}!");
 
-            ICommand command = new AttachedCommandBehavior.DelegateCommand<string>() { CanExecuteDelegate = s => true, ExecuteDelegate = s => action(s) };
+            ICommand command = new DelegateCommand<string>(s => true, s => action(s) );
 
             RoutedCommand routedCommand = new RoutedUICommand("ButtonCommand", "ButtonCommand", typeof(MainWindow));
 

@@ -10,7 +10,8 @@
   <Import Project="..\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview3" />
+    <PackageReference Include="WinCopies.Util" Version="2.2.0-preview4" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview4" />
   </ItemGroup>
 
   <ItemGroup>
