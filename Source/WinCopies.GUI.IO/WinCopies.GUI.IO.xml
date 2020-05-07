@@ -4,6 +4,58 @@
         <name>WinCopies.GUI.IO</name>
     </assembly>
     <members>
+        <member name="F:WinCopies.GUI.IO.ExplorerControlListViewItem.CommandProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ExplorerControlListViewItem.Command"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ExplorerControlListViewItem.CommandParameterProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ExplorerControlListViewItem.CommandParameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ExplorerControlListViewItem.CommandTargetProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ExplorerControlListViewItem.CommandTarget"/> dependency property.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.IO.ExplorerControlListViewItem.OnMouseDoubleClick(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Raises the <see cref="E:System.Windows.Controls.Control.MouseDoubleClick"/> routed event, tries to execute the command and, if succeeded, handles the event.
+            </summary>
+            <param name="e">The event data.</param>
+        </member>
+        <member name="M:WinCopies.GUI.IO.ExplorerControlListViewItem.OnKeyDown(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            Invoked when an unhandled System.Windows.Input.Keyboard.KeyDown attached event reaches an element in its route that is derived from this class. If the <see cref="P:System.Windows.Input.KeyEventArgs.Key"/> property of <paramref name="e"/> is defined to <see cref="F:System.Windows.Input.Key.Enter"/>, tries to execute the command and, if succeeded, handles the event. Implement this method to add class handling for this event.
+            </summary>
+            <param name="e">The <see cref="T:System.Windows.Input.KeyEventArgs"/> that contains the event data.</param>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ExplorerControlListViewItemContent.IsCheckBoxVisibleProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ExplorerControlListViewItemContent.IsCheckBoxVisible"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ExplorerControlListViewItemContent.SmallIconProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ExplorerControlListViewItemContent.SmallIcon"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ExplorerControlListViewItemContent.LargeIconProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ExplorerControlListViewItemContent.LargeIcon"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ExplorerControlListViewItemContent.ItemNameProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ExplorerControlListViewItemContent.ItemName"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ExplorerControlListViewItemContent.HasTransparencyProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ExplorerControlListViewItemContent.HasTransparency"/> dependency property.
+            </summary>
+        </member>
         <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
             <summary>
             GeneratedInternalTypeHelper

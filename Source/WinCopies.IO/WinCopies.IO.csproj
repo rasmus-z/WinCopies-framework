@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IconExtractor.dll" Version="1.0.2" />
+    <PackageReference Include="WinCopies.IconExtractor" Version="1.0.3-rc" />
     <PackageReference Include="WinCopies.IconLib" Version="0.75-rc" />
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.0-preview6" />

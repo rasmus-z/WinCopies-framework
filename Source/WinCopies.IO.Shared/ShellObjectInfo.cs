@@ -157,7 +157,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a value that indicates whether this <see cref="ShellObjectInfo"/> is browsable.
         /// </summary>
-        public override bool IsBrowsable => (ShellObject is IEnumerable<ShellObject>) && FileType != FileType.File && FileType != FileType.Link; // FileType == FileTypes.Folder || FileType == FileTypes.Drive || (FileType == FileTypes.SpecialFolder && SpecialFolder != SpecialFolders.Computer) || FileType == FileTypes.Archive;
+        public override bool IsBrowsable => /*(*/ShellObject is IEnumerable<ShellObject>/*) && FileType != FileType.File && FileType != FileType.Link*/; // FileType == FileTypes.Folder || FileType == FileTypes.Drive || (FileType == FileTypes.SpecialFolder && SpecialFolder != SpecialFolders.Computer) || FileType == FileTypes.Archive;
 
         public Stream ArchiveFileStream { get; private set; }          /*new FileStream(_archiveItemInfoProvider.ArchiveShellObject.Path, FileMode.Open, FileAccess.ReadWrite, FileShare.None)*/
 
@@ -411,7 +411,7 @@ namespace WinCopies.IO
 
             {
 
-                if (shellFolder is ShellFileSystemFolder shellFileSystemFolder)
+                if (shellObject is ShellFileSystemFolder shellFileSystemFolder)
 
                 {
 
@@ -425,13 +425,13 @@ namespace WinCopies.IO
 
                 }
 
-                if (shellFolder is NonFileSystemKnownFolder nonFileSystemKnownFolder)
+                if (shellObject is NonFileSystemKnownFolder nonFileSystemKnownFolder)
 
                     return new ShellObjectInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder, shellObject);
 
                 else if (shellObject is ShellNonFileSystemFolder)
 
-                    return new ShellObjectInfo(shellObject.ParsingName, FileType.Other, shellObject);
+                    return new ShellObjectInfo(shellObject.ParsingName, FileType.Folder, shellObject);
 
             }
 
@@ -566,25 +566,17 @@ namespace WinCopies.IO
 #endif
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func)
-        {
-            switch (FileType)
-            {
-                case FileType.Archive:
-                    return func is null ? GetArchiveItemInfoItems(null) : GetArchiveItemInfoItems(null).Where(func);
-                case FileType.Drive:
-                case FileType.Folder:
-                case FileType.KnownFolder:
-                case FileType.Library:
-                    return func is null ? ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject)) : ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject)).Where(func);
-                default:
-                    return null;
-            }
-        }
+        public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func) => IsBrowsable
+                ? func is null ? ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject)) : ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject)).Where(func)
+                : null;
 
         private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
         {
-            var enumerator = new ArchiveItemInfoEnumerator(this, func);
+#if NETCORE
+            using var enumerator = new ArchiveItemInfoEnumerator(this, func);
+#else
+            using (var enumerator = new ArchiveItemInfoEnumerator(this, func))
+#endif
 
             while (enumerator.MoveNext())
 
@@ -629,7 +621,7 @@ namespace WinCopies.IO
 
         //}
 
-        #endregion
+#endregion
 
         //{
 

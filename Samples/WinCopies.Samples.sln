@@ -41,10 +41,6 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.GUI.Windows.Share
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.IO", "..\Source\WinCopies.IO\WinCopies.IO.csproj", "{E98943E7-A3AB-4CB8-B31D-9D6B6206276A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.IO.FileProcesses", "..\Source\WinCopies.IO.FileProcesses\WinCopies.IO.FileProcesses.csproj", "{453179A1-E4DF-4802-8BEB-9A4E7CF42BD6}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO.FileProcesses.Shared", "..\Source\WinCopies.IO.FileProcesses.Shared\WinCopies.IO.FileProcesses.Shared.shproj", "{ACEEF113-2233-4C78-B0F2-87D104BAA60C}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.IO.Shared", "..\Source\WinCopies.IO.Shared\WinCopies.IO.Shared.shproj", "{5C6A8E8F-21AB-4C80-B898-5FB090CB72BD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Icons", "..\Source\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj", "{26823ED2-71FE-4E35-895C-265B5FD3C888}"
@@ -62,7 +58,6 @@ Global
 		..\Source\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{3d42b29b-e970-4a75-a30a-32c06e30511b}*SharedItemsImports = 5
 		..\Source\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{3ef25a9c-fc6e-4808-aa1f-c72d2dd7d90f}*SharedItemsImports = 5
 		..\Source\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{3fa63940-0513-455d-a3d1-fba954c22869}*SharedItemsImports = 13
-		..\Source\WinCopies.IO.FileProcesses.Shared\WinCopies.IO.FileProcesses.Shared.projitems*{453179a1-e4df-4802-8beb-9a4e7cf42bd6}*SharedItemsImports = 5
 		..\Source\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems*{4feebc6f-0d75-4940-9718-ae5d34988518}*SharedItemsImports = 5
 		..\Source\WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{589fcd51-85a1-46ff-ab94-3cdd133f92de}*SharedItemsImports = 13
 		..\Source\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems*{5c6a8e8f-21ab-4c80-b898-5fb090cb72bd}*SharedItemsImports = 13
@@ -70,7 +65,6 @@ Global
 		..\Source\WinCopies.GUI.Templates.Shared\WinCopies.GUI.Templates.Shared.projitems*{7d45384e-6983-47f1-afdc-42cd322a6d1b}*SharedItemsImports = 5
 		..\Source\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems*{8e59282e-c7fb-44dc-8617-a1b2a932c5a9}*SharedItemsImports = 13
 		..\Source\WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{a43aee04-0665-4d64-a4b9-7ff1e471bf29}*SharedItemsImports = 13
-		..\Source\WinCopies.IO.FileProcesses.Shared\WinCopies.IO.FileProcesses.Shared.projitems*{aceef113-2233-4c78-b0f2-87d104baa60c}*SharedItemsImports = 13
 		..\Source\WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems*{bc2bc116-9e76-40f3-847d-332b2febbbca}*SharedItemsImports = 5
 		..\Source\WinCopies.GUI.Shared\WinCopies.GUI.Shared.projitems*{c5a0ebad-b172-49f2-a3ba-e46e0be8fb43}*SharedItemsImports = 5
 		..\Source\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{d3cf4a66-e251-4e4e-9643-e73ccad4658d}*SharedItemsImports = 5
@@ -122,10 +116,6 @@ Global
 		{E98943E7-A3AB-4CB8-B31D-9D6B6206276A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E98943E7-A3AB-4CB8-B31D-9D6B6206276A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E98943E7-A3AB-4CB8-B31D-9D6B6206276A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{453179A1-E4DF-4802-8BEB-9A4E7CF42BD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{453179A1-E4DF-4802-8BEB-9A4E7CF42BD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{453179A1-E4DF-4802-8BEB-9A4E7CF42BD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{453179A1-E4DF-4802-8BEB-9A4E7CF42BD6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{26823ED2-71FE-4E35-895C-265B5FD3C888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{26823ED2-71FE-4E35-895C-265B5FD3C888}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26823ED2-71FE-4E35-895C-265B5FD3C888}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -152,8 +142,6 @@ Global
 		{4FEEBC6F-0D75-4940-9718-AE5D34988518} = {169DE35F-7B50-4B22-B7FA-77E00A07A2D1}
 		{3FA63940-0513-455D-A3D1-FBA954C22869} = {169DE35F-7B50-4B22-B7FA-77E00A07A2D1}
 		{E98943E7-A3AB-4CB8-B31D-9D6B6206276A} = {169DE35F-7B50-4B22-B7FA-77E00A07A2D1}
-		{453179A1-E4DF-4802-8BEB-9A4E7CF42BD6} = {169DE35F-7B50-4B22-B7FA-77E00A07A2D1}
-		{ACEEF113-2233-4C78-B0F2-87D104BAA60C} = {169DE35F-7B50-4B22-B7FA-77E00A07A2D1}
 		{5C6A8E8F-21AB-4C80-B898-5FB090CB72BD} = {169DE35F-7B50-4B22-B7FA-77E00A07A2D1}
 		{26823ED2-71FE-4E35-895C-265B5FD3C888} = {169DE35F-7B50-4B22-B7FA-77E00A07A2D1}
 	EndGlobalSection

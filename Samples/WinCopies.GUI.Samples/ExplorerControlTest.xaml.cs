@@ -34,7 +34,7 @@ namespace WinCopies.GUI.Samples
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Items = new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { new ExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\")))) { TreeViewItems = new ObservableCollection<IBrowsableObjectInfoViewModel>() { { new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\Users")), TreeViewItemBrowsableObjectInfoViewModelFactory.Predicate) { IsSelected = true, Factory = new TreeViewItemBrowsableObjectInfoViewModelFactory() } } }, IsSelected = true, SelectionMode = SelectionMode.Extended, IsCheckBoxVisible = true } } };
+            Items = new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { new ExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\")))) { TreeViewItems = new ObservableCollection<IBrowsableObjectInfoViewModel>() { { new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\Users")), TreeViewItemBrowsableObjectInfoViewModelFactory.Predicate) { IsSelected = true, Factory = new TreeViewItemBrowsableObjectInfoViewModelFactory() } }, { new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(KnownFolders.RecycleBin.ParsingName))) } }, IsSelected = true, SelectionMode = SelectionMode.Extended, IsCheckBoxVisible = true } } };
         }
     }
 }

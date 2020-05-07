@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Controls;
@@ -13,10 +14,11 @@ using WinCopies.IO;
 using WinCopies.Linq;
 using WinCopies.Util.Commands;
 using WinCopies.Util.Data;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.GUI.IO
 {
-    public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon, INotifyPropertyChanged
+    public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon
     {
 
         ObservableCollection<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
@@ -63,18 +65,27 @@ namespace WinCopies.GUI.IO
 
         public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path)
         {
-            Path = path;
+            _path = path ?? throw GetArgumentNullException(nameof(path));
 
-            ItemClickCommand = new DelegateCommand<IBrowsableObjectInfoViewModel>(browsableObjectInfo => true, browsableObjectInfo => Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(browsableObjectInfo.Path))));
+            ItemClickCommand = new DelegateCommand<IBrowsableObjectInfoViewModel>(browsableObjectInfo => true, browsableObjectInfo =>
+            {
+                if (((IShellObjectInfo)browsableObjectInfo.InnerBrowsableObjectInfo).FileType == FileType.File)
+
+                    _ = Process.Start(new ProcessStartInfo(browsableObjectInfo.Path) { UseShellExecute = true });
+
+                else
+
+                    Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(browsableObjectInfo.Path)));
+            });
         }
 
-        public static DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel>(browsableObjectInfo => browsableObjectInfo != null &&     browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo =>browsableObjectInfo.OnGoCommandExecuted());
+        public static DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel>(browsableObjectInfo => browsableObjectInfo != null && browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo => browsableObjectInfo.OnGoCommandExecuted());
 
         protected virtual bool OnGoCommandCanExecute() => true;
 
         protected virtual void OnGoCommandExecuted() => Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(Text)));
 
-        public DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; } 
+        public DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; }
 
         //private ViewStyle _viewStyle = ViewStyle.SizeThree;
 
@@ -86,9 +97,11 @@ namespace WinCopies.GUI.IO
         bool IsSelected { get; set; }
     }
 
-    public interface IBrowsableObjectInfoViewModel : IBrowsableObjectInfo, IBrowsableObjectInfoViewModelCommon, INotifyPropertyChanged
+    public interface IBrowsableObjectInfoViewModel : IBrowsableObjectInfo, IBrowsableObjectInfoViewModelCommon
     {
         ObservableCollection<IBrowsableObjectInfoViewModel> Items { get; }
+
+        IBrowsableObjectInfo InnerBrowsableObjectInfo { get; }
     }
 
     public interface IBrowsableObjectInfoViewModelFactory
@@ -100,10 +113,10 @@ namespace WinCopies.GUI.IO
     {
         public static Predicate<IBrowsableObjectInfo> Predicate => _browsableObjectInfo => _browsableObjectInfo.IsBrowsable;
 
-        public IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo, Predicate) { Factory = this }; 
+        public IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo, Predicate) { Factory = this };
     }
 
-    public class BrowsableObjectInfoViewModel : ViewModelBase, IBrowsableObjectInfoViewModel
+    public class BrowsableObjectInfoViewModel : ViewModel<IBrowsableObjectInfo>, IBrowsableObjectInfoViewModel
     {
 
         private Predicate<IBrowsableObjectInfo> _filter;
@@ -112,9 +125,9 @@ namespace WinCopies.GUI.IO
 
         private IBrowsableObjectInfoViewModelFactory _factory;
 
-        public IBrowsableObjectInfoViewModelFactory Factory { get => _factory; set { _factory = value; OnPropertyChanged(nameof(_factory)); } } 
+        public IBrowsableObjectInfoViewModelFactory Factory { get => _factory; set { _factory = value; OnPropertyChanged(nameof(_factory)); } }
 
-        protected IBrowsableObjectInfo InnerBrowsableObjectInfo { get; }
+        public IBrowsableObjectInfo InnerBrowsableObjectInfo => ModelGeneric;
 
         public bool IsSpecialItem => InnerBrowsableObjectInfo.IsSpecialItem;
 
@@ -154,9 +167,12 @@ namespace WinCopies.GUI.IO
 
                     try
                     {
+                        var v1 = (_filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems(_filter));
 
                         _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(
-                    (_filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems(_filter)).Select(_browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));
+
+                    v1
+                    .Select(_browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));
 
                     }
                     catch (ShellException) { }
@@ -201,7 +217,7 @@ namespace WinCopies.GUI.IO
 
         public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
 
-        public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => InnerBrowsableObjectInfo = browsableObjectInfo ?? throw Util.Util.GetArgumentNullException(nameof(browsableObjectInfo));
+        public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) : base(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo))) { }
 
         public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, Predicate<IBrowsableObjectInfo> filter) : this(browsableObjectInfo) => _filter = filter;
 
