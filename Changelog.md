@@ -9,15 +9,23 @@ CHANGELOG
 Updates
 -------
 
-???? 2.2.0-preview3
+???? 2.2.0-preview4
 ===================
 
 - .Net Core and .Net Standard are now supported.
 
-WinCopies.Data (2.2.0-preview2)
+WinCopies.Data (2.2.0-preview4)
 -------------------------------
 
 - Package now depends on Newtonsoft.Json v9.0.1
+
+First releases (2.2.0-preview4)
+-------------------------------
+
+- WinCopies.IO
+- WinCopies.GUI.Controls
+- WinCopies.GUI.IO
+- WinCopies.GUI.Icons
 
 02/09/2020 2.1
 ==============

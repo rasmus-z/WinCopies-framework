@@ -48,18 +48,13 @@ namespace WinCopies.GUI.Samples
             ShowHelpButton = true;
         }
 
-        private void Window_HelpButtonClick(object sender, RoutedEventArgs e)
-        {
-
-            _ = MessageBox.Show($"The window is currently in help mode: { IsInHelpMode }.");
-
-        }
+        private void Window_HelpButtonClick(object sender, RoutedEventArgs e) => _ = MessageBox.Show($"The window is currently in help mode: { IsInHelpMode }.");
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             static void action(string s) => MessageBox.Show($"You clicked the Button{s}!");
 
-            ICommand command = new DelegateCommand<string>(s => true, s => action(s) );
+            ICommand command = new DelegateCommand<string>(s => true, s => action(s));
 
             RoutedCommand routedCommand = new RoutedUICommand("ButtonCommand", "ButtonCommand", typeof(MainWindow));
 
@@ -78,64 +73,56 @@ namespace WinCopies.GUI.Samples
             }
         };
 
-        int i = 0;
+            int i = 0;
 
-        WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[0]();
+            WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[0]();
 
-        dialogWindow.Closed += (object _sender, EventArgs _e) => OnDialogWindowClosed(dialogWindows, i);
-
-        dialogWindow.Show();
-        }
-
-    private void OnDialogWindowClosed(Func<WinCopies.GUI.Windows.Dialogs.DialogWindow>[] dialogWindows, int i)
-    {
-
-        i++;
-
-        if (i == dialogWindows.Length)
-
-            return;
-
-        if (i % 2 == 0)
-
-        {
-
-            WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[i]();
-
-            dialogWindow.Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
+            dialogWindow.Closed += (object _sender, EventArgs _e) => OnDialogWindowClosed(dialogWindows, i);
 
             dialogWindow.Show();
-
         }
 
-        else
-
+        private void OnDialogWindowClosed(Func<WinCopies.GUI.Windows.Dialogs.DialogWindow>[] dialogWindows, int i)
         {
 
-            WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[i]();
+            i++;
 
-            dialogWindow.Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
+            if (i == dialogWindows.Length)
 
-            dialogWindow.ShowDialog();
+                return;
+
+            if (i % 2 == 0)
+
+            {
+
+                WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[i]();
+
+                dialogWindow.Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
+
+                dialogWindow.Show();
+
+            }
+
+            else
+
+            {
+
+                WinCopies.GUI.Windows.Dialogs.DialogWindow dialogWindow = dialogWindows[i]();
+
+                dialogWindow.Closed += (object sender, EventArgs e) => OnDialogWindowClosed(dialogWindows, i);
+
+                dialogWindow.ShowDialog();
+
+            }
 
         }
-
-    }
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
 
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e) => Close();
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
         private void MenuItem_Click(object sender, RoutedEventArgs e) => new Window1().Show();
 
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
-        {
-            new ExplorerControlTest().Show();
-        }
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new ExplorerControlTest().Show();
     }
 }
