@@ -1,5 +1,5 @@
-﻿WinCopies-framework (WinCopies.Data package)
-============================================
+﻿WinCopies-framework (WinCopies.GUI.Controls package)
+====================================================
 
 The WinCopies® software framework
 
@@ -14,7 +14,7 @@ See the Change log.
 Description
 -----------
 
-Some utilities for data manipulation (SQL, XML, JSON)
+Some WPF controls.
 
 Project link
 ------------
