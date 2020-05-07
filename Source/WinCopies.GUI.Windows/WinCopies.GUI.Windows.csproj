@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.Windows.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
+    <DocumentationFile>WinCopies.GUI.Windows.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <Import Project="..\WinCopies.GUI.Windows.Shared\WinCopies.GUI.Windows.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.0-preview6" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinCopies.GUI\WinCopies.GUI.csproj" />
+  </ItemGroup>
+
+</Project>

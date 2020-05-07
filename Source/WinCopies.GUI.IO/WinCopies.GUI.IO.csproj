@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <DocumentationFile>WinCopies.GUI.IO.xml</DocumentationFile>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinCopies.GUI.IO.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <Import Project="..\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="WinCopies.Util" Version="2.2.0-preview4" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinCopies.GUI.Controls\WinCopies.GUI.Controls.csproj" />
+    <ProjectReference Include="..\WinCopies.GUI.Icons\WinCopies.GUI.Icons.csproj" />
+    <ProjectReference Include="..\WinCopies.IO\WinCopies.IO.csproj" />
+  </ItemGroup>
+
+</Project>
