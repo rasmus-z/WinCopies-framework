@@ -283,16 +283,9 @@ namespace WinCopies.IO
 
         public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func) => func is null ? GetArchiveItemInfoItems(null) : GetArchiveItemInfoItems(null).Where(func);
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetArchiveItemInfoItems(null) ;
 
-        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
-        {
-            var enumerator = new ArchiveItemInfoEnumerator(this, func);
-
-            while (enumerator.MoveNext())
-
-                yield return enumerator.Current;
-        }
+        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new ArchiveItemInfoEnumerator(this, func);
 
         //#if DEBUG
 

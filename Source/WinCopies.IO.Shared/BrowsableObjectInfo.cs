@@ -190,9 +190,7 @@ namespace WinCopies.IO
         ///// <returns>The parent of this <see cref="BrowsableObjectInfo"/>.</returns>
         //protected abstract IBrowsableObjectInfo GetParent();
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
-
-        public abstract IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func);
+        public abstract IEnumerable<IBrowsableObjectInfo> GetItems() ;
 
         /// <summary>
         /// Gets a value that indicates whether the current object is disposed.

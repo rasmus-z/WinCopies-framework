@@ -69,10 +69,10 @@ namespace WinCopies.IO
             ArchiveFileInfo = null;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ArchiveFileInfoEnumeratorStruct"/> struct with the given <see cref="SevenZip.ArchiveFileInfo"/>.
-        /// </summary>
-        /// <param name="path">The <see cref="SevenZip.ArchiveFileInfo"/> that represents the archive item.</param>
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="ArchiveFileInfoEnumeratorStruct"/> struct with the given <see cref="SevenZip.ArchiveFileInfo"/>.
+        ///// </summary>
+        ///// <param name="path">The <see cref="SevenZip.ArchiveFileInfo"/> that represents the archive item.</param>
         public ArchiveFileInfoEnumeratorStruct(ArchiveFileInfo archiveFileInfo)
         {
             Path = null;
@@ -529,16 +529,7 @@ namespace WinCopies.IO
         {
             ThrowIfNull(func, nameof(func));
 
-            switch (FileType)
-            {
-                case FileType.Drive:
-                case FileType.Folder:
-                case FileType.KnownFolder:
-                case FileType.Library:
-                    return ((IEnumerable<ShellObject>)ShellObject).Where(func).Select(shellObject => From(shellObject));
-                default:
-                    return null;
-            }
+            return IsBrowsable ? ((IEnumerable<ShellObject>)ShellObject).Where(func).Select(shellObject => From(shellObject)) : null;
         }
 
         public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
@@ -566,22 +557,11 @@ namespace WinCopies.IO
 #endif
         }
 
-        public override IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func) => IsBrowsable
-                ? func is null ? ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject)) : ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject)).Where(func)
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => IsBrowsable
+                ? ((IEnumerable<ShellObject>)ShellObject).Select(shellObject => From(shellObject))
                 : null;
 
-        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
-        {
-#if NETCORE
-            using var enumerator = new ArchiveItemInfoEnumerator(this, func);
-#else
-            using (var enumerator = new ArchiveItemInfoEnumerator(this, func))
-#endif
-
-            while (enumerator.MoveNext())
-
-                yield return enumerator.Current;
-        }
+        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new ArchiveItemInfoEnumerator(this, func);
 
         ///// <summary>
         ///// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
@@ -621,7 +601,7 @@ namespace WinCopies.IO
 
         //}
 
-#endregion
+        #endregion
 
         //{
 

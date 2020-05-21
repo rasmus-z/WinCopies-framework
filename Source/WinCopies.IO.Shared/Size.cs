@@ -16,6 +16,8 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using WinCopies.Util;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
@@ -76,24 +78,24 @@ namespace WinCopies.IO
     /// <summary>
     /// Represent a file size in byte-based unit.
     /// </summary>
-    public struct Size
+    public struct Size : IComparable<Size>, IComparable<byte>, IComparable<ushort>, IComparable<uint>, IComparable<ulong>, IComparable<sbyte>, IComparable<short>, IComparable<int>, IComparable<long>
     {
 
         /// <summary>
         /// The numeric value in bytes.
         /// </summary>
-        public ulong ValueInBytes { get; }
+        public WinCopies.Util.CheckedUInt64 ValueInBytes { get; }
 
         public float GetFloatValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
-                ? ValueInBytes
+                ? (float)ValueInBytes
                 : (float)ValueInBytes / Util.Math.Pow(1024f, (float)unit);
 
         public double GetDoubleValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
-                ? ValueInBytes
-                : (double)ValueInBytes / Math.Pow(1024d, (double)unit);
+                ? (double)ValueInBytes
+                : (double)ValueInBytes / System.Math.Pow(1024d, (double)unit);
 
         public decimal GetDecimalValueInUnit(in ByteUnit unit) => unit == ByteUnit.Byte
-                ? ValueInBytes
+                ? (decimal)ValueInBytes
                 : (decimal)ValueInBytes / Util.Math.Pow(1024m, (decimal)unit);
 
         public float GetFloatValueInUnit() => GetFloatValueInUnit(Unit);
@@ -122,7 +124,7 @@ namespace WinCopies.IO
 
                     ushort newUnit = 0;
 
-                    float value;
+                    //float value;
 
                     var newValue = (float)ValueInBytes;
 
@@ -133,7 +135,7 @@ namespace WinCopies.IO
 
                         newUnit++;
 
-                        value = newValue;
+                        //value = newValue;
 
                         newValue /= 1024;
 
@@ -151,6 +153,13 @@ namespace WinCopies.IO
         // public Speed() { Size = 0; Unit = Unit.Byte; }
 
         public Size(in ulong valueInBytes)
+        {
+            ValueInBytes = new CheckedUInt64(valueInBytes);
+
+            _unit = null;
+        }
+
+        public Size(in CheckedUInt64 valueInBytes)
         {
             ValueInBytes = valueInBytes;
 
@@ -272,6 +281,64 @@ namespace WinCopies.IO
         /// <returns>A string with the size value and unit</returns>
         public override string ToString() => $"{GetFloatValueInUnit(Unit)} {GetDisplaySizeUnit(Unit)}";
 
+        public int CompareTo(
+#if NETCORE
+            [AllowNull]
+#endif
+        Size other) =>
+#if NETCORE
+            other == null ||
+#endif
+            this < other ? -1 : this == other ? 0 : 1;
+
+        public int CompareTo(
+#if NETCORE
+            [AllowNull]
+        #endif
+        long other) => other < 0 ? 1 : this < other ? -1 : this == other ? 0 : 1;
+
+        public int CompareTo(
+#if NETCORE
+            [AllowNull]
+        #endif
+        int other) => other < 0 ? 1 : this < other ? -1 : this == other ? 0 : 1;
+
+        public int CompareTo(
+#if NETCORE
+            [AllowNull]
+        #endif
+        short other) => other < 0 ? 1 : this < other ? -1 : this == other ? 0 : 1;
+
+        public int CompareTo(
+#if NETCORE
+            [AllowNull]
+        #endif
+        sbyte other) => other < 0 ? 1 : this < other ? -1 : this == other ? 0 : 1;
+
+        public int CompareTo(
+#if NETCORE
+            [AllowNull]
+        #endif
+        ulong other) => this < other ? -1 : this == other ? 0 : 1;
+
+        public int CompareTo(
+#if NETCORE
+            [AllowNull]
+        #endif
+        uint other) => this < other ? -1 : this == other ? 0 : 1;
+
+        public int CompareTo(
+#if NETCORE
+            [AllowNull]
+        #endif
+        ushort other) => this < other ? -1 : this == other ? 0 : 1;
+
+        public int CompareTo(
+#if NETCORE
+            [AllowNull]
+        #endif
+        byte other) => this < other ? -1 : this == other ? 0 : 1;
+
         #region Size operators
 
         #region Equality operators 
@@ -287,7 +354,7 @@ namespace WinCopies.IO
         public static bool operator <(in Size s1, in Size s2) => s1.Unit < s2.Unit ? true : s1.ValueInBytes < s2.ValueInBytes;
 
         /// <summary>
-        /// Checkes if <paramref name="s1"/> is greater than <paramref name="s2"/>.
+        /// Checks if <paramref name="s1"/> is greater than <paramref name="s2"/>.
         /// </summary>
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
@@ -1008,7 +1075,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns>A <see cref="Size"/> with the substraction of <paramref name="s2"/> by <paramref name="s1"/>.</returns>
-        public static Size operator -(in Size s1, in Size s2) => new Size(s1.ValueInBytes - s2.ValueInBytes);
+        public static Size operator -(in Size s1, in Size s2) => new Size(s1.ValueInBytes.Value - s2.ValueInBytes.Value);
 
         /// <summary>
         /// Returns a <see cref="Size"/> with the multiplication of <paramref name="s1"/> by <paramref name="s2"/>.
@@ -1024,7 +1091,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns>A <see cref="Size"/> with the division of <paramref name="s1"/> by <paramref name="s2"/></returns>
-        public static Size operator /(in Size s1, in Size s2) => new Size(s1.ValueInBytes / s2.ValueInBytes);
+        public static Size operator /(in Size s1, in Size s2) => new Size(s1.ValueInBytes.Value / s2.ValueInBytes.Value);
 
         /// <summary>
         /// Returns a <see cref="Size"/> with the remainder of <paramref name="s1"/> by <paramref name="s2"/>.
@@ -1032,7 +1099,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns>A <see cref="Size"/> with the remainder of <paramref name="s1"/> by <paramref name="s2"/></returns>
-        public static Size operator %(in Size s1, in Size s2) => new Size(s1.ValueInBytes % s2.ValueInBytes);
+        public static Size operator %(in Size s1, in Size s2) => new Size(s1.ValueInBytes.Value % s2.ValueInBytes.Value);
 
         #endregion
 
@@ -1044,11 +1111,11 @@ namespace WinCopies.IO
 
         public static Size operator +(in Size s, in sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size(s.ValueInBytes + (ulong)b);
 
-        public static Size operator -(in Size s, in sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size(s.ValueInBytes - (ulong)b);
+        public static Size operator -(in Size s, in sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size(s.ValueInBytes.Value - (ulong)b);
 
-        public static Size operator *(in Size s, in sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)b);
+        public static Size operator *(in Size s, in sbyte b) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)b);
 
-        public static Size operator /(in Size s, in sbyte b) => b <= 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be greater than 0.") : new Size(s.ValueInBytes / (ulong)b);
+        public static Size operator /(in Size s, in sbyte b) => b <= 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be greater than 0.") : new Size(s.ValueInBytes.Value / (ulong)b);
 
         // public static Size operator %(in Size s, in sbyte b) => new Size(s.ValueInBytes % (ulong)b);
 
@@ -1060,13 +1127,13 @@ namespace WinCopies.IO
 
         public static Size operator +(in Size s, in byte b) => new Size(s.ValueInBytes + (ulong)b);
 
-        public static Size operator -(in Size s, in byte b) => new Size(s.ValueInBytes - (ulong)b);
+        public static Size operator -(in Size s, in byte b) => new Size(s.ValueInBytes.Value - (ulong)b);
 
         public static Size operator *(in Size s, in byte b) => new Size(s.ValueInBytes * (ulong)b);
 
-        public static Size operator /(in Size s, in byte b) => new Size(s.ValueInBytes / (ulong)b);
+        public static Size operator /(in Size s, in byte b) => new Size(s.ValueInBytes.Value / (ulong)b);
 
-        public static Size operator %(in Size s, in byte b) => new Size(s.ValueInBytes % (ulong)b);
+        public static Size operator %(in Size s, in byte b) => new Size(s.ValueInBytes.Value % (ulong)b);
 
         #endregion
 
@@ -1074,13 +1141,13 @@ namespace WinCopies.IO
 
         #region short operators
 
-        public static Size operator +(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size(s.ValueInBytes + (ulong)@short);
+        public static Size operator +(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size(s.ValueInBytes + (ulong)@short);
 
-        public static Size operator -(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size(s.ValueInBytes - (ulong)@short);
+        public static Size operator -(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size(s.ValueInBytes.Value - (ulong)@short);
 
-        public static Size operator *(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)@short);
+        public static Size operator *(in Size s, in short @short) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)@short);
 
-        public static Size operator /(in Size s, in short @short) => @short <= 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short, $"{nameof(@short)} must be greater than 0.") : new Size(s.ValueInBytes / (ulong)@short);
+        public static Size operator /(in Size s, in short @short) => @short <= 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be greater than 0.") : new Size(s.ValueInBytes.Value / (ulong)@short);
 
         // public static Size operator %(in Size s, in short @short) => new Size(s.ValueInBytes % (ulong)@short);
 
@@ -1092,13 +1159,13 @@ namespace WinCopies.IO
 
         public static Size operator +(in Size s, in ushort @short) => new Size(s.ValueInBytes + (ulong)@short);
 
-        public static Size operator -(in Size s, in ushort @short) => new Size(s.ValueInBytes - (ulong)@short);
+        public static Size operator -(in Size s, in ushort @short) => new Size(s.ValueInBytes.Value - (ulong)@short);
 
         public static Size operator *(in Size s, in ushort @short) => new Size(s.ValueInBytes * (ulong)@short);
 
-        public static Size operator /(in Size s, in ushort @short) => new Size(s.ValueInBytes / (ulong)@short);
+        public static Size operator /(in Size s, in ushort @short) => new Size(s.ValueInBytes.Value / (ulong)@short);
 
-        public static Size operator %(in Size s, in ushort @short) => new Size(s.ValueInBytes % (ulong)@short);
+        public static Size operator %(in Size s, in ushort @short) => new Size(s.ValueInBytes.Value % (ulong)@short);
 
         #endregion
 
@@ -1106,13 +1173,13 @@ namespace WinCopies.IO
 
         #region int operators
 
-        public static Size operator +(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size(s.ValueInBytes + (ulong)i);
+        public static Size operator +(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size(s.ValueInBytes + (ulong)i);
 
-        public static Size operator -(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size(s.ValueInBytes - (ulong)i);
+        public static Size operator -(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size(s.ValueInBytes.Value - (ulong)i);
 
-        public static Size operator *(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)i);
+        public static Size operator *(in Size s, in int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)i);
 
-        public static Size operator /(in Size s, in int i) => i <= 0 ? throw new ArgumentOutOfRangeException(nameof(i),i, $"{nameof(i)} must be greater than 0.") : new Size(s.ValueInBytes / (ulong)i);
+        public static Size operator /(in Size s, in int i) => i <= 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be greater than 0.") : new Size(s.ValueInBytes.Value / (ulong)i);
 
         // public static Size operator %(in Size s, in int i) => new Size(s.ValueInBytes % (ulong)i);
 
@@ -1124,13 +1191,13 @@ namespace WinCopies.IO
 
         public static Size operator +(in Size s, in uint i) => new Size(s.ValueInBytes + (ulong)i);
 
-        public static Size operator -(in Size s, in uint i) => new Size(s.ValueInBytes - (ulong)i);
+        public static Size operator -(in Size s, in uint i) => new Size(s.ValueInBytes.Value - (ulong)i);
 
         public static Size operator *(in Size s, in uint i) => new Size(s.ValueInBytes * (ulong)i);
 
-        public static Size operator /(in Size s, in uint i) => new Size(s.ValueInBytes / (ulong)i);
+        public static Size operator /(in Size s, in uint i) => new Size(s.ValueInBytes.Value / (ulong)i);
 
-        public static Size operator %(in Size s, in uint i) => new Size(s.ValueInBytes % (ulong)i);
+        public static Size operator %(in Size s, in uint i) => new Size(s.ValueInBytes.Value % (ulong)i);
 
         #endregion
 
@@ -1138,13 +1205,13 @@ namespace WinCopies.IO
 
         #region long operators
 
-        public static Size operator +(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size(s.ValueInBytes + (ulong)l);
+        public static Size operator +(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size(s.ValueInBytes + (ulong)l);
 
-        public static Size operator -(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size(s.ValueInBytes - (ulong)l);
+        public static Size operator -(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size(s.ValueInBytes.Value - (ulong)l);
 
-        public static Size operator *(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)l);
+        public static Size operator *(in Size s, in long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l == 0 ? new Size(0) : new Size(s.ValueInBytes * (ulong)l);
 
-        public static Size operator /(in Size s, in long l) => l <= 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be greater than 0.") : new Size(s.ValueInBytes / (ulong)l);
+        public static Size operator /(in Size s, in long l) => l <= 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be greater than 0.") : new Size(s.ValueInBytes.Value / (ulong)l);
 
         // public static Size operator %(in Size s, in long l) => new Size(s.ValueInBytes % (ulong)l);
 
@@ -1156,13 +1223,13 @@ namespace WinCopies.IO
 
         public static Size operator +(in Size s, in ulong l) => new Size(s.ValueInBytes + l);
 
-        public static Size operator -(in Size s, in ulong l) => new Size(s.ValueInBytes - l);
+        public static Size operator -(in Size s, in ulong l) => new Size(s.ValueInBytes.Value - l);
 
         public static Size operator *(in Size s, in ulong l) => new Size(s.ValueInBytes * l);
 
-        public static Size operator /(in Size s, in ulong l) => new Size(s.ValueInBytes / l);
+        public static Size operator /(in Size s, in ulong l) => new Size(s.ValueInBytes.Value / l);
 
-        public static Size operator %(in Size s, in ulong l) => new Size(s.ValueInBytes % l);
+        public static Size operator %(in Size s, in ulong l) => new Size(s.ValueInBytes.Value % l);
 
         #endregion
 
@@ -1174,13 +1241,13 @@ namespace WinCopies.IO
 
         #region sbyte operators
 
-        public static Size operator +(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size((ulong)b + s.ValueInBytes);
+        public static Size operator +(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size((ulong)b + s.ValueInBytes);
 
-        public static Size operator -(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size((ulong)b - s.ValueInBytes);
+        public static Size operator -(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? s : new Size((ulong)b - s.ValueInBytes.Value);
 
-        public static Size operator *(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be equal or greater than 0.") : b == 0 ? new Size(0) : new Size((ulong)b * s.ValueInBytes);
+        public static Size operator *(in sbyte b, in Size s) => b < 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be equal or greater than 0.") : b == 0 ? new Size(0) : new Size((ulong)b * s.ValueInBytes);
 
-        public static Size operator /(in sbyte b, in Size s) => b <= 0 ? throw new ArgumentOutOfRangeException(nameof(b),b,$"{nameof(b)} must be greater than 0.") : b == 0 ? s : new Size((ulong)b / s.ValueInBytes);
+        public static Size operator /(in sbyte b, in Size s) => b <= 0 ? throw new ArgumentOutOfRangeException(nameof(b), b, $"{nameof(b)} must be greater than 0.") : b == 0 ? s : new Size((ulong)b / s.ValueInBytes.Value);
 
         // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
@@ -1192,13 +1259,13 @@ namespace WinCopies.IO
 
         public static Size operator +(in byte b, in Size s) => new Size((ulong)b + s.ValueInBytes);
 
-        public static Size operator -(in byte b, in Size s) => new Size((ulong)b - s.ValueInBytes);
+        public static Size operator -(in byte b, in Size s) => new Size((ulong)b - s.ValueInBytes.Value);
 
         public static Size operator *(in byte b, in Size s) => new Size((ulong)b * s.ValueInBytes);
 
-        public static Size operator /(in byte b, in Size s) => new Size((ulong)b / s.ValueInBytes);
+        public static Size operator /(in byte b, in Size s) => new Size((ulong)b / s.ValueInBytes.Value);
 
-        public static Size operator %(in byte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
+        public static Size operator %(in byte b, in Size s) => new Size((ulong)b % s.ValueInBytes.Value);
 
         #endregion
 
@@ -1206,13 +1273,13 @@ namespace WinCopies.IO
 
         #region short operators
 
-        public static Size operator +(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size((ulong)@short + s.ValueInBytes);
+        public static Size operator +(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size((ulong)@short + s.ValueInBytes);
 
-        public static Size operator -(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size((ulong)@short - s.ValueInBytes);
+        public static Size operator -(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? s : new Size((ulong)@short - s.ValueInBytes.Value);
 
-        public static Size operator *(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? new Size(0) : new Size((ulong)@short * s.ValueInBytes);
+        public static Size operator *(in short @short, in Size s) => @short < 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be equal or greater than 0.") : @short == 0 ? new Size(0) : new Size((ulong)@short * s.ValueInBytes);
 
-        public static Size operator /(in short @short, in Size s) => @short <= 0 ? throw new ArgumentOutOfRangeException(nameof(@short),@short,$"{nameof(@short)} must be greater than 0.") : @short == 0 ? s : new Size((ulong)@short / s.ValueInBytes);
+        public static Size operator /(in short @short, in Size s) => @short <= 0 ? throw new ArgumentOutOfRangeException(nameof(@short), @short, $"{nameof(@short)} must be greater than 0.") : @short == 0 ? s : new Size((ulong)@short / s.ValueInBytes.Value);
 
         // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
@@ -1224,13 +1291,13 @@ namespace WinCopies.IO
 
         public static Size operator +(in ushort @short, in Size s) => new Size((ulong)@short + s.ValueInBytes);
 
-        public static Size operator -(in ushort @short, in Size s) => new Size((ulong)@short - s.ValueInBytes);
+        public static Size operator -(in ushort @short, in Size s) => new Size((ulong)@short - s.ValueInBytes.Value);
 
         public static Size operator *(in ushort @short, in Size s) => new Size((ulong)@short * s.ValueInBytes);
 
-        public static Size operator /(in ushort @short, in Size s) => new Size((ulong)@short / s.ValueInBytes);
+        public static Size operator /(in ushort @short, in Size s) => new Size((ulong)@short / s.ValueInBytes.Value);
 
-        public static Size operator %(in ushort @short, in Size s) => new Size((ulong)@short % s.ValueInBytes);
+        public static Size operator %(in ushort @short, in Size s) => new Size((ulong)@short % s.ValueInBytes.Value);
 
         #endregion
 
@@ -1238,13 +1305,13 @@ namespace WinCopies.IO
 
         #region int operators
 
-        public static Size operator +(in int i, in Size s) => i< 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size((ulong)i + s.ValueInBytes);
+        public static Size operator +(in int i, in Size s) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size((ulong)i + s.ValueInBytes);
 
-        public static Size operator -(in int i, in Size s) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size((ulong)i - s.ValueInBytes);
+        public static Size operator -(in int i, in Size s) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? s : new Size((ulong)i - s.ValueInBytes.Value);
 
-        public static Size operator *(in int i, in Size s) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be equal or greater than 0.") : i == 0 ? new Size(0) : new Size((ulong)i * s.ValueInBytes);
+        public static Size operator *(in int i, in Size s) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? new Size(0) : new Size((ulong)i * s.ValueInBytes);
 
-        public static Size operator /(in int i, in Size s) => i <= 0 ? throw new ArgumentOutOfRangeException(nameof(i),i,$"{nameof(i)} must be greater than 0.") : i == 0 ? s : new Size((ulong)i / s.ValueInBytes);
+        public static Size operator /(in int i, in Size s) => i <= 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be greater than 0.") : i == 0 ? s : new Size((ulong)i / s.ValueInBytes.Value);
 
         // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
@@ -1256,13 +1323,13 @@ namespace WinCopies.IO
 
         public static Size operator +(in uint i, in Size s) => new Size((ulong)i + s.ValueInBytes);
 
-        public static Size operator -(in uint i, in Size s) => new Size((ulong)i - s.ValueInBytes);
+        public static Size operator -(in uint i, in Size s) => new Size((ulong)i - s.ValueInBytes.Value);
 
         public static Size operator *(in uint i, in Size s) => new Size((ulong)i * s.ValueInBytes);
 
-        public static Size operator /(in uint i, in Size s) => new Size((ulong)i / s.ValueInBytes);
+        public static Size operator /(in uint i, in Size s) => new Size((ulong)i / s.ValueInBytes.Value);
 
-        public static Size operator %(in uint i, in Size s) => new Size((ulong)i% s.ValueInBytes);
+        public static Size operator %(in uint i, in Size s) => new Size((ulong)i % s.ValueInBytes.Value);
 
         #endregion
 
@@ -1270,13 +1337,13 @@ namespace WinCopies.IO
 
         #region long operators
 
-        public static Size operator +(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size((ulong)l + s.ValueInBytes);
+        public static Size operator +(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size((ulong)l + s.ValueInBytes);
 
-        public static Size operator -(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size((ulong)l - s.ValueInBytes);
+        public static Size operator -(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l == 0 ? s : new Size((ulong)l - s.ValueInBytes.Value);
 
-        public static Size operator *(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l),l,$"{nameof(l)} must be equal or greater than 0.") : l == 0 ? new Size(0) : new Size((ulong)l * s.ValueInBytes);
+        public static Size operator *(in long l, in Size s) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l == 0 ? new Size(0) : new Size((ulong)l * s.ValueInBytes);
 
-        public static Size operator /(in long l, in Size s) => l <= 0 ? throw new ArgumentOutOfRangeException(nameof(l),l, $"{nameof(l)} must be greater than 0.") : l == 0 ? s : new Size((ulong)l / s.ValueInBytes);
+        public static Size operator /(in long l, in Size s) => l <= 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be greater than 0.") : l == 0 ? s : new Size((ulong)l / s.ValueInBytes.Value);
 
         // public static Size operator %(in sbyte b, in Size s) => new Size((ulong)b % s.ValueInBytes);
 
@@ -1288,13 +1355,13 @@ namespace WinCopies.IO
 
         public static Size operator +(in ulong l, in Size s) => new Size((ulong)l + s.ValueInBytes);
 
-        public static Size operator -(in ulong l, in Size s) => new Size((ulong)l - s.ValueInBytes);
+        public static Size operator -(in ulong l, in Size s) => new Size((ulong)l - s.ValueInBytes.Value);
 
         public static Size operator *(in ulong l, in Size s) => new Size((ulong)l * s.ValueInBytes);
 
-        public static Size operator /(in ulong l, in Size s) => new Size((ulong)l / s.ValueInBytes);
+        public static Size operator /(in ulong l, in Size s) => new Size((ulong)l / s.ValueInBytes.Value);
 
-        public static Size operator %(in ulong l, in Size s) => new Size((ulong)l% s.ValueInBytes);
+        public static Size operator %(in ulong l, in Size s) => new Size((ulong)l % s.ValueInBytes.Value);
 
         #endregion
 
@@ -1344,7 +1411,7 @@ namespace WinCopies.IO
 
         public static explicit operator Size(ushort @short) => new Size(@short);
 
-        public static explicit operator Size(int i) => i< 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i== 0 ? new Size(0UL) : new Size((ulong)i);
+        public static explicit operator Size(int i) => i < 0 ? throw new ArgumentOutOfRangeException(nameof(i), i, $"{nameof(i)} must be equal or greater than 0.") : i == 0 ? new Size(0UL) : new Size((ulong)i);
 
         public static explicit operator Size(uint i) => new Size(i);
 
@@ -1352,7 +1419,7 @@ namespace WinCopies.IO
         ///// Converts a <see cref="long"/> value to a <see cref="Size"/> value.
         ///// </summary>
         ///// <param name="i">The <see cref="long"/> to convert.</param>
-        public static explicit operator Size(long l) => l< 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l== 0 ? new Size(0UL) : new Size((ulong)l);
+        public static explicit operator Size(long l) => l < 0 ? throw new ArgumentOutOfRangeException(nameof(l), l, $"{nameof(l)} must be equal or greater than 0.") : l == 0 ? new Size(0UL) : new Size((ulong)l);
 
         public static explicit operator Size(ulong l) => new Size(l);
 
@@ -1382,7 +1449,7 @@ namespace WinCopies.IO
 
         public static explicit operator float(Size s) => (float)s.ValueInBytes;
 
-        public static explicit operator double(Size s) => (double) s.ValueInBytes;
+        public static explicit operator double(Size s) => (double)s.ValueInBytes;
 
         public static explicit operator decimal(Size s) => (decimal)s.ValueInBytes;
 

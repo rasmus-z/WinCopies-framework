@@ -168,8 +168,6 @@ namespace WinCopies.GUI.IO
 
         public IEnumerable<IBrowsableObjectInfo> GetItems() => Items;
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func) => Items.Where(func);
-
         public ObservableCollection<IBrowsableObjectInfoViewModel> Items
         {
             get
@@ -182,15 +180,13 @@ namespace WinCopies.GUI.IO
 
                     try
                     {
-                        var v1 = (_filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems(_filter));
+                        IEnumerable<IBrowsableObjectInfo> items = _filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems().Where(_filter);
 
-                        _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(
-
-                    v1
+                        _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(items
                     .Select(_browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));
 
                     }
-                    catch (ShellException) { }
+                    catch { }
 
                 _itemsLoaded = true;
 

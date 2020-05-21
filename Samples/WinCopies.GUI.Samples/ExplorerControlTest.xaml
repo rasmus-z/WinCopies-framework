@@ -29,7 +29,6 @@ along with the WinCopies Framework.  If not, see<https://www.gnu.org/licenses/>.
         <TabControl.ItemContainerStyle>
             <Style TargetType="{x:Type TabItem}">
                 <Setter Property="Header" Value="{Binding Path.Name}" />
-                <Setter Property="Content" Value="{Binding}" />
                 <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                 <Setter Property="ContentTemplateSelector">
                     <Setter.Value>

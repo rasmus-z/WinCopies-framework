@@ -79,8 +79,6 @@ namespace WinCopies.IO
 
         IEnumerable<IBrowsableObjectInfo> GetItems();
 
-        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IBrowsableObjectInfo> func);
-
         /// <summary>
         /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
         /// </summary>

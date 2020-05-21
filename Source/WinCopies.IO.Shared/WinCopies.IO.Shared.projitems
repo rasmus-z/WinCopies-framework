@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfoEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enumerators.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfoProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectTreeNode.cs" />
@@ -40,6 +40,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SpecialFolder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemType.cs" />
   </ItemGroup>
 </Project>

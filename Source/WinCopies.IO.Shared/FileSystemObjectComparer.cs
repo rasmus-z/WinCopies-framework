@@ -48,7 +48,7 @@ namespace WinCopies.IO
 
         public StringComparer StringComparer { get; }
 
-        public FileSystemObjectComparer() : this( stringComparer => StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
+        public FileSystemObjectComparer() : this(stringComparer => StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
 
         public FileSystemObjectComparer(DeepClone<StringComparer> stringComparerDelegate)
         {

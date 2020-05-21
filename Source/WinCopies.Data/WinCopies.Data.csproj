@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="WinCopies.Util" Version="2.2.0-preview4" />
+    <PackageReference Include="WinCopies.Util" Version="2.3.0-preview5" />
   </ItemGroup>
 
 </Project>

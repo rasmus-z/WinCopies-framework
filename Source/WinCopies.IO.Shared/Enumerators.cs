@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Management;
 using System.Security;
 using System.Text;
 using WinCopies.Collections;
@@ -12,7 +13,7 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
-    public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>
+    public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>, IEnumerable<ArchiveItemInfo>
     {
         private int _index = -1;
 
@@ -32,6 +33,10 @@ namespace WinCopies.IO
 
             Func = func;
         }
+
+        public IEnumerator<ArchiveItemInfo> GetEnumerator() => this;
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         object IEnumerator.Current => Current;
 
@@ -359,5 +364,95 @@ namespace WinCopies.IO
         // }
 
         // files.Sort(comp);
+    }
+
+    public sealed class WMIItemInfoEnumerator : IEnumerator<WMIItemInfo>, IEnumerable<WMIItemInfo>
+    {
+        private IEnumerator<ManagementBaseObject> _enumerator;
+
+        private WMIItemInfo _current;
+
+        public WMIItemInfo Current { get { if (_disposedValue) throw GetExceptionForDispose(false); return _current; } }
+
+        object IEnumerator.Current => Current;
+
+        private Func<bool> Func { get; }
+
+        public WMIItemType ItemWMIItemType { get; }
+
+        public WMIItemInfoEnumerator(IEnumerable<ManagementBaseObject> enumerator, WMIItemType itemWMIItemType, bool catchExceptions)
+        {
+            _enumerator = enumerator.GetEnumerator();
+
+            ItemWMIItemType = itemWMIItemType;
+
+            if (catchExceptions)
+
+                Func = () =>
+                  {
+                      while (_enumerator.MoveNext())
+                          try
+                          {
+                              _MoveNext();
+
+                              return true;
+                          }
+                          catch (Exception) { }
+
+                      return false;
+                  };
+
+            else
+
+                Func = () =>
+                  {
+                      if (_enumerator.MoveNext())
+                      {
+                          _MoveNext();
+
+                          return true;
+                      }
+
+                      return false;
+                  };
+        }
+
+        public IEnumerator<WMIItemInfo> GetEnumerator() => this;
+
+        private void _MoveNext()
+        {
+            ManagementBaseObject current = _enumerator.Current;
+
+            // if (CheckFilter(_path))
+
+            _current = new WMIItemInfo(ItemWMIItemType, current);
+        }
+
+        public bool MoveNext() => Func();
+
+        public void Reset()
+        {
+            _current = null;
+
+            _enumerator.Reset();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        #region IDisposable Support
+        private bool _disposedValue = false; // To detect redundant calls
+
+        public void Dispose()
+        {
+            if (!_disposedValue)
+            {
+                Reset();
+
+                _enumerator = null;
+
+                _disposedValue = true;
+            }
+        }
+        #endregion
     }
 }
