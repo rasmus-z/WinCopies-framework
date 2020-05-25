@@ -41,9 +41,36 @@ namespace WinCopies.GUI.Samples
             DataContext = this;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> ShellItems => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { new ExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\")))) { TreeViewItems = new ObservableCollection<IBrowsableObjectInfoViewModel>() { { new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\Users")), BrowsableObjectInfoViewModel.Predicate) { IsSelected = true } }, { new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(KnownFolders.RecycleBin.ParsingName))) } }, IsSelected = true, SelectionMode = SelectionMode.Extended, IsCheckBoxVisible = true } } };
+
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> RegistryItems => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { new ExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo())) { TreeViewItems = new ObservableCollection<IBrowsableObjectInfoViewModel>() { { new BrowsableObjectInfoViewModel(new RegistryItemInfo()) { IsSelected = true } } }, IsSelected = true, SelectionMode = SelectionMode.Extended, IsCheckBoxVisible = true } } };
+
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> WMIItems => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { new ExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new WMIItemInfo())) { TreeViewItems = new ObservableCollection<IBrowsableObjectInfoViewModel>() { { new BrowsableObjectInfoViewModel(new WMIItemInfo()) { IsSelected = true } } }, IsSelected = true, SelectionMode = SelectionMode.Extended, IsCheckBoxVisible = true } } };
+
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            Items = new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { new ExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\")))) { TreeViewItems = new ObservableCollection<IBrowsableObjectInfoViewModel>() { { new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\Users")), TreeViewItemBrowsableObjectInfoViewModelFactory.Predicate) { IsSelected = true, Factory = new TreeViewItemBrowsableObjectInfoViewModelFactory() } }, { new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(KnownFolders.RecycleBin.ParsingName))) } }, IsSelected = true, SelectionMode = SelectionMode.Extended, IsCheckBoxVisible = true } } };
+            string radioButton = (string)((RadioButton)e.Source).Content;
+
+            switch (radioButton)
+            {
+                case "Shell":
+
+                    Items = ShellItems;
+
+                    break;
+
+                case "Registry":
+
+                    Items = RegistryItems;
+
+                    break;
+
+                case "WMI":
+
+                    Items = WMIItems;
+
+                    break;
+            }
         }
     }
 }

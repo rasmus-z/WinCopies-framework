@@ -370,6 +370,8 @@ namespace WinCopies.IO
     {
         private IEnumerator<ManagementBaseObject> _enumerator;
 
+        private bool _resetInnerEnumerator = false;
+
         private WMIItemInfo _current;
 
         public WMIItemInfo Current { get { if (_disposedValue) throw GetExceptionForDispose(false); return _current; } }
@@ -380,9 +382,11 @@ namespace WinCopies.IO
 
         public WMIItemType ItemWMIItemType { get; }
 
-        public WMIItemInfoEnumerator(IEnumerable<ManagementBaseObject> enumerator, WMIItemType itemWMIItemType, bool catchExceptions)
+        public WMIItemInfoEnumerator(IEnumerable<ManagementBaseObject> enumerator, bool resetEnumerator, WMIItemType itemWMIItemType, bool catchExceptions)
         {
             _enumerator = enumerator.GetEnumerator();
+
+            _resetInnerEnumerator = resetEnumerator;
 
             ItemWMIItemType = itemWMIItemType;
 
@@ -433,6 +437,8 @@ namespace WinCopies.IO
         public void Reset()
         {
             _current = null;
+
+            if (_resetInnerEnumerator)
 
             _enumerator.Reset();
         }

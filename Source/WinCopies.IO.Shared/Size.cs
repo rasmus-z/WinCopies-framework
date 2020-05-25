@@ -1353,15 +1353,15 @@ namespace WinCopies.IO
 
         #region ulong operators
 
-        public static Size operator +(in ulong l, in Size s) => new Size((ulong)l + s.ValueInBytes);
+        public static Size operator +(in ulong l, in Size s) => new Size(l + s.ValueInBytes);
 
-        public static Size operator -(in ulong l, in Size s) => new Size((ulong)l - s.ValueInBytes.Value);
+        public static Size operator -(in ulong l, in Size s) => new Size(l - s.ValueInBytes.Value);
 
-        public static Size operator *(in ulong l, in Size s) => new Size((ulong)l * s.ValueInBytes);
+        public static Size operator *(in ulong l, in Size s) => new Size(l * s.ValueInBytes);
 
-        public static Size operator /(in ulong l, in Size s) => new Size((ulong)l / s.ValueInBytes.Value);
+        public static Size operator /(in ulong l, in Size s) => new Size(l / s.ValueInBytes.Value);
 
-        public static Size operator %(in ulong l, in Size s) => new Size((ulong)l % s.ValueInBytes.Value);
+        public static Size operator %(in ulong l, in Size s) => new Size(l % s.ValueInBytes.Value);
 
         #endregion
 

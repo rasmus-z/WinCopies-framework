@@ -211,9 +211,9 @@ namespace WinCopies.IO
 
         #region Constructors
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
-        /// </summary>
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
+        ///// </summary>
         public RegistryItemInfo() : base(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName).GetDisplayName(DisplayNameType.Default))
         {
 
@@ -223,10 +223,10 @@ namespace WinCopies.IO
 
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
-        /// </summary>
-        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
+        ///// </summary>
+        ///// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         public RegistryItemInfo(RegistryKey registryKey) : base((registryKey ?? throw GetArgumentNullException(nameof(registryKey))).Name)
         {
 
@@ -250,10 +250,10 @@ namespace WinCopies.IO
 
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
-        /// </summary>
-        /// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
+        ///// </summary>
+        ///// <param name="path">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
         public RegistryItemInfo(string path) : base(path)
         {
 
@@ -279,11 +279,11 @@ namespace WinCopies.IO
 
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
-        /// </summary>
-        /// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
+        ///// </summary>
+        ///// <param name="registryKey">The <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
+        ///// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
         public RegistryItemInfo(RegistryKey registryKey, string valueName) : base(registryKey.Name)
         {
 
@@ -295,11 +295,11 @@ namespace WinCopies.IO
 
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
-        /// </summary>
-        /// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
-        /// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="RegistryItemInfo"/> class using a custom factory for <see cref="RegistryItemInfo"/>s.
+        ///// </summary>
+        ///// <param name="registryKeyPath">The path of the <see cref="Microsoft.Win32.RegistryKey"/> that the new <see cref="RegistryItemInfo"/> represents.</param>
+        ///// <param name="valueName">The name of the value that the new <see cref="RegistryItemInfo"/> represents.</param>
         public RegistryItemInfo(string registryKeyPath, string valueName) : this(Registry.OpenRegistryKey(registryKeyPath), valueName) { }
 
         #endregion
@@ -633,9 +633,25 @@ namespace WinCopies.IO
                 void enumerate()
                 {
 
-                    keys = predicate == null ? RegistryKey.GetSubKeyNames().Select(item => new RegistryItemInfo(item)) : RegistryKey.GetSubKeyNames().Where(func: item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo(item));
+                    if (predicate == null)
 
-                    values = RegistryKey.GetValueNames().Where(func: s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
+                    {
+
+                        keys = RegistryKey.GetSubKeyNames().Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+
+                        values = RegistryKey.GetValueNames().Select(s => new RegistryItemInfo(Path, s));
+
+                    }
+
+                    else
+
+                    {
+
+                        keys = RegistryKey.GetSubKeyNames().Where(func: item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+
+                        values = RegistryKey.GetValueNames().Where(func: s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
+
+                    }
 
                 }
 

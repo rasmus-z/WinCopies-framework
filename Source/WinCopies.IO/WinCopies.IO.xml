@@ -617,37 +617,6 @@
             Gets a value that indicates whether this <see cref="T:WinCopies.IO.RegistryItemInfo"/> is browsable.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.RegistryItemInfo.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.RegistryItemInfo"/> class using a custom factory for <see cref="T:WinCopies.IO.RegistryItemInfo"/>s.
-            </summary>
-        </member>
-        <member name="M:WinCopies.IO.RegistryItemInfo.#ctor(Microsoft.Win32.RegistryKey)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.RegistryItemInfo"/> class using a custom factory for <see cref="T:WinCopies.IO.RegistryItemInfo"/>s.
-            </summary>
-            <param name="registryKey">The <see cref="T:Microsoft.Win32.RegistryKey"/> that the new <see cref="T:WinCopies.IO.RegistryItemInfo"/> represents.</param>
-        </member>
-        <member name="M:WinCopies.IO.RegistryItemInfo.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.RegistryItemInfo"/> class using a custom factory for <see cref="T:WinCopies.IO.RegistryItemInfo"/>s.
-            </summary>
-            <param name="path">The path of the <see cref="T:Microsoft.Win32.RegistryKey"/> that the new <see cref="T:WinCopies.IO.RegistryItemInfo"/> represents.</param>
-        </member>
-        <member name="M:WinCopies.IO.RegistryItemInfo.#ctor(Microsoft.Win32.RegistryKey,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.RegistryItemInfo"/> class using a custom factory for <see cref="T:WinCopies.IO.RegistryItemInfo"/>s.
-            </summary>
-            <param name="registryKey">The <see cref="T:Microsoft.Win32.RegistryKey"/> that the new <see cref="T:WinCopies.IO.RegistryItemInfo"/> represents.</param>
-            <param name="valueName">The name of the value that the new <see cref="T:WinCopies.IO.RegistryItemInfo"/> represents.</param>
-        </member>
-        <member name="M:WinCopies.IO.RegistryItemInfo.#ctor(System.String,System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:WinCopies.IO.RegistryItemInfo"/> class using a custom factory for <see cref="T:WinCopies.IO.RegistryItemInfo"/>s.
-            </summary>
-            <param name="registryKeyPath">The path of the <see cref="T:Microsoft.Win32.RegistryKey"/> that the new <see cref="T:WinCopies.IO.RegistryItemInfo"/> represents.</param>
-            <param name="valueName">The name of the value that the new <see cref="T:WinCopies.IO.RegistryItemInfo"/> represents.</param>
-        </member>
         <member name="M:WinCopies.IO.RegistryItemInfo.OpenKey">
             <summary>
             Opens the <see cref="P:WinCopies.IO.RegistryItemInfo.RegistryKey"/> that this <see cref="T:WinCopies.IO.RegistryItemInfo"/> represents.
@@ -841,7 +810,7 @@
         </member>
         <member name="M:WinCopies.IO.Size.op_GreaterThan(WinCopies.IO.Size@,WinCopies.IO.Size@)">
             <summary>
-            Checkes if <paramref name="s1"/> is greater than <paramref name="s2"/>.
+            Checks if <paramref name="s1"/> is greater than <paramref name="s2"/>.
             </summary>
             <param name="s1">Left size</param>
             <param name="s2">Right size</param>

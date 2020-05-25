@@ -492,7 +492,7 @@ namespace WinCopies.IO
 
         }
 
-        public override          IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new WMIItemInfoFactory(), null, false);
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new WMIItemInfoFactory(), null, false);
 
         public IEnumerable<IBrowsableObjectInfo> GetItems(IWMIItemInfoFactory factory, Predicate<ManagementBaseObject> predicate, bool catchExceptionsDuringEnumeration)
         {
@@ -546,7 +546,7 @@ namespace WinCopies.IO
 
                     }
 
-                    return new WMIItemInfoEnumerator(namespaces, WMIItemType.Namespace, catchExceptionsDuringEnumeration).AppendValues(new WMIItemInfoEnumerator(classes, WMIItemType.Class, catchExceptionsDuringEnumeration));
+                    return namespaces == null ? new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration) : classes == null ? new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration) : new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration).AppendValues(new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration));
 
                 }
 
@@ -596,67 +596,75 @@ namespace WinCopies.IO
 
                 else if (WMIItemType == WMIItemType.Class /*&& WMIItemTypes.HasFlag(WMIItemTypes.Instance)*/)
 
+                {
+
                     managementClass.Get();
 
-                    return new WMIItemInfoEnumerator(predicate==null? EnumerateInstances(managementClass, factory):EnumerateInstances(managementClass, factory).Where(predicate), WMIItemType.Instance, catchExceptionsDuringEnumeration);
+                    IEnumerable<ManagementBaseObject> items = predicate == null ? EnumerateInstances(managementClass, factory) : EnumerateInstances(managementClass, factory).Where(predicate);
 
-                    // if (CheckFilter(_path))
-
-
-
-                    //IEnumerable<PathInfo> pathInfos;
-
-
-
-                    //if (FileSystemObjectComparer == null)
-
-                    //    pathInfos = paths;
-
-                    //else
-
-                    //{
-
-                    //var _paths = paths.ToList();
-
-                    //_paths.Sort((IComparer<PathInfo>)FileSystemObjectComparer);
-
-                    //pathInfos = _paths;
-
-                    //}
-
-
-
-                    //PathInfo path_;
-
-
-
-                    //using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
-
-                    //    while (_paths.MoveNext())
-
-                    //        try
-
-                    //        {
-
-                    //            do
-
-                    //            {
-
-                    //                path_ = _paths.Current;
-
-                    //                // new_Path.LoadThumbnail();
-
-                    //                ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>((TItems)(IWMIItemInfo)Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.WMIItemType, path_.ManagementObject, path_.ManagementObjectDelegate /*managementObject => WMIItemInfo.DefaultManagementObjectDeepClone( (ManagementObject) path_.ManagementObject, null )*/), (TItemsFactory)Path.Factory.DeepClone()));
-
-                    //            } while (_paths.MoveNext());
-
-                    //        }
-
-                    //#pragma warning disable CA1031 // Do not catch general exception types
-                    //                    catch (Exception ex) when (!(ex is ThreadAbortException)) { }
-                    //#pragma warning restore CA1031 // Do not catch general exception types
+                    return items == null ? null : new WMIItemInfoEnumerator(items, false, WMIItemType.Instance, catchExceptionsDuringEnumeration);
 
                 }
+
+                return null;
+
+                // if (CheckFilter(_path))
+
+
+
+                //IEnumerable<PathInfo> pathInfos;
+
+
+
+                //if (FileSystemObjectComparer == null)
+
+                //    pathInfos = paths;
+
+                //else
+
+                //{
+
+                //var _paths = paths.ToList();
+
+                //_paths.Sort((IComparer<PathInfo>)FileSystemObjectComparer);
+
+                //pathInfos = _paths;
+
+                //}
+
+
+
+                //PathInfo path_;
+
+
+
+                //using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
+
+                //    while (_paths.MoveNext())
+
+                //        try
+
+                //        {
+
+                //            do
+
+                //            {
+
+                //                path_ = _paths.Current;
+
+                //                // new_Path.LoadThumbnail();
+
+                //                ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>((TItems)(IWMIItemInfo)Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.WMIItemType, path_.ManagementObject, path_.ManagementObjectDelegate /*managementObject => WMIItemInfo.DefaultManagementObjectDeepClone( (ManagementObject) path_.ManagementObject, null )*/), (TItemsFactory)Path.Factory.DeepClone()));
+
+                //            } while (_paths.MoveNext());
+
+                //        }
+
+                //#pragma warning disable CA1031 // Do not catch general exception types
+                //                    catch (Exception ex) when (!(ex is ThreadAbortException)) { }
+                //#pragma warning restore CA1031 // Do not catch general exception types
+
+            }
             finally
             {
                 if (dispose)

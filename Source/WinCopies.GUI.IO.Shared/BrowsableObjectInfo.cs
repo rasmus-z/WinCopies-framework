@@ -84,13 +84,13 @@ namespace WinCopies.GUI.IO
 
             ItemClickCommand = new DelegateCommand<IBrowsableObjectInfoViewModel>(browsableObjectInfo => true, browsableObjectInfo =>
             {
-                if (((IShellObjectInfo)browsableObjectInfo.InnerBrowsableObjectInfo).FileType == FileType.File)
+                if (browsableObjectInfo.InnerBrowsableObjectInfo is IShellObjectInfo shellObjectInfo && shellObjectInfo.FileType == FileType.File)
 
                     _ = Process.Start(new ProcessStartInfo(browsableObjectInfo.Path) { UseShellExecute = true });
 
                 else
 
-                    Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(browsableObjectInfo.Path)));
+                    Path = new BrowsableObjectInfoViewModel(browsableObjectInfo);
             });
         }
 
@@ -124,15 +124,15 @@ namespace WinCopies.GUI.IO
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo);
     }
 
-    public class TreeViewItemBrowsableObjectInfoViewModelFactory : IBrowsableObjectInfoViewModelFactory
-    {
-        public static Predicate<IBrowsableObjectInfo> Predicate => _browsableObjectInfo => _browsableObjectInfo.IsBrowsable;
-
-        public IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo, Predicate) { Factory = this };
-    }
+    //public class TreeViewItemBrowsableObjectInfoViewModelFactory : IBrowsableObjectInfoViewModelFactory
+    //{
+    //    public IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo, Predicate) { Factory = this };
+    //}
 
     public class BrowsableObjectInfoViewModel : ViewModel<IBrowsableObjectInfo>, IBrowsableObjectInfoViewModel
     {
+
+        public static Predicate<IBrowsableObjectInfo> Predicate => _browsableObjectInfo => _browsableObjectInfo.IsBrowsable;
 
         private Predicate<IBrowsableObjectInfo> _filter;
 
@@ -183,7 +183,7 @@ namespace WinCopies.GUI.IO
                         IEnumerable<IBrowsableObjectInfo> items = _filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems().Where(_filter);
 
                         _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(items
-                    .Select(_browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));
+                    .Select(_browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo, _filter) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));
 
                     }
                     catch { }
