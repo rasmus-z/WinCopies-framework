@@ -16,7 +16,6 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.Shell;
-using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,6 +40,8 @@ namespace WinCopies.GUI.IO
         string Text { get; set; }
 
         IBrowsableObjectInfoViewModel Path { get; set; }
+
+        IBrowsableObjectInfoFactory Factory { get; set; }
 
         SelectionMode SelectionMode { get; set; }
 
@@ -72,13 +73,19 @@ namespace WinCopies.GUI.IO
 
         public IBrowsableObjectInfoViewModel Path { get => _path; set { _path = value; OnPropertyChanged(nameof(Path)); OnPathChanged(); } }
 
+        private IBrowsableObjectInfoFactory _factory;
+
+        public IBrowsableObjectInfoFactory Factory { get => _factory; set { _factory = value ?? throw GetArgumentNullException(nameof(value)); OnPropertyChanged(nameof(BrowsableObjectInfoFactory)); } }
+
         protected virtual void OnPathChanged() => Text = _path.Path;
 
         private bool _isSelected;
 
         public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
 
-        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path)
+        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path) : this(path, new BrowsableObjectInfoFactory()) { } 
+
+        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path, IBrowsableObjectInfoFactory factory)
         {
             _path = path ?? throw GetArgumentNullException(nameof(path));
 
@@ -92,13 +99,15 @@ namespace WinCopies.GUI.IO
 
                     Path = new BrowsableObjectInfoViewModel(browsableObjectInfo);
             });
+
+            _factory = factory ?? throw GetArgumentNullException(nameof(factory));
         }
 
         public static DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel> GoCommand { get; } = new DelegateCommand<ExplorerControlBrowsableObjectInfoViewModel>(browsableObjectInfo => browsableObjectInfo != null && browsableObjectInfo.OnGoCommandCanExecute(), browsableObjectInfo => browsableObjectInfo.OnGoCommandExecuted());
 
         protected virtual bool OnGoCommandCanExecute() => true;
 
-        protected virtual void OnGoCommandExecuted() => Path = new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(Text)));
+        protected virtual void OnGoCommandExecuted() => Path = _factory.GetBrowsableObjectInfoViewModel(_factory.GetBrowsableObjectInfo(Text));
 
         public DelegateCommand<IBrowsableObjectInfoViewModel> ItemClickCommand { get; }
 
@@ -119,9 +128,29 @@ namespace WinCopies.GUI.IO
         IBrowsableObjectInfo InnerBrowsableObjectInfo { get; }
     }
 
-    public interface IBrowsableObjectInfoViewModelFactory
+    public interface IBrowsableObjectInfoFactory
     {
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo);
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path);
+    }
+
+    public class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
+    {
+        public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo);
+
+        public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path)
+        {
+            if (WinCopies.IO.Path.IsFileSystemPath(path))
+
+                return ShellObjectInfo.From(ShellObject.FromParsingName(path));
+
+            else if (WinCopies.IO.Path.IsRegistryPath(path))
+
+                return new RegistryItemInfo(path);
+
+            throw new ArgumentException("The factory cannot create an object for the given path.");
+        }
     }
 
     //public class TreeViewItemBrowsableObjectInfoViewModelFactory : IBrowsableObjectInfoViewModelFactory
@@ -138,9 +167,9 @@ namespace WinCopies.GUI.IO
 
         public Predicate<IBrowsableObjectInfo> Filter { get => _filter; set { _filter = value; OnPropertyChanged(nameof(Filter)); } }
 
-        private IBrowsableObjectInfoViewModelFactory _factory;
+        private IBrowsableObjectInfoFactory _factory;
 
-        public IBrowsableObjectInfoViewModelFactory Factory { get => _factory; set { _factory = value; OnPropertyChanged(nameof(_factory)); } }
+        public IBrowsableObjectInfoFactory Factory { get => _factory; set { _factory = value; OnPropertyChanged(nameof(_factory)); } }
 
         public IBrowsableObjectInfo InnerBrowsableObjectInfo => ModelGeneric;
 

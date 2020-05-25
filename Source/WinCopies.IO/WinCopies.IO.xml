@@ -143,11 +143,6 @@
             When overridden in a derived class, gets a value that indicates whether this <see cref="T:WinCopies.IO.BrowsableObjectInfo"/> is browsable.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.BrowsableObjectInfo.ItemTypeName">
-            <summary>
-            Gets the type name of the current <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/>. This value corresponds to the description of the file's extension.
-            </summary>
-        </member>
         <member name="P:WinCopies.IO.BrowsableObjectInfo.Size">
             <summary>
             Gets the size for this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/>.
@@ -483,11 +478,6 @@
             Gets the <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/> parent of this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.IBrowsableObjectInfo.ItemTypeName">
-            <summary>
-            Gets the type name of the current <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/>. This value corresponds to the description of the file's extension.
-            </summary>
-        </member>
         <member name="P:WinCopies.IO.IBrowsableObjectInfo.Size">
             <summary>
             Gets the size for this <see cref="T:WinCopies.IO.IBrowsableObjectInfo"/>.
@@ -669,7 +659,7 @@
         </member>
         <member name="P:WinCopies.IO.ShellObjectInfo.IsSpecialItem">
             <summary>
-            When overridden in a derived class, gets a value that indicates whether the current item has particularities.
+            Gets a value that indicates whether the current item has particularities.
             </summary>
         </member>
         <member name="P:WinCopies.IO.ShellObjectInfo.ArchiveShellObject">
@@ -715,6 +705,11 @@
         <member name="P:WinCopies.IO.ShellObjectInfo.IsBrowsable">
             <summary>
             Gets a value that indicates whether this <see cref="T:WinCopies.IO.ShellObjectInfo"/> is browsable.
+            </summary>
+        </member>
+        <member name="P:WinCopies.IO.ShellObjectInfo.ItemTypeName">
+            <summary>
+            Gets the type name of the current <see cref="T:WinCopies.IO.ShellObjectInfo"/>. This value corresponds to the description of the file's extension.
             </summary>
         </member>
         <member name="M:WinCopies.IO.ShellObjectInfo.ToString">

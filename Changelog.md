@@ -9,7 +9,7 @@ CHANGELOG
 Updates
 -------
 
-??/??/???? 2.3.0-preview5
+05/25/2020 2.3.0-preview5
 =========================
 
 - Depends on WinCopies.Util 2.3.0-preview5
@@ -20,14 +20,16 @@ WinCopies.IO (2.3.0-preview5)
 - Existing item updates:
 	- The Size struct's inner value is now of the WinCopies.Util.CheckedUInt64 type.
 	- The ArchiveItemInfoEnumerator class now implements the IEnumerable<IBrowsableObjectInfo> interface.
+	- A factory which can be used in the ExplorerControlBrowsableObjectInfoViewModel class to create custom BrowsableObjectInfo(ViewModel)s.
+	- Fixation of #6.
 - Additions:
 	- Description property to the IBrowsableObjectInfo interface.
-	- Registry browsing:
+	- Registry browsing (fixes #4):
 		- (I)RegistryItemInfo interface and class.
 		- RegistryItemType enum.
 		- Registry static class.
 		- RegistryException.
-	- WMI browsing:
+	- WMI browsing (fixes #5):
 		- (I)WMIItemInfo interface and class.
 		- WMIItemInfoEnumerator class.
 		- (I)WMIItemInfoFactory(Options) classes and interfaces.

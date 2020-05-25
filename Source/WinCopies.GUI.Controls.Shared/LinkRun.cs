@@ -385,7 +385,15 @@ namespace WinCopies.GUI.Controls
 
                 return;
 
+#if NETCORE
+
+            WinCopies.Util.Util.StartProcessNetCore(Uri);
+
+#else
+
             _ = Process.Start(Uri);
+
+#endif
 
             Seen = true;
 

@@ -488,7 +488,7 @@ namespace WinCopies.IO
 
             string registryKeyName;
 
-            if (name.Contains(IO.Path.PathSeparator, out int result))
+            if (name.Contains(System.IO.Path.PathSeparator, out int result))
 
             {
 
