@@ -34,6 +34,7 @@
 //using System.Collections.ObjectModel;
 //using System.Collections;
 
+using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Shell;
 using SevenZip;
 using System;
@@ -41,14 +42,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Text;
+using WinCopies.Util;
 
 namespace WinCopies.IO
 {
     public static class Path
 
     {
-
-        public const char PathSeparator = '\\';
 
         //public static readonly string[] PathEnvironmentVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
 
@@ -786,7 +786,7 @@ namespace WinCopies.IO
 
         {
 
-            string[] subPaths = path.Split(PathSeparator);
+            string[] subPaths = path.Split(System.IO.Path.PathSeparator);
 
             var stringBuilder = new StringBuilder();
 
@@ -820,13 +820,35 @@ namespace WinCopies.IO
 
                 if (count < subPaths.Length)
 
-                    _ = stringBuilder.Append(PathSeparator);
+                    _ = stringBuilder.Append(System.IO.Path.PathSeparator);
 
             }
 
             return stringBuilder.ToString();
 
         }
+
+        public static bool IsFileSystemPath(string path)
+        {
+            char[] invalidChars = System.IO.Path.GetInvalidPathChars();
+
+            return !path.ContainsOneOrMoreValues(invalidChars) && System.IO.Path.IsPathRooted(path);
+        }
+
+        public static bool IsRegistryPath(string path)
+        {
+            FieldInfo[] fields = typeof(Microsoft.Win32.Registry).GetFields();
+
+            foreach (FieldInfo field in fields)
+
+                if (path.StartsWith(((RegistryKey)field.GetValue(null)).Name))
+
+                    return true;
+
+            return false;
+        }
+
+        public static bool IsWMIPath(string path) => path.StartsWith('\\');
 
         //        //public static string GetShortcutPath(string path)
 

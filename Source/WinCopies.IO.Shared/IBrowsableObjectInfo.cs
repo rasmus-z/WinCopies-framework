@@ -84,10 +84,9 @@ namespace WinCopies.IO
         /// </summary>
         IBrowsableObjectInfo Parent { get; }
 
-        /// <summary>
-        /// Gets the type name of the current <see cref="IBrowsableObjectInfo"/>. This value corresponds to the description of the file's extension.
-        /// </summary>
         string ItemTypeName { get; }
+
+        string Description { get; }
 
         /// <summary>
         /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.

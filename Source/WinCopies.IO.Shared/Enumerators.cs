@@ -197,13 +197,13 @@ namespace WinCopies.IO
 
                         fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
 
-                        if (fileName.StartsWith(Path.PathSeparator))
+                        if (fileName.StartsWith(System.IO.Path.PathSeparator))
 
                             fileName = fileName.Substring(1);
 
-                        if (fileName.Contains(Path.PathSeparator, StringComparison.OrdinalIgnoreCase))
+                        if (fileName.Contains(System.IO.Path.PathSeparator, StringComparison.OrdinalIgnoreCase))
 
-                            fileName = fileName.Substring(0, fileName.IndexOf(Path.PathSeparator
+                            fileName = fileName.Substring(0, fileName.IndexOf(System.IO.Path.PathSeparator
 #if !NETFRAMEWORK
                                 , StringComparison.OrdinalIgnoreCase
 #endif
@@ -440,7 +440,7 @@ namespace WinCopies.IO
 
             if (_resetInnerEnumerator)
 
-            _enumerator.Reset();
+                _enumerator.Reset();
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

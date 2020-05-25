@@ -92,7 +92,7 @@ namespace WinCopies.IO
         #region Properties
 
         /// <summary>
-        /// When overridden in a derived class, gets a value that indicates whether the current item has particularities.
+        /// Gets a value that indicates whether the current item has particularities.
         /// </summary>
         public override bool IsSpecialItem
         {
@@ -163,7 +163,12 @@ namespace WinCopies.IO
 
         public bool IsArchiveOpen => ArchiveFileStream is object;
 
+        /// <summary>
+        /// Gets the type name of the current <see cref="ShellObjectInfo"/>. This value corresponds to the description of the file's extension.
+        /// </summary>
         public override string ItemTypeName => ShellObject.Properties.System.ItemTypeText.Value;
+
+        public override string Description => ShellObject.Properties.System.FileDescription.Value;
 
         public override Size? Size
         {

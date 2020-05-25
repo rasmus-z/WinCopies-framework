@@ -158,6 +158,8 @@ namespace WinCopies.GUI.IO
 
         public string ItemTypeName => InnerBrowsableObjectInfo.ItemTypeName;
 
+        public string Description => InnerBrowsableObjectInfo.Description;
+
         public Size? Size => InnerBrowsableObjectInfo.Size;
 
         public bool HasTransparency => InnerBrowsableObjectInfo.IsSpecialItem;

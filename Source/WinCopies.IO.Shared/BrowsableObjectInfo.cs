@@ -155,10 +155,9 @@ namespace WinCopies.IO
         /// </summary>
         public abstract bool IsBrowsable { get; }
 
-        /// <summary>
-        /// Gets the type name of the current <see cref="IBrowsableObjectInfo"/>. This value corresponds to the description of the file's extension.
-        /// </summary>
         public abstract string ItemTypeName { get; }
+
+        public abstract string Description { get; }
 
         /// <summary>
         /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.
@@ -190,7 +189,7 @@ namespace WinCopies.IO
         ///// <returns>The parent of this <see cref="BrowsableObjectInfo"/>.</returns>
         //protected abstract IBrowsableObjectInfo GetParent();
 
-        public abstract IEnumerable<IBrowsableObjectInfo> GetItems() ;
+        public abstract IEnumerable<IBrowsableObjectInfo> GetItems();
 
         /// <summary>
         /// Gets a value that indicates whether the current object is disposed.

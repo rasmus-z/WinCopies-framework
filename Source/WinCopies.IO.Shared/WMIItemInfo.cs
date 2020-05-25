@@ -92,6 +92,25 @@ namespace WinCopies.IO
             }
         }
 
+        private string _description;
+
+        public override string Description
+        {
+            get
+            {
+                if (_description == null)
+                {
+
+                    object value = ManagementObject.Qualifiers["Description"].Value;
+
+                    _description = value == null ? "N/A" : (string)value;
+
+                }
+
+                return _description;
+            }
+        }
+
         public override Size? Size => null;
 
         private IBrowsableObjectInfo _parent;
@@ -278,13 +297,13 @@ namespace WinCopies.IO
 
         {
 
-            string path = PathSeparator + managementObject.ClassPath.Server + PathSeparator + managementObject.ClassPath.NamespacePath;
+            string path = System.IO.Path.PathSeparator + managementObject.ClassPath.Server + System.IO.Path.PathSeparator + managementObject.ClassPath.NamespacePath;
 
             string name = GetName(managementObject, wmiItemType);
 
             if (name != null)
 
-                path += PathSeparator + name;
+                path += System.IO.Path.PathSeparator + name;
 
             path += ":" + managementObject.ClassPath.ClassName;
 
@@ -304,7 +323,7 @@ namespace WinCopies.IO
 
         {
 
-            string path = $"{PathSeparator}{PathSeparator}{serverName}{PathSeparator}{(IsNullEmptyOrWhiteSpace(serverRelativePath) ? ROOT : serverRelativePath)}{NamespacePath}";
+            string path = $"{System.IO.Path.PathSeparator}{System.IO.Path.PathSeparator}{serverName}{System.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(serverRelativePath) ? ROOT : serverRelativePath)}{NamespacePath}";
 
             return new WMIItemInfo(path, WMIItemType.Namespace, new ManagementClass(path)/*, managementObject => DefaultManagementClassDeepCloneDelegate((ManagementClass)managementObject, null)*/);
 
@@ -330,8 +349,6 @@ namespace WinCopies.IO
         public override int GetHashCode() => base.GetHashCode() ^ WMIItemType.GetHashCode();
 
         #endregion
-
-        #region Protected methods
 
         //public new WMIItemInfoFactory Factory { get => (WMIItemInfoFactory)base.Factory; set => base.Factory = value; }
 
@@ -372,7 +389,7 @@ namespace WinCopies.IO
 
                 case WMIItemType.Namespace:
 
-                    path = Path.Substring(0, Path.LastIndexOf(PathSeparator)) + NamespacePath;
+                    path = Path.Substring(0, Path.LastIndexOf(System.IO.Path.PathSeparator)) + NamespacePath;
 
                     return path.EndsWith(RootNamespace, true, CultureInfo.InvariantCulture)
                         ? new WMIItemInfo()
@@ -388,7 +405,7 @@ namespace WinCopies.IO
 
                     path = Path.Substring(0, Path.IndexOf(':'));
 
-                    path = path.Substring(0, path.LastIndexOf(PathSeparator)) + ':' + path.Substring(path.LastIndexOf(PathSeparator) + 1);
+                    path = path.Substring(0, path.LastIndexOf(System.IO.Path.PathSeparator)) + ':' + path.Substring(path.LastIndexOf(System.IO.Path.PathSeparator) + 1);
 
                     return new WMIItemInfo(path, WMIItemType.Class, null);
 
@@ -416,6 +433,7 @@ namespace WinCopies.IO
         ///// Disposes the current <see cref="WMIItemInfo"/> and its parent and items recursively.
         ///// </summary>
         ///// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy and does not support cancellation.</exception>
+
         protected override void Dispose(bool disposing)
         {
 
@@ -434,8 +452,6 @@ namespace WinCopies.IO
             //}
 
         }
-
-        #endregion
 
         private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
 

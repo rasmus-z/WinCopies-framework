@@ -134,6 +134,8 @@ namespace WinCopies.IO
 
         }
 
+        public override string Description => "N/A";
+
         /// <summary>
         /// The Windows registry item type of this <see cref="RegistryItemInfo"/>.
         /// </summary>
@@ -230,7 +232,7 @@ namespace WinCopies.IO
         public RegistryItemInfo(RegistryKey registryKey) : base((registryKey ?? throw GetArgumentNullException(nameof(registryKey))).Name)
         {
 
-            string[] name = registryKey.Name.Split(IO.Path.PathSeparator);
+            string[] name = registryKey.Name.Split(System.IO.Path.PathSeparator);
 
             Name =
 
@@ -259,7 +261,7 @@ namespace WinCopies.IO
 
             ThrowIfNullEmptyOrWhiteSpace(path);
 
-            string[] name = path.Split(IO.Path.PathSeparator);
+            string[] name = path.Split(System.IO.Path.PathSeparator);
 
             Name =
 
@@ -383,7 +385,7 @@ namespace WinCopies.IO
 
                 case RegistryItemType.Key:
 
-                    string[] path = RegistryKey.Name.Split(IO.Path.PathSeparator);
+                    string[] path = RegistryKey.Name.Split(System.IO.Path.PathSeparator);
 
                     if (path.Length == 1)
 

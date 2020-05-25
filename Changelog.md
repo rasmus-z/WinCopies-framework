@@ -21,6 +21,7 @@ WinCopies.IO (2.3.0-preview5)
 	- The Size struct's inner value is now of the WinCopies.Util.CheckedUInt64 type.
 	- The ArchiveItemInfoEnumerator class now implements the IEnumerable<IBrowsableObjectInfo> interface.
 - Additions:
+	- Description property to the IBrowsableObjectInfo interface.
 	- Registry browsing:
 		- (I)RegistryItemInfo interface and class.
 		- RegistryItemType enum.
@@ -32,6 +33,7 @@ WinCopies.IO (2.3.0-preview5)
 		- (I)WMIItemInfoFactory(Options) classes and interfaces.
 - Removals:
 	- IBrowsableObjectInfo.GetItems(Predicate<IBrowsableObjectInfo> func) method.
+	- WinCopies.IO.Path.PathSeparator const.
 
 05/07/2020 2.2.0-preview4
 ===================

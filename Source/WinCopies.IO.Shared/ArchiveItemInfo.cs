@@ -149,6 +149,8 @@ namespace WinCopies.IO
                     ? FileOperation.GetFileInfo("", Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
                     : FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
 
+        public override string Description => "N/A";
+
         public override Size? Size
         {
             get
@@ -261,7 +263,7 @@ namespace WinCopies.IO
 
             {
 
-                string path = Path.Substring(0, Path.LastIndexOf(IO.Path.PathSeparator));
+                string path = Path.Substring(0, Path.LastIndexOf(System.IO.Path.PathSeparator));
 
                 ArchiveFileInfo? archiveFileInfo = null;
 
