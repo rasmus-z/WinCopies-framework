@@ -9,6 +9,15 @@ CHANGELOG
 Updates
 -------
 
+??/??/???? 2.4.0-preview6
+=========================
+
+WinCopies.GUI.Templates 2.4.0-preview6
+--------------------------------------
+
+- Additions:
+	- DataTemplate for ImageSource
+
 05/25/2020 2.3.0-preview5
 =========================
 
