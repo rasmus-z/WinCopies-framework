@@ -12,6 +12,12 @@ Updates
 ??/??/???? 2.4.0-preview6
 =========================
 
+WinCopies.IO 2.4.0-preview6
+---------------------------
+
+- Additions:
+	- Path.PathSeparator const.
+
 WinCopies.GUI.Templates 2.4.0-preview6
 --------------------------------------
 

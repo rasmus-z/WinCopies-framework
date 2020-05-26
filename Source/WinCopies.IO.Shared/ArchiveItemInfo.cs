@@ -263,7 +263,7 @@ namespace WinCopies.IO
 
             {
 
-                string path = Path.Substring(0, Path.LastIndexOf(System.IO.Path.PathSeparator));
+                string path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator));
 
                 ArchiveFileInfo? archiveFileInfo = null;
 

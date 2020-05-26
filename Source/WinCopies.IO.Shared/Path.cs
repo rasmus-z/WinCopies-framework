@@ -50,6 +50,8 @@ namespace WinCopies.IO
 
     {
 
+        public const char PathSeparator = '\\';
+
         //public static readonly string[] PathEnvironmentVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
 
         private static readonly Dictionary<InArchiveFormat, string[]> dic = new Dictionary<InArchiveFormat, string[]>();
@@ -786,7 +788,7 @@ namespace WinCopies.IO
 
         {
 
-            string[] subPaths = path.Split(System.IO.Path.PathSeparator);
+            string[] subPaths = path.Split(WinCopies.IO.Path.PathSeparator);
 
             var stringBuilder = new StringBuilder();
 
@@ -820,7 +822,7 @@ namespace WinCopies.IO
 
                 if (count < subPaths.Length)
 
-                    _ = stringBuilder.Append(System.IO.Path.PathSeparator);
+                    _ = stringBuilder.Append(WinCopies.IO.Path.PathSeparator);
 
             }
 

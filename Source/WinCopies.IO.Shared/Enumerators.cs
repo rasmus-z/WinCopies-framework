@@ -197,13 +197,13 @@ namespace WinCopies.IO
 
                         fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
 
-                        if (fileName.StartsWith(System.IO.Path.PathSeparator))
+                        if (fileName.StartsWith(WinCopies.IO.Path.PathSeparator))
 
                             fileName = fileName.Substring(1);
 
-                        if (fileName.Contains(System.IO.Path.PathSeparator, StringComparison.OrdinalIgnoreCase))
+                        if (fileName.Contains(WinCopies.IO.Path.PathSeparator, StringComparison.OrdinalIgnoreCase))
 
-                            fileName = fileName.Substring(0, fileName.IndexOf(System.IO.Path.PathSeparator
+                            fileName = fileName.Substring(0, fileName.IndexOf(WinCopies.IO.Path.PathSeparator
 #if !NETFRAMEWORK
                                 , StringComparison.OrdinalIgnoreCase
 #endif

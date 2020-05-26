@@ -297,13 +297,13 @@ namespace WinCopies.IO
 
         {
 
-            string path = System.IO.Path.PathSeparator + managementObject.ClassPath.Server + System.IO.Path.PathSeparator + managementObject.ClassPath.NamespacePath;
+            string path = WinCopies.IO.Path.PathSeparator + managementObject.ClassPath.Server + WinCopies.IO.Path.PathSeparator + managementObject.ClassPath.NamespacePath;
 
             string name = GetName(managementObject, wmiItemType);
 
             if (name != null)
 
-                path += System.IO.Path.PathSeparator + name;
+                path += WinCopies.IO.Path.PathSeparator + name;
 
             path += ":" + managementObject.ClassPath.ClassName;
 
@@ -323,7 +323,7 @@ namespace WinCopies.IO
 
         {
 
-            string path = $"{System.IO.Path.PathSeparator}{System.IO.Path.PathSeparator}{serverName}{System.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(serverRelativePath) ? ROOT : serverRelativePath)}{NamespacePath}";
+            string path = $"{WinCopies.IO.Path.PathSeparator}{WinCopies.IO.Path.PathSeparator}{serverName}{WinCopies.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(serverRelativePath) ? ROOT : serverRelativePath)}{NamespacePath}";
 
             return new WMIItemInfo(path, WMIItemType.Namespace, new ManagementClass(path)/*, managementObject => DefaultManagementClassDeepCloneDelegate((ManagementClass)managementObject, null)*/);
 
@@ -389,7 +389,7 @@ namespace WinCopies.IO
 
                 case WMIItemType.Namespace:
 
-                    path = Path.Substring(0, Path.LastIndexOf(System.IO.Path.PathSeparator)) + NamespacePath;
+                    path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator)) + NamespacePath;
 
                     return path.EndsWith(RootNamespace, true, CultureInfo.InvariantCulture)
                         ? new WMIItemInfo()
@@ -405,7 +405,7 @@ namespace WinCopies.IO
 
                     path = Path.Substring(0, Path.IndexOf(':'));
 
-                    path = path.Substring(0, path.LastIndexOf(System.IO.Path.PathSeparator)) + ':' + path.Substring(path.LastIndexOf(System.IO.Path.PathSeparator) + 1);
+                    path = path.Substring(0, path.LastIndexOf(WinCopies.IO.Path.PathSeparator)) + ':' + path.Substring(path.LastIndexOf(WinCopies.IO.Path.PathSeparator) + 1);
 
                     return new WMIItemInfo(path, WMIItemType.Class, null);
 
