@@ -15,8 +15,21 @@ Updates
 WinCopies.IO 2.4.0-preview6
 ---------------------------
 
+- Existing item changes:
+	- LocalizedName and Description properties return N/A for ArchiveItemInfo
+	- FileSystemObjectInfo.FileType is now abstract.
+	- ShellObjectInfo.GetItems(Predicate<ShellObject> func):
+		- func has been redefined as: Predicate<ShellObjectInfoEnumeratorStruct>
+		- This method now returns PortableDeviceInfo when ShellObjectInfo represents the Computer virtual folder.
+	- Performance upgrades.
+- Removals:
+	- FileTypes flags enum.
+	- FileSystemObjectInfo's constructor does not have a fileType parameter anymore.
 - Additions:
-	- Path.PathSeparator const.
+	- (I)PortableDevice(Object)Info
+	- ShellObjectInfoEnumeratorStruct for ShellObjectInfo.GetItems' predicate
+	- Path.PathSeparator const. Fixes #11
+	- Public (static) methods regarding item type name and icon generation in FileSystemObjectInfo.
 
 WinCopies.GUI.Templates 2.4.0-preview6
 --------------------------------------

@@ -103,7 +103,7 @@
             </Style>
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
-    <DataTemplate DataType="{x:Type media:ImageSource}">
+    <DataTemplate DataType="{x:Type media:ImageSource}" x:Shared="false">
         <Image Source="{Binding}" />
     </DataTemplate>
     <DataTemplate DataType="{x:Type controls:IContentControlModel}" x:Shared="false">

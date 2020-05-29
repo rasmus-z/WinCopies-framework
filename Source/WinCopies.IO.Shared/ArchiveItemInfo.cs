@@ -24,8 +24,6 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-using TsudaKageyu;
-
 using static WinCopies.Util.Util;
 using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
@@ -44,6 +42,7 @@ using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using System.Runtime.InteropServices;
 using System.Collections;
 using WinCopies.Linq;
+using static WinCopies.IO.FileSystemObjectInfo; 
 
 namespace WinCopies.IO
 {
@@ -67,19 +66,9 @@ namespace WinCopies.IO
     public class ArchiveItemInfo/*<TItems, TFactory>*/ : ArchiveItemInfoProvider/*<TItems, TFactory>*/, IArchiveItemInfo // where TItems : BrowsableObjectInfo, IArchiveItemInfo where TFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory
     {
 
-        #region Fields
-
-        // public override bool IsRenamingSupported => false;
-
         private IBrowsableObjectInfo _parent;
 
-        #endregion
-
         #region Properties
-
-        //public static ArchiveFileInfoDeepClone DefaultArchiveFileInfoDeepClone { get; } = (ArchiveFileInfo? archiveFileInfo, string archivePath) => archiveFileInfo.HasValue
-        //        ? (ArchiveFileInfo?)new SevenZipExtractor(archivePath).ArchiveFileData.First(item => item.FileName.ToLower() == archiveFileInfo.Value.FileName)
-        //        : null;
 
         public override bool IsSpecialItem
         {
@@ -98,10 +87,7 @@ namespace WinCopies.IO
             }
         }
 
-        /// <summary>
-        /// Gets the localized path of this <see cref="ArchiveItemInfo"/>.
-        /// </summary>
-        public override string LocalizedName => ArchiveShellObject.LocalizedName;
+        public override string LocalizedName => "N/A";
 
         /// <summary>
         /// Gets the name of this <see cref="ArchiveItemInfo"/>.
@@ -111,22 +97,22 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource SmallBitmapSource => TryGetBitmapSource(new System.Drawing.Size(16, 16));
+        public override BitmapSource SmallBitmapSource => TryGetBitmapSource(SmallIconSize);
 
         /// <summary>
         /// Gets the medium <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource MediumBitmapSource => TryGetBitmapSource(new System.Drawing.Size(48, 48));
+        public override BitmapSource MediumBitmapSource => TryGetBitmapSource(MediumIconSize);
 
         /// <summary>
         /// Gets the large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource LargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(128, 128));
+        public override BitmapSource LargeBitmapSource => TryGetBitmapSource(LargeIconSize);
 
         /// <summary>
         /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
-        public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(256, 256));
+        public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
@@ -145,10 +131,11 @@ namespace WinCopies.IO
         /// </summary>
         public override IShellObjectInfo ArchiveShellObject { get; }
 
-        public override string ItemTypeName => FileType == FileType.Folder
-                    ? FileOperation.GetFileInfo("", Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
-                    : FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
+        public override string ItemTypeName => GetItemTypeName(System.IO.Path.GetExtension(Path), FileType);
 
+        /// <summary>
+        /// Not applicable for this item kind.
+        /// </summary>
         public override string Description => "N/A";
 
         public override Size? Size
@@ -177,26 +164,12 @@ namespace WinCopies.IO
 
         #endregion
 
-        private ArchiveItemInfo(string path, FileType fileType, IShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, fileType)
+        private ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfo archiveShellObject, in ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, fileType)
         {
             ArchiveShellObject = archiveShellObject;
 
             ArchiveFileInfo = archiveFileInfo;
         }
-
-        ///// <summary>
-        ///// Loads the items of this <see cref="ArchiveItemInfo"/> using custom worker behavior options.
-        ///// </summary>
-        ///// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        ///// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        //public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
-
-        ///// <summary>
-        ///// Loads the items of this <see cref="BrowsableObjectInfo"/> asynchronously using custom worker behavior options.
-        ///// </summary>
-        ///// <param name="workerReportsProgress">Whether the worker reports progress</param>
-        ///// <param name="workerSupportsCancellation">Whether the worker supports cancellation.</param>
-        //public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync((IBrowsableObjectInfoLoader)new ArchiveLoader<ArchiveItemInfo, TItems, TFactory>(this, GetAllEnumFlags<FileTypes>(), workerReportsProgress, workerSupportsCancellation));
 
         #region Methods
 
@@ -206,21 +179,9 @@ namespace WinCopies.IO
         ///// <param name="archiveShellObject">The <see cref="IShellObjectInfo"/> that correspond to the root path of the archive</param>
         ///// <param name="path">The full path to this archive item</param>
         ///// <param name="fileType">The file type of this archive item</param>
-        public static ArchiveItemInfo From(IShellObjectInfo archiveShellObjectInfo, ArchiveFileInfo archiveFileInfo)
+        public static ArchiveItemInfo From(in IShellObjectInfo archiveShellObjectInfo, in ArchiveFileInfo archiveFileInfo)
 
         {
-
-            //if (fileType == FileType.KnownFolder)
-
-            //    // todo:
-
-            //    throw new ArgumentException(string.Format(Properties.Resources.SpecialFolderError, nameof(fileType)));
-
-            //if (ArchiveFileInfo.HasValue && !path.EndsWith(ArchiveFileInfo.Value.FileName))
-
-            //    // todo:
-
-            //    throw new ArgumentException(string.Format(Properties.Resources.PathMustEndWithFileName, nameof(path), nameof(ArchiveFileInfo.Value.FileName)));
 
             ThrowIfNull(archiveShellObjectInfo, nameof(archiveShellObjectInfo));
 
@@ -228,23 +189,9 @@ namespace WinCopies.IO
 
             return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFileInfo.FileName), archiveFileInfo.IsDirectory ? FileType.Folder : extension == ".lnk" ? FileType.Link : extension == ".library.ms" ? FileType.Library : FileType.File, archiveShellObjectInfo, archiveFileInfo);
 
-            //#if DEBUG 
-
-            //            Debug.WriteLine("shellObject == null: " + (archiveShellObject == null).ToString());
-
-            //#endif
-
-            // Path = path;
-
-            //#if DEBUG
-
-            //            Debug.WriteLine("path: " + path);
-
-            //#endif
-
         }
 
-        public static ArchiveItemInfo From(IShellObjectInfo archiveShellObjectInfo, string archiveFilePath)
+        public static ArchiveItemInfo From( in IShellObjectInfo archiveShellObjectInfo, in string archiveFilePath)
 
         {
 
@@ -283,96 +230,13 @@ namespace WinCopies.IO
 
         }
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
+        public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetArchiveItemInfoItems(null);
 
-        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new ArchiveItemInfoEnumerator(this, func);
+        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => new ArchiveItemInfoEnumerator(this, func);
 
-        //#if DEBUG
-
-        //                        void reportProgress(PathInfo path)
-
-        //                        {
-
-        //                            Debug.WriteLine("Current thread is background: " + System.Threading.Thread.CurrentThread.IsBackground);
-        //                            Debug.WriteLine("path_.Path: " + Path);
-        //                            //Debug.WriteLine("path_.Normalized_Path: " + path.NormalizedPath);
-        //                            // Debug.WriteLine("path_.Shell_Object: " + path.ArchiveShellObject);
-
-        //                            // var new_Path = ((ArchiveItemInfo)Path).ArchiveShellObject;
-        //                            // new_Path.LoadThumbnail();
-
-        //                            ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>(    (TItems)Path.Factory.GetBrowsableObjectInfo(Path.Value.Path + IO.Path.PathSeparator + path.Path, path.FileType, Path.Value.ArchiveShellObject, path.ArchiveFileInfo, archiveFileInfo => ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(archiveFileInfo, Path.Value.ArchiveShellObject.Path)), (TItemsFactory) Path.Factory.DeepClone()));
-
-        //                            // #if DEBUG
-
-        //                            // Debug.WriteLine("Ceci est un " + new_Path.GetType().ToString());
-
-        //                            // #endif
-
-        //                        }
-
-        //#endif
-
-        //            // this._Paths = new ObservableCollection<IBrowsableObjectInfo>();
-
-
-
-        //            PathInfo path_;
-
-        //            IList<IBrowsableObjectInfo> result = new List<IBrowsableObjectInfo>(paths.Count);
-
-
-
-        //#if NETFRAMEWORK
-
-        //            using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
-
-        //#else
-
-        //            using IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator();
-
-        //#endif
-
-        //                while (_paths.MoveNext())
-
-        //                    try
-
-        //                    {
-
-        //                        do
-
-        //                        {
-
-        //                            path_ = _paths.Current;
-
-        //#if DEBUG
-
-        //                                        reportProgress(path_);
-
-        //#else
-
-        //                            result.Add(new ArchiveItemInfo($"{Path }{IO.Path.PathSeparator }{path_.Path}", path_.FileType, ArchiveShellObject, path_.ArchiveFileInfo));
-
-        //#endif
-
-        //                        } while (_paths.MoveNext());
-
-        //                    }
-        //                    catch (Exception ex) when (HandleIOException(ex)) { }
-
-        //            //foreach (FolderLoader.PathInfo path_ in files)
-
-        //            //    reportProgressAndAddNewPathToObservableCollection(path_);
-
-        //            return new ReadOnlyCollection<IBrowsableObjectInfo>(result);
-
-        //        }
-
-        // public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo) => browsableObjectInfo;
-
-        protected override void Dispose(bool disposing)
+        protected override void Dispose(in bool disposing)
         {
 
             base.Dispose(disposing);
@@ -383,72 +247,7 @@ namespace WinCopies.IO
 
         }
 
-        // public override string ToString() => System.IO.Path.GetFileName(Path);
-
-        private Icon TryGetIcon(System.Drawing.Size size) =>
-
-            // if (System.IO.Path.HasExtension(Path))
-
-            Microsoft.WindowsAPICodePack.Shell.FileOperation.GetFileInfo(System.IO.Path.GetExtension(Path), Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, Microsoft.WindowsAPICodePack.Win32Native.Shell.GetFileInfoOptions.Icon | Microsoft.WindowsAPICodePack.Win32Native.Shell.GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(FileType == FileType.Folder ? 3 : 0, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
-
-        private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
-
-        {
-
-#if NETFRAMEWORK
-
-            using (Icon icon = TryGetIcon(size))
-
-#else
-
-            using Icon icon = TryGetIcon(size);
-
-#endif
-
-            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
-        }
-
         #endregion
-
-        //protected class PathInfo : IO.PathInfo
-
-        //{
-
-        //    public FileType FileType { get; }
-
-        //    public ArchiveFileInfo? ArchiveFileInfo { get; }
-
-        //    //public DeepClone<ArchiveFileInfo?> ArchiveFileInfoDelegate { get; }
-
-        //    /// <summary>
-        //    /// Gets the localized name of this <see cref="PathInfo"/>.
-        //    /// </summary>
-        //    public override string LocalizedName => Name;
-
-        //    /// <summary>
-        //    /// Gets the name of this <see cref="PathInfo"/>.
-        //    /// </summary>
-        //    public override string Name => System.IO.Path.GetFileName(Path);
-
-        //    public PathInfo(string path, string normalizedPath, FileType fileType, ArchiveFileInfo? archiveFileInfo) : base(path, normalizedPath)
-        //    {
-
-        //        ArchiveFileInfo = archiveFileInfo;
-
-        //        //ArchiveFileInfoDelegate = archiveFileInfoDelegate;
-
-        //        FileType = fileType;
-
-        //    }
-
-        //    //public bool Equals(IFileSystemObject fileSystemObject) => ReferenceEquals(this, fileSystemObject)
-        //    //        ? true : fileSystemObject is IBrowsableObjectInfo _obj ? FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower()
-        //    //        : false;
-
-        //    //public int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
-
-        //}
 
     }
 

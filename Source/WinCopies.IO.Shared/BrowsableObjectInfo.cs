@@ -35,6 +35,13 @@ namespace WinCopies.IO
 
     public abstract class BrowsableObjectInfo : FileSystemObject, IBrowsableObjectInfo
     {
+        public const ushort SmallIconSize = 16;
+
+        public const ushort MediumIconSize = 48;
+
+        public const ushort LargeIconSize = 128;
+
+        public const ushort ExtraLargeIconSize = 256;
 
         public abstract bool IsSpecialItem { get; }
 
@@ -43,70 +50,11 @@ namespace WinCopies.IO
         /// </summary>
         protected BrowsableObjectInfo(string path) : base(path) { }
 
-        ///// <summary>
-        ///// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
-        ///// </summary>
-        ///// <param name="browsableObjectInfo">The cloned <see cref="BrowsableObjectInfo"/>.</param>
-        //protected virtual void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)
-
-        //{
-
-        //    // browsableObjectInfo.AreItemsLoaded = false;
-
-        //    //if (!(ItemsLoader is null))
-
-        //    //    browsableObjectInfo.ItemsLoader = (IBrowsableObjectInfoLoader)ItemsLoader.DeepClone();
-
-        //    // browsableObjectInfo.SetItemsProperty();
-
-        //    //if (Factory.UseRecursively)
-
-        //    // else
-
-        //    // browsableObjectInfo._factory = null;
-
-        //    // browsableObjectInfo._parent = null;
-
-        //}
-
-        ///// <summary>
-        ///// When overridden in a derived class, gets a deep clone of this <see cref="BrowsableObjectInfo"/>. The <see cref="OnDeepClone(BrowsableObjectInfo)"/> method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
-        ///// </summary>
-        //protected abstract BrowsableObjectInfo DeepCloneOverride();
-
-        ///// <summary>
-        ///// Gets a deep clone of this <see cref="BrowsableObjectInfo"/>.
-        ///// </summary>
-        ///// <returns>A new <see cref="IBrowsableObjectInfo"/> that represents the same item that the current <see cref="BrowsableObjectInfo"/>.</returns>
-        //public object DeepClone()
-
-        //{
-
-        //    //var callee = new StackFrame(0).GetMethod();
-
-        //    //var caller = new StackFrame(1).GetMethod();
-
-        //    //if (callee.DeclaringType.Equals(caller.DeclaringType) || (caller.IsConstructor && caller.DeclaringType.BaseType.Equals(this.GetType())))
-
-        //    //{
-
-        //    ((IDisposable)this).ThrowIfDisposingOrDisposed();
-
-        //    BrowsableObjectInfo browsableObjectInfo = DeepCloneOverride();
-
-        //    OnDeepClone(browsableObjectInfo);
-
-        //    return browsableObjectInfo;
-
-        //    //}
-
-        //    //    else
-
-        //    //        throw new InvalidOperationException("The type of the caller of the current constructor is not the same as the type of this constructor.");
-
-        //}
-
-        protected virtual void Dispose(bool disposing)
+        /// <summary>
+        /// Not used in this class.
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(in bool disposing)
 
         {
 
@@ -128,7 +76,7 @@ namespace WinCopies.IO
 
         }
 
-        internal static Icon TryGetIcon(int iconIndex, string dll, System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
+        internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
 
         /// <summary>
         /// When overridden in a derived class, gets the small <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
@@ -168,26 +116,6 @@ namespace WinCopies.IO
         ///// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
         ///// </summary>
         public abstract IBrowsableObjectInfo Parent { get; }
-
-        //        private IReadOnlyCollection<IBrowsableObjectInfo> _items;
-
-        //        public IReadOnlyCollection<IBrowsableObjectInfo> Items =>
-
-        //#if NETFRAMEWORK
-
-        //            _items = _items ?? (_items = GetItems());
-
-        //#else
-
-        //            _items ??= GetItems();
-
-        //#endif
-
-        ///// <summary>
-        ///// When overridden in a derived class, returns the parent of this <see cref="BrowsableObjectInfo"/>.
-        ///// </summary>
-        ///// <returns>The parent of this <see cref="BrowsableObjectInfo"/>.</returns>
-        //protected abstract IBrowsableObjectInfo GetParent();
 
         public abstract IEnumerable<IBrowsableObjectInfo> GetItems();
 

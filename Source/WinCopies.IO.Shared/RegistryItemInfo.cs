@@ -175,22 +175,22 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo"/>.
         /// </summary>
-        public override BitmapSource SmallBitmapSource => TryGetBitmapSource(new System.Drawing.Size(16, 16));
+        public override BitmapSource SmallBitmapSource => TryGetBitmapSource(SmallIconSize);
 
         /// <summary>
         /// Gets the medium <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo"/>.
         /// </summary>
-        public override BitmapSource MediumBitmapSource => TryGetBitmapSource(new System.Drawing.Size(48, 48));
+        public override BitmapSource MediumBitmapSource => TryGetBitmapSource(MediumIconSize);
 
         /// <summary>
         /// Gets the large <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo"/>.
         /// </summary>
-        public override BitmapSource LargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(128, 128));
+        public override BitmapSource LargeBitmapSource => TryGetBitmapSource(LargeIconSize);
 
         /// <summary>
         /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="RegistryItemInfo"/>.
         /// </summary>
-        public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(new System.Drawing.Size(256, 256));
+        public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="RegistryItemInfo"/> is browsable.
@@ -415,7 +415,7 @@ namespace WinCopies.IO
         ///// Disposes the current <see cref="RegistryItemInfo"/> and its parent and items recursively.
         ///// </summary>
         ///// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy and does not support cancellation.</exception>
-        protected override void Dispose(bool disposing)
+        protected override void Dispose(in bool disposing)
         {
             base.Dispose(disposing);
 
@@ -432,7 +432,7 @@ namespace WinCopies.IO
 
         #endregion
 
-        private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
+        private BitmapSource TryGetBitmapSource(int size)
 
         {
 
@@ -458,87 +458,17 @@ namespace WinCopies.IO
 
 #if NETFRAMEWORK
 
-            using (Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, size))
+            using (Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, new System.Drawing.Size(size, size)))
 
 #else
 
-            using Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, size);
+            using Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, new System.Drawing.Size(size, size));
 
 #endif
 
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
         }
-
-        //protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(default, RegistryItemTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
-
-        //private readonly RegistryItemTypes _registryItemTypes = RegistryItemTypes.None;
-
-        //public RegistryItemTypes RegistryItemTypes
-        //{
-
-        //    get => _registryItemTypes;
-
-        //    set => _ = this.SetBackgroundWorkerProperty(nameof(RegistryItemTypes), nameof(_registryItemTypes), value, typeof(RegistryKeyLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>), true);
-
-        //}
-
-        ///// <summary>
-        ///// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TSubItems, TFactory, TItemsFactory}"/> class.
-        ///// </summary>
-        ///// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
-        ///// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
-        ///// <param name="registryItemTypes">The registry item types to load.</param>
-        //public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, RegistryItemTypes registryItemTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, registryItemTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) => RegistryItemTypes = registryItemTypes;
-
-        ///// <summary>
-        ///// Initializes a new instance of the <see cref="RegistryKeyLoader{TPath, TItems, TSubItems, TFactory, TItemsFactory}"/> class using a custom comparer.
-        ///// </summary>
-        ///// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
-        ///// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
-        ///// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
-        ///// <param name="registryItemTypes">The registry item types to load.</param>
-        //public RegistryKeyLoader(BrowsableObjectTreeNode<TPath, TItems, TFactory> path, RegistryItemTypes registryItemTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) => _registryItemTypes = registryItemTypes;
-
-        //public override bool CheckFilter(string path)
-
-        //{
-
-        //    if (Filter == null) return true;
-
-        //    foreach (string filter in Filter)
-
-        //    {
-
-        //        bool checkFilters(string[] filters)
-
-        //        {
-
-        //            foreach (string _filter in filters)
-
-        //            {
-
-        //                if ( string.IsNullOrEmpty( _filter ) ) continue;
-
-        //                if (path.Length >= _filter.Length && path.Contains(_filter))
-
-        //                    path = path.Substring(path.IndexOf(_filter) + _filter.Length);
-
-        //                else return false;
-
-        //            }
-
-        //            return true;
-
-        //        }
-
-        //        return checkFilters(filter.Split('*'));
-
-        //    }
-
-        //    return true;
-
-        //}
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems()
         {
@@ -734,90 +664,6 @@ namespace WinCopies.IO
             // }
 
         }
-
-        //protected class PathInfo : IO.PathInfo
-        //{
-
-        //    /// <summary>
-        //    /// Gets the localized name of this <see cref="PathInfo"/>.
-        //    /// </summary>
-        //    public override string LocalizedName => Name;
-
-        //    /// <summary>
-        //    /// Gets the name of this <see cref="PathInfo"/>.
-        //    /// </summary>
-        //    public override string Name { get; }
-
-        //    public bool IsValue { get; }
-
-        //    public RegistryKey RegistryKey { get; }
-
-        //    public DeepClone<RegistryKey> RegistryKeyDelegate { get; }
-
-        //    public PathInfo(string path, string normalizedPath, string name, RegistryKey registryKey, DeepClone<RegistryKey> registryKeyDelegate, bool isValue) : base(path, normalizedPath)
-        //    {
-
-        //        Name = name;
-
-        //        RegistryKey = registryKey;
-
-        //        RegistryKeyDelegate = registryKeyDelegate;
-
-        //        IsValue = isValue;
-
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Gets or sets the factory for this <see cref="RegistryItemInfo{TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="RegistryItemInfo{TItems, TFactory}"/> and its associated <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/>.
-        ///// </summary>
-        ///// <exception cref="InvalidOperationException">The old <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}.ItemsLoader"/> is running. OR The given items loader has already been added to a <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.</exception>
-        ///// <exception cref="ArgumentNullException">value is null.</exception>
-        //public new RegistryItemInfoFactory Factory { get => (RegistryItemInfoFactory)base.Factory; set => base.Factory = value; }
-
-        ///// <summary>
-        ///// Renames or move to a relative path, or both, the current <see cref="RegistryItemInfo{TItems, TFactory}"/> with the specified name.
-        ///// </summary>
-        ///// <param name="newValue">The new name or relative path for this <see cref="RegistryItemInfo{TItems, TFactory}"/>.</param>
-        //public override void Rename(string newValue)
-
-        //{
-
-        //    switch (RegistryItemType)
-
-        //    {
-
-        //        case RegistryItemType.RegistryRoot:
-
-        //            throw new InvalidOperationException("This node is the registry root node and cannot be renamed.");
-
-        //        case RegistryItemType.RegistryKey:
-
-        //            // todo:
-
-        //            throw new InvalidOperationException("This feature is currently not supported.");
-
-        //        case RegistryItemType.RegistryValue:
-
-        //            if (RegistryKey.GetValue(newValue) != null)
-
-        //                throw new InvalidOperationException("A value with the specified name already exists in this registry key.");
-
-        //            object value = RegistryKey.GetValue(Name);
-
-        //            RegistryValueKind valueKind = RegistryKey.GetValueKind(Name);
-
-        //            RegistryKey.DeleteValue(Name);
-
-        //            RegistryKey.SetValue(newValue, value, valueKind);
-
-        //            break;
-
-        //    }
-
-        //}
-
-        // public override bool Equals(IFileSystemObject fileSystemObject) => Equals((object)fileSystemObject);
 
     }
 }

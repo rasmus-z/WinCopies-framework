@@ -65,40 +65,40 @@ namespace WinCopies.IO
         Library
     }
 
-    /// <summary>
-    /// File types to load in the <see cref="FolderLoader"/> and <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> classes.
-    /// </summary>
-    [Flags]
-    public enum FileTypes
-    {
-        /// <summary>
-        /// Do not load any item type.
-        /// </summary>
-        None = 0,
+    ///// <summary>
+    ///// File types to load in the <see cref="FolderLoader"/> and <see cref="ArchiveLoader{TPath, TItems, TFactory}"/> classes.
+    ///// </summary>
+    //[Flags]
+    //public enum FileTypes
+    //{
+    //    /// <summary>
+    //    /// Do not load any item type.
+    //    /// </summary>
+    //    None = 0,
 
-        /// <summary>
-        /// Load folders.
-        /// </summary>
-        Folder = 1,
+    //    /// <summary>
+    //    /// Load folders.
+    //    /// </summary>
+    //    Folder = 1,
 
-        /// <summary>
-        /// Load files.
-        /// </summary>
-        File = 2,
+    //    /// <summary>
+    //    /// Load files.
+    //    /// </summary>
+    //    File = 2,
 
-        /// <summary>
-        /// Load drives.
-        /// </summary>
-        Drive = 4,
+    //    /// <summary>
+    //    /// Load drives.
+    //    /// </summary>
+    //    Drive = 4,
 
-        /// <summary>
-        /// Load links.
-        /// </summary>
-        Link = 8,
+    //    /// <summary>
+    //    /// Load links.
+    //    /// </summary>
+    //    Link = 8,
 
-        /// <summary>
-        /// Load archives.
-        /// </summary>
-        Archive = 16
-    }
+    //    /// <summary>
+    //    /// Load archives.
+    //    /// </summary>
+    //    Archive = 16
+    //}
 }
