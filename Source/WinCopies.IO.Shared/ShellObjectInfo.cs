@@ -19,24 +19,16 @@ using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Windows.Media.Imaging;
 using static WinCopies.Util.Util;
-using FileInfo = System.IO.FileInfo;
 using IfCT = WinCopies.Util.Util.ComparisonType;
 using IfCM = WinCopies.Util.Util.ComparisonMode;
 using IfComp = WinCopies.Util.Util.Comparison;
 using WinCopies.Util;
 using static WinCopies.IO.Path;
-using static WinCopies.IO.ShellObjectInfo;
 using Microsoft.WindowsAPICodePack.COMNative.Shell;
-using WinCopies.Collections;
-using Microsoft.WindowsAPICodePack.PropertySystem;
-using Microsoft.WindowsAPICodePack.Shell.Guids;
 using System.Linq;
-using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using SevenZip;
 using WinCopies.Linq;
 using Microsoft.WindowsAPICodePack.PortableDevices;
@@ -259,7 +251,7 @@ namespace WinCopies.IO
 
                     (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, FileType.KnownFolder) : (shellFileSystemFolder.Path, FileType.Folder);
 
-                    if (Directory.GetParent(path) is null)
+                    if (System.IO.Directory.GetParent(path) is null)
 
                         return new ShellObjectInfo(path, FileType.Drive, shellObject);
 

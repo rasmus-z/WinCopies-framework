@@ -4,12 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WinCopies.Linq;
-using static Microsoft.WindowsAPICodePack.PortableDevices.Guids.PropertySystem;
 
 namespace WinCopies.IO
 {

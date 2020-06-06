@@ -1,10 +1,8 @@
 ﻿using Microsoft.WindowsAPICodePack.PortableDevices;
-using Microsoft.WindowsAPICodePack.PortableDevices.Guids;
 using Microsoft.WindowsAPICodePack.PropertySystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Media.Imaging;
 using WinCopies.Linq;
 

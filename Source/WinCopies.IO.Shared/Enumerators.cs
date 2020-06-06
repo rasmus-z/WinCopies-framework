@@ -1,4 +1,5 @@
-﻿using SevenZip;
+﻿using Microsoft.WindowsAPICodePack.PortableDevices.EventSystem;
+using SevenZip;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
+    [Serializable]
     public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>, IEnumerable<ArchiveItemInfo>
     {
         private int _index = -1;
@@ -366,6 +368,7 @@ namespace WinCopies.IO
         // files.Sort(comp);
     }
 
+    [Serializable]
     public sealed class WMIItemInfoEnumerator : IEnumerator<WMIItemInfo>, IEnumerable<WMIItemInfo>
     {
         private IEnumerator<ManagementBaseObject> _enumerator;
@@ -460,5 +463,321 @@ namespace WinCopies.IO
             }
         }
         #endregion
+    }
+
+    [Serializable]
+    public sealed class FileSystemEntryEnumerable : IEnumerable<IPathInfo>, IEnumerator<IPathInfo>
+    {
+        private IEnumerator<string> _directoryEnumerator;
+
+        private IEnumerator<string> _fileEnumerator;
+
+        private bool _completed = false;
+
+        public IPathInfo Current { get; private set; }
+
+        object IEnumerator.Current => Current;
+
+        public FileSystemEntryEnumerable(IEnumerator<string> directoryEnumerator, IEnumerator<string> fileEnumerator)
+        {
+            _directoryEnumerator = directoryEnumerator;
+
+            _fileEnumerator = fileEnumerator;
+        }
+
+        public IEnumerator<IPathInfo> GetEnumerator() => this;
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public bool MoveNext()
+        {
+            if (_completed) return false;
+
+            if (_fileEnumerator == null)
+            {
+                if (_directoryEnumerator.MoveNext())
+                {
+                    Current = new PathInfo(_directoryEnumerator.Current, true);
+
+                    return true;
+                }
+
+                _directoryEnumerator = null;
+
+                _completed = true;
+
+                return false;
+            }
+
+            if (_fileEnumerator.MoveNext())
+            {
+                Current = new PathInfo(_fileEnumerator.Current, false);
+
+                return true;
+            }
+
+            _fileEnumerator = null;
+
+            _completed = true;
+
+            return false;
+        }
+
+        public void Reset() => throw new NotSupportedException();
+
+        public void Dispose()
+        {
+            if (_completed)
+            {
+                Current = null;
+
+                return;
+            }
+
+            if (_directoryEnumerator != null)
+            {
+                _directoryEnumerator.Dispose();
+
+                _directoryEnumerator = null;
+            }
+
+            if (_fileEnumerator != null)
+            {
+                _fileEnumerator.Dispose();
+
+                _fileEnumerator = null;
+            }
+
+            Current = null;
+        }
+    }
+
+    [Serializable]
+    public sealed class FileSystemEntryEnumerator : IEnumerable<IPathInfo>, IEnumerator<IPathInfo>
+    {
+        private IEnumerator<IPathInfo> _paths;
+
+        private Stack<FileSystemEntryEnumerable> _stack;
+
+        private Queue<IPathInfo> _directories;
+
+        private Queue<IPathInfo> _files;
+
+        public IPathInfo Current { get; private set; }
+
+        object IEnumerator.Current => Current;
+
+        public FileSystemEntryEnumerator(IEnumerable<IPathInfo> paths, string searchPattern, SearchOption? searchOption
+#if NETCORE
+            , System.IO.EnumerationOptions enumerationOptions
+#endif
+            )
+        {
+            _paths = paths.GetEnumerator();
+
+            if (string.IsNullOrEmpty(searchPattern) && searchOption == null
+#if NETCORE
+                     && enumerationOptions == null
+#endif
+                    )
+            {
+                _enumerateDirectoriesFunc = _path => System.IO.Directory.EnumerateDirectories(_path);
+
+                _enumerateFilesFunc = _path => System.IO.Directory.EnumerateFiles(_path);
+            }
+
+            else if (searchPattern != null && searchOption == null
+#if NETCORE
+                    && enumerationOptions == null
+#endif
+                    )
+            {
+                _enumerateDirectoriesFunc = _path => System.IO.Directory.EnumerateDirectories(_path, searchPattern);
+
+                _enumerateFilesFunc = _path => System.IO.Directory.EnumerateFiles(_path, searchPattern);
+            }
+
+#if NETCORE
+            else if (searchOption == null)
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+
+                _enumerateDirectoriesFunc = path => System.IO.Directory.EnumerateDirectories(path, searchPattern, enumerationOptions);
+
+                _enumerateFilesFunc = path => System.IO.Directory.EnumerateFiles(path, searchPattern, enumerationOptions);
+            }
+#endif
+
+            else
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+
+                _enumerateDirectoriesFunc = _path => System.IO.Directory.EnumerateDirectories(_path, searchPattern, searchOption.Value);
+
+                _enumerateFilesFunc = _path => System.IO.Directory.EnumerateFiles(_path, searchPattern, searchOption.Value);
+            }
+        }
+
+        public void Dispose() { }
+
+        public IEnumerator<IPathInfo> GetEnumerator() => this;
+
+        private bool _firstLaunch = true;
+        private bool _completed = false;
+        private readonly Func<string, IEnumerable<string>> _enumerateDirectoriesFunc;
+        private readonly Func<string, IEnumerable<string>> _enumerateFilesFunc;
+
+        private void _markAsCompleted()
+        {
+            _stack = null;
+
+            _completed = true;
+        }
+
+        public bool MoveNext()
+        {
+            if (_completed)
+            {
+                Current = null;
+
+                return false;
+            }
+
+            bool dequeueDirectory()
+            {
+
+                FileSystemEntryEnumerable enumerator;
+
+                void push() => _stack.Push(new FileSystemEntryEnumerable(_enumerateDirectoriesFunc(Current.Path).GetEnumerator(), _enumerateFilesFunc(Current.Path).GetEnumerator()));
+
+                while (true)
+                {
+
+                    if (_stack.Count == 0)
+
+                    {
+                        if (_directories.Count == 0)
+                        {
+                            _directories = null;
+
+                            _markAsCompleted();
+
+                            return false;
+                        }
+
+                        Current = _directories.Dequeue();
+
+                        push();
+
+                        if (_directories.Count == 0)
+
+                            _directories = null;
+
+                        return true;
+                    }
+
+                    enumerator = _stack.Peek();
+
+                    if (enumerator.MoveNext())
+                    {
+                        Current = enumerator.Current;
+
+                        if (Current.IsDirectory)
+
+                            push();
+
+                        return true;
+                    }
+
+                    _ = _stack.Pop();
+
+                }
+
+            }
+
+            if (_firstLaunch)
+            {
+                _firstLaunch = false;
+
+                _directories = new Queue<IPathInfo>();
+
+                _files = new Queue<IPathInfo>();
+
+                IPathInfo path;
+
+                while (_paths.MoveNext())
+                {
+                    path = _paths.Current;
+
+                    (path.IsDirectory ? _directories : _files).Enqueue(path);
+                }
+
+                _paths = null;
+
+                if (_files.Count == 0)
+                {
+                    _files = null;
+
+                    if (_directories.Count == 0)
+                    {
+                        _directories = null;
+
+                        _markAsCompleted();
+
+                        return false;
+                    }
+
+                    _ = dequeueDirectory();
+
+                    return true;
+                }
+
+                if (_directories.Count == 0)
+
+                    _directories = null;
+
+                Current = _files.Dequeue();
+
+                if (_files.Count == 0)
+
+                    _files = null;
+
+                return true;
+            }
+
+            if (_files == null)
+            {
+                if (_directories == null && _stack.Count == 0)
+                {
+                    _markAsCompleted();
+
+                    return false;
+                }
+
+                if (dequeueDirectory())
+
+                    return true;
+
+                _markAsCompleted();
+
+                return false;
+            }
+
+            Current = _files.Dequeue();
+
+            if (_files.Count == 0)
+
+                _files = null;
+
+            return true;
+        }
+
+        public void Reset() => throw new NotSupportedException();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

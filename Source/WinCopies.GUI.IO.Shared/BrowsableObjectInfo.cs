@@ -211,7 +211,7 @@ namespace WinCopies.GUI.IO
 
                     try
                     {
-                        IEnumerable<IBrowsableObjectInfo> items = _filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems().Where(_filter);
+                        IEnumerable<IBrowsableObjectInfo> items = _filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems().WherePredicate(_filter);
 
                         _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(items
                     .Select(_browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo, _filter) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));

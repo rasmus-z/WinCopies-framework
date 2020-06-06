@@ -10,7 +10,7 @@
     <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
-  <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
+  <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />  
 
   <!--<ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
     --><!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />--><!--

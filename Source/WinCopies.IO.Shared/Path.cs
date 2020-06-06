@@ -852,6 +852,10 @@ namespace WinCopies.IO
 
         public static bool IsWMIPath(string path) => path.StartsWith('\\');
 
+        public static bool Exists(string path) => System.IO.File.Exists(path) || System.IO.Directory.Exists(path);
+
+        public static string RenameOnDuplicate(string path );
+
         //        //public static string GetShortcutPath(string path)
 
         //        //{

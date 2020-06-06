@@ -17,18 +17,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 
 using TsudaKageyu;
-
-using WinCopies.Collections;
-using WinCopies.Util;
-using static WinCopies.Util.Util;
-using IDisposable = WinCopies.Util.IDisposable;
 
 namespace WinCopies.IO
 {

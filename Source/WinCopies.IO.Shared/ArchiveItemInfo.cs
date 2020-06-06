@@ -18,10 +18,6 @@
 using SevenZip;
 
 using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 using static WinCopies.Util.Util;
@@ -31,18 +27,6 @@ using IfComp = WinCopies.Util.Util.Comparison;
 using System.Linq;
 using System.Collections.Generic;
 using WinCopies.Util;
-using System.IO;
-using WinCopies.Collections;
-using System.Collections.ObjectModel;
-using System.Security;
-using static WinCopies.IO.FolderLoader;
-using System.Security.Cryptography;
-using Microsoft.WindowsAPICodePack.Shell;
-using Microsoft.WindowsAPICodePack.Win32Native.Shell;
-using System.Runtime.InteropServices;
-using System.Collections;
-using WinCopies.Linq;
-using static WinCopies.IO.FileSystemObjectInfo; 
 
 namespace WinCopies.IO
 {

@@ -16,7 +16,6 @@
  * along with the WinCopies Framework.If not, see<https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Text;
 using System.Windows.Media.Imaging;
 using static WinCopies.Util.Util;
 using System.Management;
@@ -25,11 +24,7 @@ using System.Windows.Interop;
 using System.Drawing;
 using System.Globalization;
 using WinCopies.Util;
-using System.Security;
-using static WinCopies.IO.WMIItemInfo;
-using static WinCopies.IO.Path;
 using System.Collections.Generic;
-using System.Threading;
 using System.Linq;
 using WinCopies.Linq;
 

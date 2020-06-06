@@ -21,9 +21,7 @@ using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Security;
 using System.Security.AccessControl;
 using System.Text;
@@ -32,7 +30,6 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WinCopies.Linq;
 using WinCopies.Util;
-using static WinCopies.IO.RegistryItemInfo;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
