@@ -492,15 +492,25 @@ namespace WinCopies.IO
 
                         if (namespaces != null)
 
-                            namespaces = namespaces.Where(predicate);
+                            namespaces = namespaces.WherePredicate(predicate);
 
                         if (classes != null)
 
-                            classes = classes.Where(predicate);
+                            classes = classes.WherePredicate(predicate);
 
                     }
 
-                    return namespaces == null ? new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration) : classes == null ? new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration) : new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration).AppendValues(new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration));
+                    if (namespaces == null)
+
+                        return new WinCopies.IO.Enumerable<WMIItemInfo>(()=> new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration));
+
+                    else if (classes == null)
+
+                        return new WinCopies.IO.Enumerable<WMIItemInfo>( ()=> new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration));
+                    
+                    else 
+                        
+                        return new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration).AppendValues(new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration));
 
                 }
 

@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="2.4-preview6.1" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="2.4.0-preview6" />
+    <PackageReference Include="WinCopies.Util" Version="2.5.7-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="2.5.7-preview" />
   </ItemGroup>
 
   <ItemGroup>

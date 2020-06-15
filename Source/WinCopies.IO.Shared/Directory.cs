@@ -37,305 +37,304 @@ namespace WinCopies.IO
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
-            )
-        {
-
-            var _paths = new FileSystemEntryEnumerator(paths, searchPattern, searchOption
+            ) => new Enumerable<IPathInfo>(() => new PathInfoFileSystemEntryEnumerator(paths, searchPattern, searchOption
 #if NETCORE
                 , enumerationOptions
 #endif
+#if DEBUG
+                , null
+#endif
+                )
                 );
 
-            foreach (IPathInfo path in _paths)
+        #region Old
 
-                yield return path;
+        // _pathsLoaded = new ObservableCollection<FileSystemInfo>();
 
-            // _pathsLoaded = new ObservableCollection<FileSystemInfo>();
+        //string parent_Path = "";
 
-            //string parent_Path = "";
+        //if (((System.IO.DirectoryInfo)path.FileSystemInfoProperties).Parent != null) parent_Path = ((System.IO.DirectoryInfo)path.FileSystemInfoProperties).Parent.FullName;
 
-            //if (((System.IO.DirectoryInfo)path.FileSystemInfoProperties).Parent != null) parent_Path = ((System.IO.DirectoryInfo)path.FileSystemInfoProperties).Parent.FullName;
 
+        //    else
+        //    {
 
-            //    else
-            //    {
+        //        if (new DriveInfo(((System.IO.DirectoryInfo)path.FileSystemInfoProperties).Root.FullName).VolumeLabel == string.Empty)
+        //        {
 
-            //        if (new DriveInfo(((System.IO.DirectoryInfo)path.FileSystemInfoProperties).Root.FullName).VolumeLabel == string.Empty)
-            //        {
+        //            parent_Path = ((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName;
 
-            //            parent_Path = ((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName;
+        //            parent_Path = parent_Path.Substring(0, parent_Path.Length - 2);
 
-            //            parent_Path = parent_Path.Substring(0, parent_Path.Length - 2);
+        //        } // end if
 
-            //        } // end if
+        //        else
 
-            //        else
+        //            parent_Path = new DriveInfo(((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName).VolumeLabel;
 
-            //            parent_Path = new DriveInfo(((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName).VolumeLabel;
 
+        //    } // end if
 
-            //    } // end if
 
 
+        //if (actionType == ActionType.Recycling)
 
-            //if (actionType == ActionType.Recycling)
+        //    _pathsLoaded = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>(Paths);
 
-            //    _pathsLoaded = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>(Paths);
+        //else
 
-            //else
+        //foreach (IPathInfo path in paths)
 
-            //foreach (IPathInfo path in paths)
+        //{
 
-            //{
+        //    Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName);
 
-            //    Debug.WriteLine("FilesInfoLoader log: " + path.FileSystemInfoProperties.FullName);
+        // parent_Path = "";
 
-            // parent_Path = "";
 
 
+        //LinkedList<IPathInfo> files = new LinkedList<IPathInfo>();
 
-            //LinkedList<IPathInfo> files = new LinkedList<IPathInfo>();
 
 
+        //switch (path.FileType)
+        //{
 
-            //switch (path.FileType)
-            //{
+        //    case FileType.Folder:
+        //    case FileType.Drive:
 
-            //    case FileType.Folder:
-            //    case FileType.Drive:
 
 
+        //        List<int> pathsIndexes = new List<int>();
 
-            //        List<int> pathsIndexes = new List<int>();
+        //        Type t = path.FileSystemInfoProperties.GetType();
 
-            //        Type t = path.FileSystemInfoProperties.GetType();
+        //        DirectoryInfo directoriesInfo = (DirectoryInfo)path.FileSystemInfoProperties;
 
-            //        DirectoryInfo directoriesInfo = (DirectoryInfo)path.FileSystemInfoProperties;
+        //        Debug.WriteLine("FilesInfoLoader log: " + (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/).ToString());
 
-            //        Debug.WriteLine("FilesInfoLoader log: " + (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/).ToString());
+        //        // Console.WriteLine("FilesInfoLoader log: "+ActionType.ToString() + " " + path.FileSystemInfoProperties.FullName + " " + path.FileType.ToString() + " " + LoadOnlyItemsWithSearchTermsForAllActions.ToString() + " " + Search_Terms.ToString());
 
-            //        // Console.WriteLine("FilesInfoLoader log: "+ActionType.ToString() + " " + path.FileSystemInfoProperties.FullName + " " + path.FileType.ToString() + " " + LoadOnlyItemsWithSearchTermsForAllActions.ToString() + " " + Search_Terms.ToString());
+        //        if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
+        //        {
 
-            //        if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
-            //        {
+        //            _pathsLoaded.Add(path);
 
-            //            _pathsLoaded.Add(path);
+        //            // System.Windows.Forms.MessageBox.Show("a" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) + "a" + " " + "b" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName) + "b" + " " + (IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) != IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName)).ToString());
+        //            //if (path.FileSystemInfoProperties.FullName != ((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName)
 
-            //            // System.Windows.Forms.MessageBox.Show("a" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) + "a" + " " + "b" + IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName) + "b" + " " + (IO.Path.Return_A_Path_With_One_Backslash_Per_Path(path.FileSystemInfoProperties.FullName) != IO.Path.Return_A_Path_With_One_Backslash_Per_Path(new System.IO.DirectoryInfo(path.FileSystemInfoProperties.FullName).Root.FullName)).ToString());
-            //            //if (path.FileSystemInfoProperties.FullName != ((DirectoryInfo)path.FileSystemInfoProperties).Root.FullName)
+        //            //    if (directoriesInfo.Attributes.HasFlag(FileAttributes.Hidden) && (directoriesInfo.GetDirectories().Length > 0 || directoriesInfo.GetFiles().Length > 0))
 
-            //            //    if (directoriesInfo.Attributes.HasFlag(FileAttributes.Hidden) && (directoriesInfo.GetDirectories().Length > 0 || directoriesInfo.GetFiles().Length > 0))
+        //            //        Hidden_Folders_With_Subpaths.Add(path.FileSystemInfoProperties.FullName);
 
-            //            //        Hidden_Folders_With_Subpaths.Add(path.FileSystemInfoProperties.FullName);
+        //            //else
+        //            //{
 
-            //            //else
-            //            //{
+        //            //    _pathsLoaded.Add(new FileSystemInfo(path.FileSystemInfoProperties, FileTypes.Drive));
 
-            //            //    _pathsLoaded.Add(new FileSystemInfo(path.FileSystemInfoProperties, FileTypes.Drive));
+        //            //    ReportProgress(0);
 
-            //            //    ReportProgress(0);
+        //            //}
 
-            //            //}
 
+        //            //FileSystemInfoLoaded = pathsLoaded[pathsLoaded.Count - 1];
 
-            //            //FileSystemInfoLoaded = pathsLoaded[pathsLoaded.Count - 1];
+        //            // PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileSystemInfoThatIsLoading)));
 
-            //            // PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileSystemInfoThatIsLoading)));
+        //            //ReportProgress(0);
 
-            //            //ReportProgress(0);
+        //        } // end if
 
-            //        } // end if
+        //        //TODO : vraiment utile ?
 
-            //        //TODO : vraiment utile ?
+        //        // ReportProgress(0);
 
-            //        // ReportProgress(0);
+        //        try
+        //        {
 
-            //        try
-            //        {
+        //            foreach (FileInfo file in directoriesInfo.GetFiles())
 
-            //            foreach (FileInfo file in directoriesInfo.GetFiles())
+        //            {
 
-            //            {
+        //                //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+        //                //{
 
-            //                //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
-            //                //{
+        //                _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
 
-            //                _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
+        //                TotalSize += file.Length;
 
-            //                TotalSize += file.Length;
+        //                //} // end if
 
-            //                //} // end if
+        //            } // next file
 
-            //            } // next file
+        //        } // end try
 
-            //        } // end try
+        //        catch (Exception)
+        //        { }
 
-            //        catch (Exception)
-            //        { }
+        //        int pathSubdirectoriesCount = 0;
 
-            //        int pathSubdirectoriesCount = 0;
+        //        try
+        //        {
 
-            //        try
-            //        {
+        //            pathSubdirectoriesCount = ((DirectoryInfo)path.FileSystemInfoProperties).GetDirectories().Length;
 
-            //            pathSubdirectoriesCount = ((DirectoryInfo)path.FileSystemInfoProperties).GetDirectories().Length;
+        //        } // end try
 
-            //        } // end try
+        //        catch (Exception)
+        //        { }
 
-            //        catch (Exception)
-            //        { }
+        //        pathsIndexes.Add(0);
 
-            //        pathsIndexes.Add(0);
+        //        int findIndex = 0;
 
-            //        int findIndex = 0;
+        //        while (pathsIndexes[0] < pathSubdirectoriesCount)
+        //        {
 
-            //        while (pathsIndexes[0] < pathSubdirectoriesCount)
-            //        {
+        //            try
+        //            {
 
-            //            try
-            //            {
+        //                DirectoryInfo[] directories = directoriesInfo.GetDirectories();
 
-            //                DirectoryInfo[] directories = directoriesInfo.GetDirectories();
+        //                while (directories.Length > 0)
+        //                {
 
-            //                while (directories.Length > 0)
-            //                {
 
 
+        //                    DirectoryInfo directory = directories[pathsIndexes[findIndex]];
 
-            //                    DirectoryInfo directory = directories[pathsIndexes[findIndex]];
+        //                    directories = directory.GetDirectories();
 
-            //                    directories = directory.GetDirectories();
 
 
+        //                    //if (directory.Attributes.HasFlag(FileAttributes.Hidden) && (directory.GetDirectories().Length > 0 || directory.GetFiles().Length > 0))
 
-            //                    //if (directory.Attributes.HasFlag(FileAttributes.Hidden) && (directory.GetDirectories().Length > 0 || directory.GetFiles().Length > 0))
+        //                    //    Hidden_Folders_With_Subpaths.Add(directory.FullName);
 
-            //                    //    Hidden_Folders_With_Subpaths.Add(directory.FullName);
 
 
 
+        //                    if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
+        //                    {
 
-            //                    if (ActionType != ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
-            //                    {
+        //                        _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
 
-            //                        _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
+        //                    } // end if
 
-            //                    } // end if
 
 
+        //                    foreach (FileInfo file in directory.GetFiles())
 
-            //                    foreach (FileInfo file in directory.GetFiles())
+        //                    {
 
-            //                    {
+        //                        //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+        //                        //{
 
-            //                        //if (SearchMethods.AddFile(file, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
-            //                        //{
+        //                        _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
 
-            //                        _pathsLoaded.Add(new FileSystemInfo(file, FileType.File));
+        //                        TotalSize += file.Length;
 
-            //                        TotalSize += file.Length;
+        //                        //} // end if
 
-            //                        //} // end if
+        //                    } // next file
 
-            //                    } // next file
+        //                    if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
+        //                    {
 
-            //                    if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(directory, FileType.Folder, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
-            //                    {
+        //                        _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
 
-            //                        _pathsLoaded.Add(new FileSystemInfo(directory, FileType.Folder));
+        //                        //FileSystemInfoLoaded = pathsLoaded[pathsLoaded.Count - 1];
 
-            //                        //FileSystemInfoLoaded = pathsLoaded[pathsLoaded.Count - 1];
+        //                        // PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileSystemInfoThatIsLoading)));
 
-            //                        // PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileSystemInfoThatIsLoading)));
+        //                        //ReportProgress(0);
 
-            //                        //ReportProgress(0);
+        //                    } // end if
 
-            //                    } // end if
+        //                    pathsIndexes.Add(0);
 
-            //                    pathsIndexes.Add(0);
+        //                    findIndex++;
 
-            //                    findIndex++;
+        //                } // end while
 
-            //                } // end while
+        //            } // end try
 
-            //            } // end try
+        //            catch (Exception)
+        //            { findIndex++; }
 
-            //            catch (Exception)
-            //            { findIndex++; }
+        //            do
+        //            {
 
-            //            do
-            //            {
 
 
+        //                directoriesInfo = directoriesInfo.Parent;
 
-            //                directoriesInfo = directoriesInfo.Parent;
+        //                findIndex--;
 
-            //                findIndex--;
+        //                pathsIndexes[findIndex] += 1;
 
-            //                pathsIndexes[findIndex] += 1;
 
 
+        //                for (int i = findIndex + 1; i < pathsIndexes.Count; i++)
 
-            //                for (int i = findIndex + 1; i < pathsIndexes.Count; i++)
+        //                    pathsIndexes.RemoveAt(findIndex + 1);
 
-            //                    pathsIndexes.RemoveAt(findIndex + 1);
 
 
+        //            } while (directoriesInfo.GetDirectories().Length == pathsIndexes[findIndex] && pathsIndexes[0] != pathSubdirectoriesCount);
 
-            //            } while (directoriesInfo.GetDirectories().Length == pathsIndexes[findIndex] && pathsIndexes[0] != pathSubdirectoriesCount);
+        //        } // end while
 
-            //        } // end while
+        //        if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
+        //        {
 
-            //        if (ActionType == ActionType.Deletion /*&& SearchMethods.AddFile(path.FileSystemInfoProperties, path.FileType, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms)*/)
-            //        {
+        //            _pathsLoaded.Add(path);
 
-            //            _pathsLoaded.Add(path);
+        //        } // end if
 
-            //        } // end if
+        //        break;
 
-            //        break;
+        //    case FileType.File:
 
-            //    case FileType.File:
+        //        files.AddLast(path);
 
-            //        files.AddLast(path);
 
 
+        //        break;
 
-            //        break;
+        //} // end switch
 
-            //} // end switch
+        //while (files.Count > 0)
+        //{
 
-            //while (files.Count > 0)
-            //{
+        //    var _path = files.RemoveAndGetFirstValue();
 
-            //    var _path = files.RemoveAndGetFirstValue();
+        //    try
+        //    {
 
-            //    try
-            //    {
+        //        Debug.WriteLine("FilesInfoLoader log: " + _path.FileSystemInfoProperties.FullName + " (1)");
 
-            //        Debug.WriteLine("FilesInfoLoader log: " + _path.FileSystemInfoProperties.FullName + " (1)");
+        //        //if (SearchMethods.AddFile(path.FileSystemInfoProperties, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
+        //        //{
 
-            //        //if (SearchMethods.AddFile(path.FileSystemInfoProperties, FileType.File, ActionType, LoadOnlyItemsWithSearchTermsForAllActions, Search_Terms))
-            //        //{
+        //        Debug.WriteLine("FilesInfoLoader log: " + _path.FileSystemInfoProperties.FullName + " (2)");
 
-            //        Debug.WriteLine("FilesInfoLoader log: " + _path.FileSystemInfoProperties.FullName + " (2)");
+        //        _pathsLoaded.Add(_path);
 
-            //        _pathsLoaded.Add(_path);
+        //        TotalSize += ((FileInfo)_path.FileSystemInfoProperties).Length;
 
-            //        TotalSize += ((FileInfo)_path.FileSystemInfoProperties).Length;
+        //        //} // end if
 
-            //        //} // end if
+        //    } // end try
 
-            //    } // end try
+        //    catch (Exception) { }
 
-            //    catch (Exception) { }
+        //}
 
-            //}
+        //System.Windows.Forms.MessageBox.Show(path.FileSystemInfoProperties.FullName);
 
-            //System.Windows.Forms.MessageBox.Show(path.FileSystemInfoProperties.FullName);
+        //} // next
 
-            //} // next
-
-        } // end void
+        #endregion
     }
 }

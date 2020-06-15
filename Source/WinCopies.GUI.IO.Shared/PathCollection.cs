@@ -14,7 +14,7 @@ namespace WinCopies.GUI.IO
 
     public sealed class PathCollection : ICollection<IPathInfo>, IList<IPathInfo>
     {
-        private IList<IPathInfo> _list;
+        private readonly IList<IPathInfo> _list;
 
         public string Path { get; }
 
@@ -37,6 +37,10 @@ namespace WinCopies.GUI.IO
         public PathCollection(string path, IList<IPathInfo> list)
         {
             Path = path;
+
+            foreach (IPathInfo _path in list)
+
+                ValidatePath(_path);
 
             _list = list;
         }
