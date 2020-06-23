@@ -450,7 +450,6 @@ namespace WinCopies.IO
 
         public IEnumerable<IBrowsableObjectInfo> GetItems(IWMIItemInfoFactory factory, Predicate<ManagementBaseObject> predicate, bool catchExceptionsDuringEnumeration)
         {
-
             // var paths = new ArrayBuilder<PathInfo>();
 
             // string _path;
@@ -462,34 +461,26 @@ namespace WinCopies.IO
 #pragma warning restore IDE0019 // Pattern Matching
 
             if (managementClass == null)
-
             {
-
                 dispose = true;
 
                 // #pragma warning disable IDE0067 // Dispose objects before losing scope
                 managementClass = new ManagementClass(new ManagementScope(Path, factory.Options?.ConnectionOptions), new ManagementPath(Path), factory.Options?.ObjectGetOptions);
                 // #pragma warning restore IDE0067 // Dispose objects before losing scope
-
             }
 
             managementClass.Get();
 
             try
             {
-
                 if (WMIItemType == WMIItemType.Namespace)
-
                 {
-
                     IEnumerable<ManagementBaseObject> namespaces = EnumerateInstances(managementClass, factory);
 
                     IEnumerable<ManagementBaseObject> classes = EnumerateSubClasses(managementClass, factory);
 
                     if (predicate != null)
-
                     {
-
                         if (namespaces != null)
 
                             namespaces = namespaces.WherePredicate(predicate);
@@ -497,47 +488,33 @@ namespace WinCopies.IO
                         if (classes != null)
 
                             classes = classes.WherePredicate(predicate);
-
                     }
 
-                    if (namespaces == null)
+                    if (namespaces == null) return new Enumerable<WMIItemInfo>(() => new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration));
 
-                        return new WinCopies.IO.Enumerable<WMIItemInfo>(()=> new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration));
+                    else if (classes == null) return new Enumerable<WMIItemInfo>(() => new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration));
 
-                    else if (classes == null)
-
-                        return new WinCopies.IO.Enumerable<WMIItemInfo>( ()=> new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration));
-                    
-                    else 
-                        
-                        return new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration).AppendValues(new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration));
-
+                    else return new Enumerable<IBrowsableObjectInfo>(() => new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration)).AppendValues(new Enumerable<IBrowsableObjectInfo>(() => new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration)));
                 }
 
                 else if (WMIItemType == WMIItemType.Class /*&& WMIItemTypes.HasFlag(WMIItemTypes.Instance)*/)
-
                 {
-
                     managementClass.Get();
 
-                    IEnumerable<ManagementBaseObject> items = predicate == null ? EnumerateInstances(managementClass, factory) : EnumerateInstances(managementClass, factory).Where(predicate);
+                    IEnumerable<ManagementBaseObject> items = predicate == null ? EnumerateInstances(managementClass, factory) : EnumerateInstances(managementClass, factory).WherePredicate(predicate);
 
-                    return items == null ? null : new WMIItemInfoEnumerator(items, false, WMIItemType.Instance, catchExceptionsDuringEnumeration);
-
+                    return items == null ? null : new Enumerable<IBrowsableObjectInfo>(() => new WMIItemInfoEnumerator(items, false, WMIItemType.Instance, catchExceptionsDuringEnumeration));
                 }
 
                 return null;
-
             }
+
             finally
             {
                 if (dispose)
 
                     managementClass.Dispose();
             }
-
         }
-
     }
-
 }

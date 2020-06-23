@@ -1,20 +1,31 @@
-﻿using System;
+﻿/* Copyright © Pierre Sprimont, 2020
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Text;
-using WinCopies.Collections;
 using WinCopies.IO;
-using WinCopies.Util;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.GUI.IO
 {
-
-    public sealed class PathCollection : ICollection<IPathInfo>, IList<IPathInfo>
+    public sealed class PathCollection : ICollection<WinCopies.IO.IPathInfo>, IList<WinCopies.IO.IPathInfo>
     {
-        private readonly IList<IPathInfo> _list;
+        private readonly IList<WinCopies.IO.IPathInfo> _list;
 
         public string Path { get; }
 
@@ -22,7 +33,7 @@ namespace WinCopies.GUI.IO
 
         public bool IsReadOnly => false;
 
-        public IPathInfo this[int index]
+        public WinCopies.IO.IPathInfo this[int index]
         {
             get => _list[index]; set
             {
@@ -32,27 +43,27 @@ namespace WinCopies.GUI.IO
             }
         }
 
-        public PathCollection(string path) : this(path, new List<IPathInfo>()) { }
+        public PathCollection(string path) : this(path, new List<WinCopies.IO.IPathInfo>()) { }
 
-        public PathCollection(string path, IList<IPathInfo> list)
+        public PathCollection(string path, IList<WinCopies.IO.IPathInfo> list)
         {
             Path = path;
 
-            foreach (IPathInfo _path in list)
+            foreach (WinCopies.IO.IPathInfo _path in list)
 
                 ValidatePath(_path);
 
             _list = list;
         }
 
-        private void ValidatePath(IPathInfo item)
+        private void ValidatePath(WinCopies.IO.IPathInfo item)
         {
             if (System.IO.Path.IsPathRooted(item.Path))
 
                 throw new ArgumentException("The path to add must be relative.");
         }
 
-        public void Add(IPathInfo item)
+        public void Add(WinCopies.IO.IPathInfo item)
         {
             ValidatePath(item);
 
@@ -61,19 +72,19 @@ namespace WinCopies.GUI.IO
 
         public void Clear() => _list.Clear();
 
-        public bool Contains(IPathInfo item) => _list.Contains(item);
+        public bool Contains(WinCopies.IO.IPathInfo item) => _list.Contains(item);
 
-        public void CopyTo(IPathInfo[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
+        public void CopyTo(WinCopies.IO.IPathInfo[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
 
-        public bool Remove(IPathInfo item) => _list.Remove(item);
+        public bool Remove(WinCopies.IO.IPathInfo item) => _list.Remove(item);
 
-        public IEnumerator<IPathInfo> GetEnumerator() => new PathCollectionEnumerator();
+        public IEnumerator<WinCopies.IO.IPathInfo> GetEnumerator() => new PathCollectionEnumerator(this);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public int IndexOf(IPathInfo item) => _list.IndexOf(item);
+        public int IndexOf(WinCopies.IO.IPathInfo item) => _list.IndexOf(item);
 
-        public void Insert(int index, IPathInfo item)
+        public void Insert(int index, WinCopies.IO.IPathInfo item)
         {
             ValidatePath(item);
 
@@ -82,67 +93,29 @@ namespace WinCopies.GUI.IO
 
         public void RemoveAt(int index) => _list.RemoveAt(index);
 
-        public struct PathCollectionEnumerator : IEnumerator<IPathInfo>, WinCopies.Util.DotNetFix.IDisposable
+        public class PathCollectionEnumerator : Enumerator<WinCopies.IO.IPathInfo, WinCopies.IO.IPathInfo>
         {
             private PathCollection _pathCollection;
 
-            private IEnumerator<IPathInfo> _innerEnumerator;
+            public PathCollectionEnumerator(PathCollection pathCollection) : base((pathCollection ?? throw GetArgumentNullException(nameof(pathCollection)))._list) => _pathCollection = pathCollection;
 
-            private IPathInfo _current;
-
-            public IPathInfo Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
-
-            object IEnumerator.Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
-
-            public bool IsDisposed { get; private set; }
-
-            public PathCollectionEnumerator(PathCollection pathCollection)
+            protected override void Dispose(bool disposing)
             {
-                _pathCollection = pathCollection;
-
-                _innerEnumerator = pathCollection._list.GetEnumerator();
-
-                _current = null;
-
-                IsDisposed = false;
-            }
-
-            public void Dispose()
-            {
-                if (IsDisposed)
-
-                    return;
-
-                _innerEnumerator.Dispose();
-
-                _innerEnumerator = null;
-
                 _pathCollection = null;
 
-                IsDisposed = true;
+                base.Dispose(disposing);
             }
 
-            public bool MoveNext()
+            protected override bool MoveNextOverride()
             {
-                ThrowIfDisposed(this);
-
-                if (_innerEnumerator.MoveNext())
+                if (InnerEnumerator.MoveNext())
                 {
-                    _current = new PathInfo($"{_pathCollection.Path}{WinCopies.IO.Path.PathSeparator}{_innerEnumerator.Current.Path}", _innerEnumerator.Current.Size);
+                    Current = new WinCopies.IO. PathInfo($"{_pathCollection.Path}{WinCopies.IO.Path.PathSeparator}{InnerEnumerator.Current.Path}", InnerEnumerator.Current.IsDirectory);
 
                     return true;
                 }
 
                 return false;
-            }
-
-            public void Reset()
-            {
-                ThrowIfDisposed(this);
-
-                _innerEnumerator.Reset();
-
-                _current = null;
             }
         }
     }

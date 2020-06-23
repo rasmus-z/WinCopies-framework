@@ -24,9 +24,16 @@ namespace WinCopies.IO
     public static class Directory
     {
 
-        public static IEnumerable<IPathInfo> Enumerate(IEnumerable<IPathInfo> paths) => Enumerate(paths, null, null
+        public static IEnumerable<IPathInfo> Enumerate(IEnumerable<IPathInfo> paths
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            ) => Enumerate(paths, null, null
 #if NETCORE
             , null
+#endif
+#if DEBUG
+                , simulationParameters
 #endif
             );
 
@@ -37,12 +44,15 @@ namespace WinCopies.IO
 #if NETCORE
             , EnumerationOptions enumerationOptions
 #endif
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
             ) => new Enumerable<IPathInfo>(() => new PathInfoFileSystemEntryEnumerator(paths, searchPattern, searchOption
 #if NETCORE
                 , enumerationOptions
 #endif
 #if DEBUG
-                , null
+                , simulationParameters
 #endif
                 )
                 );

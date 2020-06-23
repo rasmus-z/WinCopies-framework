@@ -496,7 +496,7 @@ namespace WinCopies.IO
                 //{
 
                 /*FieldInfo[] _registryKeyFields = */
-                return typeof(Microsoft.Win32.Registry).GetFields().Select(f => (RegistryKey)f.GetValue(null)).Where(predicate).Select(item => new RegistryItemInfo(item));
+                return typeof(Microsoft.Win32.Registry).GetFields().Select(f => (RegistryKey)f.GetValue(null)).WherePredicate(predicate).Select(item => new RegistryItemInfo(item));
 
             //string name;
 
@@ -576,9 +576,9 @@ namespace WinCopies.IO
 
                     {
 
-                        keys = RegistryKey.GetSubKeyNames().Where(func: item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+                        keys = RegistryKey.GetSubKeyNames().Where( item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
-                        values = RegistryKey.GetValueNames().Where(func: s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
+                        values = RegistryKey.GetValueNames().Where( s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
 
                     }
 

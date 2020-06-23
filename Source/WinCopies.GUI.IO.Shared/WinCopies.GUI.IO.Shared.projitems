@@ -17,6 +17,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CopyProcessSimulationParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExplorerControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlListView.cs" />
@@ -26,6 +27,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlTreeViewItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExplorerControlTreeViewItemHeader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProcessQueueCollection.cs" />
   </ItemGroup>
 </Project>

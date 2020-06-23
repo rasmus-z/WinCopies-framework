@@ -38,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RegistryItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Size.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemType.cs" />

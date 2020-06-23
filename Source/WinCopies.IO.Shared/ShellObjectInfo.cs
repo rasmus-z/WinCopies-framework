@@ -373,39 +373,27 @@ namespace WinCopies.IO
 
                     default:
 
-                        IEnumerable<IBrowsableObjectInfo> shellObjects = ((IEnumerable<ShellObject>)ShellObject).Where((Predicate<ShellObject>)(item => func(new ShellObjectInfoEnumeratorStruct(item)))).Select(shellObject => From(shellObject));
+                        IEnumerable<IBrowsableObjectInfo> shellObjects = ((IEnumerable<ShellObject>)ShellObject).WherePredicate(item => func(new ShellObjectInfoEnumeratorStruct(item))).Select(shellObject => From(shellObject));
 
                         if (ShellObject.ParsingName == Microsoft.WindowsAPICodePack.Shell.KnownFolders.Computer.ParsingName)
-
                         {
-
-                            PortableDeviceManager portableDeviceManager = new PortableDeviceManager();
+                            var portableDeviceManager = new PortableDeviceManager();
 
                             portableDeviceManager.GetDevices();
 
-                            IEnumerable<IBrowsableObjectInfo> portableDevices = portableDeviceManager.PortableDevices.Where((Predicate<PortableDevice>)(item => func(new ShellObjectInfoEnumeratorStruct(item)))).Select(portableDevice => new PortableDeviceInfo(portableDevice));
+                            IEnumerable<IBrowsableObjectInfo> portableDevices = portableDeviceManager.PortableDevices.WherePredicate(item => func(new ShellObjectInfoEnumeratorStruct(item))).Select(portableDevice => new PortableDeviceInfo(portableDevice));
 
-                            if (shellObjects == null)
+                            if (shellObjects == null) return portableDevices;
 
-                                return portableDevices;
-
-                            else if (portableDevices == null)
-
-                                return shellObjects;
+                            else if (portableDevices == null) return shellObjects;
 
                             return shellObjects.AppendValues(portableDevices);
-
                         }
 
-                        else
-
-                            return shellObjects;
-
+                        else return shellObjects;
                 }
 
-            else
-
-                return null;
+            else return null;
         }
 
         public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
@@ -435,7 +423,7 @@ namespace WinCopies.IO
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems((Predicate<ShellObjectInfoEnumeratorStruct>)(obj => true));
 
-        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new ArchiveItemInfoEnumerator(this, func);
+        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(()=> new ArchiveItemInfoEnumerator(this, func));
 
         ///// <summary>
         ///// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.

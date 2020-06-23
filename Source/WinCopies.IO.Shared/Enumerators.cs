@@ -14,73 +14,6 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
-    internal class Enumerable<T> : IEnumerable<T> // todo: replace by WinCopies.Util's implementation.
-    {
-        private readonly Func<IEnumerator<T>> _enumeratorFunc;
-
-        public Enumerable(Func<IEnumerator<T>> enumeratorFunc) => _enumeratorFunc = enumeratorFunc;
-
-        public IEnumerator<T> GetEnumerator() => _enumeratorFunc();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
-
-    public abstract class Enumerator<TSource, TDestination> : IEnumerator<TDestination>, WinCopies.Util.DotNetFix.IDisposable // todo: replace by WinCopies.Util's implementation.
-    {
-        public bool IsDisposed { get; private set; }
-
-        private IEnumerator<TSource> _innerEnumerator;
-
-        protected IEnumerator<TSource> InnerEnumerator => IsDisposed ? throw GetExceptionForDispose(false) : _innerEnumerator;
-
-        /// <summary>
-        /// Sets <see cref="InnerEnumerator"/> to <see langword="null"/>.
-        /// </summary>
-        protected void ClearEnumerable() => _innerEnumerator = null;
-
-        public TDestination Current => IsDisposed ? throw GetExceptionForDispose(false) : CurrentOverride;
-
-        protected abstract TDestination CurrentOverride { get; }
-
-        object IEnumerator.Current => Current;
-
-        public Enumerator(IEnumerable<TSource> enumerable) => _innerEnumerator = (enumerable ?? throw GetArgumentNullException(nameof(enumerable))).GetEnumerator();
-
-        public bool MoveNext() => IsDisposed ? throw GetExceptionForDispose(false) : MoveNextOverride();
-
-        protected abstract bool MoveNextOverride();
-
-        public void Reset()
-        {
-            if (IsDisposed)
-
-                throw GetExceptionForDispose(false);
-
-            ResetOverride();
-        }
-
-        protected abstract void ResetOverride();
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-
-                _innerEnumerator = null;
-
-            IsDisposed = true;
-        }
-
-        public void Dispose()
-        {
-            if (!IsDisposed)
-            {
-                Dispose(disposing: true);
-
-                GC.SuppressFinalize(this);
-            }
-        }
-    }
-
     public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>, WinCopies.Util.DotNetFix.IDisposable
     {
         private int _index = -1;
@@ -328,11 +261,11 @@ namespace WinCopies.IO
 
                 }
 
-#if NETFRAMEWORK
+                //#if NETFRAMEWORK
 
-                        }
+                //                        }
 
-#endif
+                //#endif
 
             }
 
@@ -431,13 +364,7 @@ namespace WinCopies.IO
 
     public sealed class WMIItemInfoEnumerator : Enumerator<ManagementBaseObject, WMIItemInfo>
     {
-        private IEnumerator<ManagementBaseObject> _enumerator;
-
         private bool _resetInnerEnumerator = false;
-
-        private WMIItemInfo _current;
-
-        protected override WMIItemInfo CurrentOverride => _current;
 
         private Func<bool> _func;
 
@@ -445,8 +372,6 @@ namespace WinCopies.IO
 
         public WMIItemInfoEnumerator(IEnumerable<ManagementBaseObject> enumerable, bool resetEnumerator, WMIItemType itemWMIItemType, bool catchExceptions) : base(enumerable)
         {
-            _enumerator = enumerable.GetEnumerator();
-
             _resetInnerEnumerator = resetEnumerator;
 
             ItemWMIItemType = itemWMIItemType;
@@ -455,7 +380,8 @@ namespace WinCopies.IO
 
                 _func = () =>
                   {
-                      while (_enumerator.MoveNext())
+                      while (InnerEnumerator.MoveNext())
+
                           try
                           {
                               _MoveNext();
@@ -471,7 +397,7 @@ namespace WinCopies.IO
 
                 _func = () =>
                   {
-                      if (_enumerator.MoveNext())
+                      if (InnerEnumerator.MoveNext())
                       {
                           _MoveNext();
 
@@ -482,39 +408,30 @@ namespace WinCopies.IO
                   };
         }
 
-        private void _MoveNext()
-        {
-            ManagementBaseObject current = _enumerator.Current;
+        private void _MoveNext() =>
 
             // if (CheckFilter(_path))
 
-            _current = new WMIItemInfo(ItemWMIItemType, current);
-        }
+            Current = new WMIItemInfo(ItemWMIItemType, InnerEnumerator.Current);
 
         protected override bool MoveNextOverride() => _func();
 
         protected override void ResetOverride()
         {
-            _current = null;
+            base.ResetOverride();
 
             if (_resetInnerEnumerator)
 
-                _enumerator.Reset();
+                InnerEnumerator.Reset();
         }
 
         #region IDisposable Support
-        private bool _disposedValue = false; // To detect redundant calls
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            if (!_disposedValue)
-            {
-                Reset();
+            Reset();
 
-                _enumerator = null;
-
-                _disposedValue = true;
-            }
+            base.Dispose(disposing);
         }
         #endregion
     }
@@ -648,10 +565,6 @@ namespace WinCopies.IO
 
 #endif
 
-        private IPathInfo _current;
-
-        protected override IPathInfo CurrentOverride => _current;
-
         public PathInfoFileSystemEntryEnumerator(IEnumerable<IPathInfo> paths, string searchPattern, SearchOption? searchOption
 #if NETCORE
             , System.IO.EnumerationOptions enumerationOptions
@@ -766,12 +679,7 @@ namespace WinCopies.IO
 
         protected override bool MoveNextOverride()
         {
-            if (_completed)
-            {
-                _current = null;
-
-                return false;
-            }
+            if (_completed)                return false;
 
             void _markAsCompleted()
             {
@@ -785,7 +693,7 @@ namespace WinCopies.IO
 
                 FileSystemEntryEnumerator enumerator;
 
-                void push() => _stack.Push(new FileSystemEntryEnumerator(_enumerateDirectoriesFunc(_current.Path), _enumerateFilesFunc(_current.Path)));
+                void push() => _stack.Push(new FileSystemEntryEnumerator(_enumerateDirectoriesFunc(Current.Path), _enumerateFilesFunc(Current.Path)));
 
                 while (true)
                 {
@@ -802,7 +710,7 @@ namespace WinCopies.IO
                             return false;
                         }
 
-                        _current = _directories.Dequeue();
+                        Current = _directories.Dequeue();
 
                         push();
 
@@ -817,7 +725,7 @@ namespace WinCopies.IO
 
                     if (enumerator.MoveNext())
                     {
-                        _current = enumerator.Current;
+                        Current = enumerator.Current;
 
                         if (Current.IsDirectory)
 
@@ -849,8 +757,6 @@ namespace WinCopies.IO
                     (path.IsDirectory ? _directories : _files).Enqueue(path);
                 }
 
-                ClearEnumerable();
-
                 if (_files.Count == 0)
                 {
                     _files = null;
@@ -873,7 +779,7 @@ namespace WinCopies.IO
 
                     _directories = null;
 
-                _current = _files.Dequeue();
+                Current = _files.Dequeue();
 
                 if (_files.Count == 0)
 
@@ -900,7 +806,7 @@ namespace WinCopies.IO
                 return false;
             }
 
-            _current = _files.Dequeue();
+            Current = _files.Dequeue();
 
             if (_files.Count == 0)
 

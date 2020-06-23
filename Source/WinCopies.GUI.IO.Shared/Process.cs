@@ -21,102 +21,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using WinCopies.Collections.DotNetFix;
+using WinCopies.IO;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 using Size = WinCopies.IO.Size;
 
 namespace WinCopies.GUI.IO
 {
-    public interface IPathInfo : WinCopies.IO.IPathInfo
-    {
-        Size? Size { get; }
-    }
-
-    public readonly struct PathInfo : IPathInfo
-    {
-        public string Path { get; }
-
-        public Size? Size { get; }
-
-        public bool IsDirectory => Size.HasValue;
-
-        public PathInfo(string path, Size? size)
-        {
-            Path = path;
-
-            Size = size;
-        }
-    }
-
-    public sealed class ProcessQueueCollection : ReadOnlyObservableQueueCollection<IPathInfo> // todo: inherits from ReadOnlyObservableQueueCollection when it has been implemented, make it sealed and make constructors public.
-    {
-        private Size _size;
-
-        public Size Size { get => _size; private set { _size = value; RaisePropertyChangedEvent(nameof(Size)); } }
-
-        public ProcessQueueCollection(ObservableQueueCollection<IPathInfo> queueCollection) : base(queueCollection) { }
-
-        protected override void OnCollectionChanged(SimpleLinkedCollectionChangedEventArgs<IPathInfo> e)
-        {
-            base.OnCollectionChanged(e);
-
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-
-                    if (!e.Item.IsDirectory)
-
-                        Size += e.Item.Size.Value;
-
-                    break;
-
-                case NotifyCollectionChangedAction.Reset:
-
-                    Size = new Size(0ul);
-
-                    break;
-            }
-        }
-
-        public void DecrementSize(ulong sizeInBytes) => Size -= sizeInBytes;
-    }
-
-    //public class ReadOnlyObservableQueueCollection<T, U> : INotifyPropertyChanged where T : ObservableQueueCollection<U> // todo: remove when CopyProcessQueueCollection has been updated.
-    //{
-    //    private readonly T _innerCollection;
-
-    //    public event PropertyChangedEventHandler PropertyChanged;
-
-    //    public ReadOnlyObservableQueueCollection(T innerCollection)
-    //    {
-    //        _innerCollection = innerCollection ?? throw GetArgumentNullException(nameof(innerCollection));
-
-    //        innerCollection.PropertyChanged += PropertyChanged;
-    //    }
-
-    //    public U Peek() => _innerCollection.Peek();
-    //}
-
-    //public class ReadOnlyCopyProcessQueueCollection // todo: remove when CopyProcessQueueCollection has been updated.
-    //{
-    //    private readonly ProcessQueueCollection _innerCollection;
-
-    //    public Size Size => _innerCollection.Size;
-
-    //    public event PropertyChangedEventHandler PropertyChanged;
-
-    //    public ReadOnlyCopyProcessQueueCollection(ProcessQueueCollection innerCollection)
-    //    {
-    //        _innerCollection = innerCollection ?? throw GetArgumentNullException(nameof(innerCollection));
-
-    //        innerCollection.PropertyChanged += PropertyChanged;
-    //    }
-
-    //    public IPathInfo Peek() => _innerCollection.Peek();
-    //}
 
     public enum ProcessError : byte
     {
@@ -208,98 +123,93 @@ namespace WinCopies.GUI.IO
         EncryptionFailed = 17
     }
 
-    // todo: move to WinCopies.Util
-
-    public class PausableBackgroundWorker : System.ComponentModel.BackgroundWorker
-    {
-        public bool PausePending { get; private set; }
-
-        private bool _workerSupportsPausing = false;
-
-        public bool WorkerSupportsPausing { get => _workerSupportsPausing; set => _workerSupportsPausing = IsBusy ? throw new InvalidOperationException("The BackgroundWorker is running.") : value; }
-
-        public void PauseAsync()
-        {
-            if (!_workerSupportsPausing)
-
-                throw new InvalidOperationException("The BackgroundWorker does not support pausing.");
-
-            if (IsBusy)
-
-                PausePending = true;
-        }
-
-        protected override void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
-        {
-            base.OnRunWorkerCompleted(e);
-
-            PausePending = false;
-        }
-    }
-
-    public interface IErrorPathInfo
-    {
-        IPathInfo Path { get; }
-
-        ProcessError Error { get; }
-    }
-
-    public struct ErrorPathInfo : IErrorPathInfo
-    {
-        public IPathInfo Path { get; }
-
-        public ProcessError Error { get; }
-
-        public ErrorPathInfo(IPathInfo path, ProcessError error)
-        {
-            Path = path;
-
-            Error = error;
-        }
-    }
-
     public abstract class Process : INotifyPropertyChanged
     {
 
+        /// <summary>
+        /// Gets the inner background worker.
+        /// </summary>
         protected PausableBackgroundWorker BackgroundWorker { get; } = new PausableBackgroundWorker();
 
+        /// <summary>
+        /// Gets or sets (protected) the initial total item size.
+        /// </summary>
         public Size InitialSize { get; protected set; }
 
+        /// <summary>
+        /// Gets or sets (protected) the initial total item count.
+        /// </summary>
         public int InitialItemCount { get; protected set; }
 
         protected ObservableQueueCollection<IPathInfo> _Paths { get; } = new ObservableQueueCollection<IPathInfo>();
 
+        /// <summary>
+        /// Gets the paths that have been loaded.
+        /// </summary>
         public ProcessQueueCollection Paths { get; }
 
         private bool _completed = false;
 
+        /// <summary>
+        /// Gets a value that indicates whether the process has completed.
+        /// </summary>
         public bool Completed { get => _completed; protected set { _completed = value; OnPropertyChanged(nameof(Completed)); } }
 
+        /// <summary>
+        /// Gets the source root path.
+        /// </summary>
         public string SourcePath { get; }
 
         private bool _pathsLoaded = false;
 
-        public bool ArePathsLoaded { get => _pathsLoaded; set { _pathsLoaded = value; OnPropertyChanged(nameof(ArePathsLoaded)); } }
+        /// <summary>
+        /// Gets a value that indicates whether all the paths and subpaths are loaded.
+        /// </summary>
+        public bool ArePathsLoaded { get => _pathsLoaded; protected set { _pathsLoaded = value; OnPropertyChanged(nameof(ArePathsLoaded)); } }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether the process supports cancellation.
+        /// </summary>
         public bool WorkerSupportsCancellation { get => BackgroundWorker.WorkerSupportsCancellation; set { BackgroundWorker.WorkerSupportsCancellation = value; OnPropertyChanged(nameof(WorkerSupportsCancellation)); } }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether the process reports progress.
+        /// </summary>
         public bool WorkerReportsProgress { get => BackgroundWorker.WorkerReportsProgress; set { BackgroundWorker.WorkerReportsProgress = value; OnPropertyChanged(nameof(WorkerReportsProgress)); } }
 
+        /// <summary>
+        /// Gets a value that indicates whether the process is busy.
+        /// </summary>
         public bool IsBusy => BackgroundWorker.IsBusy;
 
+        /// <summary>
+        /// Gets a value that indicates whether a cancellation is pending.
+        /// </summary>
         public bool CancellationPending => BackgroundWorker.CancellationPending;
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether the process supports pausing.
+        /// </summary>
         public bool WorkerSupportsPausing { get => BackgroundWorker.WorkerSupportsPausing; set => BackgroundWorker.WorkerSupportsPausing = value; }
 
+        /// <summary>
+        /// Gets a value that indicates whether a pause is pending.
+        /// </summary>
         public bool PausePending => BackgroundWorker.PausePending;
 
         protected ObservableQueueCollection<IErrorPathInfo> _ErrorPaths { get; } = new ObservableQueueCollection<IErrorPathInfo>();
 
-        public ReadOnlyObservableQueueCollection< IErrorPathInfo> ErrorPaths { get; }
+        public ReadOnlyObservableQueueCollection<IErrorPathInfo> ErrorPaths { get; }
 
-        public ProcessError Error { get; private set; }
+        /// <summary>
+        /// Gets the global process error, if any.
+        /// </summary>
+        public ProcessError Error { get; protected set; }
 
-        public IPathInfo CurrentPath { get; private set; }
+        /// <summary>
+        /// Gets the current processed <see cref="IPathInfo"/>.
+        /// </summary>
+        public IPathInfo CurrentPath { get; protected set; }
 
         public event DoWorkEventHandler DoWork;
 
@@ -309,6 +219,10 @@ namespace WinCopies.GUI.IO
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Process"/> class.
+        /// </summary>
+        /// <param name="sourcePath">The source root path of the process.</param>
         public Process(string sourcePath)
         {
             SourcePath = sourcePath;
@@ -377,65 +291,9 @@ namespace WinCopies.GUI.IO
 
     }
 
-#if DEBUG
-
-    public delegate bool CopyFileEx(string lpExistingFileName, string lpNewFileName, CopyProgressRoutine lpProgressRoutine, IntPtr lpData, ref bool pbCancel, CopyFileFlags dwCopyFlags);
-
-    public enum PathDirectoryType
-    {
-        Source,
-
-        Destination
-    }
-
-    public class CopyProcessSimulationParameters
-    {
-
-        public Size PathsSize { get; set; }
-
-        public bool SourcePathRootExists { get; set; }
-
-        public bool SourceDriveReady { get; set; }
-
-        public bool DestPathRootExists { get; set; }
-
-        public bool DestDriveReady { get; set; }
-
-        public long DestDriveTotalFreeSpace { get; set; }
-
-        private Func<string, string> _renameOnDuplicateAction;
-
-        private InvalidOperationException GetInvalidOperationException() => new InvalidOperationException("Value cannot be null.");
-
-        public Func<string, string> RenameOnDuplicateAction { get => _renameOnDuplicateAction ?? throw GetInvalidOperationException(); set => _renameOnDuplicateAction = value ?? throw GetInvalidOperationException(); }
-
-        private CopyFileEx _copyFileExAction;
-
-        public CopyFileEx CopyFileExAction { get => _copyFileExAction ?? throw GetInvalidOperationException(); set => _copyFileExAction = value ?? throw GetInvalidOperationException(); }
-
-        private Func<string, bool> _createDirectoryWAction;
-
-        public Func<string, bool> CreateDirectoryWAction { get => _createDirectoryWAction ?? throw GetInvalidOperationException(); set => _createDirectoryWAction = value ?? throw GetInvalidOperationException(); }
-
-        private Func<string, bool> _destPathExistsAction;
-
-        public Func<string, bool> DestPathExistsAction { get => _destPathExistsAction ?? throw GetInvalidOperationException(); set => _destPathExistsAction = value ?? throw GetInvalidOperationException(); }
-
-        private Func<string, PathDirectoryType, Exception> _creatingFileStreamSucceedsAction;
-
-        public Func<string, PathDirectoryType, Exception> CreatingFileStreamSucceedsAction { get => _creatingFileStreamSucceedsAction ?? throw GetInvalidOperationException(); set => _creatingFileStreamSucceedsAction = value ?? throw GetInvalidOperationException(); }
-
-        private Func<string, string, Func<bool>, bool?> _isDuplicateAction;
-
-        public Func<string, string, Func<bool>, bool?> IsDuplicateAction { get => _isDuplicateAction ?? throw GetInvalidOperationException(); set => _isDuplicateAction = value ?? throw GetInvalidOperationException(); }
-
-    }
-
-#endif 
-
     public class CopyProcess : Process
     {
-        private IEnumerator<IPathInfo> _pathsToLoadEnumerator;
+        private IEnumerator<WinCopies.IO.IPathInfo> _pathsToLoadEnumerator;
 
 #if DEBUG
 
@@ -443,15 +301,17 @@ namespace WinCopies.GUI.IO
 
 #endif
 
+        /// <summary>
+        /// Gets the destination root path.
+        /// </summary>
         public string DestPath { get; }
 
-        private ProcessError _error;
+        private bool _autoRenameFiles;
 
-        public ProcessError Error { get => _error; private set { _error = value; OnPropertyChanged(nameof(Error)); } }
-
-        private bool _autoRenamePaths;
-
-        public bool AutoRenamePaths { get => _autoRenamePaths; set => _autoRenamePaths = BackgroundWorker.IsBusy ? throw new InvalidOperationException("The BackgroundWorker is busy.") : value; }
+        /// <summary>
+        /// Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
+        /// </summary>
+        public bool AutoRenameFiles { get => _autoRenameFiles; set => _autoRenameFiles = BackgroundWorker.IsBusy ? throw new InvalidOperationException("The BackgroundWorker is busy.") : value; }
 
         private int _bufferLength;
 
@@ -463,7 +323,9 @@ namespace WinCopies.GUI.IO
 #endif
             ) : base((pathsToLoad ?? throw GetArgumentNullException(nameof(pathsToLoad))).Path)
         {
+#if DEBUG
             SimulationParameters = simulationParameters;
+#endif
 
             DestPath = WinCopies.IO.Path.IsFileSystemPath(destPath) && System.IO.Path.IsPathRooted(destPath) ? destPath : throw new ArgumentException($"{nameof(destPath)} is not a valid path.");
 
@@ -503,15 +365,7 @@ namespace WinCopies.GUI.IO
 
             void copy()
             {
-                if (
-#if DEBUG
-                    (SimulationParameters?.PathsSize ??
-#endif
-                    Paths.Size
-#if DEBUG
-                    )
-#endif
-                    .ValueInBytes.IsNaN)
+                if (Paths.Size.ValueInBytes.IsNaN)
                 {
                     Error = ProcessError.NotEnoughSpace;
 
@@ -557,23 +411,12 @@ namespace WinCopies.GUI.IO
 #if DEBUG
                     )
 #endif
-                    >=
-#if DEBUG
-                    (SimulationParameters?.PathsSize ??
-#endif
-                    Paths.Size
-#if DEBUG
-                    )
-#endif
-                    .ValueInBytes
-                    )
+                    >= Paths.Size.ValueInBytes)
                                 {
-                                    IPathInfo path;
-
                                     void dequeueErrorPath(ProcessError _error)
                                     {
 
-                                        _ErrorPaths.Enqueue(new ErrorPathInfo(path, _error));
+                                        _ErrorPaths.Enqueue(new ErrorPathInfo(CurrentPath, _error));
 
                                         _ = _Paths.Dequeue();
 
@@ -596,15 +439,7 @@ namespace WinCopies.GUI.IO
 
                                     CopyProgressRoutine copyProgressRoutine = (long totalFileSize, long totalBytesTransferred, long streamSize, long streamBytesTransferred, uint streamNumber, CopyProgressCallbackReason copyProgressCallbackReason, IntPtr sourceFile, IntPtr destinationFile, IntPtr data) =>
                                     {
-                                        if (
-#if DEBUG
-                                        (SimulationParameters?.PathsSize ??
-#endif
-                                        Paths.Size
-#if DEBUG
-                                        )
-#endif
-                                        .ValueInBytes.IsNaN)
+                                        if (Paths.Size.ValueInBytes.IsNaN)
 
                                             copyProgressRoutine = (long _totalFileSize, long _totalBytesTransferred, long _streamSize, long _streamBytesTransferred, uint _streamNumber, CopyProgressCallbackReason _copyProgressCallbackReason, IntPtr _sourceFile, IntPtr _destinationFile, IntPtr _data) =>
                                              {
@@ -632,20 +467,12 @@ namespace WinCopies.GUI.IO
                                         bool cancel = false;
                                         bool result;
 
-                                        if (
-#if DEBUG
-                                            (SimulationParameters?.PathsSize ??
-#endif
-                                            path.Size
-#if DEBUG
-                                            )
-#endif
-                                            .HasValue)
+                                        if (CurrentPath.Size.HasValue)
                                         {
 
                                             CopyFileFlags copyFileFlags = CopyFileFlags.FailIfExists | CopyFileFlags.NoBuffering;
 
-                                            if (path.Path.EndsWith(".lnk"))
+                                            if (CurrentPath.Path.EndsWith(".lnk", true, CultureInfo.InvariantCulture))
 
                                                 copyFileFlags |= CopyFileFlags.CopySymLink;
 
@@ -667,7 +494,7 @@ namespace WinCopies.GUI.IO
 #if DEBUG
                                                 SimulationParameters?.CreateDirectoryWAction?.Invoke(destPath) ??
 #endif
-                                        Directory.CreateDirectoryW(destPath, IntPtr.Zero);
+                                                Directory.CreateDirectoryW(destPath, IntPtr.Zero);
 
                                         if (result)
 
@@ -677,9 +504,10 @@ namespace WinCopies.GUI.IO
 
                                         switch (error)
                                         {
+                                            // todo: the current version of this process is not optimized: when a file name conflict occurs when we want to create a folder, we know that all the subpaths won't be able to be copied neither. So, we should have a tree structure, so we can dequeue all the path in conflict with all of its subpaths at one time.
                                             case ErrorCode.AlreadyExists:
 
-                                                if (path.Size.HasValue) // We do not try to rename folders, because folder name conflicts are handled the same way as file name conflicts.
+                                                if (CurrentPath.Size.HasValue) // We do not try to rename folders, because folder name conflicts are handled the same way as file name conflicts.
                                                 {
                                                     if (alreadyRenamed)
                                                     {
@@ -688,7 +516,7 @@ namespace WinCopies.GUI.IO
                                                         return;
                                                     }
 
-                                                    if (_autoRenamePaths)
+                                                    if (_autoRenameFiles)
                                                     {
                                                         renameOnDuplicate();
 
@@ -746,11 +574,11 @@ namespace WinCopies.GUI.IO
 
                                             return;
 
-                                        path = _Paths.Peek();
+                                        CurrentPath = _Paths.Peek();
 
-                                        sourcePath = $"{SourcePath}{WinCopies.IO.Path.PathSeparator}{path.Path}";
+                                        sourcePath = $"{SourcePath}{WinCopies.IO.Path.PathSeparator}{CurrentPath.Path}";
 
-                                        destPath = $"{DestPath}{WinCopies.IO.Path.PathSeparator}{path.Path}";
+                                        destPath = $"{DestPath}{WinCopies.IO.Path.PathSeparator}{CurrentPath.Path}";
 
                                         if (
 #if DEBUG
@@ -762,19 +590,33 @@ namespace WinCopies.GUI.IO
 #endif
                                             (destPath))
 
-                                            if (_autoRenamePaths && _bufferLength == 0)
+                                            if (_autoRenameFiles && _bufferLength == 0)
 
                                                 renameOnDuplicate();
 
                                             else if (_bufferLength > 0)
                                             {
+#if DEBUG
+                                                FileStream sourceFileStream = null;
+#endif
                                                 try
                                                 {
-                                                    FileStream sourceFileStream;
 #if DEBUG
                                                     if (SimulationParameters == null)
+#else
+                                                    using
+#if CS7
+                                                        (
 #endif
-                                                        sourceFileStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None);
+                                                        var
+#endif
+                                                        sourceFileStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None)
+#if CS7 && !DEBUG
+                                                        )
+                                                    {
+#else
+                                                        ;
+#endif
 
 #if DEBUG
                                                     else
@@ -789,17 +631,28 @@ namespace WinCopies.GUI.IO
 
                                                             throw exception;
                                                     }
+
+                                                    FileStream destFileStream = null;
 #endif
 
                                                     try
                                                     {
-                                                        FileStream destFileStream;
-
 #if DEBUG
                                                         if (SimulationParameters == null)
+#else
+                                                        using
+#if CS7
+                                                            (
 #endif
-
-                                                            destFileStream = new FileStream(destPath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None);
+                                                            var
+#endif
+                                                            destFileStream = new FileStream(destPath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None)
+#if CS7 && !DEBUG
+                                                            )
+                                                        {
+#else
+                                                            ;
+#endif
 
 #if DEBUG
 
@@ -807,11 +660,7 @@ namespace WinCopies.GUI.IO
                                                         {
                                                             Exception exception = SimulationParameters.CreatingFileStreamSucceedsAction(destPath, PathDirectoryType.Destination);
 
-                                                            if (exception == null)
-
-                                                                destFileStream = null;
-
-                                                            else
+                                                            if (exception != null)
 
                                                                 throw exception;
                                                         }
@@ -822,9 +671,7 @@ namespace WinCopies.GUI.IO
                                                         if (SimulationParameters == null)
 #endif
 
-                                                            _result = WinCopies.IO.File.IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () =>
-                                                                   PausePending || CancellationPending
-                                                                );
+                                                            _result = WinCopies.IO.File.IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => PausePending || CancellationPending);
 
 #if DEBUG
 
@@ -834,13 +681,17 @@ namespace WinCopies.GUI.IO
 
 #endif
 
+                                                        if (checkIfPauseOrCancellationPending())
+
+                                                            return;
+
                                                         if (_result.HasValue && _result.Value)
                                                         {
                                                             if (checkIfPauseOrCancellationPending())
 
                                                                 return;
 
-                                                            if (_autoRenamePaths)
+                                                            if (_autoRenameFiles)
 
                                                                 renameOnDuplicate();
 
@@ -855,7 +706,11 @@ namespace WinCopies.GUI.IO
                                                         else
 
                                                             _ = _Paths.Dequeue();
+#if CS7 && !DEBUG
+                                                        }
+#endif
                                                     }
+
                                                     catch (System.IO.FileNotFoundException)
                                                     {
                                                         // Left empty.
@@ -867,15 +722,15 @@ namespace WinCopies.GUI.IO
 
                                                         continue;
                                                     }
+#if DEBUG
+                                                    finally
+                                                    {
+                                                        destFileStream?.Dispose();
+                                                    }
+#endif
                                                 }
-                                                catch (System.IO.FileNotFoundException)
-                                                {
-                                                    dequeueErrorPath(ProcessError.PathNotFound);
 
-                                                    continue;
-                                                }
-
-                                                catch (System.IO.DirectoryNotFoundException)
+                                                catch (System.IO.IOException ex) when (ex.Is(false, typeof(System.IO.FileNotFoundException), typeof(System.IO.DirectoryNotFoundException)))
                                                 {
                                                     dequeueErrorPath(ProcessError.PathNotFound);
 
@@ -902,6 +757,12 @@ namespace WinCopies.GUI.IO
 
                                                     continue;
                                                 }
+#if DEBUG
+                                                finally
+                                                {
+                                                    sourceFileStream.Dispose();
+                                                }
+#endif
                                             }
 
                                             else
@@ -918,6 +779,7 @@ namespace WinCopies.GUI.IO
 
                                     return;
                                 }
+
                                 else
                                 {
                                     Error = ProcessError.NotEnoughSpace;
@@ -932,16 +794,24 @@ namespace WinCopies.GUI.IO
                 Error = ProcessError.DriveNotReady;
             }
 
-            void loadPathsAndCopy(IEnumerator<IPathInfo> pathsToLoad)
+            void loadPathsAndCopy(IEnumerator<WinCopies.IO.IPathInfo> pathsToLoad)
             {
-                while (pathsToLoad.MoveNext())
-                {
-                    if (checkIfPauseOrCancellationPending())
+                bool _continue = true;
 
-                        return;
+                while (_continue)
 
-                    _Paths.Enqueue(pathsToLoad.Current);
-                }
+                    try
+                    {
+                        if (checkIfPauseOrCancellationPending())
+
+                            return;
+
+                        _continue = pathsToLoad.MoveNext();
+
+                        _Paths.Enqueue(new PathInfo(pathsToLoad.Current.Path, pathsToLoad.Current.IsDirectory ? (Size?)null : (Size)new FileInfo(pathsToLoad.Current.Path).Length)); // todo: use Windows API Code Pack's Shell's implementation instead.
+                    }
+
+                    catch (Exception) { }
 
                 InitialSize = Paths.Size;
 
@@ -964,7 +834,11 @@ namespace WinCopies.GUI.IO
 
             else
             {
-                IEnumerator<IPathInfo> _pathsToLoad = ((PathCollection)e.Argument).GetEnumerator();
+                IEnumerator<WinCopies.IO.IPathInfo> _pathsToLoad = WinCopies.IO.Directory.Enumerate((PathCollection)e.Argument
+#if DEBUG
+                    , SimulationParameters?.FileSystemEntryEnumeratorProcessSimulation
+#endif
+                    ).GetEnumerator();
 
                 if (WorkerSupportsPausing)
 
