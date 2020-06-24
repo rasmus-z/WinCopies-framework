@@ -35,14 +35,16 @@
 //using System.Collections;
 
 using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Shell;
 using SevenZip;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using WinCopies.Util;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
@@ -308,7 +310,7 @@ namespace WinCopies.IO
 
         //        }
 
-        public static bool IsSupportedArchiveFormat(string extension)
+        public static bool IsSupportedArchiveFormat(in string extension)
 
         {
 
@@ -784,7 +786,7 @@ namespace WinCopies.IO
 
         //        }
 
-        public static string GetRealPathFromEnvironmentVariables(string path)
+        public static string GetRealPathFromEnvironmentVariables(in string path)
 
         {
 
@@ -805,9 +807,9 @@ namespace WinCopies.IO
                     _ = subPath.EndsWith("%") ? stringBuilder.Append(Environment.GetEnvironmentVariable(subPath
 
 #if NETFRAMEWORK
-                            
-                            .Substring(1, subPath.Length-2)
-                            
+
+                            .Substring(1, subPath.Length - 2)
+
 #else
 
                         [1..^1]
@@ -830,14 +832,18 @@ namespace WinCopies.IO
 
         }
 
-        public static bool IsFileSystemPath(string path)
+        public static bool IsFileSystemPath(in string path)
         {
+            if (IsNullEmptyOrWhiteSpace(path))
+
+                throw GetArgumentNullException(nameof(path));
+
             char[] invalidChars = System.IO.Path.GetInvalidPathChars();
 
             return !path.ContainsOneOrMoreValues(invalidChars) && System.IO.Path.IsPathRooted(path);
         }
 
-        public static bool IsRegistryPath(string path)
+        public static bool IsRegistryPath(in string path)
         {
             FieldInfo[] fields = typeof(Microsoft.Win32.Registry).GetFields();
 
@@ -850,11 +856,73 @@ namespace WinCopies.IO
             return false;
         }
 
-        public static bool IsWMIPath(string path) => path.StartsWith('\\');
+        public static bool IsWMIPath(in string path) => (IsNullEmptyOrWhiteSpace(path) ? throw GetArgumentNullException(nameof(path)) : path).StartsWith(PathSeparator);
 
-        public static bool Exists(string path) => System.IO.File.Exists(path) || System.IO.Directory.Exists(path);
+        public static bool Exists(in string path) => System.IO.File.Exists(path) || System.IO.Directory.Exists(path);
 
-        public static string RenameOnDuplicate(string path );
+        public static uint? PathFileNameContainsParenthesesNumber(string path) => FileNameContainsParenthesesNumber(IsFileSystemPath(path) ? System.IO.Path.GetFileNameWithoutExtension(path) : throw new ArgumentException($"{nameof(path)} is not a file system path."));
+
+        public static uint? FileNameContainsParenthesesNumber(string fileName) => _FileNameContainsParenthesesNumber(IsNullEmptyOrWhiteSpace(fileName) ? throw GetArgumentNullException(nameof(fileName)) : fileName);
+
+        private static uint? _FileNameContainsParenthesesNumber(string fileName)
+        {
+            Debug.Assert(!IsNullEmptyOrWhiteSpace(fileName), $"{nameof(fileName)} is null, empty or whitespace.");
+
+            if (fileName.EndsWith(
+#if NETFRAMEWORK
+                ")", StringComparison.OrdinalIgnoreCase
+#else
+                ')'
+#endif
+                ) && fileName.Contains('(', StringComparison.OrdinalIgnoreCase))
+            {
+                var stringBuilder = new StringBuilder();
+
+                for (int i = fileName.Length - 2; i > 0; i--)
+                {
+                    if (fileName[i] == '(')
+
+                        break;
+
+                    _ = stringBuilder.Append(fileName[i]);
+                }
+
+                if (uint.TryParse(stringBuilder.ToString(), NumberStyles.None, CultureInfo.CurrentCulture, out uint result))
+
+                    return result;
+
+                else
+
+                    return null;
+            }
+
+            return null;
+        }
+
+        public static string RenameDuplicate(string path, in uint first = 2)
+        {
+            if (IsFileSystemPath(path))
+
+                throw new ArgumentException($"{nameof(path)} is not a file system path.");
+
+            if (path.EndsWith(
+#if NETFRAMEWORK
+                $"{PathSeparator}", StringComparison.OrdinalIgnoreCase
+#else
+                PathSeparator
+#endif
+                ))
+
+                throw new ArgumentException($"{nameof(path)} is a root path.");
+
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
+
+            uint? result = _FileNameContainsParenthesesNumber(fileName);
+
+            string getResult(in uint number) => $"{System.IO.Path.GetDirectoryName(path)}{PathSeparator}{fileName} ({number}){System.IO.Path.GetExtension(path)}";
+
+            return result.HasValue ? getResult(result.Value > first ? result.Value + 1 : first) : getResult(first);
+        }
 
         //        //public static string GetShortcutPath(string path)
 

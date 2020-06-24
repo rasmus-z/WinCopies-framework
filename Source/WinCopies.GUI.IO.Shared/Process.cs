@@ -424,7 +424,7 @@ namespace WinCopies.GUI.IO
 
                                     string sourcePath;
                                     string destPath;
-                                    bool alreadyRenamed = false;
+                                    bool alreadyRenamed;
 
                                     void renameOnDuplicate()
                                     {
@@ -432,7 +432,7 @@ namespace WinCopies.GUI.IO
 #if DEBUG
                                             SimulationParameters?.RenameOnDuplicateAction(destPath) ??
 #endif
-                                            WinCopies.IO.Path.RenameOnDuplicate(destPath);
+                                            WinCopies.IO.Path.RenameDuplicate(destPath);
 
                                         alreadyRenamed = true;
                                     }
@@ -574,6 +574,8 @@ namespace WinCopies.GUI.IO
 
                                             return;
 
+                                        alreadyRenamed = false;
+
                                         CurrentPath = _Paths.Peek();
 
                                         sourcePath = $"{SourcePath}{WinCopies.IO.Path.PathSeparator}{CurrentPath.Path}";
@@ -581,28 +583,31 @@ namespace WinCopies.GUI.IO
                                         destPath = $"{DestPath}{WinCopies.IO.Path.PathSeparator}{CurrentPath.Path}";
 
                                         if (
+
 #if DEBUG
-                                            (SimulationParameters?.DestPathExistsAction ??
+                                        (SimulationParameters == null &&
 #endif
-                                            WinCopies.IO.Path.Exists
+                                            WinCopies.IO.Path.Exists(destPath)
 #if DEBUG
+                                            ) || SimulationParameters.DestPathExistsAction(destPath)
+#endif
                                             )
-#endif
-                                            (destPath))
 
-                                            if (_autoRenameFiles && _bufferLength == 0)
+                                            if (_autoRenameFiles)
 
-                                                renameOnDuplicate();
+                                                if (_bufferLength == 0)
 
-                                            else if (_bufferLength > 0)
-                                            {
-#if DEBUG
-                                                FileStream sourceFileStream = null;
-#endif
-                                                try
+                                                    renameOnDuplicate();
+
+                                                else
                                                 {
 #if DEBUG
-                                                    if (SimulationParameters == null)
+                                                    FileStream sourceFileStream = null;
+#endif
+                                                    try
+                                                    {
+#if DEBUG
+                                                        if (SimulationParameters == null)
 #else
                                                     using
 #if CS7
@@ -610,7 +615,7 @@ namespace WinCopies.GUI.IO
 #endif
                                                         var
 #endif
-                                                        sourceFileStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None)
+                                                            sourceFileStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None)
 #if CS7 && !DEBUG
                                                         )
                                                     {
@@ -619,26 +624,26 @@ namespace WinCopies.GUI.IO
 #endif
 
 #if DEBUG
-                                                    else
-                                                    {
-                                                        Exception exception = SimulationParameters.CreatingFileStreamSucceedsAction(sourcePath, PathDirectoryType.Source);
-
-                                                        if (exception == null)
-
-                                                            sourceFileStream = null;
-
                                                         else
+                                                        {
+                                                            Exception exception = SimulationParameters.CreatingFileStreamSucceedsAction(sourcePath, PathDirectoryType.Source);
 
-                                                            throw exception;
-                                                    }
+                                                            if (exception == null)
 
-                                                    FileStream destFileStream = null;
+                                                                sourceFileStream = null;
+
+                                                            else
+
+                                                                throw exception;
+                                                        }
+
+                                                        FileStream destFileStream = null;
 #endif
 
-                                                    try
-                                                    {
+                                                        try
+                                                        {
 #if DEBUG
-                                                        if (SimulationParameters == null)
+                                                            if (SimulationParameters == null)
 #else
                                                         using
 #if CS7
@@ -646,7 +651,7 @@ namespace WinCopies.GUI.IO
 #endif
                                                             var
 #endif
-                                                            destFileStream = new FileStream(destPath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None)
+                                                                destFileStream = new FileStream(destPath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferLength, FileOptions.None)
 #if CS7 && !DEBUG
                                                             )
                                                         {
@@ -656,114 +661,105 @@ namespace WinCopies.GUI.IO
 
 #if DEBUG
 
-                                                        else
-                                                        {
-                                                            Exception exception = SimulationParameters.CreatingFileStreamSucceedsAction(destPath, PathDirectoryType.Destination);
+                                                            else
+                                                            {
+                                                                Exception exception = SimulationParameters.CreatingFileStreamSucceedsAction(destPath, PathDirectoryType.Destination);
 
-                                                            if (exception != null)
+                                                                if (exception != null)
 
-                                                                throw exception;
-                                                        }
+                                                                    throw exception;
+                                                            }
 #endif
 
-                                                        bool? _result;
+                                                            bool? _result;
 #if DEBUG
-                                                        if (SimulationParameters == null)
+                                                            if (SimulationParameters == null)
 #endif
 
-                                                            _result = WinCopies.IO.File.IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => PausePending || CancellationPending);
+                                                                _result = WinCopies.IO.File.IsDuplicate(sourceFileStream, destFileStream, _bufferLength, () => PausePending || CancellationPending);
 
 #if DEBUG
 
-                                                        else
+                                                            else
 
-                                                            _result = SimulationParameters.IsDuplicateAction(sourcePath, destPath, () => PausePending || CancellationPending);
+                                                                _result = SimulationParameters.IsDuplicateAction(sourcePath, destPath, () => PausePending || CancellationPending);
 
 #endif
 
-                                                        if (checkIfPauseOrCancellationPending())
-
-                                                            return;
-
-                                                        if (_result.HasValue && _result.Value)
-                                                        {
                                                             if (checkIfPauseOrCancellationPending())
 
                                                                 return;
 
-                                                            if (_autoRenameFiles)
+                                                            if (_result.HasValue && _result.Value)
+                                                            {
+                                                                if (checkIfPauseOrCancellationPending())
+
+                                                                    return;
 
                                                                 renameOnDuplicate();
+                                                            }
 
                                                             else
-                                                            {
-                                                                dequeueErrorPath(ProcessError.FileSystemEntryAlreadyExists);
 
-                                                                continue;
-                                                            }
+                                                                _ = _Paths.Dequeue();
+#if CS7 && !DEBUG
+                                                        }
+#endif
                                                         }
 
-                                                        else
+                                                        catch (System.IO.FileNotFoundException)
+                                                        {
+                                                            // Left empty.
+                                                        }
 
-                                                            _ = _Paths.Dequeue();
-#if CS7 && !DEBUG
+                                                        catch (Exception ex) when (ex.Is(false, typeof(System.UnauthorizedAccessException), typeof(System.Security.SecurityException)))
+                                                        {
+                                                            dequeueErrorPath(ProcessError.DestinationReadProtection);
+
+                                                            continue;
+                                                        }
+#if DEBUG
+                                                        finally
+                                                        {
+                                                            destFileStream?.Dispose();
                                                         }
 #endif
                                                     }
 
-                                                    catch (System.IO.FileNotFoundException)
+                                                    catch (System.IO.IOException ex) when (ex.Is(false, typeof(System.IO.FileNotFoundException), typeof(System.IO.DirectoryNotFoundException)))
                                                     {
-                                                        // Left empty.
+                                                        dequeueErrorPath(ProcessError.PathNotFound);
+
+                                                        continue;
+                                                    }
+
+                                                    catch (System.IO.PathTooLongException)
+                                                    {
+                                                        dequeueErrorPath(ProcessError.PathTooLong);
+
+                                                        continue;
+                                                    }
+
+                                                    catch (System.IO.IOException)
+                                                    {
+                                                        dequeueErrorPath(ProcessError.UnknownError);
+
+                                                        continue;
                                                     }
 
                                                     catch (Exception ex) when (ex.Is(false, typeof(System.UnauthorizedAccessException), typeof(System.Security.SecurityException)))
                                                     {
-                                                        dequeueErrorPath(ProcessError.DestinationReadProtection);
+                                                        dequeueErrorPath(ProcessError.ReadProtection);
 
                                                         continue;
                                                     }
 #if DEBUG
                                                     finally
                                                     {
-                                                        destFileStream?.Dispose();
+                                                        sourceFileStream.Dispose();
                                                     }
 #endif
                                                 }
-
-                                                catch (System.IO.IOException ex) when (ex.Is(false, typeof(System.IO.FileNotFoundException), typeof(System.IO.DirectoryNotFoundException)))
-                                                {
-                                                    dequeueErrorPath(ProcessError.PathNotFound);
-
-                                                    continue;
-                                                }
-
-                                                catch (System.IO.PathTooLongException)
-                                                {
-                                                    dequeueErrorPath(ProcessError.PathTooLong);
-
-                                                    continue;
-                                                }
-
-                                                catch (System.IO.IOException)
-                                                {
-                                                    dequeueErrorPath(ProcessError.UnknownError);
-
-                                                    continue;
-                                                }
-
-                                                catch (Exception ex) when (ex.Is(false, typeof(System.UnauthorizedAccessException), typeof(System.Security.SecurityException)))
-                                                {
-                                                    dequeueErrorPath(ProcessError.ReadProtection);
-
-                                                    continue;
-                                                }
-#if DEBUG
-                                                finally
-                                                {
-                                                    sourceFileStream.Dispose();
-                                                }
-#endif
-                                            }
 
                                             else
                                             {
