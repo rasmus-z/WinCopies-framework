@@ -11,7 +11,7 @@ using WinCopies.Linq;
 
 namespace WinCopies.IO
 {
-    public interface IPortableDeviceInfo:IFileSystemObjectInfo
+    public interface IPortableDeviceInfo : IFileSystemObjectInfo
     {
         IPortableDevice PortableDevice { get; }
     }
@@ -70,6 +70,6 @@ namespace WinCopies.IO
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IPortableDeviceObject> predicate) => (predicate == null ? PortableDevice : PortableDevice.Where(predicate)).Select(portableDeviceObject => new PortableDeviceItemInfo(portableDeviceObject, this));
+        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IPortableDeviceObject> predicate) => (predicate == null ? PortableDevice : PortableDevice.WherePredicate(predicate)).Select(portableDeviceObject => new PortableDeviceItemInfo(portableDeviceObject, this));
     }
 }

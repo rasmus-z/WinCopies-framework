@@ -175,7 +175,7 @@ namespace WinCopies.IO
 
         }
 
-        public static ArchiveItemInfo From( in IShellObjectInfo archiveShellObjectInfo, in string archiveFilePath)
+        public static ArchiveItemInfo From(in IShellObjectInfo archiveShellObjectInfo, in string archiveFilePath)
 
         {
 
@@ -218,7 +218,7 @@ namespace WinCopies.IO
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetArchiveItemInfoItems(null);
 
-        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>( () =>  new ArchiveItemInfoEnumerator(this, func) ) ; 
+        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
 
         protected override void Dispose(in bool disposing)
         {

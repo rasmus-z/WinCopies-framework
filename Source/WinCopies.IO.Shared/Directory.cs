@@ -47,7 +47,7 @@ namespace WinCopies.IO
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
-            ) => new Enumerable<IPathInfo>(() => new PathInfoFileSystemEntryEnumerator(paths, searchPattern, searchOption
+            ) => new WinCopies.Util.Enumerable<IPathInfo>(() => new PathInfoFileSystemEntryEnumerator(paths, searchPattern, searchOption
 #if NETCORE
                 , enumerationOptions
 #endif

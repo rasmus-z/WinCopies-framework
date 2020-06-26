@@ -24,7 +24,7 @@ using WinCopies.Util;
 
 namespace WinCopies.IO
 {
-    public interface IFileSystemObjectComparer< in T> : IComparer<T>, IDeepCloneable where T : IFileSystemObject
+    public interface IFileSystemObjectComparer<in T> : IComparer<T>, IDeepCloneable where T : IFileSystemObject
     {
     }
 }

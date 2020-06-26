@@ -1,12 +1,15 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using WinCopies.Collections;
 using WinCopies.IO;
+using WinCopies.Linq;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 
@@ -39,6 +42,11 @@ namespace WinCopies.Tests
     [TestClass]
     public class PathInfoFileSystemEntryEnumerator
     {
+        FileStream fs = new FileStream("log.log", FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.None);
+        StreamWriter sw;
+
+        public PathInfoFileSystemEntryEnumerator() => sw = new StreamWriter(fs);
+
         internal static PathInfo[] _paths = {
                 new PathInfo("C:", FileType.Drive,
                     new PathInfo("A", FileType.Folder,
@@ -58,9 +66,9 @@ namespace WinCopies.Tests
         internal static IPathInfo[] _joinedPaths =
         {
                 new PathInfo("C:", FileType.Drive),
+                new PathInfo("C:\\C", FileType.File),
                 new PathInfo("C:\\A", FileType.Folder),
                 new PathInfo("C:\\A\\B", FileType.File),
-                new PathInfo("C:\\C", FileType.File),
                 new PathInfo("C:\\D", FileType.Folder),
                 new PathInfo("C:\\D\\E", FileType.File),
                 new PathInfo("C:\\F", FileType.Folder),
@@ -76,39 +84,100 @@ namespace WinCopies.Tests
 #if NETCORE
                 null,
 #endif
-                new FileSystemEntryEnumeratorProcessSimulation() { EnumerateFunc = GetEnumerable });
+                new FileSystemEntryEnumeratorProcessSimulation() { EnumerateFunc = GetEnumerable, WriteLogAction = s => { sw.WriteLine(s); sw.Flush(); }  });
 
             for (int i = 0; enumerator.MoveNext(); i++)
+            {
+                sw.WriteLine($"i: {i}; enumerator.Current.Path: {enumerator.Current.Path}; enumerator.Current.IsDirectory: {enumerator.Current.IsDirectory}");
 
-                Assert.IsTrue(_joinedPaths[i].Path == enumerator.Current.Path && _joinedPaths[i].IsDirectory == enumerator.Current.IsDirectory, $"Occurrence: {i}; Joined path: {_joinedPaths[i].Path}; Current enumeration path: {enumerator.Current.Path}; Joined path is directory: {_joinedPaths[i].IsDirectory}; Current enumeration path is directory: {enumerator.Current.IsDirectory}.");
+                sw.Flush();
+
+                Assert.IsTrue(_joinedPaths[i].Path.EndsWith(enumerator.Current.Path) && _joinedPaths[i].IsDirectory == enumerator.Current.IsDirectory, $"Occurrence: {i}; Joined path: {_joinedPaths[i].Path}; Current enumeration path: {enumerator.Current.Path}; Joined path is directory: {_joinedPaths[i].IsDirectory}; Current enumeration path is directory: {enumerator.Current.IsDirectory}.");
+            }
 
             enumerator.Dispose();
         }
 
-        internal static IEnumerable<string> GetEnumerable(string path, PathType pathType)
+        internal IEnumerable<string> GetEnumerable(string path, PathType pathType)
         {
-            Queue<string> _paths = path.SplitToQueue(false, Path.PathSeparator);
+            sw.WriteLine(nameof(GetEnumerable));
+
+            sw.WriteLine($"\tpath: {path}; path type: {pathType}");
+
+            Queue<string> _paths = Temp.SplitToQueue(path, false, IO.Path.PathSeparator);
+
+            Assert.IsNotNull(_paths);
+
+            Assert.IsTrue(_paths.Count > 0, "Queue count error.");
+
+            sw.WriteLine($"\t_paths.Count: {_paths.Count}");
+
+            foreach (string p in _paths)
+
+                sw.WriteLine($"\t{p}");
+
+            sw.Flush();
 
             IReadOnlyList<PathInfo> __paths = PathInfoFileSystemEntryEnumerator._paths;
 
             var _path = new System.Collections.Generic.LinkedList<string>();
 
-            string dequeue()
+            string peek()
             {
-                _ = _path.AddLast(_paths.Peek());
+                sw.WriteLine($"\t{nameof(peek)}");
 
-                return _paths.Dequeue();
+                sw.Flush();
+
+                string __path = _paths.Peek();
+
+                sw.WriteLine($"\t\t_paths.Dequeue(): {__path}");
+
+                sw.Flush();
+
+                return __path;
             }
 
-            PathInfo getFirst() => __paths.FirstOrDefault(p => p.Name == dequeue()) ?? throw new InvalidOperationException($"Cannot find path from given parameter. Name: { _path.Last}; path: { _path.Join(true, "\\")}");
+            PathInfo getFirst() => __paths.FirstOrDefault(p=>p.Name == peek()  );
 
-            int length = _paths.Count - 1;
+            // ?? throw new InvalidOperationException($"Cannot find path from given parameter. Name: { _path.Last?.Value ?? "<Null>"}; joined paths: { _path.Join(true, "\\")}; path: {path}; path type: {pathType}")
 
-            for (int i = 0; i < length; i++)
+            PathInfo pathInfo;
 
-                __paths = getFirst().SubPaths;
+            while (_paths.Count > 1)
+            {
+                pathInfo = getFirst();
 
-            return getFirst().SubPaths.Select(p => p.Name);
+                if (pathInfo == null) return Temp.GetEmptyEnumerable();
+
+                __paths = pathInfo.SubPaths;
+
+                _ = _path.AddLast(_ = _paths.Dequeue());
+            }
+
+            sw.WriteLine($"\tLoop ok.");
+
+            sw.Flush();
+
+            pathInfo = getFirst();
+
+            if (pathInfo == null)
+            {
+                sw.WriteLine($"\t_pathInfo is null.");
+
+                sw.Flush();
+
+                return Temp.GetEmptyEnumerable();
+            }
+
+            IEnumerable<PathInfo> result = pathInfo.SubPaths.WherePredicate(p => ((If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, p.FileType, FileType.Folder, FileType.Drive) && pathType == PathType.Directories) || (p.FileType == FileType.File && pathType == PathType.Files)));
+
+            foreach (PathInfo _pathInfo in result ) 
+
+                sw.WriteLine($"\t_pathInfo name: {_pathInfo.Name}; _pathInfo file type: {_pathInfo.FileType}");
+
+            sw.Flush();
+
+            return result .Select(p => $"{path}{WinCopies.IO.Path.PathSeparator}{p.Name}");
         }
     }
 }

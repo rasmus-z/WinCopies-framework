@@ -36,7 +36,6 @@ namespace WinCopies.GUI.IO
 
     public class CopyProcessSimulationParameters
     {
-        private WinCopies.IO.Size? _pathsSize;
         private bool? _sourcePathRootExists;
         private bool? _sourceDriveReady;
         private bool? _destPathRootExists;
@@ -65,7 +64,7 @@ namespace WinCopies.GUI.IO
 
         public FileSystemEntryEnumeratorProcessSimulation FileSystemEntryEnumeratorProcessSimulation { get => _fileSystemEntryEnumeratorProcessSimulation ?? throw GetInvalidOperationException(); set => _fileSystemEntryEnumeratorProcessSimulation = value ?? throw GetInvalidOperationException(); }
 
-        public Func<WinCopies.IO.IPathInfo, IPathInfo> IOPathInfoToGUIIOPathInfoAction { get => _ioPathInfoToGUIIOPathInfoAction ?? throw GetInvalidOperationException(); set => _ioPathInfoToGUIIOPathInfoAction = value ?? throw GetInvalidOperationException(); } 
+        public Func<WinCopies.IO.IPathInfo, IPathInfo> IOPathInfoToGUIIOPathInfoAction { get => _ioPathInfoToGUIIOPathInfoAction ?? throw GetInvalidOperationException(); set => _ioPathInfoToGUIIOPathInfoAction = value ?? throw GetInvalidOperationException(); }
 
         public Func<string, string> RenameOnDuplicateAction { get => _renameOnDuplicateAction ?? throw GetInvalidOperationException(); set => _renameOnDuplicateAction = value ?? throw GetInvalidOperationException(); }
 

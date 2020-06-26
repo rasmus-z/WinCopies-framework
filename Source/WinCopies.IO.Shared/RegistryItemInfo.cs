@@ -576,9 +576,9 @@ namespace WinCopies.IO
 
                     {
 
-                        keys = RegistryKey.GetSubKeyNames().Where( item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
+                        keys = RegistryKey.GetSubKeyNames().Where(item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
-                        values = RegistryKey.GetValueNames().Where( s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
+                        values = RegistryKey.GetValueNames().Where(s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
 
                     }
 

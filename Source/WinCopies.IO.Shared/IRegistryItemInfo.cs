@@ -31,7 +31,7 @@ namespace WinCopies.IO
 
         IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate);
 
-        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions ); 
+        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions);
 
     }
 

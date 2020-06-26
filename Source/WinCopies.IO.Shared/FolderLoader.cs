@@ -41,214 +41,214 @@ using WinCopies.Util;
 namespace WinCopies.IO
 {
 
-//    public interface IFolderLoader : IFileSystemObjectLoader
-//    {
+    //    public interface IFolderLoader : IFileSystemObjectLoader
+    //    {
 
-//        FolderLoaderFileSystemWatcher FileSystemWatcher { get; }
+    //        FolderLoaderFileSystemWatcher FileSystemWatcher { get; }
 
-//    }
+    //    }
 
-internal static class FolderLoader
+    internal static class FolderLoader
 
-{
+    {
 
-    internal static bool HandleIOException(Exception ex) => ex.Is(false, typeof(IOException), typeof(UnauthorizedAccessException), typeof(SecurityException));
+        internal static bool HandleIOException(Exception ex) => ex.Is(false, typeof(IOException), typeof(UnauthorizedAccessException), typeof(SecurityException));
 
-}
+    }
 
-//    /// <summary>
-//    /// Provides a background process that can be used to load items of a folder. See the Remarks section.
-//    /// </summary>
-//    /// <remarks>
-//    /// This loader is not designed for <see cref="ShellObjectInfo"/> that have their <see cref="FileSystemObject.FileType"/> property set up with an other value than <see cref="FileType.Folder"/>, <see cref="FileType.Drive"/> or <see cref="FileType.SpecialFolder"/>, even if they can be browsable (e.g. <see cref="FileType.Archive"/>). If the file type of the given <see cref="BrowsableObjectInfoLoader.Path"/> is not supported by this loader, you'll have to use a specific loader or to inherit from this loader.
-//    /// </remarks>
-//    public class FolderLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory>, IFolderLoader where TPath : ShellObjectInfo where TItems : FileSystemObjectInfo where TSubItems : FileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory, IShellObjectInfoFactory where TItemsFactory : BrowsableObjectInfoFactory
-//    {
+    //    /// <summary>
+    //    /// Provides a background process that can be used to load items of a folder. See the Remarks section.
+    //    /// </summary>
+    //    /// <remarks>
+    //    /// This loader is not designed for <see cref="ShellObjectInfo"/> that have their <see cref="FileSystemObject.FileType"/> property set up with an other value than <see cref="FileType.Folder"/>, <see cref="FileType.Drive"/> or <see cref="FileType.SpecialFolder"/>, even if they can be browsable (e.g. <see cref="FileType.Archive"/>). If the file type of the given <see cref="BrowsableObjectInfoLoader.Path"/> is not supported by this loader, you'll have to use a specific loader or to inherit from this loader.
+    //    /// </remarks>
+    //    public class FolderLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory> : FileSystemObjectLoader<TPath, TItems, TSubItems, TFactory>, IFolderLoader where TPath : ShellObjectInfo where TItems : FileSystemObjectInfo where TSubItems : FileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory, IShellObjectInfoFactory where TItemsFactory : BrowsableObjectInfoFactory
+    //    {
 
-//        public override bool NeedsObjectsOrValuesReconstruction => true;
+    //        public override bool NeedsObjectsOrValuesReconstruction => true;
 
-//        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new FolderLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(null, FileTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
+    //        protected override BrowsableObjectInfoLoader<TPath, TItems, TSubItems, TFactory> DeepCloneOverride() => new FolderLoader<TPath, TItems, TSubItems, TFactory, TItemsFactory>(null, FileTypes, (IFileSystemObjectComparer<IFileSystemObject>)FileSystemObjectComparer.DeepClone(), WorkerReportsProgress, WorkerSupportsCancellation);
 
-//        // todo: to turn on ShellObjectWatcher for better compatibility
+    //        // todo: to turn on ShellObjectWatcher for better compatibility
 
-//#pragma warning disable CS0649 // Set up using reflection
-//        private FolderLoaderFileSystemWatcher _fileSystemWatcher;
-//#pragma warning restore CS0649
+    //#pragma warning disable CS0649 // Set up using reflection
+    //        private FolderLoaderFileSystemWatcher _fileSystemWatcher;
+    //#pragma warning restore CS0649
 
-//        public FolderLoaderFileSystemWatcher FileSystemWatcher
-//        {
-//            get => _fileSystemWatcher ?? (FileSystemWatcher = GetFolderLoaderFileSystemWatcher()); private set
-//            {
+    //        public FolderLoaderFileSystemWatcher FileSystemWatcher
+    //        {
+    //            get => _fileSystemWatcher ?? (FileSystemWatcher = GetFolderLoaderFileSystemWatcher()); private set
+    //            {
 
-//                if (IsBusy)
+    //                if (IsBusy)
 
-//                    throw new InvalidOperationException("The items loader is busy.");
+    //                    throw new InvalidOperationException("The items loader is busy.");
 
-//                value.Created += FileSystemWatcher_Created;
+    //                value.Created += FileSystemWatcher_Created;
 
-//                value.Renamed += FileSystemWatcher_Renamed;
+    //                value.Renamed += FileSystemWatcher_Renamed;
 
-//                value.Deleted += FileSystemWatcher_Deleted;
+    //                value.Deleted += FileSystemWatcher_Deleted;
 
-//                _fileSystemWatcher = value;
+    //                _fileSystemWatcher = value;
 
-//            }
-//        }
+    //            }
+    //        }
 
-//        /// <summary>
-//        /// Initializes a new instance of the <see cref="FolderLoader"/> class.
-//        /// </summary>
-//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
-//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
-//        /// <param name="fileTypes">The file types to load.</param>
-//        public FolderLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) { }
+    //        /// <summary>
+    //        /// Initializes a new instance of the <see cref="FolderLoader"/> class.
+    //        /// </summary>
+    //        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+    //        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+    //        /// <param name="fileTypes">The file types to load.</param>
+    //        public FolderLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, bool workerReportsProgress, bool workerSupportsCancellation) : this(path, fileTypes, new FileSystemObjectComparer<IFileSystemObject>(), workerReportsProgress, workerSupportsCancellation) { }
 
-//        /// <summary>
-//        /// Initializes a new instance of the <see cref="FolderLoader"/> class using a custom comparer.
-//        /// </summary>
-//        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
-//        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
-//        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
-//        /// <param name="fileTypes">The file types to load.</param>
-//        public FolderLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, fileTypes, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) { }
+    //        /// <summary>
+    //        /// Initializes a new instance of the <see cref="FolderLoader"/> class using a custom comparer.
+    //        /// </summary>
+    //        /// <param name="workerReportsProgress">Whether the thread can notify of the progress.</param>
+    //        /// <param name="workerSupportsCancellation">Whether the thread supports the cancellation.</param>
+    //        /// <param name="fileSystemObjectComparer">The comparer used to sort the loaded items.</param>
+    //        /// <param name="fileTypes">The file types to load.</param>
+    //        public FolderLoader( BrowsableObjectTreeNode< TPath, TItems, TFactory > path, FileTypes fileTypes, IFileSystemObjectComparer<IFileSystemObject> fileSystemObjectComparer, bool workerReportsProgress, bool workerSupportsCancellation) : base(path, fileTypes, (IFileSystemObjectComparer<IFileSystemObject>)fileSystemObjectComparer, workerReportsProgress, workerSupportsCancellation) { }
 
-//        protected override void OnPathChanging( BrowsableObjectTreeNode< TPath, TItems, TFactory > path)
-//        {
+    //        protected override void OnPathChanging( BrowsableObjectTreeNode< TPath, TItems, TFactory > path)
+    //        {
 
-//            if (path is null)
+    //            if (path is null)
 
-//                return;
+    //                return;
 
-//            FileSystemWatcher.EnableRaisingEvents = false;
+    //            FileSystemWatcher.EnableRaisingEvents = false;
 
-//            FileSystemWatcher.Path = null;
+    //            FileSystemWatcher.Path = null;
 
-//            if (Path is null) return;
+    //            if (Path is null) return;
 
-//            if (If(IFCT.Or, IfCM.Logical, IfComp.NotEqual, path.Value.FileType, FileType.Folder, FileType.Drive, FileType.SpecialFolder))
+    //            if (If(IFCT.Or, IfCM.Logical, IfComp.NotEqual, path.Value.FileType, FileType.Folder, FileType.Drive, FileType.SpecialFolder))
 
-//                throw new ArgumentException("'Path' isn't a folder, a drive or a special folder. 'Path': " + path.ToString());
+    //                throw new ArgumentException("'Path' isn't a folder, a drive or a special folder. 'Path': " + path.ToString());
 
-//            if ((Path.Value.FileType == FileType.Drive && new DriveInfo(Path.Value.Path).IsReady) || Path.Value.ShellObject.IsFileSystemObject)
+    //            if ((Path.Value.FileType == FileType.Drive && new DriveInfo(Path.Value.Path).IsReady) || Path.Value.ShellObject.IsFileSystemObject)
 
-//            {
+    //            {
 
-//                FileSystemWatcher.Path = Path.Value.Path;
+    //                FileSystemWatcher.Path = Path.Value.Path;
 
-//                FileSystemWatcher.EnableRaisingEvents = true;
+    //                FileSystemWatcher.EnableRaisingEvents = true;
 
-//            }
+    //            }
 
-//        }
+    //        }
 
-//        /// <summary>
-//        /// <para>Gets the <see cref="FolderLoaderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoLoader.Path"/> property.</para>
-//        /// <para>When overridden in a derived class, provides a custom <see cref="FolderLoaderFileSystemWatcher"/>.</para>
-//        /// </summary>
-//        /// <returns>An instance of the <see cref="FolderLoaderFileSystemWatcher"/> class.</returns>
-//        protected virtual FolderLoaderFileSystemWatcher GetFolderLoaderFileSystemWatcher() => new FolderLoaderFileSystemWatcher();
+    //        /// <summary>
+    //        /// <para>Gets the <see cref="FolderLoaderFileSystemWatcher"/> used to listen to the file system events for the current <see cref="BrowsableObjectInfoLoader.Path"/> property.</para>
+    //        /// <para>When overridden in a derived class, provides a custom <see cref="FolderLoaderFileSystemWatcher"/>.</para>
+    //        /// </summary>
+    //        /// <returns>An instance of the <see cref="FolderLoaderFileSystemWatcher"/> class.</returns>
+    //        protected virtual FolderLoaderFileSystemWatcher GetFolderLoaderFileSystemWatcher() => new FolderLoaderFileSystemWatcher();
 
-//        /// <summary>
-//        /// Frees all resources used by this <see cref="FolderLoader"/>.
-//        /// </summary>
-//        protected override void Dispose(bool disposing)
+    //        /// <summary>
+    //        /// Frees all resources used by this <see cref="FolderLoader"/>.
+    //        /// </summary>
+    //        protected override void Dispose(bool disposing)
 
-//        {
+    //        {
 
-//            base.Dispose(disposing);
+    //            base.Dispose(disposing);
 
-//            if (FileSystemWatcher != null)
+    //            if (FileSystemWatcher != null)
 
-//                FileSystemWatcher.Dispose();
+    //                FileSystemWatcher.Dispose();
 
-//        }
+    //        }
 
-//        protected virtual void OnNewShellObjectCreated(string path)
+    //        protected virtual void OnNewShellObjectCreated(string path)
 
-//        {
+    //        {
 
-//            // todo:
+    //            // todo:
 
-//            if (!Application.Current.Dispatcher.CheckAccess())
+    //            if (!Application.Current.Dispatcher.CheckAccess())
 
-//                Application.Current.Dispatcher.InvokeAsync(() => OnNewShellObjectCreated(path));
+    //                Application.Current.Dispatcher.InvokeAsync(() => OnNewShellObjectCreated(path));
 
-//            else
-//            {
+    //            else
+    //            {
 
-//                try
-//                {
+    //                try
+    //                {
 
-//                    // todo: may not work with ShellObjectWatcher
+    //                    // todo: may not work with ShellObjectWatcher
 
-//                    Path.Insert( Path.Count, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>( (TItems)Path.Factory.GetBrowsableObjectInfo(path, FileType.File, SpecialFolder.OtherFolderOrFile, ShellObject.FromParsingName(path), ShellObjectInfo.DefaultShellObjectDeepClone), (TItemsFactory) Path.Factory.DeepClone()));
+    //                    Path.Insert( Path.Count, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>( (TItems)Path.Factory.GetBrowsableObjectInfo(path, FileType.File, SpecialFolder.OtherFolderOrFile, ShellObject.FromParsingName(path), ShellObjectInfo.DefaultShellObjectDeepClone), (TItemsFactory) Path.Factory.DeepClone()));
 
-//                }
-//#if DEBUG
-//#pragma warning disable CA1031 // Do not catch general exception types
-//                catch (Exception ex) { Debug.WriteLine(ex.Message); }
-//#pragma warning restore CA1031 // Do not catch general exception types
-//#else
-//            catch { }
-//#endif
+    //                }
+    //#if DEBUG
+    //#pragma warning disable CA1031 // Do not catch general exception types
+    //                catch (Exception ex) { Debug.WriteLine(ex.Message); }
+    //#pragma warning restore CA1031 // Do not catch general exception types
+    //#else
+    //            catch { }
+    //#endif
 
-//                // todo:
+    //                // todo:
 
-//                //if (FileSystemObjectComparer != null)
+    //                //if (FileSystemObjectComparer != null)
 
-//                //    Path.Items.Sort( 0, Path.Items.Count,     FileSystemObjectComparer);
+    //                //    Path.Items.Sort( 0, Path.Items.Count,     FileSystemObjectComparer);
 
-//            }
+    //            }
 
-//        }
+    //        }
 
-//        protected virtual void OnShellObjectRenamed(string oldPath, string newPath)
+    //        protected virtual void OnShellObjectRenamed(string oldPath, string newPath)
 
-//        {
+    //        {
 
-//            if (!Application.Current.Dispatcher.CheckAccess())
+    //            if (!Application.Current.Dispatcher.CheckAccess())
 
-//                _ = Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectRenamed(oldPath, newPath));
+    //                _ = Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectRenamed(oldPath, newPath));
 
-//            else
-//            {
+    //            else
+    //            {
 
-//                OnShellObjectDeleted(oldPath);
+    //                OnShellObjectDeleted(oldPath);
 
-//                OnNewShellObjectCreated(newPath);
+    //                OnNewShellObjectCreated(newPath);
 
-//            }
+    //            }
 
-//        }
+    //        }
 
-//        protected virtual void OnShellObjectDeleted(string path)
+    //        protected virtual void OnShellObjectDeleted(string path)
 
-//        {
+    //        {
 
-//            if (!Application.Current.Dispatcher.CheckAccess())
+    //            if (!Application.Current.Dispatcher.CheckAccess())
 
-//                _ = Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectDeleted(path));
+    //                _ = Application.Current.Dispatcher.InvokeAsync(() => OnShellObjectDeleted(path));
 
-//            else
+    //            else
 
-//                for (int i = 0; i < Path.Count; i++)
+    //                for (int i = 0; i < Path.Count; i++)
 
-//                    if (Path[i].Value.Path == path)
+    //                    if (Path[i].Value.Path == path)
 
-//                    {
+    //                    {
 
-//                        Path.RemoveAt(i);
+    //                        Path.RemoveAt(i);
 
-//                        return;
+    //                        return;
 
-//                    }
+    //                    }
 
-//        }
+    //        }
 
-//        private void FileSystemWatcher_Created(object sender, FileSystemEventArgs e) => OnNewShellObjectCreated(e.FullPath);
+    //        private void FileSystemWatcher_Created(object sender, FileSystemEventArgs e) => OnNewShellObjectCreated(e.FullPath);
 
-//        private void FileSystemWatcher_Renamed(object sender, RenamedEventArgs e) => OnShellObjectRenamed(e.OldFullPath, e.FullPath);
+    //        private void FileSystemWatcher_Renamed(object sender, RenamedEventArgs e) => OnShellObjectRenamed(e.OldFullPath, e.FullPath);
 
-//        private void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e) => OnShellObjectDeleted(e.FullPath);
+    //        private void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e) => OnShellObjectDeleted(e.FullPath);
 
 }

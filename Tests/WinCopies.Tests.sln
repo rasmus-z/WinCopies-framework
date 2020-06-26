@@ -50,6 +50,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\Source\Directory.Build.props = ..\Source\Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Util.Temp", "..\Source\WinCopies.Util\WinCopies.Util.Temp.csproj", "{F241DE2B-6C22-4279-8B8A-5D6F5BD598E3}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\Source\WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{09ffb314-471c-4e5d-bb3b-26e3029dd54e}*SharedItemsImports = 5
@@ -120,6 +122,10 @@ Global
 		{FDE6381C-4DD3-4609-81CB-12EF6A177564}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDE6381C-4DD3-4609-81CB-12EF6A177564}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDE6381C-4DD3-4609-81CB-12EF6A177564}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F241DE2B-6C22-4279-8B8A-5D6F5BD598E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F241DE2B-6C22-4279-8B8A-5D6F5BD598E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F241DE2B-6C22-4279-8B8A-5D6F5BD598E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F241DE2B-6C22-4279-8B8A-5D6F5BD598E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,6 +150,7 @@ Global
 		{3FA63940-0513-455D-A3D1-FBA954C22869} = {DFED3923-8DCC-4B2A-8714-1478EB146B68}
 		{FDE6381C-4DD3-4609-81CB-12EF6A177564} = {DFED3923-8DCC-4B2A-8714-1478EB146B68}
 		{5C6A8E8F-21AB-4C80-B898-5FB090CB72BD} = {DFED3923-8DCC-4B2A-8714-1478EB146B68}
+		{F241DE2B-6C22-4279-8B8A-5D6F5BD598E3} = {DFED3923-8DCC-4B2A-8714-1478EB146B68}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2469145D-D5F7-45CB-9F50-780AA60E1760}

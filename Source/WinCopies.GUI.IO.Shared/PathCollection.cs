@@ -93,7 +93,7 @@ namespace WinCopies.GUI.IO
 
         public void RemoveAt(int index) => _list.RemoveAt(index);
 
-        public class PathCollectionEnumerator : Enumerator<WinCopies.IO.IPathInfo, WinCopies.IO.IPathInfo>
+        public class PathCollectionEnumerator : WinCopies.Util. Enumerator<WinCopies.IO.IPathInfo, WinCopies.IO.IPathInfo>
         {
             private PathCollection _pathCollection;
 
@@ -110,7 +110,7 @@ namespace WinCopies.GUI.IO
             {
                 if (InnerEnumerator.MoveNext())
                 {
-                    Current = new WinCopies.IO. PathInfo($"{_pathCollection.Path}{WinCopies.IO.Path.PathSeparator}{InnerEnumerator.Current.Path}", InnerEnumerator.Current.IsDirectory);
+                    Current = new WinCopies.IO.PathInfo($"{_pathCollection.Path}{WinCopies.IO.Path.PathSeparator}{InnerEnumerator.Current.Path}", InnerEnumerator.Current.IsDirectory);
 
                     return true;
                 }

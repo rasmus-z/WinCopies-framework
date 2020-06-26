@@ -144,7 +144,7 @@ namespace WinCopies.IO
         {
             if (PortableDeviceObject is IEnumerablePortableDeviceObject enumerablePortableDeviceObject)
 
-                return (predicate == null ? enumerablePortableDeviceObject : enumerablePortableDeviceObject).Where(predicate).Select(portableDeviceObject => new PortableDeviceItemInfo(portableDeviceObject, this));
+                return (predicate == null ? enumerablePortableDeviceObject : enumerablePortableDeviceObject).WherePredicate(predicate).Select(portableDeviceObject => new PortableDeviceItemInfo(portableDeviceObject, this));
 
             return null;
         }

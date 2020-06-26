@@ -52,7 +52,6 @@ namespace WinCopies.IO
 
         public bool MoveNext()
         {
-
             #region Old
 
             // if (FileTypes == FileTypes.None) return;
@@ -110,9 +109,7 @@ namespace WinCopies.IO
             #endregion
 
             try
-
             {
-
                 //try
                 //{
 
@@ -162,9 +159,7 @@ namespace WinCopies.IO
                 //#endif
 
                 bool addPath(ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct)
-
                 {
-
                     if (Func is object && !Func(archiveFileInfoEnumeratorStruct))
 
                         return false;
@@ -176,22 +171,18 @@ namespace WinCopies.IO
                             return false;
 
                     return true;
-
                 }
 
                 ArchiveFileInfo archiveFileInfo;
 
                 for (int i = _index; i < _archiveExtractor.ArchiveFileData.Count; i++)
-
                 {
                     archiveFileInfo = _archiveExtractor.ArchiveFileData[i];
 
                     // _path = archiveFileInfo.FileName.Replace('/', IO.Path.PathSeparator);
 
                     if (archiveFileInfo.FileName.StartsWith(relativePath, StringComparison.OrdinalIgnoreCase) && archiveFileInfo.FileName.Length > relativePath.Length)
-
                     {
-
                         fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
 
                         if (fileName.StartsWith(WinCopies.IO.Path.PathSeparator))
@@ -215,28 +206,21 @@ namespace WinCopies.IO
                         ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct;
 
                         if (fileName.ToUpperInvariant() == archiveFileInfo.FileName.ToUpperInvariant())
-
                         {
-
                             archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(archiveFileInfo);
 
                             addValue = () => AddArchiveFileInfo(archiveFileInfoEnumeratorStruct.ArchiveFileInfo.Value);
-
                         }
 
                         else
-
                         {
-
                             archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(fileName);
 
                             addValue = () => AddPath(archiveFileInfoEnumeratorStruct.Path);
-
                         }
 
                         if (addPath(archiveFileInfoEnumeratorStruct))
                         {
-
                             //if (archiveFileInfo.IsDirectory)
 
                             //    AddDirectory(fileName, archiveFileInfo);
@@ -252,13 +236,9 @@ namespace WinCopies.IO
                             _paths.Enqueue(Current);
 
                             return true;
-
                         }
-
                         // }
-
                     }
-
                 }
 
                 //#if NETFRAMEWORK
@@ -266,13 +246,11 @@ namespace WinCopies.IO
                 //                        }
 
                 //#endif
-
             }
 
             catch (Exception ex) when (ex.Is(false, typeof(IOException), typeof(SecurityException), typeof(UnauthorizedAccessException), typeof(SevenZipException))) { }
 
             return false;
-
         }
 
         public void Reset()
@@ -439,7 +417,7 @@ namespace WinCopies.IO
     public sealed class FileSystemEntryEnumerator : IEnumerator<IPathInfo>
     {
         private IEnumerator<string> _directoryEnumerable;
-        private IEnumerator<string> _fileEnumerable;
+        private EmptyCheckEnumerator<string> _fileEnumerable;
 
         private bool _completed = false;
 
@@ -449,22 +427,37 @@ namespace WinCopies.IO
 
         object IEnumerator.Current => Current;
 
-        public FileSystemEntryEnumerator(IEnumerable<string> directoryEnumerable, IEnumerable<string> fileEnumerable)
+#if DEBUG
+        public IPathInfo PathInfo { get; }
+#endif 
+
+        public FileSystemEntryEnumerator(
+#if DEBUG
+            IPathInfo pathInfo,
+#endif 
+            IEnumerable<string> directoryEnumerable, IEnumerable<string> fileEnumerable)
         {
+#if DEBUG
+            ThrowIfNull(pathInfo, nameof(pathInfo));
+
+            PathInfo = pathInfo;
+#endif
             ThrowIfNull(directoryEnumerable, nameof(directoryEnumerable));
             ThrowIfNull(fileEnumerable, nameof(fileEnumerable));
 
             _directoryEnumerable = directoryEnumerable.GetEnumerator();
 
-            _fileEnumerable = fileEnumerable.GetEnumerator();
+            _fileEnumerable = new EmptyCheckEnumerator<string>(fileEnumerable.GetEnumerator());
         }
 
         public bool MoveNext()
         {
             if (_completed) return false;
 
-            if (_fileEnumerable == null)
+            bool enumerateDirectories()
             {
+                _fileEnumerable = null;
+
                 if (_directoryEnumerable.MoveNext())
                 {
                     _current = new PathInfo(_directoryEnumerable.Current, true);
@@ -479,6 +472,10 @@ namespace WinCopies.IO
                 return false;
             }
 
+            if (_fileEnumerable == null || !_fileEnumerable.HasItems)
+
+                return enumerateDirectories();
+
             if (_fileEnumerable.MoveNext())
             {
                 _current = new PathInfo(_fileEnumerable.Current, false);
@@ -488,9 +485,7 @@ namespace WinCopies.IO
 
             _fileEnumerable = null;
 
-            _completed = true;
-
-            return false;
+            return enumerateDirectories();
         }
 
         public void Reset() => throw new NotSupportedException();
@@ -540,15 +535,18 @@ namespace WinCopies.IO
         private InvalidOperationException GetInvalidOperationException() => new InvalidOperationException("Value cannot be null.");
 
         private Func<string, PathType, IEnumerable<string>> _enumerateFunc;
+        private Action<string> _writeLogAction;
 
         public Func<string, PathType, IEnumerable<string>> EnumerateFunc { get => _enumerateFunc ?? throw GetInvalidOperationException(); set => _enumerateFunc = value ?? throw GetInvalidOperationException(); }
+
+        public Action<string> WriteLogAction { get => _writeLogAction ?? throw GetInvalidOperationException(); set => _writeLogAction = value ?? throw GetInvalidOperationException(); }
     }
 
 #endif
 
     public sealed class PathInfoFileSystemEntryEnumerator : Enumerator<IPathInfo, IPathInfo>
     {
-        private Stack<FileSystemEntryEnumerator> _stack;
+        private Stack<FileSystemEntryEnumerator> _stack = new Stack<FileSystemEntryEnumerator>();
 
         private Queue<IPathInfo> _directories;
         private Queue<IPathInfo> _files;
@@ -679,7 +677,7 @@ namespace WinCopies.IO
 
         protected override bool MoveNextOverride()
         {
-            if (_completed)                return false;
+            if (_completed) return false;
 
             void _markAsCompleted()
             {
@@ -690,18 +688,19 @@ namespace WinCopies.IO
 
             bool dequeueDirectory()
             {
-
                 FileSystemEntryEnumerator enumerator;
 
-                void push() => _stack.Push(new FileSystemEntryEnumerator(_enumerateDirectoriesFunc(Current.Path), _enumerateFilesFunc(Current.Path)));
+                void push() => _stack.Push(new FileSystemEntryEnumerator(
+#if DEBUG
+                    Current,
+#endif 
+                    _enumerateDirectoriesFunc(Current.Path), _enumerateFilesFunc(Current.Path)));
 
                 while (true)
                 {
-
                     if (_stack.Count == 0)
-
                     {
-                        if (_directories.Count == 0)
+                        if (_directories == null)
                         {
                             _directories = null;
 
@@ -723,21 +722,31 @@ namespace WinCopies.IO
 
                     enumerator = _stack.Peek();
 
+#if DEBUG
+                    SimulationParameters?.WriteLogAction($"Peeked enumerator: {enumerator.PathInfo.Path}");
+#endif 
+
                     if (enumerator.MoveNext())
                     {
                         Current = enumerator.Current;
 
-                        if (Current.IsDirectory)
+#if DEBUG
+                        SimulationParameters?.WriteLogAction($"Peeked enumerator: {enumerator.PathInfo.Path}; Peeked enumerator current: {enumerator.Current.Path}");
+#endif 
+
+                        if (enumerator.Current.IsDirectory)
 
                             push();
 
                         return true;
                     }
 
+#if DEBUG
+                    SimulationParameters?.WriteLogAction($"Peeked enumerator: {enumerator.PathInfo.Path}; Peeked enumerator move next failed.");
+#endif 
+
                     _ = _stack.Pop();
-
                 }
-
             }
 
             if (_firstLaunch)

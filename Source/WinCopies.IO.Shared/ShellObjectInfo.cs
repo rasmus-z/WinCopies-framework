@@ -423,7 +423,7 @@ namespace WinCopies.IO
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems((Predicate<ShellObjectInfoEnumeratorStruct>)(obj => true));
 
-        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(()=> new ArchiveItemInfoEnumerator(this, func));
+        private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
 
         ///// <summary>
         ///// This method already has an implementation for deep cloning from constructor and not from an <see cref="object.MemberwiseClone"/> operation. If you perform a deep cloning operation using an <see cref="object.MemberwiseClone"/> operation in <see cref="DeepCloneOverride()"/>, you'll have to override this method if your class has to reinitialize members.
