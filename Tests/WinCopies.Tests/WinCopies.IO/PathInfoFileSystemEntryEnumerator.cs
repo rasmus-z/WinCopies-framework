@@ -1,13 +1,25 @@
+/* Copyright © Pierre Sprimont, 2020
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using WinCopies.Collections;
 using WinCopies.IO;
 using WinCopies.Linq;
 using WinCopies.Util;
@@ -42,10 +54,16 @@ namespace WinCopies.Tests
     [TestClass]
     public class PathInfoFileSystemEntryEnumerator
     {
-        FileStream fs = new FileStream("log.log", FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.None);
+        FileStream fs;
         StreamWriter sw;
+        static int count = 1;
 
-        public PathInfoFileSystemEntryEnumerator() => sw = new StreamWriter(fs);
+        public PathInfoFileSystemEntryEnumerator()
+        {
+            fs = new FileStream($"log{count++}.log", FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.None);
+
+            sw = new StreamWriter(fs);
+        }
 
         internal static PathInfo[] _paths = {
                 new PathInfo("C:", FileType.Drive,
@@ -84,7 +102,7 @@ namespace WinCopies.Tests
 #if NETCORE
                 null,
 #endif
-                new FileSystemEntryEnumeratorProcessSimulation() { EnumerateFunc = GetEnumerable, WriteLogAction = s => { sw.WriteLine(s); sw.Flush(); }  });
+                new FileSystemEntryEnumeratorProcessSimulation() { EnumerateFunc = GetEnumerable, WriteLogAction = s => { sw.WriteLine(s); sw.Flush(); } });
 
             for (int i = 0; enumerator.MoveNext(); i++)
             {
@@ -96,6 +114,13 @@ namespace WinCopies.Tests
             }
 
             enumerator.Dispose();
+        }
+
+        ~PathInfoFileSystemEntryEnumerator()
+        {
+            sw?.Close();
+
+            count--;
         }
 
         internal IEnumerable<string> GetEnumerable(string path, PathType pathType)
@@ -137,7 +162,7 @@ namespace WinCopies.Tests
                 return __path;
             }
 
-            PathInfo getFirst() => __paths.FirstOrDefault(p=>p.Name == peek()  );
+            PathInfo getFirst() => __paths.FirstOrDefault(p => p.Name == peek());
 
             // ?? throw new InvalidOperationException($"Cannot find path from given parameter. Name: { _path.Last?.Value ?? "<Null>"}; joined paths: { _path.Join(true, "\\")}; path: {path}; path type: {pathType}")
 
@@ -171,13 +196,13 @@ namespace WinCopies.Tests
 
             IEnumerable<PathInfo> result = pathInfo.SubPaths.WherePredicate(p => ((If(ComparisonType.Or, ComparisonMode.Logical, Util.Util.Comparison.Equal, p.FileType, FileType.Folder, FileType.Drive) && pathType == PathType.Directories) || (p.FileType == FileType.File && pathType == PathType.Files)));
 
-            foreach (PathInfo _pathInfo in result ) 
+            foreach (PathInfo _pathInfo in result)
 
                 sw.WriteLine($"\t_pathInfo name: {_pathInfo.Name}; _pathInfo file type: {_pathInfo.FileType}");
 
             sw.Flush();
 
-            return result .Select(p => $"{path}{WinCopies.IO.Path.PathSeparator}{p.Name}");
+            return result.Select(p => $"{path}{WinCopies.IO.Path.PathSeparator}{p.Name}");
         }
     }
 }

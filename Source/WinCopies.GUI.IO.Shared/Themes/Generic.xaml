@@ -8,6 +8,7 @@
     xmlns:icons="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
     xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util.Desktop"
     xmlns:data="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     >
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
@@ -20,6 +21,12 @@
             <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Stroke" Color="#FF1CC4F7"/>
             <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Fill" Color="#FF82DFFB"/>
             <PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z"/>
+            <sys:String x:Key="Name">Name:</sys:String>
+            <sys:String x:Key="Status">Status:</sys:String>
+            <sys:String x:Key="TotalItemCount">Total item count:</sys:String>
+            <sys:String x:Key="Remaining">Remaining:</sys:String>
+            <sys:String x:Key="CopyingFrom">Copying from</sys:String>
+            <sys:String x:Key="To">To</sys:String>
 
             <!--Data converters-->
 
@@ -27,7 +34,7 @@
             <data:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
-    
+
     <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Width" Value="16"/>
@@ -69,7 +76,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <!--<Style x:Key="TreeViewItemFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -328,7 +335,9 @@
                 <Setter Property="TextDecorations" >
                     <Setter.Value>
                         <TextDecorationCollection>
-                            --><!--todo: to put in style resources--><!--
+                            -->
+        <!--todo: to put in style resources-->
+        <!--
                             <TextDecoration Location="Underline" />
                         </TextDecorationCollection>
                     </Setter.Value>
@@ -344,7 +353,9 @@
                 <Setter Property="TextDecorations" >
                     <Setter.Value>
                         <TextDecorationCollection>
-                            --><!--todo: to put in style resources--><!--
+                            -->
+        <!--todo: to put in style resources-->
+        <!--
                             <TextDecoration Location="Underline" />
                         </TextDecorationCollection>
                     </Setter.Value>
@@ -360,7 +371,9 @@
                 <Setter Property="TextDecorations" >
                     <Setter.Value>
                         <TextDecorationCollection>
-                            --><!--todo: to put in style resources--><!--
+                            -->
+        <!--todo: to put in style resources-->
+        <!--
                             <TextDecoration Location="Underline" />
                         </TextDecorationCollection>
                     </Setter.Value>
@@ -377,7 +390,9 @@
                 <Setter Property="TextDecorations" >
                     <Setter.Value>
                         <TextDecorationCollection>
-                            --><!--todo: to put in style resources--><!--
+                            -->
+        <!--todo: to put in style resources-->
+        <!--
                             <TextDecoration Location="Underline" />
                         </TextDecorationCollection>
                     </Setter.Value>
@@ -483,4 +498,79 @@
             </Setter.Value>
         </Setter>
     </Style>-->
+
+    <Style TargetType="{x:Type local:ProcessControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ProcessControl}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <controls:Label Grid.ColumnSpan="2" RecognizesAccessKey="False" Content="{TemplateBinding Header}" />
+                        <ProgressBar x:Name="PART_ProgressBar" Grid.ColumnSpan="2" Grid.Row="1" IsIndeterminate="True" />
+                        <Label Grid.Row="2" Content="{StaticResource Name}" />
+                        <Label Grid.Column="1" Grid.Row="2">
+                            <Label.Content>
+                                <MultiBinding StringFormat="{}{0} ({1}%)">
+                                    <TemplateBinding Property="CurrentPath.Path" />
+                                    <TemplateBinding Property="CurrentPathProgressPercentage" />
+                                </MultiBinding>
+                            </Label.Content>
+                        </Label>
+                        <Label Grid.Row="3" Content="{StaticResource Status}" />
+                        <Label Grid.Column="1" Grid.Row="3" Content="{TemplateBinding Status}" />
+                        <Label Grid.Row="4" Content="{StaticResource TotalItemCount}" />
+                        <Label Grid.Column="1" Grid.Row="4">
+                            <Label.Content>
+                                <MultiBinding StringFormat="{}{0} ({1})">
+                                    <TemplateBinding Property="InitialItemCount" />
+                                    <TemplateBinding Property="InitialItemSize" />
+                                </MultiBinding>
+                            </Label.Content>
+                        </Label>
+                        <Label Grid.Row="5" Content="{StaticResource Remaining}" />
+                        <Label Grid.Column="1" Grid.Row="5" >
+                            <Label.Content>
+                                <MultiBinding StringFormat="{}{0} ({1})">
+                                    <TemplateBinding Property="RemainingItemCount" />
+                                    <TemplateBinding Property="RemainingItemSize" />
+                                </MultiBinding>
+                            </Label.Content>
+                        </Label>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{TemplateBinding ArePathsLoaded}" Value="true">
+                            <Setter TargetName="PART_ProgressBar" Property="IsIndeterminate" Value="false" />
+                            <Setter TargetName="PART_ProgressBar" Property="Maximum" Value="100" />
+                            <Setter TargetName="PART_ProgressBar" Property="Value" Value="{TemplateBinding ProgressPercentage}" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <DataTemplate DataType="{x:Type local:CopyProcess}">
+        <local:CopyProcessControl SourcePath="{Binding SourcePath}" DestPath="{Binding DestPath}" InitialItemCount="{Binding InitialItemCount}" InitialItemSize="{Binding InitialItemSize}" RemainingItemCount="{Binding Paths.Count}" RemainingItemSize="{Binding Paths.Size}">
+            <local:ProcessControl.Header>
+                <MultiBinding StringFormat="{}{0} {1} {2} {3}">
+                    <Binding Source="{StaticResource CopyingFrom}" />
+                    <Binding Path="SourcePath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ProcessControl}}" />
+                    <Binding Source="{StaticResource To}" />
+                    <Binding Path="DestPath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ProcessControl}}" />
+                </MultiBinding>
+            </local:ProcessControl.Header>
+        </local:CopyProcessControl>
+    </DataTemplate>
 </ResourceDictionary>

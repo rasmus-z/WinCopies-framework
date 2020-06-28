@@ -27,6 +27,7 @@ using System.Runtime.InteropServices;
 using WinCopies.Collections.DotNetFix;
 using WinCopies.IO;
 using WinCopies.Util;
+using WinCopies.Util.Data;
 using static WinCopies.Util.Util;
 using Size = WinCopies.IO.Size;
 
@@ -123,7 +124,7 @@ namespace WinCopies.GUI.IO
         EncryptionFailed = 17
     }
 
-    public abstract class Process : INotifyPropertyChanged
+    public abstract class Process : ViewModelBase
     {
 
         /// <summary>
@@ -131,15 +132,41 @@ namespace WinCopies.GUI.IO
         /// </summary>
         protected PausableBackgroundWorker BackgroundWorker { get; } = new PausableBackgroundWorker();
 
+        private Size _initialSize;
+
         /// <summary>
         /// Gets or sets (protected) the initial total item size.
         /// </summary>
-        public Size InitialSize { get; protected set; }
+        public Size InitialItemSize
+        {
+            get => _initialSize; protected set
+            {
+                if (value != _initialSize)
+                {
+                    _initialSize = value;
+
+                    OnPropertyChanged(nameof(InitialItemSize));
+                }
+            }
+        }
+
+        private int _initialItemCount;
 
         /// <summary>
         /// Gets or sets (protected) the initial total item count.
         /// </summary>
-        public int InitialItemCount { get; protected set; }
+        public int InitialItemCount
+        {
+            get => _initialItemCount; protected set
+            {
+                if (value != _initialItemCount)
+                {
+                    _initialItemCount = value;
+
+                    OnPropertyChanged(nameof(InitialItemCount));
+                }
+            }
+        }
 
         protected ObservableQueueCollection<IPathInfo> _Paths { get; } = new ObservableQueueCollection<IPathInfo>();
 
@@ -153,7 +180,18 @@ namespace WinCopies.GUI.IO
         /// <summary>
         /// Gets a value that indicates whether the process has completed.
         /// </summary>
-        public bool Completed { get => _completed; protected set { _completed = value; OnPropertyChanged(nameof(Completed)); } }
+        public bool Completed
+        {
+            get => _completed; protected set
+            {
+                if (value != _completed)
+                {
+                    _completed = value;
+
+                    OnPropertyChanged(nameof(Completed));
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the source root path.
@@ -165,7 +203,18 @@ namespace WinCopies.GUI.IO
         /// <summary>
         /// Gets a value that indicates whether all the paths and subpaths are loaded.
         /// </summary>
-        public bool ArePathsLoaded { get => _pathsLoaded; protected set { _pathsLoaded = value; OnPropertyChanged(nameof(ArePathsLoaded)); } }
+        public bool ArePathsLoaded
+        {
+            get => _pathsLoaded; protected set
+            {
+                if (value != _pathsLoaded)
+                {
+                    _pathsLoaded = value;
+
+                    OnPropertyChanged(nameof(ArePathsLoaded));
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value that indicates whether the process supports cancellation.
@@ -206,18 +255,29 @@ namespace WinCopies.GUI.IO
         /// </summary>
         public ProcessError Error { get; protected set; }
 
+        private IPathInfo _currentPath;
+
         /// <summary>
         /// Gets the current processed <see cref="IPathInfo"/>.
         /// </summary>
-        public IPathInfo CurrentPath { get; protected set; }
+        public IPathInfo CurrentPath
+        {
+            get => _currentPath; protected set
+            {
+                if (value != _currentPath)
+                {
+                    _currentPath = value;
+
+                    OnPropertyChanged(nameof(CurrentPath));
+                }
+            }
+        }
 
         public event DoWorkEventHandler DoWork;
 
         public event ProgressChangedEventHandler ProgressChanged;
 
         public event RunWorkerCompletedEventHandler RunWorkerCompleted;
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Process"/> class.
@@ -285,9 +345,9 @@ namespace WinCopies.GUI.IO
 
         public void ReportProgress(int percentProgress, object userState) => BackgroundWorker.ReportProgress(percentProgress, userState);
 
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
+        //protected virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
-        protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     }
 
@@ -454,7 +514,7 @@ namespace WinCopies.GUI.IO
                                         {
                                             Paths.DecrementSize((ulong)_totalBytesTransferred);
 
-                                            ReportProgress((int)(Paths.Size / InitialSize) * 100);
+                                            ReportProgress((int)(Paths.Size / InitialItemSize) * 100);
 
                                             return CancellationPending ? CopyProgressResult.Cancel : CopyProgressResult.Continue;
                                         };
@@ -809,7 +869,7 @@ namespace WinCopies.GUI.IO
 
                     catch (Exception) { }
 
-                InitialSize = Paths.Size;
+                InitialItemSize = Paths.Size;
 
                 InitialItemCount = _Paths.Count;
 

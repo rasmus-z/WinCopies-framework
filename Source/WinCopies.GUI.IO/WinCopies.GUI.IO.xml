@@ -232,5 +232,50 @@
             Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
             </summary>
         </member>
+        <member name="T:WinCopies.GUI.IO.ProcessControl">
+            <summary>
+            Represents an I/O process control.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.SourcePathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.SourcePath"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.SourcePath">
+            <summary>
+            Gets or sets the source path.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.ArePathsLoadedProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.ArePathsLoaded"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.ArePathsLoaded">
+            <summary>
+            Gets or sets a value that indicates whether the paths of the associated process are loaded.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.InitialItemSizeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.InitialItemSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.InitialItemSize">
+            <summary>
+            Gets or sets the initial item size.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.InitialItemCountProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.InitialItemCount"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.InitialItemCount">
+            <summary>
+            Gets or sets the initial item count.
+            </summary>
+        </member>
     </members>
 </doc>

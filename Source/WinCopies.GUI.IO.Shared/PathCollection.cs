@@ -47,7 +47,7 @@ namespace WinCopies.GUI.IO
 
         public PathCollection(string path, IList<WinCopies.IO.IPathInfo> list)
         {
-            Path = path;
+            Path = path == null ? string.Empty : path .Length==0 ? string.Empty :     System.IO.Path.IsPathRooted(path)? path:throw new ArgumentException($"{nameof(path)} must be null, empty or rooted.")    ;        
 
             foreach (WinCopies.IO.IPathInfo _path in list)
 
@@ -58,7 +58,7 @@ namespace WinCopies.GUI.IO
 
         private void ValidatePath(WinCopies.IO.IPathInfo item)
         {
-            if (System.IO.Path.IsPathRooted(item.Path))
+            if ( (  Path.Length>1&& System.IO.Path.IsPathRooted(item.Path))|| (Path.Length == 0 && !System.IO.Path.IsPathRooted(item.Path)))
 
                 throw new ArgumentException("The path to add must be relative.");
         }
@@ -119,5 +119,4 @@ namespace WinCopies.GUI.IO
             }
         }
     }
-
 }
