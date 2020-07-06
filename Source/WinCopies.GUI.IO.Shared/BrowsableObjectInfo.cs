@@ -83,7 +83,7 @@ namespace WinCopies.GUI.IO
 
         public bool IsSelected { get => _isSelected; set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); } }
 
-        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path) : this(path, new BrowsableObjectInfoFactory()) { } 
+        public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path) : this(path, new BrowsableObjectInfoFactory()) { }
 
         public ExplorerControlBrowsableObjectInfoViewModel(IBrowsableObjectInfoViewModel path, IBrowsableObjectInfoFactory factory)
         {
@@ -93,7 +93,7 @@ namespace WinCopies.GUI.IO
             {
                 if (browsableObjectInfo.InnerBrowsableObjectInfo is IShellObjectInfo shellObjectInfo && shellObjectInfo.FileType == FileType.File)
 
-                    _ = Process.Start(new ProcessStartInfo(browsableObjectInfo.Path) { UseShellExecute = true });
+                    _ = System.Diagnostics.Process.Start(new ProcessStartInfo(browsableObjectInfo.Path) { UseShellExecute = true });
 
                 else
 
@@ -211,7 +211,7 @@ namespace WinCopies.GUI.IO
 
                     try
                     {
-                        IEnumerable<IBrowsableObjectInfo> items = _filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems().Where(_filter);
+                        IEnumerable<IBrowsableObjectInfo> items = _filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems().WherePredicate(_filter);
 
                         _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(items
                     .Select(_browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo, _filter) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));

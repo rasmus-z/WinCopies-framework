@@ -2,48 +2,53 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Management;
 using System.Security;
-using System.Text;
 using WinCopies.Collections;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
-    public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>, IEnumerable<ArchiveItemInfo>
+    public sealed class ArchiveItemInfoEnumerator : IEnumerator<ArchiveItemInfo>, WinCopies.Util.DotNetFix.IDisposable
     {
         private int _index = -1;
 
         private IArchiveItemInfoProvider _archiveItemInfoProvider;
 
+        private SevenZipExtractor _archiveExtractor;
+
         private Queue<IFileSystemObject> _paths = new Queue<IFileSystemObject>();
+
+        public bool IsDisposed { get; private set; }
 
         private ArchiveItemInfo _current;
 
-        public ArchiveItemInfo Current => disposedValue ? throw GetExceptionForDispose(false) : _current;
-
-        public Predicate<ArchiveFileInfoEnumeratorStruct> Func { get; }
-
-        public ArchiveItemInfoEnumerator(IArchiveItemInfoProvider archiveItemInfoProvider, Predicate<ArchiveFileInfoEnumeratorStruct> func)
-        {
-            _archiveItemInfoProvider = archiveItemInfoProvider;
-
-            Func = func;
-        }
-
-        public IEnumerator<ArchiveItemInfo> GetEnumerator() => this;
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public ArchiveItemInfo Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
 
         object IEnumerator.Current => Current;
 
-        public bool MoveNext()
+        private Predicate<ArchiveFileInfoEnumeratorStruct> _func;
 
+        public Predicate<ArchiveFileInfoEnumeratorStruct> Func => IsDisposed ? throw GetExceptionForDispose(false) : _func;
+
+        public ArchiveItemInfoEnumerator(IArchiveItemInfoProvider archiveItemInfoProvider, Predicate<ArchiveFileInfoEnumeratorStruct> func)
         {
+            ThrowIfNull(archiveItemInfoProvider, nameof(archiveItemInfoProvider));
+            ThrowIfNull(func, nameof(func));
 
+            _archiveItemInfoProvider = archiveItemInfoProvider;
+
+            var extractor = new SevenZipExtractor(archiveItemInfoProvider.ArchiveShellObject.ArchiveFileStream);
+
+            _archiveExtractor = extractor;
+
+            _func = func;
+        }
+
+        public bool MoveNext()
+        {
             #region Old
 
             // if (FileTypes == FileTypes.None) return;
@@ -101,21 +106,7 @@ namespace WinCopies.IO
             #endregion
 
             try
-
             {
-
-#if NETFRAMEWORK
-
-                using (var archiveExtractor = new SevenZipExtractor(_archiveItemInfoProvider.ArchiveShellObject.ArchiveFileStream))
-
-                {
-
-#else
-
-                using var archiveExtractor = new SevenZipExtractor(_archiveItemInfoProvider.ArchiveShellObject.ArchiveFileStream);
-
-#endif
-
                 //try
                 //{
 
@@ -148,7 +139,7 @@ namespace WinCopies.IO
                 //    ? FileType.Link
                 //    : IO.Path.IsSupportedArchiveFormat(System.IO.Path.GetExtension(_path)) ? FileType.Archive : FileType.File, ref archiveFileInfo);
 
-                System.Collections.ObjectModel.ReadOnlyCollection<ArchiveFileInfo> archiveFileData = archiveExtractor.ArchiveFileData;
+
 
                 string fileName;
 
@@ -165,9 +156,7 @@ namespace WinCopies.IO
                 //#endif
 
                 bool addPath(ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct)
-
                 {
-
                     if (Func is object && !Func(archiveFileInfoEnumeratorStruct))
 
                         return false;
@@ -179,31 +168,27 @@ namespace WinCopies.IO
                             return false;
 
                     return true;
-
                 }
 
                 ArchiveFileInfo archiveFileInfo;
 
-                for (int i = _index; i < archiveFileData.Count; i++)
-
+                for (int i = _index; i < _archiveExtractor.ArchiveFileData.Count; i++)
                 {
-                    archiveFileInfo = archiveFileData[i];
+                    archiveFileInfo = _archiveExtractor.ArchiveFileData[i];
 
                     // _path = archiveFileInfo.FileName.Replace('/', IO.Path.PathSeparator);
 
                     if (archiveFileInfo.FileName.StartsWith(relativePath, StringComparison.OrdinalIgnoreCase) && archiveFileInfo.FileName.Length > relativePath.Length)
-
                     {
-
                         fileName = archiveFileInfo.FileName.Substring(relativePath.Length);
 
-                        if (fileName.StartsWith(System.IO.Path.PathSeparator))
+                        if (fileName.StartsWith(WinCopies.IO.Path.PathSeparator))
 
                             fileName = fileName.Substring(1);
 
-                        if (fileName.Contains(System.IO.Path.PathSeparator, StringComparison.OrdinalIgnoreCase))
+                        if (fileName.Contains(WinCopies.IO.Path.PathSeparator, StringComparison.OrdinalIgnoreCase))
 
-                            fileName = fileName.Substring(0, fileName.IndexOf(System.IO.Path.PathSeparator
+                            fileName = fileName.Substring(0, fileName.IndexOf(WinCopies.IO.Path.PathSeparator
 #if !NETFRAMEWORK
                                 , StringComparison.OrdinalIgnoreCase
 #endif
@@ -218,28 +203,21 @@ namespace WinCopies.IO
                         ArchiveFileInfoEnumeratorStruct archiveFileInfoEnumeratorStruct;
 
                         if (fileName.ToUpperInvariant() == archiveFileInfo.FileName.ToUpperInvariant())
-
                         {
-
                             archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(archiveFileInfo);
 
                             addValue = () => AddArchiveFileInfo(archiveFileInfoEnumeratorStruct.ArchiveFileInfo.Value);
-
                         }
 
                         else
-
                         {
-
                             archiveFileInfoEnumeratorStruct = new ArchiveFileInfoEnumeratorStruct(fileName);
 
                             addValue = () => AddPath(archiveFileInfoEnumeratorStruct.Path);
-
                         }
 
                         if (addPath(archiveFileInfoEnumeratorStruct))
                         {
-
                             //if (archiveFileInfo.IsDirectory)
 
                             //    AddDirectory(fileName, archiveFileInfo);
@@ -255,27 +233,21 @@ namespace WinCopies.IO
                             _paths.Enqueue(Current);
 
                             return true;
-
                         }
-
                         // }
-
                     }
-
                 }
 
-#if NETFRAMEWORK
+                //#if NETFRAMEWORK
 
-                        }
+                //                        }
 
-#endif
-
+                //#endif
             }
 
             catch (Exception ex) when (ex.Is(false, typeof(IOException), typeof(SecurityException), typeof(UnauthorizedAccessException), typeof(SevenZipException))) { }
 
             return false;
-
         }
 
         public void Reset()
@@ -288,21 +260,20 @@ namespace WinCopies.IO
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
 
         public void Dispose()
         {
-            if (!disposedValue)
-            {
-                Reset();
+            Reset();
 
-                _archiveItemInfoProvider = null;
+            _archiveItemInfoProvider = null;
 
-                _paths = null;
+            _archiveExtractor.Dispose();
 
-                disposedValue = true;
-            }
+            _archiveExtractor = null;
+
+            _paths = null;
         }
+
         #endregion
 
         //private void Load()
@@ -366,35 +337,26 @@ namespace WinCopies.IO
         // files.Sort(comp);
     }
 
-    public sealed class WMIItemInfoEnumerator : IEnumerator<WMIItemInfo>, IEnumerable<WMIItemInfo>
+    public sealed class WMIItemInfoEnumerator : Enumerator<ManagementBaseObject, WMIItemInfo>
     {
-        private IEnumerator<ManagementBaseObject> _enumerator;
-
         private bool _resetInnerEnumerator = false;
 
-        private WMIItemInfo _current;
-
-        public WMIItemInfo Current { get { if (_disposedValue) throw GetExceptionForDispose(false); return _current; } }
-
-        object IEnumerator.Current => Current;
-
-        private Func<bool> Func { get; }
+        private Func<bool> _func;
 
         public WMIItemType ItemWMIItemType { get; }
 
-        public WMIItemInfoEnumerator(IEnumerable<ManagementBaseObject> enumerator, bool resetEnumerator, WMIItemType itemWMIItemType, bool catchExceptions)
+        public WMIItemInfoEnumerator(IEnumerable<ManagementBaseObject> enumerable, bool resetEnumerator, WMIItemType itemWMIItemType, bool catchExceptions) : base(enumerable)
         {
-            _enumerator = enumerator.GetEnumerator();
-
             _resetInnerEnumerator = resetEnumerator;
 
             ItemWMIItemType = itemWMIItemType;
 
             if (catchExceptions)
 
-                Func = () =>
+                _func = () =>
                   {
-                      while (_enumerator.MoveNext())
+                      while (InnerEnumerator.MoveNext())
+
                           try
                           {
                               _MoveNext();
@@ -408,9 +370,9 @@ namespace WinCopies.IO
 
             else
 
-                Func = () =>
+                _func = () =>
                   {
-                      if (_enumerator.MoveNext())
+                      if (InnerEnumerator.MoveNext())
                       {
                           _MoveNext();
 
@@ -421,44 +383,446 @@ namespace WinCopies.IO
                   };
         }
 
-        public IEnumerator<WMIItemInfo> GetEnumerator() => this;
-
-        private void _MoveNext()
-        {
-            ManagementBaseObject current = _enumerator.Current;
+        private void _MoveNext() =>
 
             // if (CheckFilter(_path))
 
-            _current = new WMIItemInfo(ItemWMIItemType, current);
-        }
+            Current = new WMIItemInfo(ItemWMIItemType, InnerEnumerator.Current);
 
-        public bool MoveNext() => Func();
+        protected override bool MoveNextOverride() => _func();
 
-        public void Reset()
+        protected override void ResetOverride()
         {
-            _current = null;
+            base.ResetOverride();
 
             if (_resetInnerEnumerator)
 
-                _enumerator.Reset();
+                InnerEnumerator.Reset();
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
         #region IDisposable Support
-        private bool _disposedValue = false; // To detect redundant calls
+
+        protected override void Dispose(bool disposing)
+        {
+            Reset();
+
+            base.Dispose(disposing);
+        }
+        #endregion
+    }
+
+    public sealed class FileSystemEntryEnumerator : IEnumerator<IPathInfo>
+    {
+        private IEnumerator<string> _directoryEnumerable;
+        private EmptyCheckEnumerator<string> _fileEnumerable;
+
+        private bool _completed = false;
+
+        private IPathInfo _current;
+
+        public IPathInfo Current => IsDisposed ? throw GetExceptionForDispose(false) : _current;
+
+        object IEnumerator.Current => Current;
+
+#if DEBUG
+        public IPathInfo PathInfo { get; }
+#endif 
+
+        public FileSystemEntryEnumerator(
+#if DEBUG
+            IPathInfo pathInfo,
+#endif 
+            IEnumerable<string> directoryEnumerable, IEnumerable<string> fileEnumerable)
+        {
+#if DEBUG
+            ThrowIfNull(pathInfo, nameof(pathInfo));
+
+            PathInfo = pathInfo;
+#endif
+            ThrowIfNull(directoryEnumerable, nameof(directoryEnumerable));
+            ThrowIfNull(fileEnumerable, nameof(fileEnumerable));
+
+            _directoryEnumerable = directoryEnumerable.GetEnumerator();
+
+            _fileEnumerable = new EmptyCheckEnumerator<string>(fileEnumerable.GetEnumerator());
+        }
+
+        public bool MoveNext()
+        {
+            if (_completed) return false;
+
+            bool enumerateDirectories()
+            {
+                _fileEnumerable = null;
+
+                if (_directoryEnumerable.MoveNext())
+                {
+                    _current = new PathInfo(_directoryEnumerable.Current, true);
+
+                    return true;
+                }
+
+                _directoryEnumerable = null;
+
+                _completed = true;
+
+                return false;
+            }
+
+            if (_fileEnumerable == null || !_fileEnumerable.HasItems)
+
+                return enumerateDirectories();
+
+            if (_fileEnumerable.MoveNext())
+            {
+                _current = new PathInfo(_fileEnumerable.Current, false);
+
+                return true;
+            }
+
+            _fileEnumerable = null;
+
+            return enumerateDirectories();
+        }
+
+        public void Reset() => throw new NotSupportedException();
 
         public void Dispose()
         {
-            if (!_disposedValue)
+            if (_completed)
+
+                _current = null;
+
+            else
             {
-                Reset();
+                if (_directoryEnumerable != null)
+                {
+                    _directoryEnumerable.Dispose();
 
-                _enumerator = null;
+                    _directoryEnumerable = null;
+                }
 
-                _disposedValue = true;
+                if (_fileEnumerable != null)
+                {
+                    _fileEnumerable.Dispose();
+
+                    _fileEnumerable = null;
+                }
+            }
+
+            _current = null;
+
+            IsDisposed = true;
+        }
+
+        public bool IsDisposed { get; private set; }
+    }
+
+#if DEBUG
+
+    public enum PathType
+    {
+        Directories,
+
+        Files
+    }
+
+    public class FileSystemEntryEnumeratorProcessSimulation
+    {
+        private InvalidOperationException GetInvalidOperationException() => new InvalidOperationException("Value cannot be null.");
+
+        private Func<string, PathType, IEnumerable<string>> _enumerateFunc;
+        private Action<string> _writeLogAction;
+
+        public Func<string, PathType, IEnumerable<string>> EnumerateFunc { get => _enumerateFunc ?? throw GetInvalidOperationException(); set => _enumerateFunc = value ?? throw GetInvalidOperationException(); }
+
+        public Action<string> WriteLogAction { get => _writeLogAction ?? throw GetInvalidOperationException(); set => _writeLogAction = value ?? throw GetInvalidOperationException(); }
+    }
+
+#endif
+
+    public sealed class PathInfoFileSystemEntryEnumerator : Enumerator<IPathInfo, IPathInfo>
+    {
+        private Stack<FileSystemEntryEnumerator> _stack = new Stack<FileSystemEntryEnumerator>();
+
+        private Queue<IPathInfo> _directories;
+        private Queue<IPathInfo> _files;
+
+        private bool _firstLaunch = true;
+        private bool _completed = false;
+
+        private readonly Func<string, IEnumerable<string>> _enumerateDirectoriesFunc;
+        private readonly Func<string, IEnumerable<string>> _enumerateFilesFunc;
+
+#if DEBUG
+
+        public FileSystemEntryEnumeratorProcessSimulation SimulationParameters { get; }
+
+#endif
+
+        public PathInfoFileSystemEntryEnumerator(IEnumerable<IPathInfo> paths, string searchPattern, SearchOption? searchOption
+#if NETCORE
+            , System.IO.EnumerationOptions enumerationOptions
+#endif
+#if DEBUG
+            , FileSystemEntryEnumeratorProcessSimulation simulationParameters
+#endif
+            ) : base(paths)
+        {
+#if DEBUG
+            SimulationParameters = simulationParameters;
+#endif
+
+            if (string.IsNullOrEmpty(searchPattern) && searchOption == null
+#if NETCORE
+                     && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (SimulationParameters == null)
+                {
+#endif
+                    _enumerateDirectoriesFunc = _path => System.IO.Directory.EnumerateDirectories(_path);
+
+                    _enumerateFilesFunc = _path => System.IO.Directory.EnumerateFiles(_path);
+#if DEBUG
+                }
+
+                else
+                {
+                    _enumerateDirectoriesFunc = _path => SimulationParameters.EnumerateFunc(_path, PathType.Directories);
+
+                    _enumerateFilesFunc = _path => SimulationParameters.EnumerateFunc(_path, PathType.Files);
+                }
+#endif
+            }
+
+            else if (searchPattern != null && searchOption == null
+#if NETCORE
+                    && enumerationOptions == null
+#endif
+                    )
+            {
+#if DEBUG
+                if (SimulationParameters == null)
+                {
+#endif
+                    _enumerateDirectoriesFunc = _path => System.IO.Directory.EnumerateDirectories(_path, searchPattern);
+
+                    _enumerateFilesFunc = _path => System.IO.Directory.EnumerateFiles(_path, searchPattern);
+#if DEBUG
+                }
+
+                else
+                {
+                    _enumerateDirectoriesFunc = _path => SimulationParameters.EnumerateFunc(_path, PathType.Directories);
+
+                    _enumerateFilesFunc = _path => SimulationParameters.EnumerateFunc(_path, PathType.Files);
+                }
+#endif
+            }
+
+#if NETCORE
+            else if (searchOption == null)
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (SimulationParameters == null)
+                {
+#endif
+                    _enumerateDirectoriesFunc = path => System.IO.Directory.EnumerateDirectories(path, searchPattern, enumerationOptions);
+
+                    _enumerateFilesFunc = path => System.IO.Directory.EnumerateFiles(path, searchPattern, enumerationOptions);
+#if DEBUG
+                }
+
+                else
+                {
+                    _enumerateDirectoriesFunc = _path => SimulationParameters.EnumerateFunc(_path, PathType.Directories);
+
+                    _enumerateFilesFunc = _path => SimulationParameters.EnumerateFunc(_path, PathType.Files);
+                }
+#endif
+            }
+#endif
+
+            else
+            {
+                if (searchPattern == null)
+
+                    searchPattern = "";
+#if DEBUG
+                if (SimulationParameters == null)
+                {
+#endif
+                    _enumerateDirectoriesFunc = _path => System.IO.Directory.EnumerateDirectories(_path, searchPattern, searchOption.Value);
+
+                    _enumerateFilesFunc = _path => System.IO.Directory.EnumerateFiles(_path, searchPattern, searchOption.Value);
+#if DEBUG
+                }
+
+                else
+                {
+                    _enumerateDirectoriesFunc = _path => SimulationParameters.EnumerateFunc(_path, PathType.Directories);
+
+                    _enumerateFilesFunc = _path => SimulationParameters.EnumerateFunc(_path, PathType.Files);
+                }
+#endif
             }
         }
-        #endregion
+
+        protected override bool MoveNextOverride()
+        {
+            if (_completed) return false;
+
+            void _markAsCompleted()
+            {
+                _stack = null;
+
+                _completed = true;
+            }
+
+            bool dequeueDirectory()
+            {
+                FileSystemEntryEnumerator enumerator;
+
+                void push() => _stack.Push(new FileSystemEntryEnumerator(
+#if DEBUG
+                    Current,
+#endif
+                    _enumerateDirectoriesFunc(Current.Path), _enumerateFilesFunc(Current.Path)));
+
+                while (true)
+                {
+                    if (_stack.Count == 0)
+                    {
+                        if (_directories == null)
+                        {
+                            _directories = null;
+
+                            _markAsCompleted();
+
+                            return false;
+                        }
+
+                        Current = _directories.Dequeue();
+
+                        push();
+
+                        if (_directories.Count == 0)
+
+                            _directories = null;
+
+                        return true;
+                    }
+
+                    enumerator = _stack.Peek();
+
+#if DEBUG
+                    SimulationParameters?.WriteLogAction($"Peeked enumerator: {enumerator.PathInfo.Path}");
+#endif
+
+                    if (enumerator.MoveNext())
+                    {
+                        Current = enumerator.Current;
+
+#if DEBUG
+                        SimulationParameters?.WriteLogAction($"Peeked enumerator: {enumerator.PathInfo.Path}; Peeked enumerator current: {enumerator.Current.Path}");
+#endif
+
+                        if (enumerator.Current.IsDirectory)
+
+                            push();
+
+                        return true;
+                    }
+
+#if DEBUG
+                    SimulationParameters?.WriteLogAction($"Peeked enumerator: {enumerator.PathInfo.Path}; Peeked enumerator move next failed.");
+#endif
+
+                    _ = _stack.Pop();
+                }
+            }
+
+            if (_firstLaunch)
+            {
+                _firstLaunch = false;
+
+                _directories = new Queue<IPathInfo>();
+
+                _files = new Queue<IPathInfo>();
+
+                IPathInfo path;
+
+                while (InnerEnumerator.MoveNext())
+                {
+                    path = InnerEnumerator.Current;
+
+                    (path.IsDirectory ? _directories : _files).Enqueue(path);
+                }
+
+                if (_files.Count == 0)
+                {
+                    _files = null;
+
+                    if (_directories.Count == 0)
+                    {
+                        _directories = null;
+
+                        _markAsCompleted();
+
+                        return false;
+                    }
+
+                    _ = dequeueDirectory();
+
+                    return true;
+                }
+
+                if (_directories.Count == 0)
+
+                    _directories = null;
+
+                Current = _files.Dequeue();
+
+                if (_files.Count == 0)
+
+                    _files = null;
+
+                return true;
+            }
+
+            if (_files == null)
+            {
+                if (_directories == null && _stack.Count == 0)
+                {
+                    _markAsCompleted();
+
+                    return false;
+                }
+
+                if (dequeueDirectory())
+
+                    return true;
+
+                _markAsCompleted();
+
+                return false;
+            }
+
+            Current = _files.Dequeue();
+
+            if (_files.Count == 0)
+
+                _files = null;
+
+            return true;
+        }
+
+        protected override void ResetOverride() => throw new NotSupportedException();
     }
 }

@@ -25,7 +25,6 @@ namespace WinCopies.Data
 {
     public class Command
     {
-
         public string Query { get; private set; }
 
         public IDictionary<string, object> Parameters { get; set; }
@@ -33,16 +32,12 @@ namespace WinCopies.Data
         public Command(string query) : this(query, new Dictionary<string, object>()) { }
 
         public Command(string query, IDictionary<string, object> parameters)
-
         {
-
             Init(query);
 
             Parameters = parameters;
-
         }
 
-        private void Init(string query) => Query = IsNullEmptyOrWhiteSpace(query) ? throw new ArgumentException(string.Format(Util .Resources.ExceptionMessages. StringParameterEmptyOrWhiteSpaces, nameof(query))) : query;
-
+        private void Init(string query) => Query = IsNullEmptyOrWhiteSpace(query) ? throw new ArgumentException(string.Format(Util.Resources.ExceptionMessages.StringParameterEmptyOrWhiteSpace, nameof(query))) : query;
     }
 }

@@ -287,57 +287,57 @@ namespace WinCopies.IO
 #endif
         Size other) =>
 #if NETCORE
-            other == null ||
+            other == null ? ValueInBytes.IsNaN ? 0 : 1 : 
 #endif
-            this < other ? -1 : this == other ? 0 : 1;
+            ValueInBytes.CompareTo(other.ValueInBytes);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
         #endif
-        long other) => other < 0 ? 1 : this < other ? -1 : this == other ? 0 : 1;
+        long other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
         #endif
-        int other) => other < 0 ? 1 : this < other ? -1 : this == other ? 0 : 1;
+        int other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
         #endif
-        short other) => other < 0 ? 1 : this < other ? -1 : this == other ? 0 : 1;
+        short other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
         #endif
-        sbyte other) => other < 0 ? 1 : this < other ? -1 : this == other ? 0 : 1;
+        sbyte other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
         #endif
-        ulong other) => this < other ? -1 : this == other ? 0 : 1;
+        ulong other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
         #endif
-        uint other) => this < other ? -1 : this == other ? 0 : 1;
+        uint other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
         #endif
-        ushort other) => this < other ? -1 : this == other ? 0 : 1;
+        ushort other) => ValueInBytes.CompareTo(other);
 
         public int CompareTo(
 #if NETCORE
             [AllowNull]
         #endif
-        byte other) => this < other ? -1 : this == other ? 0 : 1;
+        byte other) => ValueInBytes.CompareTo(other) ; 
 
         #region Size operators
 
@@ -351,7 +351,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns><see langword="true"/> if <paramref name="s1"/> is less than <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
-        public static bool operator <(in Size s1, in Size s2) => s1.Unit < s2.Unit ? true : s1.ValueInBytes < s2.ValueInBytes;
+        public static bool operator <(in Size s1, in Size s2) =>  s1.ValueInBytes < s2.ValueInBytes;
 
         /// <summary>
         /// Checks if <paramref name="s1"/> is greater than <paramref name="s2"/>.
@@ -359,7 +359,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns><see langword="true"/> if <paramref name="s1"/> is greater than <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
-        public static bool operator >(in Size s1, in Size s2) => s1.Unit > s2.Unit ? true : s1.ValueInBytes > s2.ValueInBytes;
+        public static bool operator >(in Size s1, in Size s2) => s1.ValueInBytes > s2.ValueInBytes;
 
         /// <summary>
         /// Checks if <paramref name="s1"/> is less than or equal to <paramref name="s2"/>.
@@ -383,7 +383,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns><see langword="true"/> if <paramref name="s1"/> is equal to <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(in Size s1, in Size s2) => s1.Unit != s2.Unit ? false : s1.ValueInBytes == s2.ValueInBytes;
+        public static bool operator ==(in Size s1, in Size s2) => s1.ValueInBytes == s2.ValueInBytes;
 
         /// <summary>
         /// Checks if <paramref name="s1"/> doesn't equal s2.

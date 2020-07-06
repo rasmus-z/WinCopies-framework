@@ -15,11 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
+using TsudaKageyu;
+
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
@@ -86,7 +90,7 @@ namespace WinCopies.IO
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo"/>s are equal.</returns>
-        public static bool operator ==(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is null ? right is null : left.Equals(right);
+        public static bool operator ==(in FileSystemObjectInfo left, in FileSystemObjectInfo right) => left is null ? right is null : left.Equals(right);
 
         /// <summary>
         /// Checks if two <see cref="FileSystemObjectInfo"/>s are different.
@@ -94,7 +98,7 @@ namespace WinCopies.IO
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the two <see cref="FileSystemObjectInfo"/>s are different.</returns>
-        public static bool operator !=(FileSystemObjectInfo left, FileSystemObjectInfo right) => !(left == right);
+        public static bool operator !=(in FileSystemObjectInfo left, in FileSystemObjectInfo right) => !(left == right);
 
         /// <summary>
         /// Checks if a given <see cref="FileSystemObjectInfo"/> is lesser than an other <see cref="FileSystemObjectInfo"/>.
@@ -102,7 +106,7 @@ namespace WinCopies.IO
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo"/> is lesser than the <see cref="FileSystemObjectInfo"/> to compare with.</returns>
-        public static bool operator <(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is null ? right is object : left.CompareTo(right) < 0;
+        public static bool operator <(in FileSystemObjectInfo left, in FileSystemObjectInfo right) => left is null ? right is object : left.CompareTo(right) < 0;
 
         /// <summary>
         /// Checks if a given <see cref="FileSystemObjectInfo"/> is lesser or equal to an other <see cref="FileSystemObjectInfo"/>.
@@ -110,7 +114,7 @@ namespace WinCopies.IO
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo"/> is lesser or equal to the <see cref="FileSystemObjectInfo"/> to compare with.</returns>
-        public static bool operator <=(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is null || left.CompareTo(right) <= 0;
+        public static bool operator <=(in FileSystemObjectInfo left, in FileSystemObjectInfo right) => left is null || left.CompareTo(right) <= 0;
 
         /// <summary>
         /// Checks if a given <see cref="FileSystemObjectInfo"/> is greater than an other <see cref="FileSystemObjectInfo"/>.
@@ -118,7 +122,7 @@ namespace WinCopies.IO
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo"/> is greater than the <see cref="FileSystemObjectInfo"/> to compare with.</returns>
-        public static bool operator >(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is object && left.CompareTo(right) > 0;
+        public static bool operator >(in FileSystemObjectInfo left, in FileSystemObjectInfo right) => left is object && left.CompareTo(right) > 0;
 
         /// <summary>
         /// Checks if a given <see cref="FileSystemObjectInfo"/> is greater or equal to an other <see cref="FileSystemObjectInfo"/>.
@@ -126,14 +130,48 @@ namespace WinCopies.IO
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObjectInfo"/> is greater or equal to the <see cref="FileSystemObjectInfo"/> to compare with.</returns>
-        public static bool operator >=(FileSystemObjectInfo left, FileSystemObjectInfo right) => left is null ? right is null : left.CompareTo(right) >= 0;
+        public static bool operator >=(in FileSystemObjectInfo left, in FileSystemObjectInfo right) => left is null ? right is null : left.CompareTo(right) >= 0;
 
         /// <summary>
         /// The file type of this <see cref="FileSystemObject"/>.
         /// </summary>
-        public virtual FileType FileType { get; private set; } = FileType.Other;
+        public abstract FileType FileType { get; }
+
+        public static string GetItemTypeName(string extension, FileType fileType) => fileType == FileType.Folder
+                    ? FileOperation.GetFileInfo("", Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
+                    : FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, GetFileInfoOptions.TypeName).TypeName;
+
+        private static Icon TryGetIcon(in int index, in System.Drawing.Size size) => TryGetIcon(index, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, size);
+
+        public static Icon TryGetIcon(in string extension, in FileType fileType, in System.Drawing.Size size) =>
+
+           // if (System.IO.Path.HasExtension(Path))
+
+           fileType == FileType.Folder ? TryGetIcon(3, size) : Microsoft.WindowsAPICodePack.Shell.FileOperation.GetFileInfo(extension, Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Normal, Microsoft.WindowsAPICodePack.Win32Native.Shell.GetFileInfoOptions.Icon | Microsoft.WindowsAPICodePack.Win32Native.Shell.GetFileInfoOptions.UseFileAttributes).Icon?.TryGetIcon(size, 32, true, true) ?? TryGetIcon(0, size);// else// return TryGetIcon(FileType == FileType.Folder ? 3 : 0, "SHELL32.dll", size);
+
+        public Icon TryGetIcon(in int size) => TryGetIcon(System.IO.Path.GetExtension(Path), FileType, new System.Drawing.Size(size, size));
+
+        public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in System.Drawing.Size size)
+
+        {
+
+#if NETFRAMEWORK
+
+            using (Icon icon = TryGetIcon(extension, fileType, size))
+
+#else
+
+            using Icon icon = TryGetIcon(extension, fileType, size);
+
+#endif
+
+            return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+
+        }
+
+        public BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(System.IO.Path.GetExtension(Path), FileType, new System.Drawing.Size(size, size));
 
         // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-        protected FileSystemObjectInfo(string path, FileType fileType) : base(path) => FileType = fileType;
+        protected FileSystemObjectInfo(in string path) : base(path) { }
     }
 }

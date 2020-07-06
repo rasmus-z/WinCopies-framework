@@ -16,7 +16,6 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
 
 namespace WinCopies.IO
 {
@@ -52,16 +51,12 @@ namespace WinCopies.IO
 
     {
 
+        public override FileType FileType { get; }
+
         /// <summary>
         /// The parent <see cref="IShellObjectInfo"/> of the current archive item.
         /// </summary>
         public abstract IShellObjectInfo ArchiveShellObject { get; }
-
-        //    IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
-
-        //    public ArchiveItemInfoProvider(string path, FileType fileType) : this(path, fileType) { }
-
-        //    public ArchiveItemInfoProvider(string path, FileType fileType, ArchiveItemInfoFactory archiveItemInfoFactory) : base(path, fileType, ) { }
 
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="ArchiveItemInfoProvider"/> class.
@@ -69,18 +64,7 @@ namespace WinCopies.IO
         /// <param name="path">The path of this <see cref="ArchiveItemInfoProvider"/>.</param>
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="ArchiveItemInfoProvider"/>.</param>
         /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-        protected ArchiveItemInfoProvider(string path, FileType fileType) : base(path, fileType) { }
-
-        //    protected override void OnDeepClone(BrowsableObjectInfo browsableObjectInfo)
-        //    {
-
-        //        base.OnDeepClone(browsableObjectInfo);
-
-        //        if (ArchiveItemInfoFactory.UseRecursively)
-
-        //            (((ArchiveItemInfoProvider)browsableObjectInfo).ArchiveItemInfoFactory = ArchiveItemInfoFactory.Clone();
-
-        //    }
+        protected ArchiveItemInfoProvider(in string path, in FileType fileType) : base(path) => FileType = fileType;
 
     }
 

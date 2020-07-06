@@ -6,6 +6,8 @@ The WinCopies® software framework
 README
 ======
 
+[![NuGet Badge](https://buildstats.info/nuget/WinCopies.Data)](https://www.nuget.org/packages/WinCopies.Data/)
+
 Updates
 -------
 

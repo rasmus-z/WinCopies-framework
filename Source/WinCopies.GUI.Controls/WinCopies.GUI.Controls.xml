@@ -4,6 +4,21 @@
         <name>WinCopies.GUI.Controls</name>
     </assembly>
     <members>
+        <member name="T:WinCopies.GUI.Controls.HeaderedControl">
+            <summary>
+            Represents a WPF control that can display a header.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.Controls.HeaderedControl.HeaderProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.Controls.HeaderedControl.Header"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.Controls.HeaderedControl.Header">
+            <summary>
+            Gets or sets the header of the control. This is a dependency property.
+            </summary>
+        </member>
         <member name="F:WinCopies.GUI.Controls.Label.RecognizesAccessKeyProperty">
             <summary>
             Identifies the <see cref="P:WinCopies.GUI.Controls.Label.RecognizesAccessKey"/> dependency property.

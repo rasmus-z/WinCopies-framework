@@ -16,7 +16,6 @@
  * along with the WinCopies Framework.If not, see<https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Text;
 using System.Windows.Media.Imaging;
 using static WinCopies.Util.Util;
 using System.Management;
@@ -25,27 +24,16 @@ using System.Windows.Interop;
 using System.Drawing;
 using System.Globalization;
 using WinCopies.Util;
-using System.Security;
-using static WinCopies.IO.WMIItemInfo;
-using static WinCopies.IO.Path;
 using System.Collections.Generic;
-using System.Threading;
 using System.Linq;
 using WinCopies.Linq;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
 
-    //public delegate ManagementObject ManagementObjectDeepClone(ManagementObject managementObject, SecureString password);
-
-    //public delegate ManagementClass ManagementClassDeepClone(ManagementClass managementClass, SecureString password);
-
-    //public delegate ConnectionOptions ConnectionOptionsDeepClone(ConnectionOptions connectionOptions, SecureString password);
-
     public class WMIItemInfo/*<TItems, TFactory>*/ : BrowsableObjectInfo/*<TItems, TFactory>*/, IWMIItemInfo // where TItems : BrowsableObjectInfo<TItems, TFactory>, IWMIItemInfo where TFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
     {
-
-        // public override bool IsRenamingSupported => false;
 
         #region Consts
 
@@ -56,12 +44,6 @@ namespace WinCopies.IO
         public const string ROOT = "ROOT";
 
         #endregion
-
-        //#region Fields
-
-        //private DeepClone<ManagementBaseObject> _managementObjectDelegate;
-
-        //#endregion
 
         #region Properties
 
@@ -297,13 +279,13 @@ namespace WinCopies.IO
 
         {
 
-            string path = System.IO.Path.PathSeparator + managementObject.ClassPath.Server + System.IO.Path.PathSeparator + managementObject.ClassPath.NamespacePath;
+            string path = WinCopies.IO.Path.PathSeparator + managementObject.ClassPath.Server + WinCopies.IO.Path.PathSeparator + managementObject.ClassPath.NamespacePath;
 
             string name = GetName(managementObject, wmiItemType);
 
             if (name != null)
 
-                path += System.IO.Path.PathSeparator + name;
+                path += WinCopies.IO.Path.PathSeparator + name;
 
             path += ":" + managementObject.ClassPath.ClassName;
 
@@ -323,7 +305,7 @@ namespace WinCopies.IO
 
         {
 
-            string path = $"{System.IO.Path.PathSeparator}{System.IO.Path.PathSeparator}{serverName}{System.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(serverRelativePath) ? ROOT : serverRelativePath)}{NamespacePath}";
+            string path = $"{WinCopies.IO.Path.PathSeparator}{WinCopies.IO.Path.PathSeparator}{serverName}{WinCopies.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(serverRelativePath) ? ROOT : serverRelativePath)}{NamespacePath}";
 
             return new WMIItemInfo(path, WMIItemType.Namespace, new ManagementClass(path)/*, managementObject => DefaultManagementClassDeepCloneDelegate((ManagementClass)managementObject, null)*/);
 
@@ -350,32 +332,6 @@ namespace WinCopies.IO
 
         #endregion
 
-        //public new WMIItemInfoFactory Factory { get => (WMIItemInfoFactory)base.Factory; set => base.Factory = value; }
-
-        //protected override BrowsableObjectInfo DeepCloneOverride() => IsRootNode ? new WMIItemInfo() : new WMIItemInfo(Path, WMIItemType, _managementObjectDelegate(ManagementObject), _managementObjectDelegate);
-
-        //    public static WMIItemInfo GetWMIItemInfo(string path, WMIItemType wmiItemType, ConnectionOptions connectionOptions, ObjectGetOptions objectGetOptions) => new WMIItemInfo(path, wmiItemType, new ManagementObject(
-        //    new ManagementScope(
-        //        path,
-        //        connectionOptions is null
-        //            ? null
-        //            : WMIItemInfo.DefaultConnectionOptionsDeepClone(
-        //                connectionOptions, null)),
-        //                new ManagementPath(path),
-        //                objectGetOptions is null
-        //                    ? null
-        //                    : WMIItemInfo.DefaultObjectGetOptionsDeepClone(objectGetOptions)
-        //),
-        //_managementObject => _managementObject is ManagementClass managementClass
-        //    ? WMIItemInfo.DefaultManagementClassDeepCloneDelegate(
-        //        managementClass,
-        //        null)
-        //    : _managementObject is ManagementObject __managementObject
-        //        ? WMIItemInfo.DefaultManagementObjectDeepClone(
-        //            __managementObject,
-        //            null)
-        //        : throw new ArgumentException("The given object must be a ManagementClass or a ManagementObject.", "managementObject"));
-
         private IBrowsableObjectInfo GetParent()
         {
 
@@ -389,7 +345,7 @@ namespace WinCopies.IO
 
                 case WMIItemType.Namespace:
 
-                    path = Path.Substring(0, Path.LastIndexOf(System.IO.Path.PathSeparator)) + NamespacePath;
+                    path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator)) + NamespacePath;
 
                     return path.EndsWith(RootNamespace, true, CultureInfo.InvariantCulture)
                         ? new WMIItemInfo()
@@ -405,7 +361,7 @@ namespace WinCopies.IO
 
                     path = Path.Substring(0, Path.IndexOf(':'));
 
-                    path = path.Substring(0, path.LastIndexOf(System.IO.Path.PathSeparator)) + ':' + path.Substring(path.LastIndexOf(System.IO.Path.PathSeparator) + 1);
+                    path = path.Substring(0, path.LastIndexOf(WinCopies.IO.Path.PathSeparator)) + ':' + path.Substring(path.LastIndexOf(WinCopies.IO.Path.PathSeparator) + 1);
 
                     return new WMIItemInfo(path, WMIItemType.Class, null);
 
@@ -417,24 +373,7 @@ namespace WinCopies.IO
 
         }
 
-        //#pragma warning disable IDE0067 // Dispose objects before losing scope
-        //        public override void LoadItems(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItems(GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation));
-
-        //        public override void LoadItemsAsync(bool workerReportsProgress, bool workerSupportsCancellation) => LoadItemsAsync(GetDefaultWMIItemsLoader(workerReportsProgress, workerSupportsCancellation));
-        //#pragma warning restore IDE0067 // Dispose objects before losing scope
-
-        ///// <summary>
-        ///// Not implemented.
-        ///// </summary>
-        ///// <param name="newValue"></param>
-        //public override void Rename(string newValue) => throw new NotImplementedException();
-
-        ///// <summary>
-        ///// Disposes the current <see cref="WMIItemInfo"/> and its parent and items recursively.
-        ///// </summary>
-        ///// <exception cref="InvalidOperationException">The <see cref="BrowsableObjectInfo.ItemsLoader"/> is busy and does not support cancellation.</exception>
-
-        protected override void Dispose(bool disposing)
+        protected override void Dispose(in bool disposing)
         {
 
             base.Dispose(disposing);
@@ -512,7 +451,6 @@ namespace WinCopies.IO
 
         public IEnumerable<IBrowsableObjectInfo> GetItems(IWMIItemInfoFactory factory, Predicate<ManagementBaseObject> predicate, bool catchExceptionsDuringEnumeration)
         {
-
             // var paths = new ArrayBuilder<PathInfo>();
 
             // string _path;
@@ -524,210 +462,60 @@ namespace WinCopies.IO
 #pragma warning restore IDE0019 // Pattern Matching
 
             if (managementClass == null)
-
             {
-
                 dispose = true;
 
                 // #pragma warning disable IDE0067 // Dispose objects before losing scope
                 managementClass = new ManagementClass(new ManagementScope(Path, factory.Options?.ConnectionOptions), new ManagementPath(Path), factory.Options?.ObjectGetOptions);
                 // #pragma warning restore IDE0067 // Dispose objects before losing scope
-
             }
 
             managementClass.Get();
 
             try
             {
-
                 if (WMIItemType == WMIItemType.Namespace)
-
                 {
-
                     IEnumerable<ManagementBaseObject> namespaces = EnumerateInstances(managementClass, factory);
 
                     IEnumerable<ManagementBaseObject> classes = EnumerateSubClasses(managementClass, factory);
 
                     if (predicate != null)
-
                     {
-
                         if (namespaces != null)
 
-                            namespaces = namespaces.Where(predicate);
+                            namespaces = namespaces.WherePredicate(predicate);
 
                         if (classes != null)
 
-                            classes = classes.Where(predicate);
-
+                            classes = classes.WherePredicate(predicate);
                     }
 
-                    return namespaces == null ? new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration) : classes == null ? new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration) : new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration).AppendValues(new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration));
+                    if (namespaces == null) return new Enumerable<WMIItemInfo>(() => new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration));
 
+                    else if (classes == null) return new Enumerable<WMIItemInfo>(() => new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration));
+
+                    else return new Enumerable<IBrowsableObjectInfo>(() => new WMIItemInfoEnumerator(namespaces, false, WMIItemType.Namespace, catchExceptionsDuringEnumeration)).AppendValues(new Enumerable<IBrowsableObjectInfo>(() => new WMIItemInfoEnumerator(classes, false, WMIItemType.Class, catchExceptionsDuringEnumeration)));
                 }
 
-                #region Old
-
-                // managementClass = Path.ManagementObject as ManagementClass ?? new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path), Path.Factory?.Options?.ObjectGetOptions);
-
-                // if (WMIItemTypes.HasFlag(WMIItemTypes.Namespace))
-
-                //try
-                //{
-
-                //}
-
-                // #pragma warning disable CA1031 // Do not catch general exception types
-                //catch (Exception ex) when (!(ex is ThreadAbortException)) { }
-                // #pragma warning restore CA1031 // Do not catch general exception types
-
-                // if (WMIItemTypes.HasFlag(WMIItemTypes.Class))
-
-                //try
-
-                //{
-
-                // MessageBox.Show(wmiItemInfo.Path.Substring(0, wmiItemInfo.Path.Length - ":__NAMESPACE".Length));
-                // managementClass = new ManagementClass(new ManagementScope(Path.Path, Path.Factory?.Options?.ConnectionOptions), new ManagementPath(Path.Path.Substring(0, Path.Path.Length - ":__NAMESPACE".Length)), Path.Factory?.Options?.ObjectGetOptions);
-
-                //#if DEBUG
-                //                        if (Path.Path.Contains("CIM"))
-
-                //                            MessageBox.Show(instances.Count.ToString());
-                //#endif
-
-                //ManagementBaseObject instance;
-
-                //using (ManagementObjectCollection.ManagementObjectEnumerator instances =
-
-                //{
-
-                //#pragma warning disable CA1031 // Do not catch general exception types
-                //                catch (Exception ex) when (!(ex is ThreadAbortException)) { }
-                //#pragma warning restore CA1031 // Do not catch general exception types
-
-                #endregion
-
-                //}
-
                 else if (WMIItemType == WMIItemType.Class /*&& WMIItemTypes.HasFlag(WMIItemTypes.Instance)*/)
-
                 {
-
                     managementClass.Get();
 
-                    IEnumerable<ManagementBaseObject> items = predicate == null ? EnumerateInstances(managementClass, factory) : EnumerateInstances(managementClass, factory).Where(predicate);
+                    IEnumerable<ManagementBaseObject> items = predicate == null ? EnumerateInstances(managementClass, factory) : EnumerateInstances(managementClass, factory).WherePredicate(predicate);
 
-                    return items == null ? null : new WMIItemInfoEnumerator(items, false, WMIItemType.Instance, catchExceptionsDuringEnumeration);
-
+                    return items == null ? null : new Enumerable<IBrowsableObjectInfo>(() => new WMIItemInfoEnumerator(items, false, WMIItemType.Instance, catchExceptionsDuringEnumeration));
                 }
 
                 return null;
-
-                // if (CheckFilter(_path))
-
-
-
-                //IEnumerable<PathInfo> pathInfos;
-
-
-
-                //if (FileSystemObjectComparer == null)
-
-                //    pathInfos = paths;
-
-                //else
-
-                //{
-
-                //var _paths = paths.ToList();
-
-                //_paths.Sort((IComparer<PathInfo>)FileSystemObjectComparer);
-
-                //pathInfos = _paths;
-
-                //}
-
-
-
-                //PathInfo path_;
-
-
-
-                //using (IEnumerator<PathInfo> _paths = pathInfos.GetEnumerator())
-
-                //    while (_paths.MoveNext())
-
-                //        try
-
-                //        {
-
-                //            do
-
-                //            {
-
-                //                path_ = _paths.Current;
-
-                //                // new_Path.LoadThumbnail();
-
-                //                ReportProgress(0, new BrowsableObjectTreeNode<TItems, TSubItems, TItemsFactory>((TItems)(IWMIItemInfo)Path.Factory.GetBrowsableObjectInfo(path_.Path, path_.WMIItemType, path_.ManagementObject, path_.ManagementObjectDelegate /*managementObject => WMIItemInfo.DefaultManagementObjectDeepClone( (ManagementObject) path_.ManagementObject, null )*/), (TItemsFactory)Path.Factory.DeepClone()));
-
-                //            } while (_paths.MoveNext());
-
-                //        }
-
-                //#pragma warning disable CA1031 // Do not catch general exception types
-                //                    catch (Exception ex) when (!(ex is ThreadAbortException)) { }
-                //#pragma warning restore CA1031 // Do not catch general exception types
-
             }
+
             finally
             {
                 if (dispose)
 
                     managementClass.Dispose();
             }
-
-            //protected class PathInfo : IO.PathInfo
-            //{
-
-            //    /// <summary>
-            //    /// Gets the localized name of this <see cref="PathInfo"/>.
-            //    /// </summary>
-            //    public override string LocalizedName => Name;
-
-            //    /// <summary>
-            //    /// Gets the name of this <see cref="PathInfo"/>.
-            //    /// </summary>
-            //    public override string Name { get; }
-
-            //    public DeepClone<ManagementBaseObject> ManagementObjectDelegate { get; }
-
-            //    public ManagementBaseObject ManagementObject { get; }
-
-            //    public WMIItemType WMIItemType { get; }
-
-            //    public PathInfo(string path, string normalizedPath, string name, WMIItemType wmiItemType, ManagementBaseObject managementObject, DeepClone<ManagementBaseObject> managementObjectDelegate) : base(path, normalizedPath)
-            //    {
-
-            //        Name = name;
-
-            //        ManagementObject = managementObject;
-
-            //        ManagementObjectDelegate = managementObjectDelegate;
-
-            //        WMIItemType = wmiItemType;
-
-            //    }
-
-            //}
-
-            //    }
-
-            //}
-
         }
-
     }
-
 }

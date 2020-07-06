@@ -40,11 +40,6 @@
             Represents an archive item.
             </summary>
         </member>
-        <member name="P:WinCopies.IO.ArchiveItemInfo.LocalizedName">
-            <summary>
-            Gets the localized path of this <see cref="T:WinCopies.IO.ArchiveItemInfo"/>.
-            </summary>
-        </member>
         <member name="P:WinCopies.IO.ArchiveItemInfo.Name">
             <summary>
             Gets the name of this <see cref="T:WinCopies.IO.ArchiveItemInfo"/>.
@@ -85,6 +80,11 @@
             The parent <see cref="T:WinCopies.IO.IShellObjectInfo"/> of the current archive item.
             </summary>
         </member>
+        <member name="P:WinCopies.IO.ArchiveItemInfo.Description">
+            <summary>
+            Not applicable for this item kind.
+            </summary>
+        </member>
         <member name="T:WinCopies.IO.IArchiveItemInfoProvider">
             <summary>
             Provides interoperability for interacting with browsable items.
@@ -105,18 +105,24 @@
             The parent <see cref="T:WinCopies.IO.IShellObjectInfo"/> of the current archive item.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ArchiveItemInfoProvider.#ctor(System.String,WinCopies.IO.FileType)">
+        <member name="M:WinCopies.IO.ArchiveItemInfoProvider.#ctor(System.String@,WinCopies.IO.FileType@)">
             <summary>
             When called from a derived class, initializes a new instance of the <see cref="T:WinCopies.IO.ArchiveItemInfoProvider"/> class.
             </summary>
             <param name="path">The path of this <see cref="T:WinCopies.IO.ArchiveItemInfoProvider"/>.</param>
-            <param name="fileType">The <see cref="T:WinCopies.IO.FileType"/> of this <see cref="T:WinCopies.IO.ArchiveItemInfoProvider"/>.</param>
+            <param name="fileType">The <see cref="P:WinCopies.IO.ArchiveItemInfoProvider.FileType"/> of this <see cref="T:WinCopies.IO.ArchiveItemInfoProvider"/>.</param>
             <exception cref="T:System.InvalidOperationException">The given factory has already been added to a <see cref="T:WinCopies.IO.BrowsableObjectInfo"/>.</exception>
         </member>
         <member name="M:WinCopies.IO.BrowsableObjectInfo.#ctor(System.String)">
             <summary>
             When called from a derived class, initializes a new instance of the <see cref="T:WinCopies.IO.BrowsableObjectInfo"/> class.
             </summary>
+        </member>
+        <member name="M:WinCopies.IO.BrowsableObjectInfo.Dispose(System.Boolean@)">
+            <summary>
+            Not used in this class.
+            </summary>
+            <param name="disposing"></param>
         </member>
         <member name="P:WinCopies.IO.BrowsableObjectInfo.SmallBitmapSource">
             <summary>
@@ -310,7 +316,7 @@
             </summary>
             <returns>The <see cref="P:WinCopies.IO.FileSystemObject.LocalizedName"/> of this <see cref="T:WinCopies.IO.FileSystemObjectInfo"/>.</returns>
         </member>
-        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_Equality(WinCopies.IO.FileSystemObjectInfo,WinCopies.IO.FileSystemObjectInfo)">
+        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_Equality(WinCopies.IO.FileSystemObjectInfo@,WinCopies.IO.FileSystemObjectInfo@)">
             <summary>
             Checks if two <see cref="T:WinCopies.IO.FileSystemObjectInfo"/>s are equal.
             </summary>
@@ -318,7 +324,7 @@
             <param name="right">Right operand.</param>
             <returns>A <see cref="T:System.Boolean"/> value that indicates whether the two <see cref="T:WinCopies.IO.FileSystemObjectInfo"/>s are equal.</returns>
         </member>
-        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_Inequality(WinCopies.IO.FileSystemObjectInfo,WinCopies.IO.FileSystemObjectInfo)">
+        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_Inequality(WinCopies.IO.FileSystemObjectInfo@,WinCopies.IO.FileSystemObjectInfo@)">
             <summary>
             Checks if two <see cref="T:WinCopies.IO.FileSystemObjectInfo"/>s are different.
             </summary>
@@ -326,7 +332,7 @@
             <param name="right">Right operand.</param>
             <returns>A <see cref="T:System.Boolean"/> value that indicates whether the two <see cref="T:WinCopies.IO.FileSystemObjectInfo"/>s are different.</returns>
         </member>
-        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_LessThan(WinCopies.IO.FileSystemObjectInfo,WinCopies.IO.FileSystemObjectInfo)">
+        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_LessThan(WinCopies.IO.FileSystemObjectInfo@,WinCopies.IO.FileSystemObjectInfo@)">
             <summary>
             Checks if a given <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> is lesser than an other <see cref="T:WinCopies.IO.FileSystemObjectInfo"/>.
             </summary>
@@ -334,7 +340,7 @@
             <param name="right">Right operand.</param>
             <returns>A <see cref="T:System.Boolean"/> value that indicates whether the given <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> is lesser than the <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> to compare with.</returns>
         </member>
-        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_LessThanOrEqual(WinCopies.IO.FileSystemObjectInfo,WinCopies.IO.FileSystemObjectInfo)">
+        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_LessThanOrEqual(WinCopies.IO.FileSystemObjectInfo@,WinCopies.IO.FileSystemObjectInfo@)">
             <summary>
             Checks if a given <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> is lesser or equal to an other <see cref="T:WinCopies.IO.FileSystemObjectInfo"/>.
             </summary>
@@ -342,7 +348,7 @@
             <param name="right">Right operand.</param>
             <returns>A <see cref="T:System.Boolean"/> value that indicates whether the given <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> is lesser or equal to the <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> to compare with.</returns>
         </member>
-        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_GreaterThan(WinCopies.IO.FileSystemObjectInfo,WinCopies.IO.FileSystemObjectInfo)">
+        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_GreaterThan(WinCopies.IO.FileSystemObjectInfo@,WinCopies.IO.FileSystemObjectInfo@)">
             <summary>
             Checks if a given <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> is greater than an other <see cref="T:WinCopies.IO.FileSystemObjectInfo"/>.
             </summary>
@@ -350,7 +356,7 @@
             <param name="right">Right operand.</param>
             <returns>A <see cref="T:System.Boolean"/> value that indicates whether the given <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> is greater than the <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> to compare with.</returns>
         </member>
-        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_GreaterThanOrEqual(WinCopies.IO.FileSystemObjectInfo,WinCopies.IO.FileSystemObjectInfo)">
+        <member name="M:WinCopies.IO.FileSystemObjectInfo.op_GreaterThanOrEqual(WinCopies.IO.FileSystemObjectInfo@,WinCopies.IO.FileSystemObjectInfo@)">
             <summary>
             Checks if a given <see cref="T:WinCopies.IO.FileSystemObjectInfo"/> is greater or equal to an other <see cref="T:WinCopies.IO.FileSystemObjectInfo"/>.
             </summary>
@@ -406,41 +412,6 @@
         <member name="F:WinCopies.IO.FileType.Library">
             <summary>
             The item is a library.
-            </summary>
-        </member>
-        <member name="T:WinCopies.IO.FileTypes">
-            <summary>
-            File types to load in the <see cref="T:WinCopies.IO.FolderLoader"/> and <see cref="!:ArchiveLoader&lt;TPath, TItems, TFactory&gt;"/> classes.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.FileTypes.None">
-            <summary>
-            Do not load any item type.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.FileTypes.Folder">
-            <summary>
-            Load folders.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.FileTypes.File">
-            <summary>
-            Load files.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.FileTypes.Drive">
-            <summary>
-            Load drives.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.FileTypes.Link">
-            <summary>
-            Load links.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.FileTypes.Archive">
-            <summary>
-            Load archives.
             </summary>
         </member>
         <member name="T:WinCopies.IO.IBrowsableObjectInfo">

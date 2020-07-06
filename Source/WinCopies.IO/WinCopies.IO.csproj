@@ -10,7 +10,7 @@
     <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
-  <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />
+  <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />  
 
   <!--<ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
     --><!--<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />--><!--
@@ -38,7 +38,12 @@
     <PackageReference Include="WinCopies.IconLib" Version="0.75-rc" />
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.0-preview6" />
-    <PackageReference Include="WinCopies.Util" Version="2.3.0-preview5" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="2.0.0-preview6" />
+    <PackageReference Include="WinCopies.Util" Version="2.5.8-preview" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinCopies.Util\WinCopies.Util.Temp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

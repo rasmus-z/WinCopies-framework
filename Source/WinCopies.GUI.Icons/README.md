@@ -6,6 +6,8 @@ The WinCopies® software framework
 README
 ======
 
+[![NuGet Badge](https://buildstats.info/nuget/WinCopies.GUI.Icons)](https://www.nuget.org/packages/WinCopies.GUI.Icons/)
+
 Updates
 -------
 

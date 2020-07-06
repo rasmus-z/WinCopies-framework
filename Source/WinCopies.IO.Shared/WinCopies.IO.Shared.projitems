@@ -10,16 +10,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumerators.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfoProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectTreeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)File.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileInfoLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FolderLoader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FolderLoaderFileSystemWatcher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IBrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFileSystemObject.cs" />
@@ -30,16 +31,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)IWMIItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Old.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Path.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PortableDeviceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PortableDeviceItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Registry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RegistryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RegistryItemInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RegistryItemInfoComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Size.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SpecialFolder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemType.cs" />
   </ItemGroup>

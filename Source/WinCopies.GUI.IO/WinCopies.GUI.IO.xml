@@ -56,5 +56,266 @@
             Identifies the <see cref="P:WinCopies.GUI.IO.ExplorerControlListViewItemContent.HasTransparency"/> dependency property.
             </summary>
         </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.None">
+            <summary>
+            No error occurred.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.UnknownError">
+            <summary>
+            An unknown error occurred.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.AbortedByUser">
+            <summary>
+            The process was aborted by user.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.PathNotFound">
+            <summary>
+            One part or all of the source or destination path was not found.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.DriveNotReady">
+            <summary>
+            The source or destination drive is not ready.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.ReadProtection">
+            <summary>
+            The source path is read-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.DestinationReadProtection">
+            <summary>
+            The destination path is read-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.WriteProtection">
+            <summary>
+            The destination path is write-protected.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.AccessDenied">
+            <summary>
+            The source or destination path cannot be accessed.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.PathTooLong">
+            <summary>
+            The destination path is too long.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.NotEnoughSpace">
+            <summary>
+            The destination disk has not enough space.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.FileSystemEntryAlreadyExists">
+            <summary>
+            A file or folder already exists with the same name.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.FolderAlreadyExists">
+            <summary>
+            A folder already exists with the same name.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.FileRenamingFailed">
+            <summary>
+            The file could not be renamed.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.SourceAndDestPathAreEqual">
+            <summary>
+            The source and destination relative paths are equal.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.DestPathIsASubPath">
+            <summary>
+            The destination path is a sub-path of the source path.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessError.DiskError">
+            <summary>
+            An unknown disk error occurred.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.BackgroundWorker">
+            <summary>
+            Gets the inner background worker.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.InitialItemSize">
+            <summary>
+            Gets or sets (protected) the initial total item size.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.InitialItemCount">
+            <summary>
+            Gets or sets (protected) the initial total item count.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.Paths">
+            <summary>
+            Gets the paths that have been loaded.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.Completed">
+            <summary>
+            Gets a value that indicates whether the process has completed.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.SourcePath">
+            <summary>
+            Gets the source root path.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ArePathsLoaded">
+            <summary>
+            Gets a value that indicates whether all the paths and subpaths are loaded.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.WorkerSupportsCancellation">
+            <summary>
+            Gets or sets a value that indicates whether the process supports cancellation.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.WorkerReportsProgress">
+            <summary>
+            Gets or sets a value that indicates whether the process reports progress.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.IsBusy">
+            <summary>
+            Gets a value that indicates whether the process is busy.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.CancellationPending">
+            <summary>
+            Gets a value that indicates whether a cancellation is pending.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.WorkerSupportsPausing">
+            <summary>
+            Gets or sets a value that indicates whether the process supports pausing.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.PausePending">
+            <summary>
+            Gets a value that indicates whether a pause is pending.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.Error">
+            <summary>
+            Gets the global process error, if any.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.CurrentPath">
+            <summary>
+            Gets the current processed <see cref="T:WinCopies.GUI.IO.IPathInfo"/>.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProgressPercentage">
+            <summary>
+            Gets the progress percentage of the current process.
+            </summary>
+        </member>
+        <member name="M:WinCopies.GUI.IO.Process.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WinCopies.GUI.IO.Process"/> class.
+            </summary>
+            <param name="sourcePath">The source root path of the process.</param>
+        </member>
+        <member name="P:WinCopies.GUI.IO.CopyProcess.DestPath">
+            <summary>
+            Gets the destination root path.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.CopyProcess.AutoRenameFiles">
+            <summary>
+            Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
+            </summary>
+        </member>
+        <member name="T:WinCopies.GUI.IO.ProcessControl">
+            <summary>
+            Represents an I/O process control.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.SourcePathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.SourcePath"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.SourcePath">
+            <summary>
+            Gets or sets the source path.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.ArePathsLoadedProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.ArePathsLoaded"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.ArePathsLoaded">
+            <summary>
+            Gets or sets a value that indicates whether the paths of the associated process are loaded.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.InitialItemSizeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.InitialItemSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.InitialItemSize">
+            <summary>
+            Gets or sets the initial item size.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.InitialItemCountProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.InitialItemCount"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.InitialItemCount">
+            <summary>
+            Gets or sets the initial item count.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.RemainingItemSizeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.RemainingItemSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.RemainingItemSize">
+            <summary>
+            Gets or sets the Remaining item size.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.RemainingItemCountProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.RemainingItemCount"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.RemainingItemCount">
+            <summary>
+            Gets or sets the Remaining item count.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.CurrentPathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.CurrentPath"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.ProgressPercentageProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.ProgressPercentage"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.CurrentPathProgressPercentageProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.CurrentPathProgressPercentage"/> dependency property.
+            </summary>
+        </member>
     </members>
 </doc>

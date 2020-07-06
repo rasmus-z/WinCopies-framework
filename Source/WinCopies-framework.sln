@@ -54,6 +54,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B43D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Samples", "..\Samples\WinCopies.GUI.Samples\WinCopies.GUI.Samples.csproj", "{4CAFBD2F-AB7A-4401-A099-5720D7796A3D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Util.Temp", "WinCopies.Util\WinCopies.Util.Temp.csproj", "{AFB0D464-844B-4797-8539-35113326BE32}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{04e726ca-5f9e-4633-978a-9c536b20f565}*SharedItemsImports = 5
@@ -170,6 +172,14 @@ Global
 		{4CAFBD2F-AB7A-4401-A099-5720D7796A3D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4CAFBD2F-AB7A-4401-A099-5720D7796A3D}.Release|x64.ActiveCfg = Release|Any CPU
 		{4CAFBD2F-AB7A-4401-A099-5720D7796A3D}.Release|x64.Build.0 = Release|Any CPU
+		{AFB0D464-844B-4797-8539-35113326BE32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFB0D464-844B-4797-8539-35113326BE32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFB0D464-844B-4797-8539-35113326BE32}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AFB0D464-844B-4797-8539-35113326BE32}.Debug|x64.Build.0 = Debug|Any CPU
+		{AFB0D464-844B-4797-8539-35113326BE32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFB0D464-844B-4797-8539-35113326BE32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFB0D464-844B-4797-8539-35113326BE32}.Release|x64.ActiveCfg = Release|Any CPU
+		{AFB0D464-844B-4797-8539-35113326BE32}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
