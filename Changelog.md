@@ -9,11 +9,11 @@ CHANGELOG
 Updates
 -------
 
-07/06/2020 2.5.8-preview
-========================
+07/06/2020 2.5.8-preview1
+=========================
 
-WinCopies.IO 2.5.8-preview
---------------------------
+WinCopies.IO 2.5.8-preview1
+---------------------------
 
 - Existing item changes:
 	- LocalizedName and Description properties return N/A for ArchiveItemInfo
