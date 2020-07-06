@@ -32,6 +32,7 @@ using System.Linq;
 using SevenZip;
 using WinCopies.Linq;
 using Microsoft.WindowsAPICodePack.PortableDevices;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {

@@ -21,15 +21,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WinCopies.Data
 {
     public class Connection
     {
-
         private readonly DbProviderFactory _factory;
 
         private readonly string _connectionString;
@@ -37,13 +33,10 @@ namespace WinCopies.Data
 #if NETSTANDARD
 
         public Connection(string connectionString, DbProviderFactory factory)
-
         {
-
             _factory = factory;
 
             _connectionString = connectionString;
-
         }
 
 #else

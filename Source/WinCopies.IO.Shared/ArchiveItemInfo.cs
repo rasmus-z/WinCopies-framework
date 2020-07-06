@@ -27,6 +27,7 @@ using IfComp = WinCopies.Util.Util.Comparison;
 using System.Linq;
 using System.Collections.Generic;
 using WinCopies.Util;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {

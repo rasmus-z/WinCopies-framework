@@ -17,6 +17,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
@@ -47,7 +48,7 @@ namespace WinCopies.IO
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters
 #endif
-            ) => new WinCopies.Util.Enumerable<IPathInfo>(() => new PathInfoFileSystemEntryEnumerator(paths, searchPattern, searchOption
+            ) => new Enumerable<IPathInfo>(() => new PathInfoFileSystemEntryEnumerator(paths, searchPattern, searchOption
 #if NETCORE
                 , enumerationOptions
 #endif

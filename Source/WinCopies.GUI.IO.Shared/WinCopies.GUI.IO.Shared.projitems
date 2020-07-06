@@ -31,5 +31,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Process.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProcessControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProcessQueueCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
   </ItemGroup>
 </Project>

@@ -4407,21 +4407,21 @@
 //    //        /// <summary>
 //    //        /// Notifies of the progress.
 //    //        /// </summary>
-//    //        /// <param name="percentProgress">
+//    //        /// <param name="ProgressPercentage">
 //    //        /// Progress percentage.
 //    //        /// </param>
-//    //        public void ReportProgress(int percentProgress) => backgroundWorker.ReportProgress(percentProgress);
+//    //        public void ReportProgress(int ProgressPercentage) => backgroundWorker.ReportProgress(ProgressPercentage);
 
 //    //        /// <summary>
 //    //        /// Notifies of the progress.
 //    //        /// </summary>
-//    //        /// <param name="percentProgress">
+//    //        /// <param name="ProgressPercentage">
 //    //        /// Progress percentage.
 //    //        /// </param>
 //    //        /// <param name="userState">
 //    //        /// User object.
 //    //        /// </param>
-//    //        public void ReportProgress(int percentProgress, object userState) => backgroundWorker.ReportProgress(percentProgress, userState);
+//    //        public void ReportProgress(int ProgressPercentage, object userState) => backgroundWorker.ReportProgress(ProgressPercentage, userState);
 
 //    //        public static FileTypes FileTypeToFileTypeFlags(FileType fileType)
 

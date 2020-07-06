@@ -39,7 +39,7 @@
     <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.231" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.0.0-preview6" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.PortableDevices" Version="2.0.0-preview6" />
-    <PackageReference Include="WinCopies.Util" Version="2.5.7-preview" />
+    <PackageReference Include="WinCopies.Util" Version="2.5.8-preview" />
   </ItemGroup>
 
   <ItemGroup>

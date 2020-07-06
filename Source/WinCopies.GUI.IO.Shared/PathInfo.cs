@@ -37,7 +37,7 @@ namespace WinCopies.GUI.IO
 
         public Size? Size { get; }
 
-        public bool IsDirectory => Size.HasValue;
+        public bool IsDirectory => !Size.HasValue;
 
         public PathInfo(string path, Size? size)
         {

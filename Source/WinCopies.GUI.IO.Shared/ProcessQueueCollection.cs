@@ -23,7 +23,7 @@ namespace WinCopies.GUI.IO
 {
     public sealed class ProcessQueueCollection : ReadOnlyObservableQueueCollection<IPathInfo>
     {
-        private Size _size;
+        private Size _size = new Size(0ul);
 
         public Size Size { get => _size; private set { _size = value; RaisePropertyChangedEvent(nameof(Size)); } }
 

@@ -1,13 +1,10 @@
-﻿using Microsoft.WindowsAPICodePack.PortableDevices.EventSystem;
-using SevenZip;
+﻿using SevenZip;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Management;
 using System.Security;
-using System.Text;
 using WinCopies.Collections;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
@@ -572,7 +569,9 @@ namespace WinCopies.IO
 #endif
             ) : base(paths)
         {
+#if DEBUG
             SimulationParameters = simulationParameters;
+#endif
 
             if (string.IsNullOrEmpty(searchPattern) && searchOption == null
 #if NETCORE
@@ -693,7 +692,7 @@ namespace WinCopies.IO
                 void push() => _stack.Push(new FileSystemEntryEnumerator(
 #if DEBUG
                     Current,
-#endif 
+#endif
                     _enumerateDirectoriesFunc(Current.Path), _enumerateFilesFunc(Current.Path)));
 
                 while (true)
@@ -724,7 +723,7 @@ namespace WinCopies.IO
 
 #if DEBUG
                     SimulationParameters?.WriteLogAction($"Peeked enumerator: {enumerator.PathInfo.Path}");
-#endif 
+#endif
 
                     if (enumerator.MoveNext())
                     {
@@ -732,7 +731,7 @@ namespace WinCopies.IO
 
 #if DEBUG
                         SimulationParameters?.WriteLogAction($"Peeked enumerator: {enumerator.PathInfo.Path}; Peeked enumerator current: {enumerator.Current.Path}");
-#endif 
+#endif
 
                         if (enumerator.Current.IsDirectory)
 
@@ -743,7 +742,7 @@ namespace WinCopies.IO
 
 #if DEBUG
                     SimulationParameters?.WriteLogAction($"Peeked enumerator: {enumerator.PathInfo.Path}; Peeked enumerator move next failed.");
-#endif 
+#endif
 
                     _ = _stack.Pop();
                 }

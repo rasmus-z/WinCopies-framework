@@ -146,7 +146,7 @@
             Gets the inner background worker.
             </summary>
         </member>
-        <member name="P:WinCopies.GUI.IO.Process.InitialSize">
+        <member name="P:WinCopies.GUI.IO.Process.InitialItemSize">
             <summary>
             Gets or sets (protected) the initial total item size.
             </summary>
@@ -216,6 +216,11 @@
             Gets the current processed <see cref="T:WinCopies.GUI.IO.IPathInfo"/>.
             </summary>
         </member>
+        <member name="P:WinCopies.GUI.IO.Process.ProgressPercentage">
+            <summary>
+            Gets the progress percentage of the current process.
+            </summary>
+        </member>
         <member name="M:WinCopies.GUI.IO.Process.#ctor(System.String)">
             <summary>
             Initializes a new instance of the <see cref="T:WinCopies.GUI.IO.Process"/> class.
@@ -275,6 +280,41 @@
         <member name="P:WinCopies.GUI.IO.ProcessControl.InitialItemCount">
             <summary>
             Gets or sets the initial item count.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.RemainingItemSizeProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.RemainingItemSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.RemainingItemSize">
+            <summary>
+            Gets or sets the Remaining item size.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.RemainingItemCountProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.RemainingItemCount"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:WinCopies.GUI.IO.ProcessControl.RemainingItemCount">
+            <summary>
+            Gets or sets the Remaining item count.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.CurrentPathProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.CurrentPath"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.ProgressPercentageProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.ProgressPercentage"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:WinCopies.GUI.IO.ProcessControl.CurrentPathProgressPercentageProperty">
+            <summary>
+            Identifies the <see cref="P:WinCopies.GUI.IO.ProcessControl.CurrentPathProgressPercentage"/> dependency property.
             </summary>
         </member>
     </members>

@@ -47,7 +47,7 @@ namespace WinCopies.GUI.IO
 
         public PathCollection(string path, IList<WinCopies.IO.IPathInfo> list)
         {
-            Path = path == null ? string.Empty : path .Length==0 ? string.Empty :     System.IO.Path.IsPathRooted(path)? path:throw new ArgumentException($"{nameof(path)} must be null, empty or rooted.")    ;        
+            Path = path == null ? string.Empty : path.Length == 0 ? string.Empty : System.IO.Path.IsPathRooted(path) ? path : throw new ArgumentException($"{nameof(path)} must be null, empty or rooted.");
 
             foreach (WinCopies.IO.IPathInfo _path in list)
 
@@ -58,7 +58,7 @@ namespace WinCopies.GUI.IO
 
         private void ValidatePath(WinCopies.IO.IPathInfo item)
         {
-            if ( (  Path.Length>1&& System.IO.Path.IsPathRooted(item.Path))|| (Path.Length == 0 && !System.IO.Path.IsPathRooted(item.Path)))
+            if ((Path.Length > 1 && System.IO.Path.IsPathRooted(item.Path)) || (Path.Length == 0 && !System.IO.Path.IsPathRooted(item.Path)))
 
                 throw new ArgumentException("The path to add must be relative.");
         }
@@ -93,9 +93,10 @@ namespace WinCopies.GUI.IO
 
         public void RemoveAt(int index) => _list.RemoveAt(index);
 
-        public class PathCollectionEnumerator : WinCopies.Util. Enumerator<WinCopies.IO.IPathInfo, WinCopies.IO.IPathInfo>
+        public class PathCollectionEnumerator : WinCopies.Collections.Enumerator<WinCopies.IO.IPathInfo, WinCopies.IO.IPathInfo>
         {
             private PathCollection _pathCollection;
+            private bool _completed = false;
 
             public PathCollectionEnumerator(PathCollection pathCollection) : base((pathCollection ?? throw GetArgumentNullException(nameof(pathCollection)))._list) => _pathCollection = pathCollection;
 
@@ -108,12 +109,25 @@ namespace WinCopies.GUI.IO
 
             protected override bool MoveNextOverride()
             {
+                if (_completed) return false;
+
+                if (_pathCollection.Count == 0)
+                {
+                    Current = new WinCopies.IO.PathInfo(_pathCollection.Path, System.IO.Directory.Exists(_pathCollection.Path));
+
+                    _completed = true;
+
+                    return true;
+                }
+
                 if (InnerEnumerator.MoveNext())
                 {
                     Current = new WinCopies.IO.PathInfo($"{_pathCollection.Path}{WinCopies.IO.Path.PathSeparator}{InnerEnumerator.Current.Path}", InnerEnumerator.Current.IsDirectory);
 
                     return true;
                 }
+
+                _completed = true;
 
                 return false;
             }

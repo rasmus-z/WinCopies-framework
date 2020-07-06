@@ -18,11 +18,7 @@
  * Authors: Khun Ly, Pierre Sprimont */
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WinCopies.Data
 {
@@ -36,7 +32,6 @@ namespace WinCopies.Data
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class ReaderToEntityMapperAttribute : Attribute
     {
-
         public IValueConverter Converter { get; set; }
 
         public object ConverterParameter { get; set; }
@@ -46,6 +41,5 @@ namespace WinCopies.Data
         public string TableFieldName { get; }
 
         public ReaderToEntityMapperAttribute(string tableFieldName) => TableFieldName = tableFieldName;
-
     }
 }

@@ -1,502 +1,502 @@
-﻿/* Copyright © Pierre Sprimont, 2020
- *
- * This file is part of the WinCopies Framework.
- *
- * The WinCopies Framework is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * The WinCopies Framework is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+﻿///* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-#if DEBUG
+//#if DEBUG
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Text;
-using static WinCopies.Util.Util;
+//using System;
+//using System.Collections;
+//using System.Collections.Generic;
+//using System.ComponentModel;
+//using System.Diagnostics;
+//using System.Text;
+//using static WinCopies.Util.Util;
 
-namespace WinCopies.Util
-{
-    public static class Temp
-    {
-        public static IEnumerable<string> GetEmptyEnumerable() => new Enumerable<string>(() => new EmptyEnumerator<string>());
+//namespace WinCopies.Util
+//{
+//    public static class Temp
+//    {
+//        // public static IEnumerable<T> GetEmptyEnumerable<T>() => new Enumerable<T>(() => new EmptyEnumerator<T>());
 
-        // todo: replace with WinCopies.Util's implementation.
+//        // todo: replace with WinCopies.Util's implementation.
 
-        private static void Split(string s, in bool skipEmptyValues, in StringBuilder stringBuilder, in Action<string> action, params char[] separators)
-        {
-            ThrowIfNull(s, nameof(s));
-            ThrowIfNull(stringBuilder, nameof(stringBuilder));
-            ThrowIfNull(separators, nameof(separators));
+//        //private static void Split(string s, in bool skipEmptyValues, in StringBuilder stringBuilder, in Action<string> action, params char[] separators)
+//        //{
+//        //    ThrowIfNull(s, nameof(s));
+//        //    ThrowIfNull(stringBuilder, nameof(stringBuilder));
+//        //    ThrowIfNull(separators, nameof(separators));
 
-            if (separators.Length == 0)
+//        //    if (separators.Length == 0)
 
-                throw new ArgumentException($"{nameof(separators)} does not contain values.");
+//        //        throw new ArgumentException($"{nameof(separators)} does not contain values.");
 
-            Debug.Assert(action != null, $"{nameof(action)} must be not null.");
+//        //    Debug.Assert(action != null, $"{nameof(action)} must be not null.");
 
-            Predicate<char> getPredicate()
-            {
-                Predicate<char> predicate;
+//        //    Predicate<char> getPredicate()
+//        //    {
+//        //        Predicate<char> predicate;
 
-                if (separators.Length == 1)
+//        //        if (separators.Length == 1)
 
-                    predicate = __c => __c == separators[0];
+//        //            predicate = __c => __c == separators[0];
 
-                else
+//        //        else
 
-                    predicate = __c => separators.Contains(__c);
+//        //            predicate = __c => separators.Contains(__c);
 
-                return predicate;
-            }
+//        //        return predicate;
+//        //    }
 
-            if (skipEmptyValues)
+//        //    if (skipEmptyValues)
 
-                if (s.Length == 0)
+//        //        if (s.Length == 0)
 
-                    return;
+//        //            return;
 
-                else if (s.Length == 1)
+//        //        else if (s.Length == 1)
 
-                    if ((separators.Length == 1 && s[0] == separators[0]) || separators.Contains(s[0]))
+//        //            if ((separators.Length == 1 && s[0] == separators[0]) || separators.Contains(s[0]))
 
-                        return;
+//        //                return;
 
-                    else
+//        //            else
 
-                        action(s);
+//        //                action(s);
 
-                else
-                {
-                    Predicate<char> predicate = getPredicate();
+//        //        else
+//        //        {
+//        //            Predicate<char> predicate = getPredicate();
 
-                    foreach (char _c in s)
+//        //            foreach (char _c in s)
 
-                        if (predicate(_c) && stringBuilder.Length > 0)
-                        {
-                            action(stringBuilder.ToString());
+//        //                if (predicate(_c) && stringBuilder.Length > 0)
+//        //                {
+//        //                    action(stringBuilder.ToString());
 
-                            _ = stringBuilder.Clear();
-                        }
+//        //                    _ = stringBuilder.Clear();
+//        //                }
 
-                        else
+//        //                else
 
-                            _ = stringBuilder.Append(_c);
+//        //                    _ = stringBuilder.Append(_c);
 
-                    if (stringBuilder.Length > 0)
+//        //            if (stringBuilder.Length > 0)
 
-                        action(stringBuilder.ToString());
-                }
+//        //                action(stringBuilder.ToString());
+//        //        }
 
-            else if (s.Length == 0)
+//        //    else if (s.Length == 0)
 
-                action("");
+//        //        action("");
 
-            else if (s.Length == 1)
+//        //    else if (s.Length == 1)
 
-                if ((separators.Length == 1 && s[0] == separators[0]) || separators.Contains(s[0]))
-                {
-                    action("");
+//        //        if ((separators.Length == 1 && s[0] == separators[0]) || separators.Contains(s[0]))
+//        //        {
+//        //            action("");
 
-                    action("");
-                }
+//        //            action("");
+//        //        }
 
-                else
+//        //        else
 
-                    action(s);
+//        //            action(s);
 
-            else
-            {
-                Predicate<char> predicate = getPredicate();
+//        //    else
+//        //    {
+//        //        Predicate<char> predicate = getPredicate();
 
-                foreach (char _c in s)
+//        //        foreach (char _c in s)
 
-                    if (predicate(_c))
+//        //            if (predicate(_c))
 
-                        if (stringBuilder.Length == 0)
+//        //                if (stringBuilder.Length == 0)
 
-                            action("");
+//        //                    action("");
 
-                        else
-                        {
-                            action(stringBuilder.ToString());
+//        //                else
+//        //                {
+//        //                    action(stringBuilder.ToString());
 
-                            _ = stringBuilder.Clear();
-                        }
+//        //                    _ = stringBuilder.Clear();
+//        //                }
 
-                    else
+//        //            else
 
-                        _ = stringBuilder.Append(_c);
+//        //                _ = stringBuilder.Append(_c);
 
-                if (stringBuilder.Length > 0)
+//        //        if (stringBuilder.Length > 0)
 
-                    action(stringBuilder.ToString());
-            }
-        }
+//        //            action(stringBuilder.ToString());
+//        //    }
+//        ////}
 
-        public static Queue<string> SplitToQueue(string s, in bool skipEmptyValues, params char[] separators)
-        {
-            var queue = new Queue<string>();
+//        //public static Queue<string> SplitToQueue(string s, in bool skipEmptyValues, params char[] separators)
+//        //{
+//        //    var queue = new Queue<string>();
 
-            SplitToQueue(s, skipEmptyValues, new StringBuilder(), queue, separators);
+//        //    SplitToQueue(s, skipEmptyValues, new StringBuilder(), queue, separators);
 
-            return queue;
-        }
+//        //    return queue;
+//        //}
 
-        public static void SplitToQueue(string s, in bool skipEmptyValues, in StringBuilder stringBuilder, Queue<string> queue, params char[] separators)
-        {
-            ThrowIfNull(queue, nameof(queue));
+//        //public static void SplitToQueue(string s, in bool skipEmptyValues, in StringBuilder stringBuilder, Queue<string> queue, params char[] separators)
+//        //{
+//        //    ThrowIfNull(queue, nameof(queue));
 
-            Split(s, skipEmptyValues, stringBuilder, _s => queue.Enqueue(_s), separators);
-        }
-    }
+//        //    Split(s, skipEmptyValues, stringBuilder, _s => queue.Enqueue(_s), separators);
+//        //}
+//    }
 
-    public sealed class EmptyCheckEnumerator<T> : IEnumerator<T>, WinCopies.Util.DotNetFix.IDisposable
-    {
-        #region Fields
-        private IEnumerator<T> _enumerator;
-        private Func<bool> _moveNext;
-        private bool? _hasItems = null;
-        private Func<T> _current;
-        #endregion
+//    //public sealed class EmptyCheckEnumerator<T> : IEnumerator<T>, WinCopies.Util.DotNetFix.IDisposable
+//    //{
+//    //    #region Fields
+//    //    private IEnumerator<T> _enumerator;
+//    //    private Func<bool> _moveNext;
+//    //    private bool? _hasItems = null;
+//    //    private Func<T> _current;
+//    //    #endregion
 
-        #region Properties
-        public bool IsDisposed { get; private set; }
+//    //    #region Properties
+//    //    public bool IsDisposed { get; private set; }
 
-        public bool HasItems
-        {
-            get
-            {
-                ThrowIfDisposed();
+//    //    public bool HasItems
+//    //    {
+//    //        get
+//    //        {
+//    //            ThrowIfDisposed();
 
-                if (!_hasItems.HasValue)
+//    //            if (!_hasItems.HasValue)
 
-                    _hasItems = _enumerator.MoveNext();
+//    //                _hasItems = _enumerator.MoveNext();
 
-                return _hasItems.Value;
-            }
-        }
+//    //            return _hasItems.Value;
+//    //        }
+//    //    }
 
-        public T Current
-        {
-            get
-            {
-                ThrowIfDisposed();
+//    //    public T Current
+//    //    {
+//    //        get
+//    //        {
+//    //            ThrowIfDisposed();
 
-                return _current();
-            }
-        }
-        #endregion
+//    //            return _current();
+//    //        }
+//    //    }
+//    //    #endregion
 
-        public EmptyCheckEnumerator(IEnumerator<T> enumerator)
-        {
-            _enumerator = enumerator;
+//    //    public EmptyCheckEnumerator(IEnumerator<T> enumerator)
+//    //    {
+//    //        _enumerator = enumerator;
 
-            ResetMoveNext();
-        }
+//    //        ResetMoveNext();
+//    //    }
 
-        #region Methods
-        private void ResetCurrent() => _current = () => throw new InvalidOperationException("The enumeration has not been started or has completed.");
+//    //    #region Methods
+//    //    private void ResetCurrent() => _current = () => throw new InvalidOperationException("The enumeration has not been started or has completed.");
 
-        private void ResetMoveNext()
-        {
-            ResetCurrent();
+//    //    private void ResetMoveNext()
+//    //    {
+//    //        ResetCurrent();
 
-            void resetMoveNext()
-            {
-                _moveNext = () => false;
+//    //        void resetMoveNext()
+//    //        {
+//    //            _moveNext = () => false;
 
-                ResetCurrent();
-            }
+//    //            ResetCurrent();
+//    //        }
 
-            bool enumerate()
-            {
-                if (_enumerator.MoveNext())
+//    //        bool enumerate()
+//    //        {
+//    //            if (_enumerator.MoveNext())
 
-                    return true;
+//    //                return true;
 
-                resetMoveNext();
+//    //            resetMoveNext();
 
-                return false;
-            }
+//    //            return false;
+//    //        }
 
-            _moveNext = () =>
-            {
-                if (_hasItems.HasValue)
-                {
-                    if (_hasItems.Value)
-                    {
-                        _current = () => _enumerator.Current;
+//    //        _moveNext = () =>
+//    //        {
+//    //            if (_hasItems.HasValue)
+//    //            {
+//    //                if (_hasItems.Value)
+//    //                {
+//    //                    _current = () => _enumerator.Current;
 
-                        _moveNext = enumerate;
+//    //                    _moveNext = enumerate;
 
-                        return true;
-                    }
+//    //                    return true;
+//    //                }
 
-                    else
-                    {
-                        resetMoveNext();
+//    //                else
+//    //                {
+//    //                    resetMoveNext();
 
-                        return false;
-                    }
-                }
+//    //                    return false;
+//    //                }
+//    //            }
 
-                else
-                {
-                    _moveNext = enumerate;
+//    //            else
+//    //            {
+//    //                _moveNext = enumerate;
 
-                    return enumerate();
-                }
-            };
-        }
+//    //                return enumerate();
+//    //            }
+//    //        };
+//    //    }
 
-        private void ThrowIfDisposed()
-        {
-            if (IsDisposed)
+//    //    private void ThrowIfDisposed()
+//    //    {
+//    //        if (IsDisposed)
 
-                throw GetExceptionForDispose(false);
-        }
-        #endregion
+//    //            throw GetExceptionForDispose(false);
+//    //    }
+//    //    #endregion
 
-        #region Interface implementations
-        #region IEnumerator implementation
-        object IEnumerator.Current => Current;
+//    //    #region Interface implementations
+//    //    #region IEnumerator implementation
+//    //    object IEnumerator.Current => Current;
 
-        public bool MoveNext()
-        {
-            ThrowIfDisposed();
+//    //    public bool MoveNext()
+//    //    {
+//    //        ThrowIfDisposed();
 
-            return _moveNext();
-        }
+//    //        return _moveNext();
+//    //    }
 
-        public void Reset()
-        {
-            ThrowIfDisposed();
+//    //    public void Reset()
+//    //    {
+//    //        ThrowIfDisposed();
 
-            _enumerator.Reset();
+//    //        _enumerator.Reset();
 
-            _hasItems = null;
+//    //        _hasItems = null;
 
-            ResetMoveNext();
-        }
-        #endregion
+//    //        ResetMoveNext();
+//    //    }
+//    //    #endregion
 
-        #region IDisposable implementation
-        public void Dispose()
-        {
-            if (IsDisposed) return;
+//    //    #region IDisposable implementation
+//    //    public void Dispose()
+//    //    {
+//    //        if (IsDisposed) return;
 
-            _enumerator.Dispose();
+//    //        _enumerator.Dispose();
 
-            ResetMoveNext();
-        }
-        #endregion
-        #endregion
-    }
+//    //        ResetMoveNext();
+//    //    }
+//    //    #endregion
+//    //    #endregion
+//    //}
 
-    public sealed class EmptyEnumerator<T> : IEnumerator<T>
-    {
-        private readonly T _current = default;
+//    //public sealed class EmptyEnumerator<T> : IEnumerator<T>
+//    //{
+//    //    private readonly T _current = default;
 
-        T IEnumerator<T>.Current => _current;
+//    //    T IEnumerator<T>.Current => _current;
 
-        object IEnumerator.Current => _current;
+//    //    object IEnumerator.Current => _current;
 
-        bool IEnumerator.MoveNext() => false;
+//    //    bool IEnumerator.MoveNext() => false;
 
-        void IEnumerator.Reset() { }
+//    //    void IEnumerator.Reset() { }
 
-        void System.IDisposable.Dispose() { }
-    }
+//    //    void System.IDisposable.Dispose() { }
+//    //}
 
-    public sealed class Enumerable<T> : IEnumerable<T>
-    {
-        private readonly Func<IEnumerator<T>> _enumeratorFunc;
+//    //public sealed class Enumerable<T> : IEnumerable<T>
+//    //{
+//    //    private readonly Func<IEnumerator<T>> _enumeratorFunc;
 
-        public Enumerable(Func<IEnumerator<T>> enumeratorFunc) => _enumeratorFunc = enumeratorFunc;
+//    //    public Enumerable(Func<IEnumerator<T>> enumeratorFunc) => _enumeratorFunc = enumeratorFunc;
 
-        public IEnumerator<T> GetEnumerator() => _enumeratorFunc();
+//    //    public IEnumerator<T> GetEnumerator() => _enumeratorFunc();
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
+//    //    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+//    ////}
 
-    public abstract class Enumerator<TSource, TDestination> : IEnumerator<TDestination>, WinCopies.Util.DotNetFix.IDisposable
-    {
-        public bool IsDisposed { get; private set; }
+//    //public abstract class Enumerator<TSource, TDestination> : IEnumerator<TDestination>, WinCopies.Util.DotNetFix.IDisposable
+//    //{
+//    //    public bool IsDisposed { get; private set; }
 
-        private IEnumerator<TSource> _innerEnumerator;
+//    //    private IEnumerator<TSource> _innerEnumerator;
 
-        protected IEnumerator<TSource> InnerEnumerator => IsDisposed ? throw GetExceptionForDispose(false) : _innerEnumerator;
+//    //    protected IEnumerator<TSource> InnerEnumerator => IsDisposed ? throw GetExceptionForDispose(false) : _innerEnumerator;
 
-        private TDestination _current;
+//    //    private TDestination _current;
 
-        public TDestination Current { get => IsDisposed ? throw GetExceptionForDispose(false) : _current; protected set => _current = IsDisposed ? throw GetExceptionForDispose(false) : value; }
+//    //    public TDestination Current { get => IsDisposed ? throw GetExceptionForDispose(false) : _current; protected set => _current = IsDisposed ? throw GetExceptionForDispose(false) : value; }
 
-        object IEnumerator.Current => Current;
+//    //    object IEnumerator.Current => Current;
 
-        public Enumerator(IEnumerable<TSource> enumerable) => _innerEnumerator = (enumerable ?? throw GetArgumentNullException(nameof(enumerable))).GetEnumerator();
+//    //    public Enumerator(IEnumerable<TSource> enumerable) => _innerEnumerator = (enumerable ?? throw GetArgumentNullException(nameof(enumerable))).GetEnumerator();
 
-        public bool MoveNext()
-        {
-            if (IsDisposed ? throw GetExceptionForDispose(false) : MoveNextOverride()) return true;
+//    //    public bool MoveNext()
+//    //    {
+//    //        if (IsDisposed ? throw GetExceptionForDispose(false) : MoveNextOverride()) return true;
 
-            _current = default;
+//    //        _current = default;
 
-            return false;
-        }
+//    //        return false;
+//    //    }
 
-        protected abstract bool MoveNextOverride();
+//    //    protected abstract bool MoveNextOverride();
 
-        public void Reset()
-        {
-            if (IsDisposed)
+//    //    public void Reset()
+//    //    {
+//    //        if (IsDisposed)
 
-                throw GetExceptionForDispose(false);
+//    //            throw GetExceptionForDispose(false);
 
-            ResetOverride();
-        }
+//    //        ResetOverride();
+//    //    }
 
-        protected virtual void ResetOverride()
-        {
-            _current = default;
+//    //    protected virtual void ResetOverride()
+//    //    {
+//    //        _current = default;
 
-            InnerEnumerator.Reset();
-        }
+//    //        InnerEnumerator.Reset();
+//    //    }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
+//    //    protected virtual void Dispose(bool disposing)
+//    //    {
+//    //        if (disposing)
 
-                _innerEnumerator = null;
+//    //            _innerEnumerator = null;
 
-            IsDisposed = true;
-        }
+//    //        IsDisposed = true;
+//    //    }
 
-        public void Dispose()
-        {
-            if (!IsDisposed)
-            {
-                Dispose(disposing: true);
+//    //    public void Dispose()
+//    //    {
+//    //        if (!IsDisposed)
+//    //        {
+//    //            Dispose(disposing: true);
 
-                GC.SuppressFinalize(this);
-            }
-        }
-    }
+//    //            GC.SuppressFinalize(this);
+//    //        }
+//    //    }
+//    //}
 
-    // todo: moved to WinCopies.Util
+//    //// todo: moved to WinCopies.Util
 
-    public class PausableBackgroundWorker : System.ComponentModel.BackgroundWorker
-    {
-        public bool PausePending { get; private set; }
+//    //public class PausableBackgroundWorker : System.ComponentModel.BackgroundWorker
+//    //{
+//    //    public bool PausePending { get; private set; }
 
-        private bool _workerSupportsPausing = false;
+//    //    private bool _workerSupportsPausing = false;
 
-        public bool WorkerSupportsPausing { get => _workerSupportsPausing; set => _workerSupportsPausing = IsBusy ? throw new InvalidOperationException("The BackgroundWorker is running.") : value; }
+//    //    public bool WorkerSupportsPausing { get => _workerSupportsPausing; set => _workerSupportsPausing = IsBusy ? throw new InvalidOperationException("The BackgroundWorker is running.") : value; }
 
-        public void PauseAsync()
-        {
-            if (!_workerSupportsPausing)
+//    //    public void PauseAsync()
+//    //    {
+//    //        if (!_workerSupportsPausing)
 
-                throw new InvalidOperationException("The BackgroundWorker does not support pausing.");
+//    //            throw new InvalidOperationException("The BackgroundWorker does not support pausing.");
 
-            if (IsBusy)
+//    //        if (IsBusy)
 
-                PausePending = true;
-        }
+//    //            PausePending = true;
+//    //    }
 
-        protected override void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
-        {
-            base.OnRunWorkerCompleted(e);
+//    //    protected override void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
+//    //    {
+//    //        base.OnRunWorkerCompleted(e);
 
-            PausePending = false;
-        }
-    }
+//    //        PausePending = false;
+//    //    }
+//    //}
 
-    public static class Extensions// todo: replace by WinCopies.Util's implementation.
-    {
-        public static string Join(this IEnumerable<string> enumerable, in bool keepEmptyValues, params char[] join) => Join(enumerable, keepEmptyValues, new string(join));
+////    public static class Extensions// todo: replace by WinCopies.Util's implementation.
+////    {
+////        public static string Join(this IEnumerable<string> enumerable, in bool keepEmptyValues, params char[] join) => Join(enumerable, keepEmptyValues, new string(join));
 
-        public static string Join(this IEnumerable<string> enumerable, in bool keepEmptyValues, in string join, StringBuilder stringBuilder = null)
-        {
-            IEnumerator<string> enumerator = (enumerable ?? throw GetArgumentNullException(nameof(enumerable))).GetEnumerator();
+////        public static string Join(this IEnumerable<string> enumerable, in bool keepEmptyValues, in string join, StringBuilder stringBuilder = null)
+////        {
+////            IEnumerator<string> enumerator = (enumerable ?? throw GetArgumentNullException(nameof(enumerable))).GetEnumerator();
 
-#if CS7
-            if (stringBuilder == null)
+////#if CS7
+////            if (stringBuilder == null)
 
-                stringBuilder = new StringBuilder();
-#else
-            stringBuilder ??= new StringBuilder();
-#endif
+////                stringBuilder = new StringBuilder();
+////#else
+////            stringBuilder ??= new StringBuilder();
+////#endif
 
-            try
-            {
-                void append() => _ = stringBuilder.Append(enumerator.Current);
+////            try
+////            {
+////                void append() => _ = stringBuilder.Append(enumerator.Current);
 
-                bool moveNext() => enumerator.MoveNext();
+////                bool moveNext() => enumerator.MoveNext();
 
-                if (moveNext())
+////                if (moveNext())
 
-                    append();
+////                    append();
 
-                while (moveNext() && (keepEmptyValues || enumerator.Current.Length > 0))
-                {
-                    _ = stringBuilder.Append(join);
+////                while (moveNext() && (keepEmptyValues || enumerator.Current.Length > 0))
+////                {
+////                    _ = stringBuilder.Append(join);
 
-                    append();
-                }
-            }
-            finally
-            {
-                enumerator.Dispose();
-            }
+////                    append();
+////                }
+////            }
+////            finally
+////            {
+////                enumerator.Dispose();
+////            }
 
-            return stringBuilder.ToString();
-        }
-    }
+////            return stringBuilder.ToString();
+////        }
+////    }
 
-    //public class ReadOnlyObservableQueueCollection<T, U> : INotifyPropertyChanged where T : ObservableQueueCollection<U> // todo: remove when CopyProcessQueueCollection has been updated.
-    //{
-    //    private readonly T _innerCollection;
+//    //public class ReadOnlyObservableQueueCollection<T, U> : INotifyPropertyChanged where T : ObservableQueueCollection<U> // todo: remove when CopyProcessQueueCollection has been updated.
+//    //{
+//    //    private readonly T _innerCollection;
 
-    //    public event PropertyChangedEventHandler PropertyChanged;
+//    //    public event PropertyChangedEventHandler PropertyChanged;
 
-    //    public ReadOnlyObservableQueueCollection(T innerCollection)
-    //    {
-    //        _innerCollection = innerCollection ?? throw GetArgumentNullException(nameof(innerCollection));
+//    //    public ReadOnlyObservableQueueCollection(T innerCollection)
+//    //    {
+//    //        _innerCollection = innerCollection ?? throw GetArgumentNullException(nameof(innerCollection));
 
-    //        innerCollection.PropertyChanged += PropertyChanged;
-    //    }
+//    //        innerCollection.PropertyChanged += PropertyChanged;
+//    //    }
 
-    //    public U Peek() => _innerCollection.Peek();
-    //}
+//    //    public U Peek() => _innerCollection.Peek();
+//    //}
 
-    //public class ReadOnlyCopyProcessQueueCollection // todo: remove when CopyProcessQueueCollection has been updated.
-    //{
-    //    private readonly ProcessQueueCollection _innerCollection;
+//    //public class ReadOnlyCopyProcessQueueCollection // todo: remove when CopyProcessQueueCollection has been updated.
+//    //{
+//    //    private readonly ProcessQueueCollection _innerCollection;
 
-    //    public Size Size => _innerCollection.Size;
+//    //    public Size Size => _innerCollection.Size;
 
-    //    public event PropertyChangedEventHandler PropertyChanged;
+//    //    public event PropertyChangedEventHandler PropertyChanged;
 
-    //    public ReadOnlyCopyProcessQueueCollection(ProcessQueueCollection innerCollection)
-    //    {
-    //        _innerCollection = innerCollection ?? throw GetArgumentNullException(nameof(innerCollection));
+//    //    public ReadOnlyCopyProcessQueueCollection(ProcessQueueCollection innerCollection)
+//    //    {
+//    //        _innerCollection = innerCollection ?? throw GetArgumentNullException(nameof(innerCollection));
 
-    //        innerCollection.PropertyChanged += PropertyChanged;
-    //    }
+//    //        innerCollection.PropertyChanged += PropertyChanged;
+//    //    }
 
-    //    public IPathInfo Peek() => _innerCollection.Peek();
-    //}
-}
+//    //    public IPathInfo Peek() => _innerCollection.Peek();
+//    //}
+//}
 
-#endif
+//#endif

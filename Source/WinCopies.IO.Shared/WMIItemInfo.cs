@@ -27,6 +27,7 @@ using WinCopies.Util;
 using System.Collections.Generic;
 using System.Linq;
 using WinCopies.Linq;
+using WinCopies.Collections;
 
 namespace WinCopies.IO
 {

@@ -9,11 +9,11 @@ CHANGELOG
 Updates
 -------
 
-??/??/???? 2.4.0-preview6
-=========================
+07/06/2020 2.5.8-preview
+========================
 
-WinCopies.IO 2.4.0-preview6
----------------------------
+WinCopies.IO 2.5.8-preview
+--------------------------
 
 - Existing item changes:
 	- LocalizedName and Description properties return N/A for ArchiveItemInfo
@@ -30,9 +30,10 @@ WinCopies.IO 2.4.0-preview6
 	- ShellObjectInfoEnumeratorStruct for ShellObjectInfo.GetItems' predicate
 	- Path.PathSeparator const. Fixes #11
 	- Public (static) methods regarding item type name and icon generation in FileSystemObjectInfo.
+- Bug fixes.
 
-WinCopies.GUI.Templates 2.4.0-preview6
---------------------------------------
+WinCopies.GUI.Templates 2.5.8-preview
+-------------------------------------
 
 - Additions:
 	- DataTemplate for ImageSource
