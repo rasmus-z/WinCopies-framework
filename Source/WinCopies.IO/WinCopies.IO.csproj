@@ -8,6 +8,10 @@
     <UseWPF>true</UseWPF>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>WinCopies.IO.snk</AssemblyOriginatorKeyFile>
+    <VersionPrefix>2.5.8</VersionPrefix>
+    <VersionSuffix>preview1</VersionSuffix>
+    <AssemblyVersion>2.5.8.1</AssemblyVersion>
+    <FileVersion>2.5.8.1</FileVersion>
   </PropertyGroup>
 
   <Import Project="..\WinCopies.IO.Shared\WinCopies.IO.Shared.projitems" Label="Shared" />  
@@ -42,7 +46,7 @@
     <PackageReference Include="WinCopies.Util" Version="2.5.8-preview" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <ProjectReference Include="..\WinCopies.Util\WinCopies.Util.Temp.csproj" />
   </ItemGroup>
 

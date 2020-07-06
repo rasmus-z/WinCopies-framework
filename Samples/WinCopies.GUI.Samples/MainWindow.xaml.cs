@@ -58,13 +58,17 @@ namespace WinCopies.GUI.Samples
 
             RoutedCommand routedCommand = new RoutedUICommand("ButtonCommand", "ButtonCommand", typeof(MainWindow));
 
-            Func<WinCopies.GUI.Windows.Dialogs.DialogWindow>[] dialogWindows = { () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { Content = "1 - This is a sample DialogWindow.", ShowHelpButton = true },
-            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { Content = "2 - This is a sample DialogWindow.", ShowHelpButton = true },
-            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { Content = "3 - This is a sample DialogWindow.", ShowHelpButtonAsCommandButton = true },
-            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { Content = "4 - This is a sample DialogWindow.", ShowHelpButtonAsCommandButton = true },
-            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { Content = "5 - This is a sample DialogWindow.", DialogButton = DialogButton.YesNoCancel, DefaultButton = DefaultButton.Cancel, ShowHelpButtonAsCommandButton = true },
-            () => new WinCopies.GUI.Windows.Dialogs.DialogWindow() { Content = "6 - This is a sample DialogWindow.", DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1") { CommandParameter = "1", Command = command }, new ButtonModel("Button2") { CommandParameter = "2", Command = command } } },
-            () => { var _dialogWindow = new WinCopies.GUI.Windows.Dialogs.DialogWindow() { Content = "7 - This is a sample DialogWindow.", DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1") { CommandParameter = "1", Command = routedCommand }, new ButtonModel("Button2") { CommandParameter = "2", Command = routedCommand } } };
+            Func<DialogWindow>[] dialogWindows =
+                {
+                () => new DialogWindow() { Content = "1 - This is a sample DialogWindow.", ShowHelpButton = true },
+            () => new DialogWindow() { Content = "2 - This is a sample DialogWindow.", ShowHelpButton = true },
+            () => new DialogWindow() { Content = "3 - This is a sample DialogWindow.", ShowHelpButtonAsCommandButton = true },
+            () => new DialogWindow() { Content = "4 - This is a sample DialogWindow.", ShowHelpButtonAsCommandButton = true },
+            () => new DialogWindow() { Content = "5 - This is a sample DialogWindow.", DialogButton = DialogButton.YesNoCancel, DefaultButton = DefaultButton.Cancel, ShowHelpButtonAsCommandButton = true },
+            () => new DialogWindow() { Content = "6 - This is a sample DialogWindow.", DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1") { CommandParameter = "1", Command = command }, new ButtonModel("Button2") { CommandParameter = "2", Command = command } } },
+            () => 
+            { 
+                var _dialogWindow = new WinCopies.GUI.Windows.Dialogs.DialogWindow() { Content = "7 - This is a sample DialogWindow.", DialogButton = null, CustomButtonTemplateSelector = new AttributeDataTemplateSelector(), CustomButtonsSource = new ButtonModel[] { new ButtonModel("Button1") { CommandParameter = "1", Command = routedCommand }, new ButtonModel("Button2") { CommandParameter = "2", Command = routedCommand } } };
 
                 _dialogWindow.CommandBindings.Add(new CommandBinding(routedCommand, (object _sender, ExecutedRoutedEventArgs _e) => MessageBox.Show($"You clicked the Button{ (string) _e.Parameter}!")));
 
