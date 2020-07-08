@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		..\.gitignore = ..\.gitignore
 		..\Changelog.md = ..\Changelog.md
+		Changelog3.0.md = Changelog3.0.md
 		Directory.Build.props = Directory.Build.props
 		..\LICENSE = ..\LICENSE
 		..\README.md = ..\README.md
@@ -56,6 +57,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.GUI.Samples", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Util.Temp", "WinCopies.Util\WinCopies.Util.Temp.csproj", "{AFB0D464-844B-4797-8539-35113326BE32}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies.Collections", "WinCopies.Collections\WinCopies.Collections.csproj", "{90E7CA59-60CC-4790-A431-ECC9A8FA9271}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Collections.Shared", "WinCopies.Collections.Shared\WinCopies.Collections.Shared.shproj", "{D10E044B-9233-43C6-BC64-770CF7B521BF}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{04e726ca-5f9e-4633-978a-9c536b20f565}*SharedItemsImports = 5
@@ -74,7 +79,9 @@ Global
 		WinCopies.GUI.IO.Shared\WinCopies.GUI.IO.Shared.projitems*{690260b7-f85d-481e-9527-0a6034e39053}*SharedItemsImports = 13
 		WinCopies.IO.Shared\WinCopies.IO.Shared.projitems*{74abd400-80a5-4afe-a17a-faddbbe0ac69}*SharedItemsImports = 5
 		WinCopies.GUI.Controls.Shared\WinCopies.GUI.Controls.Shared.projitems*{8e59282e-c7fb-44dc-8617-a1b2a932c5a9}*SharedItemsImports = 13
+		WinCopies.Collections.Shared\WinCopies.Collections.Shared.projitems*{90e7ca59-60cc-4790-a431-ecc9a8fa9271}*SharedItemsImports = 5
 		WinCopies.GUI.Models.Shared\WinCopies.GUI.Models.Shared.projitems*{a43aee04-0665-4d64-a4b9-7ff1e471bf29}*SharedItemsImports = 13
+		WinCopies.Collections.Shared\WinCopies.Collections.Shared.projitems*{d10e044b-9233-43c6-bc64-770cf7b521bf}*SharedItemsImports = 13
 		WinCopies.GUI.ViewModels.Shared\WinCopies.GUI.ViewModels.Shared.projitems*{f56036c3-b4f6-448a-a07c-5a03238a736c}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -180,6 +187,14 @@ Global
 		{AFB0D464-844B-4797-8539-35113326BE32}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AFB0D464-844B-4797-8539-35113326BE32}.Release|x64.ActiveCfg = Release|Any CPU
 		{AFB0D464-844B-4797-8539-35113326BE32}.Release|x64.Build.0 = Release|Any CPU
+		{90E7CA59-60CC-4790-A431-ECC9A8FA9271}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90E7CA59-60CC-4790-A431-ECC9A8FA9271}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90E7CA59-60CC-4790-A431-ECC9A8FA9271}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{90E7CA59-60CC-4790-A431-ECC9A8FA9271}.Debug|x64.Build.0 = Debug|Any CPU
+		{90E7CA59-60CC-4790-A431-ECC9A8FA9271}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90E7CA59-60CC-4790-A431-ECC9A8FA9271}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90E7CA59-60CC-4790-A431-ECC9A8FA9271}.Release|x64.ActiveCfg = Release|Any CPU
+		{90E7CA59-60CC-4790-A431-ECC9A8FA9271}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
