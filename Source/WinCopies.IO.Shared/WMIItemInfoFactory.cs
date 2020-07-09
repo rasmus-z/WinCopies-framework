@@ -21,7 +21,6 @@ using WinCopies.Util;
 
 namespace WinCopies.IO
 {
-
     public class WMIItemInfoFactory : IWMIItemInfoFactory // where TItems : BrowsableObjectInfo, IWMIItemInfo
     {
         public WMIItemInfoFactoryOptions Options { get; set; }
@@ -51,7 +50,6 @@ namespace WinCopies.IO
 
     public interface IWMIItemInfoFactory
     {
-
         IWMIItemInfoFactoryOptions Options { get; }
 
         /// <summary>
@@ -63,23 +61,19 @@ namespace WinCopies.IO
         IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject);
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType);
-
     }
 
     public interface IWMIItemInfoFactoryOptions
     {
-
         ConnectionOptions ConnectionOptions { get; set; }
 
         ObjectGetOptions ObjectGetOptions { get; set; }
 
         EnumerationOptions EnumerationOptions { get; set; }
-
     }
 
     public class WMIItemInfoFactoryOptions : IWMIItemInfoFactoryOptions
     {
-
         public ConnectionOptions ConnectionOptions { get; set; }
 
         public ObjectGetOptions ObjectGetOptions { get; set; }
@@ -89,16 +83,12 @@ namespace WinCopies.IO
         public WMIItemInfoFactoryOptions() { }
 
         public WMIItemInfoFactoryOptions(ConnectionOptions connectionOptions, ObjectGetOptions objectGetOptions, EnumerationOptions enumerationOptions)
-
         {
-
             ConnectionOptions = connectionOptions;
 
             ObjectGetOptions = objectGetOptions;
 
             EnumerationOptions = enumerationOptions;
-
         }
-
     }
 }

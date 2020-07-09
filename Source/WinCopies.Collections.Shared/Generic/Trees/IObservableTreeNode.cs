@@ -22,7 +22,7 @@ using System.ComponentModel;
 
 namespace WinCopies.Collections.Generic
 {
-    public interface IObservableTreeNode<T> : IReadOnlyTreeNode, ITreeNode<T>, IReadOnlyObservableTreeNode<T>, IReadOnlyTreeNode<T>, WinCopies.        Util.        IValueObject<T>, WinCopies.        Util.        IValueObject, System.Collections.Generic.IList<ITreeNode<T>>, System.Collections.Generic.ICollection<T>, IEnumerable<T>, /*IEnumerable, System.Collections.IList, System.Collections.ICollection,*/ System.Collections.Generic.IReadOnlyList<ITreeNode<T>>, System.Collections.Generic.IReadOnlyCollection<ITreeNode<T>>, System.IDisposable, System.Collections.Specialized.INotifyCollectionChanged, INotifyPropertyChanged    { }
+    public interface IObservableTreeNode<T> : IReadOnlyTreeNode, ITreeNode<T>, IReadOnlyObservableTreeNode<T>, IReadOnlyTreeNode<T>, WinCopies.Util.IValueObject<T>, WinCopies.Util.IValueObject, System.Collections.Generic.IList<ITreeNode<T>>, System.Collections.Generic.ICollection<T>, IEnumerable<T>, /*IEnumerable, System.Collections.IList, System.Collections.ICollection,*/ System.Collections.Generic.IReadOnlyList<ITreeNode<T>>, System.Collections.Generic.IReadOnlyCollection<ITreeNode<T>>, System.IDisposable, System.Collections.Specialized.INotifyCollectionChanged, INotifyPropertyChanged { }
 }
 
 #endif

@@ -53,7 +53,6 @@ namespace WinCopies.IO
     /// </summary>
     public enum RegistryItemType
     {
-
         /// <summary>
         /// The current instance represents the Windows registry root node.
         /// </summary>
@@ -68,7 +67,6 @@ namespace WinCopies.IO
         /// The current instance represents a Windows registry value.
         /// </summary>
         Value
-
     }
 
     /// <summary>
@@ -76,7 +74,6 @@ namespace WinCopies.IO
     /// </summary>
     public class RegistryItemInfo/*<TItems, TFactory>*/ : BrowsableObjectInfo/*<TItems, TFactory>*/, IRegistryItemInfo // where TItems : BrowsableObjectInfo, IRegistryItemInfo where TFactory : IRegistryItemInfoFactory
     {
-
         // public override bool IsRenamingSupported => false;
 
         #region Fields
@@ -430,15 +427,11 @@ namespace WinCopies.IO
         #endregion
 
         private BitmapSource TryGetBitmapSource(int size)
-
         {
-
             int iconIndex = FileIcon;
 
             switch (RegistryItemType)
-
             {
-
                 case RegistryItemType.Root:
 
                     iconIndex = ComputerIcon;
@@ -450,7 +443,6 @@ namespace WinCopies.IO
                     iconIndex = FolderIcon;
 
                     break;
-
             }
 
 #if NETFRAMEWORK
@@ -464,10 +456,10 @@ namespace WinCopies.IO
 #endif
 
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
         }
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems()
+#if NETFRAMEWORK
         {
             switch (RegistryItemType)
             {
@@ -484,6 +476,14 @@ namespace WinCopies.IO
                     throw new InvalidOperationException("The current item cannot be browsed.");
             }
         }
+#else
+            => RegistryItemType switch
+            {
+                RegistryItemType.Root => typeof(Microsoft.Win32.Registry).GetFields().Select(f => new RegistryItemInfo((RegistryKey)f.GetValue(null))),
+                RegistryItemType.Key => GetItems(null, false),
+                _ => throw new InvalidOperationException("The current item cannot be browsed."),
+            };
+#endif
 
         public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate)
         {
@@ -519,7 +519,6 @@ namespace WinCopies.IO
 
         public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions)
         {
-
             //protected override void OnDoWork(DoWorkEventArgs e)
             //{
 
@@ -550,9 +549,7 @@ namespace WinCopies.IO
             //}
 
             if (RegistryItemType == RegistryItemType.Key)
-
             {
-
                 //string[] items;
 
                 IEnumerable<RegistryItemInfo> keys;
@@ -561,41 +558,30 @@ namespace WinCopies.IO
 
                 void enumerate()
                 {
-
                     if (predicate == null)
-
                     {
-
                         keys = RegistryKey.GetSubKeyNames().Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
                         values = RegistryKey.GetValueNames().Select(s => new RegistryItemInfo(Path, s));
-
                     }
 
                     else
-
                     {
-
                         keys = RegistryKey.GetSubKeyNames().Where(item => predicate(new RegistryItemInfoEnumeratorStruct(item, RegistryItemType.Key))).Select(item => new RegistryItemInfo($"{Path}\\{item}"));
 
                         values = RegistryKey.GetValueNames().Where(s => predicate(new RegistryItemInfoEnumeratorStruct(s, RegistryItemType.Value))).Select(s => new RegistryItemInfo(Path, s));
-
                     }
-
                 }
 
                 if (catchExceptions)
 
                     try
-
                     {
-
                         enumerate();
 
                         // foreach (string item in items)
 
                         // item.Substring(0, item.LastIndexOf(IO.Path.PathSeparator)), item.Substring(item.LastIndexOf(IO.Path.PathSeparator) + 1), false
-
                     }
 
                     catch (Exception ex) when (ex.Is(false, typeof(SecurityException), typeof(IOException), typeof(UnauthorizedAccessException))) { keys = null; values = null; }
@@ -605,7 +591,6 @@ namespace WinCopies.IO
                     enumerate();
 
                 return values == null ? keys : keys == null ? values : keys.AppendValues(values);
-
             }
 
             else
@@ -659,8 +644,6 @@ namespace WinCopies.IO
 
 
             // }
-
         }
-
     }
 }

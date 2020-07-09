@@ -19,38 +19,22 @@ using System;
 
 namespace WinCopies.IO
 {
-
     /// <summary>
     /// Provides interoperability for interacting with browsable items.
     /// </summary>
     public interface IArchiveItemInfoProvider : IFileSystemObjectInfo
-
     {
-
-        // IBrowsableObjectInfo GetBrowsableObjectInfo(ShellObjectInfo archiveShellObject, ArchiveFileInfo? archiveFileInfo, string path, FileType fileType);
-
         /// <summary>
         /// The parent <see cref="IShellObjectInfo"/> of the current archive item.
         /// </summary>
         IShellObjectInfo ArchiveShellObject { get; }
-
     }
-
-    //public interface IArchiveItemInfoProvider<T> : IFileSystemObjectInfo<T>, IArchiveItemInfoProvider where T : IFileSystemObjectInfoFactory
-
-    //{
-
-
-
-    //}
 
     /// <summary>
     /// The base class for <see cref="ArchiveItemInfoProvider"/>s objects.
     /// </summary>
     public abstract class ArchiveItemInfoProvider/*<TItems, TFactory>*/ : FileSystemObjectInfo/*<TItems, TFactory>*/, IArchiveItemInfoProvider // where TItems : BrowsableObjectInfo, IFileSystemObjectInfo    where TFactory : IBrowsableObjectInfoFactory
-
     {
-
         public override FileType FileType { get; }
 
         /// <summary>
@@ -65,7 +49,5 @@ namespace WinCopies.IO
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="ArchiveItemInfoProvider"/>.</param>
         /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
         protected ArchiveItemInfoProvider(in string path, in FileType fileType) : base(path) => FileType = fileType;
-
     }
-
 }

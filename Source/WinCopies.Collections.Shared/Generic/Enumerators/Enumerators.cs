@@ -90,7 +90,7 @@ namespace WinCopies.Collections.Generic
 
 
 
-    public abstract class Enumerator<TSource, TDestination> : IEnumerator<TDestination>, WinCopies.Util        .DotNetFix.IDisposable
+    public abstract class Enumerator<TSource, TDestination> : IEnumerator<TDestination>, WinCopies.Util.DotNetFix.IDisposable
     {
         public bool IsDisposed { get; private set; }
 

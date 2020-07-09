@@ -32,17 +32,14 @@ namespace WinCopies.IO
 
     public interface IFileSystemObjectInfo : IBrowsableObjectInfo
     {
-
         /// <summary>
         /// Gets the <see cref="WinCopies.IO.FileType"/> of this <see cref="IFileSystemObject"/>.
         /// </summary>
         FileType FileType { get; }
-
     }
 
     public abstract class FileSystemObjectInfo/*<TItems, TFactory>*/ : BrowsableObjectInfo/*<TItems, TFactory>*/, IFileSystemObjectInfo // where TItems : BrowsableObjectInfo, IFileSystemObjectInfo where TFactory : BrowsableObjectInfoFactory
     {
-
         /// <summary>
         /// Gets a default comparer for <see cref="FileSystemObjectInfo"/>s.
         /// </summary>
@@ -152,9 +149,7 @@ namespace WinCopies.IO
         public Icon TryGetIcon(in int size) => TryGetIcon(System.IO.Path.GetExtension(Path), FileType, new System.Drawing.Size(size, size));
 
         public static BitmapSource TryGetBitmapSource(in string extension, in FileType fileType, in System.Drawing.Size size)
-
         {
-
 #if NETFRAMEWORK
 
             using (Icon icon = TryGetIcon(extension, fileType, size))
@@ -166,7 +161,6 @@ namespace WinCopies.IO
 #endif
 
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
         }
 
         public BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(System.IO.Path.GetExtension(Path), FileType, new System.Drawing.Size(size, size));

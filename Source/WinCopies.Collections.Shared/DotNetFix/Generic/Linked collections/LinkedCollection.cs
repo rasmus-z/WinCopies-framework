@@ -41,7 +41,7 @@ namespace WinCopies.Collections.DotNetFix.Generic
 
         bool ICollection<T>.IsReadOnly => false;
 
-        public LinkedCollection() : this(new System.Collections.Generic. LinkedList<T>()) { } 
+        public LinkedCollection() : this(new System.Collections.Generic.LinkedList<T>()) { }
 
         public LinkedCollection(in System.Collections.Generic.LinkedList<T> list) => InnerList = list;
 

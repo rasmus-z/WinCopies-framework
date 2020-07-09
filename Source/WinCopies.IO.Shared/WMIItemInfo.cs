@@ -31,10 +31,8 @@ using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
-
     public class WMIItemInfo/*<TItems, TFactory>*/ : BrowsableObjectInfo/*<TItems, TFactory>*/, IWMIItemInfo // where TItems : BrowsableObjectInfo<TItems, TFactory>, IWMIItemInfo where TFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
     {
-
         #region Consts
 
         public const string RootPath = @"\\.\";
@@ -222,7 +220,6 @@ namespace WinCopies.IO
         ///// <param name="managementObject">The <see cref="ManagementBaseObject"/> that this <see cref="WMIItemInfo"/> represents.</param>
         public WMIItemInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject) : base(path)
         {
-
             //ThrowIfNull(managementObjectDelegate, nameof(managementObjectDelegate));
 
             ThrowIfNull(managementObject, nameof(managementObject));
@@ -242,7 +239,6 @@ namespace WinCopies.IO
             if (wmiItemType == WMIItemType.Namespace && Path.ToUpper().EndsWith("ROOT:__NAMESPACE"))
 
                 IsRootNode = true;
-
         }
 
         #endregion
@@ -258,15 +254,12 @@ namespace WinCopies.IO
         /// <param name="wmiItemType">The <see cref="IO.WMIItemType"/> of <paramref name="managementObject"/>.</param>
         /// <returns>The name of the given <see cref="ManagementBaseObject"/>.</returns>
         public static string GetName(ManagementBaseObject managementObject, WMIItemType wmiItemType)
-
         {
-
             (managementObject as ManagementClass)?.Get();
 
             const string name = NameConst;
 
             return wmiItemType == WMIItemType.Namespace ? (string)managementObject[name] : managementObject.ClassPath.ClassName;
-
         }
 
         /// <summary>
@@ -276,21 +269,16 @@ namespace WinCopies.IO
         /// <param name="wmiItemType">The <see cref="IO.WMIItemType"/> of <paramref name="managementObject"/>.</param>
         /// <returns>The path of the given <see cref="ManagementBaseObject"/>.</returns>
         public static string GetPath(ManagementBaseObject managementObject, WMIItemType wmiItemType)
-
         {
-
-            string path = WinCopies.IO.Path.PathSeparator + managementObject.ClassPath.Server + WinCopies.IO.Path.PathSeparator + managementObject.ClassPath.NamespacePath;
+            string path = $"{WinCopies.IO.Path.PathSeparator}{managementObject.ClassPath.Server}{WinCopies.IO.Path.PathSeparator}{managementObject.ClassPath.NamespacePath}";
 
             string name = GetName(managementObject, wmiItemType);
 
-            if (name != null)
+            string _getPath() => $"{path}:{managementObject.ClassPath.ClassName}";
 
-                path += WinCopies.IO.Path.PathSeparator + name;
-
-            path += ":" + managementObject.ClassPath.ClassName;
+            path = name == null ? _getPath() : $"{WinCopies.IO.Path.PathSeparator}{name}" + _getPath();
 
             return path;
-
         }
 
         ///// <summary>
@@ -302,18 +290,13 @@ namespace WinCopies.IO
         ///// <seealso cref="WMIItemInfo()"/>
         ///// <seealso cref="WMIItemInfo(string, WMIItemType, ManagementBaseObject, DeepClone{ManagementBaseObject})"/>
         public static WMIItemInfo GetWMIItemInfo(string serverName, string serverRelativePath)
-
         {
-
             string path = $"{WinCopies.IO.Path.PathSeparator}{WinCopies.IO.Path.PathSeparator}{serverName}{WinCopies.IO.Path.PathSeparator}{(IsNullEmptyOrWhiteSpace(serverRelativePath) ? ROOT : serverRelativePath)}{NamespacePath}";
 
             return new WMIItemInfo(path, WMIItemType.Namespace, new ManagementClass(path)/*, managementObject => DefaultManagementClassDeepCloneDelegate((ManagementClass)managementObject, null)*/);
-
         }
 
-        public override bool Equals(object obj) => ReferenceEquals(this, obj)
-                ? true : obj is IWMIItemInfo _obj ? WMIItemType == _obj.WMIItemType && Path.ToLower() == _obj.Path.ToLower()
-                : false;
+        public override bool Equals(object obj) => ReferenceEquals(this, obj) || (obj is IWMIItemInfo _obj && WMIItemType == _obj.WMIItemType && Path.ToLower() == _obj.Path.ToLower());
 
         //public int CompareTo(IWMIItemInfo other) => GetDefaultWMIItemInfoComparer().Compare(this, other);
 
@@ -334,15 +317,12 @@ namespace WinCopies.IO
 
         private IBrowsableObjectInfo GetParent()
         {
-
             if (IsRootNode) return null;
 
             string path;
 
             switch (WMIItemType)
-
             {
-
                 case WMIItemType.Namespace:
 
                     path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator)) + NamespacePath;
@@ -361,41 +341,32 @@ namespace WinCopies.IO
 
                     path = Path.Substring(0, Path.IndexOf(':'));
 
-                    path = path.Substring(0, path.LastIndexOf(WinCopies.IO.Path.PathSeparator)) + ':' + path.Substring(path.LastIndexOf(WinCopies.IO.Path.PathSeparator) + 1);
+                    path = path.Substring(0, $"{path.LastIndexOf(WinCopies.IO.Path.PathSeparator)}:{path.Substring(path.LastIndexOf(WinCopies.IO.Path.PathSeparator) + 1)}");
 
                     return new WMIItemInfo(path, WMIItemType.Class, null);
 
                 default: // We souldn't reach this point.
 
                     return null;
-
             }
-
         }
 
         protected override void Dispose(in bool disposing)
         {
-
             base.Dispose(disposing);
 
             ManagementObject.Dispose();
 
             if (disposing)
-
                 //{
-
                 ManagementObject = null;
 
             //_managementObjectDelegate = null;
-
             //}
-
         }
 
         private BitmapSource TryGetBitmapSource(System.Drawing.Size size)
-
         {
-
             int iconIndex = 0;
 
             if (IsRootNode)
@@ -417,34 +388,29 @@ namespace WinCopies.IO
 #endif
 
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
         }
 
         // public override bool CheckFilter(string path) => throw new NotImplementedException();
 
         private static IEnumerable<ManagementBaseObject> Enumerate(ManagementObjectCollection collection)
         {
-            foreach (var value in collection)
+            foreach (ManagementBaseObject value in collection)
 
                 yield return value;
         }
 
         private static IEnumerable<ManagementBaseObject> EnumerateInstances(ManagementClass managementClass, IWMIItemInfoFactory factory)
         {
-
             ManagementObjectCollection collection = factory.Options?.EnumerationOptions == null ? managementClass.GetInstances() : managementClass.GetInstances(factory.Options?.EnumerationOptions);
 
             return collection == null || collection.Count == 0 ? null : Enumerate(collection);
-
         }
 
         private static IEnumerable<ManagementBaseObject> EnumerateSubClasses(ManagementClass managementClass, IWMIItemInfoFactory factory)
         {
-
             ManagementObjectCollection collection = factory?.Options?.EnumerationOptions == null ? managementClass.GetSubclasses() : managementClass.GetSubclasses(factory?.Options?.EnumerationOptions);
 
             return collection == null || collection.Count == 0 ? null : Enumerate(collection);
-
         }
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(new WMIItemInfoFactory(), null, false);

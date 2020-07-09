@@ -16,22 +16,16 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
-
     /// <summary>
     /// The base class for all file system objects in the WinCopies framework. This class can represent virtual file system objects (for example registry items, WMI items, ...).
     /// </summary>
     public abstract class FileSystemObject : IFileSystemObject
     {
-
         /// <summary>
         /// Gets the path of this <see cref="FileSystemObject"/>.
         /// </summary>
@@ -65,9 +59,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public override bool Equals(object obj) => obj is null ? false : ReferenceEquals(this, obj)
-                ? true : obj is IFileSystemObject _obj ? Path.ToLower() == _obj.Path.ToLower() // TODO: make better string comparison
-                : false;
+        public override bool Equals(object obj) => obj is null ? false : ReferenceEquals(this, obj) || (obj is IFileSystemObject _obj && Path.ToLower() == _obj.Path.ToLower());
 
         /// <summary>
         /// Gets an hash code for this <see cref="FileSystemObject"/>.
@@ -141,6 +133,5 @@ namespace WinCopies.IO
         /// <param name="fileSystemObject">The <see cref="FileSystemObject"/> to compare with.</param>
         /// <returns>The comparison result. See <see cref="IComparable{T}.CompareTo(T)"/> for more details.</returns>
         public virtual int CompareTo(IFileSystemObject fileSystemObject) => GetDefaultComparer().Compare(this, fileSystemObject);
-
     }
 }

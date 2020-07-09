@@ -25,13 +25,11 @@ using IDisposable = WinCopies.Util.DotNetFix.IDisposable;
 
 namespace WinCopies.IO
 {
-
     /// <summary>
     /// Provides interoperability for interacting with browsable items.
     /// </summary>
     public interface IBrowsableObjectInfo : IFileSystemObject, /*IDeepCloneable,*/ IDisposable
     {
-
         bool IsSpecialItem { get; }
 
         /// <summary>
@@ -130,7 +128,6 @@ namespace WinCopies.IO
         ///// <param name="recursively">Whether to dispose recursively.</param>
         ///// <exception cref="InvalidOperationException">The <see cref="ItemsLoader"/> is busy and does not support cancellation.</exception>
         //void Dispose(bool disposeItemsLoader, bool disposeParent, bool disposeItems, bool recursively);
-
     }
 
     //public interface IBrowsableObjectInfo<TFactory> : IBrowsableObjectInfo where TFactory : IBrowsableObjectInfoFactory

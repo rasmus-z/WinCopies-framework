@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.Shell;
 using System.IO;
 
 namespace WinCopies.IO
 {
-
     public interface IShellObjectInfo : IArchiveItemInfoProvider
     {
         Stream ArchiveFileStream { get; }
@@ -31,7 +31,7 @@ namespace WinCopies.IO
         /// <summary>
         /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="IShellObjectInfo"/>.
         /// </summary>
-        //ShellObject ShellObject { get; }
+        ShellObject ShellObject { get; }
 
         ///// <summary>
         ///// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.
@@ -62,7 +62,5 @@ namespace WinCopies.IO
         ///// Gets the special folder type of this <see cref="IShellObjectInfo"/>. <see cref="SpecialFolder.None"/> if this <see cref="IShellObjectInfo"/> is a casual file system item.
         ///// </summary>
         //SpecialFolder SpecialFolder { get; }
-
     }
-
 }

@@ -201,7 +201,7 @@ namespace WinCopies.Collections.Generic
             OnUpdate();
         }
 
-#region AddRange methods
+        #region AddRange methods
 
         /// <summary>
         /// Add multiple values at the top of this <see cref="ArrayBuilder{T}"/>.
@@ -411,7 +411,7 @@ namespace WinCopies.Collections.Generic
         /// <param name="array">The values to add to this <see cref="ArrayBuilder{T}"/></param>
         public void AddRangeAfter(in LinkedListNode<T> node, in IEnumerable<LinkedListNode<T>> array) { if (node.Next == null) AddRangeLast(array); else AddRangeBefore(node.Next, array); }
 
-#endregion
+        #endregion
 
         /// <summary>
         /// Removes all nodes from this <see cref="ArrayBuilder{T}"/>.

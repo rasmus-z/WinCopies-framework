@@ -15,14 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-#if !WinCopies2
+using System;
+using System.Runtime.Serialization;
 
-using System.Collections.Generic;
-using System.ComponentModel;
-
-namespace WinCopies.Collections.Generic
+namespace WinCopies.IO
 {
-    public interface IReadOnlyObservableTreeNode<T> : IReadOnlyTreeNode, IReadOnlyTreeNode<T>, WinCopies.Util.IReadOnlyValueObject<T>, WinCopies.Util.IReadOnlyValueObject, System.Collections.Generic.IReadOnlyList<IReadOnlyTreeNode<T>>, System.Collections.Generic.IReadOnlyCollection<IReadOnlyTreeNode<T>>, IEnumerable<IReadOnlyTreeNode<T>>, /*IEnumerable,*/ System.IDisposable, System.Collections.Specialized.INotifyCollectionChanged, INotifyPropertyChanged { }
-}
+    public class IOException : System.IO.IOException
+    {
+        public IBrowsableObjectInfo Path { get; }
 
-#endif
+        public IOException(IBrowsableObjectInfo path) : base() => Path = path;
+
+        public IOException(string message, IBrowsableObjectInfo path) : base(message) => Path = path;
+
+        public IOException(string message, int hresult, IBrowsableObjectInfo path) : base(message, hresult) => Path = path;
+
+        public IOException(string message, Exception innerException, IBrowsableObjectInfo path) : base(message, innerException) => Path = path;
+
+        protected IOException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+    }
+}

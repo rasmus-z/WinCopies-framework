@@ -32,7 +32,7 @@ namespace WinCopies.Collections.DotNetFix.Generic
 
         public ObservableLinkedCollection() : base() { }
 
-        public ObservableLinkedCollection(in System.Collections.Generic. LinkedList<T> list) : base(list) { }
+        public ObservableLinkedCollection(in System.Collections.Generic.LinkedList<T> list) : base(list) { }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
@@ -166,7 +166,7 @@ namespace WinCopies.Collections.DotNetFix.Generic
 
         protected override bool RemoveItem(T item)
         {
-            foreach (LinkedListNode<T> node in new  LinkedListNodeEnumerator<T>(InnerList))
+            foreach (LinkedListNode<T> node in new LinkedListNodeEnumerator<T>(InnerList))
 
                 if (node.Value.Equals(item))
                 {

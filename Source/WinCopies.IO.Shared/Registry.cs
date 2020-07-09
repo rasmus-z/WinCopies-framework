@@ -29,7 +29,6 @@ namespace WinCopies.IO
 
     public static class Registry
     {
-
         //        //private const string DefaultIcon = "DefaultIcon";
         //        //private const string OpenCommandPath = "shell\\open\\command";
         //        //private const string DefaultIconDllPath = "%SystemRoot%\\System32\\SHELL32.dll";
@@ -479,9 +478,7 @@ namespace WinCopies.IO
         public static RegistryKey OpenRegistryKey(string name, bool writable) => writable ? OpenRegistryKey(name, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.WriteKey) : OpenRegistryKey(name, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
 
         public static RegistryKey OpenRegistryKey(string name, RegistryKeyPermissionCheck registryKeyPermissionCheck, RegistryRights registryRights)
-
         {
-
             ThrowIfNullEmptyOrWhiteSpace(name, nameof(name));
 
             string originalName = name;
@@ -489,23 +486,17 @@ namespace WinCopies.IO
             string registryKeyName;
 
             if (name.Contains(WinCopies.IO.Path.PathSeparator, out int result))
-
             {
-
                 registryKeyName = name.Substring(0, result);
 
                 name = name.Length == 1 ? "" : name.Substring(result + 1);
-
             }
 
             else
-
             {
-
                 registryKeyName = name;
 
                 name = "";
-
             }
 
             FieldInfo[] fields = typeof(Microsoft.Win32.Registry).GetFields();
@@ -515,13 +506,10 @@ namespace WinCopies.IO
             RegistryKey item;
 
             for (int i = 0; i < fields.Length; i++)
-
             {
-
                 item = (RegistryKey)fields[i].GetValue(null);
 
                 registryKeys[i] = new KeyValuePair<RegistryKey, string>(item, item.Name);
-
             }
 
             if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, out RegistryKey registryKey, registryKeyName, registryKeys))
@@ -529,7 +517,6 @@ namespace WinCopies.IO
                 return name.Length > 0 ? registryKey.OpenSubKey(name, registryKeyPermissionCheck, registryRights) : registryKey;
 
             else throw new RegistryException(string.Format(Properties.Resources.RegistryKeyNotExists, originalName), originalName);
-
         }
 
         //        //public static Icon[] GetIconVariationsFromFileType(string fileType) => GetIconVariationsFromFileTypeRegistryKey(GetFileTypeRegistryKey(fileType));
@@ -706,5 +693,4 @@ namespace WinCopies.IO
         //        //}
 
     }
-
 }

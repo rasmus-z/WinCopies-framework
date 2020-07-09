@@ -27,9 +27,7 @@ namespace WinCopies.IO
     /// Provides data about file system items.
     /// </summary>
     public interface IFileSystemObject : IComparable<IFileSystemObject>, IEquatable<IFileSystemObject>
-
     {
-
         /// <summary>
         /// Gets the path of this <see cref="IFileSystemObject"/>.
         /// </summary>
@@ -44,6 +42,5 @@ namespace WinCopies.IO
         /// Gets the name of this <see cref="IFileSystemObject"/>.
         /// </summary>
         string Name { get; }
-
     }
 }

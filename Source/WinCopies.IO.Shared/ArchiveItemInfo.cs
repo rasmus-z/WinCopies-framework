@@ -31,26 +31,22 @@ using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
-
     /// <summary>
     /// Represents an archive item.
     /// </summary>
     public interface IArchiveItemInfo : IArchiveItemInfoProvider
     {
-
         /// <summary>
         /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="IArchiveItemInfo"/> represents.
         /// </summary>
         ArchiveFileInfo? ArchiveFileInfo { get; }
-
     }
 
     /// <summary>
     /// Represents an archive item.
     /// </summary>
-    public class ArchiveItemInfo/*<TItems, TFactory>*/ : ArchiveItemInfoProvider/*<TItems, TFactory>*/, IArchiveItemInfo // where TItems : BrowsableObjectInfo, IArchiveItemInfo where TFactory : BrowsableObjectInfoFactory, IArchiveItemInfoFactory
+    public class ArchiveItemInfo : ArchiveItemInfoProvider, IArchiveItemInfo
     {
-
         private IBrowsableObjectInfo _parent;
 
         #region Properties
@@ -167,34 +163,26 @@ namespace WinCopies.IO
         public static ArchiveItemInfo From(in IShellObjectInfo archiveShellObjectInfo, in ArchiveFileInfo archiveFileInfo)
 
         {
-
             ThrowIfNull(archiveShellObjectInfo, nameof(archiveShellObjectInfo));
 
             string extension = System.IO.Path.GetExtension(archiveFileInfo.FileName);
 
             return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFileInfo.FileName), archiveFileInfo.IsDirectory ? FileType.Folder : extension == ".lnk" ? FileType.Link : extension == ".library.ms" ? FileType.Library : FileType.File, archiveShellObjectInfo, archiveFileInfo);
-
         }
 
         public static ArchiveItemInfo From(in IShellObjectInfo archiveShellObjectInfo, in string archiveFilePath)
-
         {
-
             ThrowIfNull(archiveShellObjectInfo, nameof(archiveShellObjectInfo));
 
             return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFilePath), FileType.Folder, archiveShellObjectInfo, null);
-
         }
 
         private IBrowsableObjectInfo GetParent()
         {
-
             IBrowsableObjectInfo result;
 
             if (Path.Length > ArchiveShellObject.Path.Length)
-
             {
-
                 string path = Path.Substring(0, Path.LastIndexOf(WinCopies.IO.Path.PathSeparator));
 
                 ArchiveFileInfo? archiveFileInfo = null;
@@ -203,16 +191,14 @@ namespace WinCopies.IO
 
                     archiveFileInfo = extractor.ArchiveFileData.FirstOrDefault(item => string.Compare(item.FileName, path, StringComparison.OrdinalIgnoreCase) == 0);
 
-                result = new ArchiveItemInfo(path, FileType.Folder, ArchiveShellObject, archiveFileInfo/*, _archiveFileInfo => ArchiveItemInfo.DefaultArchiveFileInfoDeepClone(_archiveFileInfo, ArchiveShellObject.Path) archiveParentFileInfo.Value*/);
-
+                result = new ArchiveItemInfo(path, FileType.Folder, ArchiveShellObject, archiveFileInfo);
             }
 
             else
 
                 result = ArchiveShellObject;
 
-            return result /*&& Path.Contains(IO.Path.PathSeparator)*/;
-
+            return result;
         }
 
         public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
@@ -223,17 +209,13 @@ namespace WinCopies.IO
 
         protected override void Dispose(in bool disposing)
         {
-
             base.Dispose(disposing);
 
             if (disposing)
 
                 ArchiveFileInfo = null;
-
         }
 
         #endregion
-
     }
-
 }

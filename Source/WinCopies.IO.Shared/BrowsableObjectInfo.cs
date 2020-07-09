@@ -24,7 +24,6 @@ using TsudaKageyu;
 
 namespace WinCopies.IO
 {
-
     public abstract class BrowsableObjectInfo : FileSystemObject, IBrowsableObjectInfo
     {
         public const ushort SmallIconSize = 16;
@@ -47,9 +46,7 @@ namespace WinCopies.IO
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(in bool disposing)
-
         {
-
             //if (ItemsLoader != null)
 
             //{
@@ -65,7 +62,6 @@ namespace WinCopies.IO
             //if (disposing)
 
             //    _parent = null;
-
         }
 
         internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
@@ -117,9 +113,7 @@ namespace WinCopies.IO
         public bool IsDisposed { get; internal set; }
 
         public void Dispose()
-
         {
-
             if (IsDisposed)
 
                 return;
@@ -129,19 +123,13 @@ namespace WinCopies.IO
             GC.SuppressFinalize(this);
 
             IsDisposed = true;
-
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         ~BrowsableObjectInfo()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-
         {
-
             Dispose(false);
-
         }
-
     }
-
 }

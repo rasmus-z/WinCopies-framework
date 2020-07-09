@@ -36,7 +36,6 @@ using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
-
     public struct ShellObjectInfoEnumeratorStruct
     {
         public ShellObject ShellObject { get; }
@@ -116,7 +115,6 @@ namespace WinCopies.IO
     /// </summary>
     public class ShellObjectInfo/*<TItems, TArchiveItemInfoItems, TFactory>*/ : ArchiveItemInfoProvider/*<TItems, TFactory>*/, IShellObjectInfo // where TItems : BrowsableObjectInfo, IFileSystemObjectInfo where TArchiveItemInfoItems : BrowsableObjectInfo, IArchiveItemInfo where TFactory : BrowsableObjectInfoFactory, IShellObjectInfoFactory
     {
-
         private IBrowsableObjectInfo _parent;
 
         #region Properties
@@ -131,7 +129,6 @@ namespace WinCopies.IO
                 uint? value = ShellObject.Properties.System.FileAttributes.Value;
 
                 if (value.HasValue)
-
                 {
                     var _value = (Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes)value.Value;
 
@@ -241,33 +238,24 @@ namespace WinCopies.IO
 
         public static ShellObjectInfo From(ShellObject shellObject)
         {
-
             if ((shellObject ?? throw GetArgumentNullException(nameof(shellObject))) is ShellFolder shellFolder)
-
             {
-
                 if (shellObject is ShellFileSystemFolder shellFileSystemFolder)
-
                 {
-
                     (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, FileType.KnownFolder) : (shellFileSystemFolder.Path, FileType.Folder);
 
-                    if (System.IO.Directory.GetParent(path) is null)
-
-                        return new ShellObjectInfo(path, FileType.Drive, shellObject);
-
-                    return new ShellObjectInfo(path, fileType, shellObject);
-
+                    return System.IO.Directory.GetParent(path) is null
+                        ? new ShellObjectInfo(path, FileType.Drive, shellObject)
+                        : new ShellObjectInfo(path, fileType, shellObject);
                 }
 
-                if (shellObject is NonFileSystemKnownFolder nonFileSystemKnownFolder)
-
-                    return new ShellObjectInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder, shellObject);
-
-                else if (shellObject is ShellNonFileSystemFolder)
-
-                    return new ShellObjectInfo(shellObject.ParsingName, FileType.Folder, shellObject);
-
+                switch (shellObject)
+                {
+                    case NonFileSystemKnownFolder nonFileSystemKnownFolder:
+                        return new ShellObjectInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder, shellObject);
+                    case ShellNonFileSystemFolder _:
+                        return new ShellObjectInfo(shellObject.ParsingName, FileType.Folder, shellObject);
+                }
             }
 
             if (shellObject is ShellLink shellLink)
@@ -279,7 +267,6 @@ namespace WinCopies.IO
                 return new ShellObjectInfo(shellFile.Path, IsSupportedArchiveFormat(System.IO.Path.GetExtension(shellFile.Path)) ? FileType.Archive : shellFile.IsLink ? FileType.Link : System.IO.Path.GetExtension(shellFile.Path) == ".library-ms" ? FileType.Library : FileType.File, shellObject);
 
             throw new ArgumentException($"The given {nameof(Microsoft.WindowsAPICodePack.Shell.ShellObject)} is not supported.");
-
         }
 
         public void OpenArchive(Stream stream)
@@ -312,7 +299,6 @@ namespace WinCopies.IO
         /// <returns>The parent of this <see cref="ShellObjectInfo"/>.</returns>
         private IBrowsableObjectInfo GetParent()
         {
-
             //#if !NETFRAMEWORK
 
             //            static
@@ -340,12 +326,10 @@ namespace WinCopies.IO
                 return new ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.KnownFolders.Computer.Path, FileType.KnownFolder, ShellObject.FromParsingName(Microsoft.WindowsAPICodePack.Shell.KnownFolders.Computer.ParsingName));
 
             else return null;
-
         }
 
         protected override void Dispose(in bool disposing)
         {
-
             base.Dispose(disposing);
 
             ShellObject.Dispose();
@@ -357,7 +341,6 @@ namespace WinCopies.IO
             if (disposing)
 
                 ShellObject = null;
-
         }
 
         public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ShellObjectInfoEnumeratorStruct> func)
@@ -465,7 +448,5 @@ namespace WinCopies.IO
         //}
 
         #endregion
-
     }
-
 }

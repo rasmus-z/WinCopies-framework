@@ -49,9 +49,7 @@ using static WinCopies.Util.Util;
 namespace WinCopies.IO
 {
     public static class Path
-
     {
-
         public const char PathSeparator = '\\';
 
         //public static readonly string[] PathEnvironmentVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
@@ -63,9 +61,7 @@ namespace WinCopies.IO
         // public new event PropertyChangedEventHandler PropertyChanged;
 
         static Path()
-
         {
-
             // todo: to add the other 'in' archive formats
 
             dic.Add(InArchiveFormat.Zip, new string[] { ".zip" });
@@ -161,7 +157,6 @@ namespace WinCopies.IO
             dic.Add(InArchiveFormat.XZ, new string[] { ".xz" });
 
             InArchiveFormats = new ReadOnlyDictionary<InArchiveFormat, string[]>(dic);
-
         }
 
         //        public static ITreeNode< FileSystemObjectInfo > GetBrowsableObjectInfoFromPath(string path, bool parent/*, bool deepArchiveCheck*/)
@@ -311,9 +306,7 @@ namespace WinCopies.IO
         //        }
 
         public static bool IsSupportedArchiveFormat(in string extension)
-
         {
-
             foreach (KeyValuePair<InArchiveFormat, string[]> value in InArchiveFormats)
 
                 if (value.Value != null)
@@ -325,7 +318,6 @@ namespace WinCopies.IO
                             return true;
 
             return false;
-
         }
 
         //        public static bool MatchToFilter(string path, string filter)
@@ -787,9 +779,7 @@ namespace WinCopies.IO
         //        }
 
         public static string GetRealPathFromEnvironmentVariables(in string path)
-
         {
-
             string[] subPaths = path.Split(WinCopies.IO.Path.PathSeparator);
 
             var stringBuilder = new StringBuilder();
@@ -797,9 +787,7 @@ namespace WinCopies.IO
             int count = 0;
 
             foreach (string subPath in subPaths)
-
             {
-
                 count++;
 
                 if (subPath.StartsWith("%"))
@@ -825,11 +813,9 @@ namespace WinCopies.IO
                 if (count < subPaths.Length)
 
                     _ = stringBuilder.Append(WinCopies.IO.Path.PathSeparator);
-
             }
 
             return stringBuilder.ToString();
-
         }
 
         public static bool IsFileSystemPath(in string path)

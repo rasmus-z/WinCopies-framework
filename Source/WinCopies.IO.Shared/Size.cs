@@ -27,7 +27,6 @@ namespace WinCopies.IO
     /// </summary>
     public enum ByteUnit : ushort
     {
-
         /// <summary>
         /// A size given in bytes.
         /// </summary>
@@ -72,7 +71,6 @@ namespace WinCopies.IO
         /// A size given in yobibytes.
         /// </summary>
         YobiByte = 8
-
     }
 
     /// <summary>
@@ -80,7 +78,6 @@ namespace WinCopies.IO
     /// </summary>
     public struct Size : IComparable<Size>, IComparable<byte>, IComparable<ushort>, IComparable<uint>, IComparable<ulong>, IComparable<sbyte>, IComparable<short>, IComparable<int>, IComparable<long>
     {
-
         /// <summary>
         /// The numeric value in bytes.
         /// </summary>
@@ -115,11 +112,8 @@ namespace WinCopies.IO
         {
             get
             {
-
                 if (_unit is null)
-
                 {
-
                     ushort unit;
 
                     ushort newUnit = 0;
@@ -130,7 +124,6 @@ namespace WinCopies.IO
 
                     do
                     {
-
                         unit = newUnit;
 
                         newUnit++;
@@ -142,11 +135,9 @@ namespace WinCopies.IO
                     } while (newValue > 1 && Enum.IsDefined(typeof(ByteUnit), newUnit));
 
                     _unit = (ByteUnit)unit;
-
                 }
 
                 return _unit.Value;
-
             }
         }
 
@@ -171,9 +162,7 @@ namespace WinCopies.IO
             if (obj is Size size) return size == this;
 
             if (IsNumber(obj))
-
             {
-
                 if (obj is sbyte sb) return sb == this;
 
                 if (obj is byte b) return b == this;
@@ -195,7 +184,6 @@ namespace WinCopies.IO
                 if (obj is decimal d) return d == this;
 
                 if (obj is double _d) return _d == this;
-
             }
 
             return false;
@@ -204,15 +192,10 @@ namespace WinCopies.IO
         public override int GetHashCode() => ValueInBytes.GetHashCode();
 
         public static string GetDisplaySizeUnit(in ByteUnit unit)
-
 #if NETFRAMEWORK
-            
-            {
-
+        {
             switch (unit)
-
             {
-
                 case ByteUnit.Byte:
 
                     return "B";
@@ -252,10 +235,8 @@ namespace WinCopies.IO
                 default:
 
                     throw new ArgumentOutOfRangeException(nameof(unit), unit, $"{nameof(unit)} must be a value defined in the {nameof(ByteUnit)} enumeration.");
-
             }
-            
-            }
+        }
             
 #else
 
@@ -287,7 +268,7 @@ namespace WinCopies.IO
 #endif
         Size other) =>
 #if NETCORE
-            other == null ? ValueInBytes.IsNaN ? 0 : 1 : 
+            other == null ? ValueInBytes.IsNaN ? 0 : 1 :
 #endif
             ValueInBytes.CompareTo(other.ValueInBytes);
 
@@ -337,7 +318,7 @@ namespace WinCopies.IO
 #if NETCORE
             [AllowNull]
         #endif
-        byte other) => ValueInBytes.CompareTo(other) ; 
+        byte other) => ValueInBytes.CompareTo(other);
 
         #region Size operators
 
@@ -351,7 +332,7 @@ namespace WinCopies.IO
         /// <param name="s1">Left size</param>
         /// <param name="s2">Right size</param>
         /// <returns><see langword="true"/> if <paramref name="s1"/> is less than <paramref name="s2"/>, otherwise <see langword="false"/>.</returns>
-        public static bool operator <(in Size s1, in Size s2) =>  s1.ValueInBytes < s2.ValueInBytes;
+        public static bool operator <(in Size s1, in Size s2) => s1.ValueInBytes < s2.ValueInBytes;
 
         /// <summary>
         /// Checks if <paramref name="s1"/> is greater than <paramref name="s2"/>.

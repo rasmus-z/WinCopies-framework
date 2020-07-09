@@ -18,15 +18,12 @@
 using System;
 
 namespace WinCopies.IO
-
 {
-
     /// <summary>
     /// The WMI item type.
     /// </summary>
     public enum WMIItemType
     {
-
         /// <summary>
         /// The WMI item is a namespace.
         /// </summary>
@@ -41,7 +38,6 @@ namespace WinCopies.IO
         /// The WMI item is an instance.
         /// </summary>
         Instance
-
     }
 
     ///// <summary>
@@ -72,5 +68,4 @@ namespace WinCopies.IO
     //    Instance = 4
 
     //}
-
 }

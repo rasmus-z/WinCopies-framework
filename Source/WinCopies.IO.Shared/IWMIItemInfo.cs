@@ -22,7 +22,6 @@ namespace WinCopies.IO
 {
     public interface IWMIItemInfo : IBrowsableObjectInfo, IComparable<IFileSystemObject>, IEquatable<IFileSystemObject>
     {
-
         ManagementBaseObject ManagementObject { get; }
 
         /// <summary>
@@ -31,6 +30,5 @@ namespace WinCopies.IO
         bool IsRootNode { get; }
 
         WMIItemType WMIItemType { get; }
-
     }
 }

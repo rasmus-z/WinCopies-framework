@@ -21,10 +21,8 @@ using WinCopies.Collections;
 
 namespace WinCopies.IO
 {
-
     public static class Directory
     {
-
         public static IEnumerable<IPathInfo> Enumerate(IEnumerable<IPathInfo> paths
 #if DEBUG
             , FileSystemEntryEnumeratorProcessSimulation simulationParameters

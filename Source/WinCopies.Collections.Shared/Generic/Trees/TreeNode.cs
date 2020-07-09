@@ -41,7 +41,7 @@ namespace WinCopies.Collections.Generic
     /// <typeparam name="T">The value and item type.</typeparam>
     [Serializable]
     [DebuggerDisplay("Value = {Value}, Count = {Count}")]
-    public class TreeNode<T> : IReadOnlyTreeNode, WinCopies.Util        .IValueObject, ITreeNode<T>, ICollection<TreeNode<T>>, System.Collections.Generic.IList<TreeNode<T>>, ICollection, System.Collections.IList, IReadOnlyCollection<TreeNode<T>>, System.Collections.Generic.IReadOnlyList<TreeNode<T>>, IReadOnlyCollection<T>, System.Collections.Generic.IReadOnlyList<T>
+    public class TreeNode<T> : IReadOnlyTreeNode, WinCopies.Util.IValueObject, ITreeNode<T>, ICollection<TreeNode<T>>, System.Collections.Generic.IList<TreeNode<T>>, ICollection, System.Collections.IList, IReadOnlyCollection<TreeNode<T>>, System.Collections.Generic.IReadOnlyList<TreeNode<T>>, IReadOnlyCollection<T>, System.Collections.Generic.IReadOnlyList<T>
     {
         /// <summary>
         /// Gets a value that indicates whether this <see cref="TreeNode{T}"/> is read-only. This value is always <see langword="false"/> for this class.

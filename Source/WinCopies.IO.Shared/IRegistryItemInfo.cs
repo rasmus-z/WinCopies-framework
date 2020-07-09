@@ -22,9 +22,8 @@ using System.Collections.Generic;
 
 namespace WinCopies.IO
 {
-    public interface IRegistryItemInfo : IBrowsableObjectInfo/*, IComparable<IRegistryItemInfo>, IEquatable<IRegistryItemInfo>*/
+    public interface IRegistryItemInfo : IBrowsableObjectInfo
     {
-
         RegistryItemType RegistryItemType { get; }
 
         RegistryKey RegistryKey { get; }
@@ -32,14 +31,5 @@ namespace WinCopies.IO
         IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate);
 
         IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions);
-
     }
-
-    //public interface IRegistryItemInfo<T> : IRegistryItemInfo, IBrowsableObjectInfo<T> where T : IRegistryItemInfoFactory
-
-    //{
-
-
-
-    //}
 }

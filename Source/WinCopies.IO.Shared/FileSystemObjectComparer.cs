@@ -23,9 +23,7 @@ using WinCopies.Util;
 namespace WinCopies.IO
 {
     public class FileSystemObjectComparer<T> : Comparer<T>, IFileSystemObjectComparer<T> where T : IFileSystemObject
-
     {
-
         public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
 
         protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer) { }
@@ -33,15 +31,12 @@ namespace WinCopies.IO
         protected virtual FileSystemObjectComparer<T> DeepCloneOverride() => new FileSystemObjectComparer<T>(_stringComparerDelegate);
 
         public object DeepClone()
-
         {
-
             FileSystemObjectComparer<T> fileSystemObjectComparer = DeepCloneOverride();
 
             OnDeepClone(fileSystemObjectComparer);
 
             return fileSystemObjectComparer;
-
         }
 
         private readonly DeepClone<StringComparer> _stringComparerDelegate;
@@ -52,21 +47,16 @@ namespace WinCopies.IO
 
         public FileSystemObjectComparer(DeepClone<StringComparer> stringComparerDelegate)
         {
-
             _stringComparerDelegate = stringComparerDelegate;
 
             StringComparer = stringComparerDelegate(null);
-
         }
 
         protected override int CompareOverride(T x, T y) => StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents());
-
     }
 
     public class FileSystemObjectInfoComparer<T> : FileSystemObjectComparer<T>, IFileSystemObjectComparer<T> where T : IFileSystemObjectInfo
-
     {
-
         public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
 
         protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer) { }
@@ -74,15 +64,12 @@ namespace WinCopies.IO
         protected virtual FileSystemObjectComparer<T> DeepCloneOverride() => new FileSystemObjectComparer<T>(_stringComparerDelegate);
 
         public object DeepClone()
-
         {
-
             FileSystemObjectComparer<T> fileSystemObjectComparer = DeepCloneOverride();
 
             OnDeepClone(fileSystemObjectComparer);
 
             return fileSystemObjectComparer;
-
         }
 
         private readonly DeepClone<StringComparer> _stringComparerDelegate;
@@ -93,11 +80,9 @@ namespace WinCopies.IO
 
         public FileSystemObjectInfoComparer(DeepClone<StringComparer> stringComparerDelegate)
         {
-
             _stringComparerDelegate = stringComparerDelegate;
 
             StringComparer = stringComparerDelegate(null);
-
         }
 
         protected override int CompareOverride(T x, T y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
@@ -107,6 +92,5 @@ namespace WinCopies.IO
                 : (x.FileType == FileType.File || x.FileType == FileType.Archive || x.FileType == FileType.Link) && (y.FileType == FileType.Folder || y.FileType == FileType.Drive)
                 ? 1
                 : 0;
-
     }
 }

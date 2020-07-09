@@ -51,9 +51,7 @@ namespace WinCopies.IO
         public PortableDeviceInfo(in IPortableDevice portableDevice) : base(portableDevice.DeviceFriendlyName) => PortableDevice = portableDevice;
 
         private BitmapSource TryGetBitmapSource(int size)
-
         {
-
 #if NETFRAMEWORK
 
             using (Icon icon = TryGetIcon(PortableDeviceIcon, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, new System.Drawing.Size(size, size)))
@@ -65,7 +63,6 @@ namespace WinCopies.IO
 #endif
 
             return icon == null ? null : Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
         }
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
