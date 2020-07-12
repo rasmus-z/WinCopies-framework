@@ -9,7 +9,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WinCopies.Linq;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     public interface IPortableDeviceInfo : IFileSystemObjectInfo
     {
@@ -47,6 +47,8 @@ namespace WinCopies.IO
         public override string LocalizedName => "N/A";
 
         public override string Name => PortableDevice.DeviceFriendlyName;
+
+        public override FileSystemType ItemFileSystemType => FileSystemType.PortableDevice;
 
         public PortableDeviceInfo(in IPortableDevice portableDevice) : base(portableDevice.DeviceFriendlyName) => PortableDevice = portableDevice;
 

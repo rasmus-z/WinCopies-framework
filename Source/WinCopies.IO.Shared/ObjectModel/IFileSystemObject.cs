@@ -16,12 +16,8 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     /// <summary>
     /// Provides data about file system items.
@@ -42,5 +38,7 @@ namespace WinCopies.IO
         /// Gets the name of this <see cref="IFileSystemObject"/>.
         /// </summary>
         string Name { get; }
+
+        FileSystemType ItemFileSystemType { get; }
     }
 }

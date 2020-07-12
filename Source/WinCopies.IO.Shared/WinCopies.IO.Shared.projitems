@@ -9,21 +9,22 @@
     <Import_RootNamespace>WinCopies.IO.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ArchiveFileInfoEnumeratorStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ArchiveItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enumerators.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ArchiveItemInfoProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BrowsableObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ArchiveItemInfoProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)File.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileInfoLoader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FileSystemObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\FileSystemObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectComparer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FileSystemObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\FileSystemObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FolderLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IBrowsableObjectInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IFileSystemObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IBrowsableObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IFileSystemObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFileSystemObjectComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DirectoryNotFoundException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DriveNotFoundException.cs" />
@@ -33,19 +34,23 @@
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\IOException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PathTooLongException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PipeException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IRegistryItemInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IShellObjectInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IWMIItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IRegistryItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IShellObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IWMIItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Path.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PortableDeviceInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PortableDeviceItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Registry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\RegistryException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RegistryItemInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\RegistryItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\ShellObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShellObjectInfoEnumeratorStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Size.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)WMIItemInfoFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\WMIItemInfoFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WMIItemType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)ObjectModel\" />
   </ItemGroup>
 </Project>

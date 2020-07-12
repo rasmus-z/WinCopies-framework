@@ -19,7 +19,7 @@ using System;
 using System.Management;
 using WinCopies.Util;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     public class WMIItemInfoFactory : IWMIItemInfoFactory // where TItems : BrowsableObjectInfo, IWMIItemInfo
     {

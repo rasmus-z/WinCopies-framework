@@ -32,7 +32,7 @@ using WinCopies.Linq;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     public struct RegistryItemInfoEnumeratorStruct
     {
@@ -83,6 +83,8 @@ namespace WinCopies.IO
         private const int FolderIcon = 3;
 
         private RegistryKey _registryKey;
+
+        private IBrowsableObjectInfo _parent;
 
         #endregion
 
@@ -139,21 +141,15 @@ namespace WinCopies.IO
         /// The <see cref="Microsoft.Win32.RegistryKey"/> that this <see cref="RegistryItemInfo"/> represents.
         /// </summary>
         public RegistryKey RegistryKey
-
         {
-
             get
-
             {
-
                 if (_registryKey == null && RegistryItemType == RegistryItemType.Key)
 
                     OpenKey();
 
                 return _registryKey;
-
             }
-
         }
 
         /// <summary>
@@ -191,10 +187,6 @@ namespace WinCopies.IO
         /// </summary>
         public override bool IsBrowsable => RegistryItemType == RegistryItemType.Root || RegistryItemType == RegistryItemType.Key;
 
-        #endregion
-
-        private IBrowsableObjectInfo _parent;
-
 #if NETCORE
 
         public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
@@ -204,6 +196,10 @@ namespace WinCopies.IO
         public override IBrowsableObjectInfo Parent => _parent ?? (_parent = GetParent());
 
 #endif
+
+        #endregion
+
+        public override FileSystemType ItemFileSystemType => FileSystemType.Registry;
 
         #region Constructors
 

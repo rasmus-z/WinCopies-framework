@@ -18,7 +18,7 @@
 using Microsoft.WindowsAPICodePack.Shell;
 using System.IO;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     public interface IShellObjectInfo : IArchiveItemInfoProvider
     {

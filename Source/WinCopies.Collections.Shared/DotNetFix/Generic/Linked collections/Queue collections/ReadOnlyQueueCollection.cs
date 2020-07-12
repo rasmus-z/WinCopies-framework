@@ -46,7 +46,7 @@ namespace WinCopies.Collections.DotNetFix.Generic
         /// <param name="queue">The inner <see cref="Queue{T}"/> for this <see cref="QueueCollection{T}"/>.</param>
         public ReadOnlyQueueCollection(in Queue<T> queue) => InnerQueue = queue;
 
-        public ReadOnlyQueueCollection(in Generic.DotNetFix.QueueCollection<T> queueCollection) : this(queueCollection.InnerQueue) { }
+        public ReadOnlyQueueCollection(in QueueCollection<T> queueCollection) : this(queueCollection.InnerQueue) { }
 
         /// <summary>
         /// Determines whether an element is in the <see cref="QueueCollection{T}"/>.

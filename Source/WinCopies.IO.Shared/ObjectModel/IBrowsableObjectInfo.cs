@@ -15,22 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Media.Imaging;
-using WinCopies.Collections;
-using WinCopies.Util;
+
 using IDisposable = WinCopies.Util.DotNetFix.IDisposable;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     /// <summary>
     /// Provides interoperability for interacting with browsable items.
     /// </summary>
     public interface IBrowsableObjectInfo : IFileSystemObject, /*IDeepCloneable,*/ IDisposable
     {
-        bool IsSpecialItem { get; }
+        /// <summary>
+        /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is browsable.
+        /// </summary>
+        bool IsBrowsable { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+        /// </summary>
+        IBrowsableObjectInfo Parent { get; }
 
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="IBrowsableObjectInfo"/>.
@@ -52,10 +57,16 @@ namespace WinCopies.IO
         /// </summary>
         BitmapSource ExtraLargeBitmapSource { get; }
 
+        string ItemTypeName { get; }
+
+        string Description { get; }
+
         /// <summary>
-        /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is browsable.
+        /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.
         /// </summary>
-        bool IsBrowsable { get; }
+        Size? Size { get; }
+
+        bool IsSpecialItem { get; }
 
         ///// <summary>
         ///// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.
@@ -76,20 +87,6 @@ namespace WinCopies.IO
         //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
 
         IEnumerable<IBrowsableObjectInfo> GetItems();
-
-        /// <summary>
-        /// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="IBrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
-        /// </summary>
-        IBrowsableObjectInfo Parent { get; }
-
-        string ItemTypeName { get; }
-
-        string Description { get; }
-
-        /// <summary>
-        /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        Size? Size { get; }
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 

@@ -29,7 +29,7 @@ using System.Linq;
 using WinCopies.Linq;
 using WinCopies.Collections;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     public class WMIItemInfo/*<TItems, TFactory>*/ : BrowsableObjectInfo/*<TItems, TFactory>*/, IWMIItemInfo // where TItems : BrowsableObjectInfo<TItems, TFactory>, IWMIItemInfo where TFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
     {
@@ -42,6 +42,8 @@ namespace WinCopies.IO
         public const string ROOT = "ROOT";
 
         #endregion
+
+        private IBrowsableObjectInfo _parent;
 
         #region Properties
 
@@ -93,7 +95,7 @@ namespace WinCopies.IO
 
         public override Size? Size => null;
 
-        private IBrowsableObjectInfo _parent;
+        public override FileSystemType ItemFileSystemType => FileSystemType.WMI;
 
 #if NETCORE
 
@@ -341,7 +343,9 @@ namespace WinCopies.IO
 
                     path = Path.Substring(0, Path.IndexOf(':'));
 
-                    path = path.Substring(0, $"{path.LastIndexOf(WinCopies.IO.Path.PathSeparator)}:{path.Substring(path.LastIndexOf(WinCopies.IO.Path.PathSeparator) + 1)}");
+                    int splitIndex = path.LastIndexOf(WinCopies.IO.Path.PathSeparator) ; 
+
+                    path = $"{path.Substring(0, splitIndex)}:{path.Substring(splitIndex + 1)}";
 
                     return new WMIItemInfo(path, WMIItemType.Class, null);
 

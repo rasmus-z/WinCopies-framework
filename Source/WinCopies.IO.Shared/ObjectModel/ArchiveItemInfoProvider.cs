@@ -17,7 +17,7 @@
 
 using System;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     /// <summary>
     /// Provides interoperability for interacting with browsable items.

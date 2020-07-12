@@ -15,21 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.If not, see<https://www.gnu.org/licenses/>. */
 
-using Microsoft.Win32;
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Management;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
-    public interface IRegistryItemInfo : IBrowsableObjectInfo
+    public interface IWMIItemInfo : IBrowsableObjectInfo, IComparable<IFileSystemObject>, IEquatable<IFileSystemObject>
     {
-        RegistryItemType RegistryItemType { get; }
+        ManagementBaseObject ManagementObject { get; }
 
-        RegistryKey RegistryKey { get; }
+        /// <summary>
+        /// Gets a value that indicates whether this <see cref="WMIItemInfo"/> represents a root node.
+        /// </summary>
+        bool IsRootNode { get; }
 
-        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryKey> predicate);
-
-        IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<RegistryItemInfoEnumeratorStruct> predicate, bool catchExceptions);
+        WMIItemType WMIItemType { get; }
     }
 }

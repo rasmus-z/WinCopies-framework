@@ -22,24 +22,90 @@ using System.Windows.Media.Imaging;
 
 using TsudaKageyu;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     public abstract class BrowsableObjectInfo : FileSystemObject, IBrowsableObjectInfo
     {
+        #region Consts
         public const ushort SmallIconSize = 16;
-
         public const ushort MediumIconSize = 48;
-
         public const ushort LargeIconSize = 128;
-
         public const ushort ExtraLargeIconSize = 256;
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
+        /// </summary>
+        public abstract bool IsBrowsable { get; }
+
+        ///// <summary>
+        ///// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
+        ///// </summary>
+        public abstract IBrowsableObjectInfo Parent { get; }
+
+        #region BitmapSources
+        /// <summary>
+        /// When overridden in a derived class, gets the small <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        public abstract BitmapSource SmallBitmapSource { get; }
+
+        /// <summary>
+        /// When overridden in a derived class, gets the medium <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        public abstract BitmapSource MediumBitmapSource { get; }
+
+        /// <summary>
+        /// When overridden in a derived class, gets the large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        public abstract BitmapSource LargeBitmapSource { get; }
+
+        /// <summary>
+        /// When overridden in a derived class, gets the extra large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
+        /// </summary>
+        public abstract BitmapSource ExtraLargeBitmapSource { get; }
+        #endregion
+
+        public abstract string ItemTypeName { get; }
+
+        public abstract string Description { get; }
+
+        /// <summary>
+        /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.
+        /// </summary>
+        public abstract Size? Size { get; }
 
         public abstract bool IsSpecialItem { get; }
+
+        /// <summary>
+        /// Gets a value that indicates whether the current object is disposed.
+        /// </summary>
+        public bool IsDisposed { get; internal set; }
+        #endregion
 
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
         protected BrowsableObjectInfo(string path) : base(path) { }
+
+        #region Methods
+        internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
+
+        public abstract IEnumerable<IBrowsableObjectInfo> GetItems();
+
+        #region IDisposable
+        public void Dispose()
+        {
+            if (IsDisposed)
+
+                return;
+
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+
+            IsDisposed = true;
+        }
 
         /// <summary>
         /// Not used in this class.
@@ -63,73 +129,11 @@ namespace WinCopies.IO
 
             //    _parent = null;
         }
-
-        internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);
-
-        /// <summary>
-        /// When overridden in a derived class, gets the small <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract BitmapSource SmallBitmapSource { get; }
-
-        /// <summary>
-        /// When overridden in a derived class, gets the medium <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract BitmapSource MediumBitmapSource { get; }
-
-        /// <summary>
-        /// When overridden in a derived class, gets the large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract BitmapSource LargeBitmapSource { get; }
-
-        /// <summary>
-        /// When overridden in a derived class, gets the extra large <see cref="BitmapSource"/> of this <see cref="BrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract BitmapSource ExtraLargeBitmapSource { get; }
-
-        /// <summary>
-        /// When overridden in a derived class, gets a value that indicates whether this <see cref="BrowsableObjectInfo"/> is browsable.
-        /// </summary>
-        public abstract bool IsBrowsable { get; }
-
-        public abstract string ItemTypeName { get; }
-
-        public abstract string Description { get; }
-
-        /// <summary>
-        /// Gets the size for this <see cref="IBrowsableObjectInfo"/>.
-        /// </summary>
-        public abstract Size? Size { get; }
-
-        ///// <summary>
-        ///// Gets the <see cref="IBrowsableObjectInfo"/> parent of this <see cref="BrowsableObjectInfo"/>. Returns <see langword="null"/> if this object is the root object of a hierarchy.
-        ///// </summary>
-        public abstract IBrowsableObjectInfo Parent { get; }
-
-        public abstract IEnumerable<IBrowsableObjectInfo> GetItems();
-
-        /// <summary>
-        /// Gets a value that indicates whether the current object is disposed.
-        /// </summary>
-        public bool IsDisposed { get; internal set; }
-
-        public void Dispose()
-        {
-            if (IsDisposed)
-
-                return;
-
-            Dispose(true);
-
-            GC.SuppressFinalize(this);
-
-            IsDisposed = true;
-        }
+        #endregion
+        #endregion
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        ~BrowsableObjectInfo()
+        ~BrowsableObjectInfo() => Dispose(false);
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            Dispose(false);
-        }
     }
 }

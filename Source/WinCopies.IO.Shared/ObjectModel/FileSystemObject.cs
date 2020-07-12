@@ -19,7 +19,7 @@ using System;
 
 using static WinCopies.Util.Util;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     /// <summary>
     /// The base class for all file system objects in the WinCopies framework. This class can represent virtual file system objects (for example registry items, WMI items, ...).
@@ -40,6 +40,8 @@ namespace WinCopies.IO
         /// When overridden in a derived class, gets the name of this <see cref="FileSystemObject"/>.
         /// </summary>
         public abstract string Name { get; }
+
+        public abstract FileSystemType ItemFileSystemType { get; }
 
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="FileSystemObject"/> class.

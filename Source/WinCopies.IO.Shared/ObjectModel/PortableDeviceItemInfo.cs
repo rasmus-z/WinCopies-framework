@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows.Media.Imaging;
 using WinCopies.Linq;
 
-namespace WinCopies.IO
+namespace WinCopies.IO.ObjectModel
 {
     public interface IPortableDeviceItemInfo : IFileSystemObjectInfo
     {
@@ -112,6 +112,8 @@ namespace WinCopies.IO
         }
 
         public override FileType FileType { get; }
+
+        public override FileSystemType ItemFileSystemType => FileSystemType.PortableDevice;
 
         private static FileType GetFileType(in PortableDeviceFileType portableDeviceFileType, in string path)
         {

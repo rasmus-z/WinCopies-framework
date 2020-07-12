@@ -6,6 +6,7 @@ using System.IO;
 using System.Management;
 using System.Security;
 using WinCopies.Collections;
+using WinCopies.IO.ObjectModel;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 

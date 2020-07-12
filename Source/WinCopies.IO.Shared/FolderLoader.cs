@@ -49,11 +49,8 @@ namespace WinCopies.IO
     //    }
 
     internal static class FolderLoader
-
     {
-
         internal static bool HandleIOException(Exception ex) => ex.Is(false, typeof(IOException), typeof(UnauthorizedAccessException), typeof(SecurityException));
-
     }
 
     //    /// <summary>

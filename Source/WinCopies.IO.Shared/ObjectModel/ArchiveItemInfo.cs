@@ -18,18 +18,20 @@
 using SevenZip;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Media.Imaging;
 
-using static WinCopies.Util.Util;
-using IfCT = WinCopies.Util.Util.ComparisonType;
-using IfCM = WinCopies.Util.Util.ComparisonMode;
-using IfComp = WinCopies.Util.Util.Comparison;
-using System.Linq;
-using System.Collections.Generic;
-using WinCopies.Util;
 using WinCopies.Collections;
+using WinCopies.Util;
 
-namespace WinCopies.IO
+using static WinCopies.Util.Util;
+
+using IfComp = WinCopies.Util.Util.Comparison;
+using IfCM = WinCopies.Util.Util.ComparisonMode;
+using IfCT = WinCopies.Util.Util.ComparisonType;
+
+namespace WinCopies.IO.ObjectModel
 {
     /// <summary>
     /// Represents an archive item.
@@ -50,23 +52,26 @@ namespace WinCopies.IO
         private IBrowsableObjectInfo _parent;
 
         #region Properties
+        //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
 
-        public override bool IsSpecialItem
-        {
-            get
-            {
-                if (ArchiveFileInfo.HasValue)
-                {
-                    var value = (Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes)ArchiveFileInfo.Value.Attributes;
+        /// <summary>
+        /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="IArchiveItemInfo"/> represents.
+        /// </summary>
+        public ArchiveFileInfo? ArchiveFileInfo { get; private set; }
 
-                    return value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Hidden) || value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.System);
-                }
+        #region Overrides
+        public override FileSystemType ItemFileSystemType => FileSystemType.Archive;
 
-                else
+        /// <summary>
+        /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
+        /// </summary>
+        public override bool IsBrowsable => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.Drive, FileType.Archive);
 
-                    return false;
-            }
-        }
+#if NETFRAMEWORK
+        public override IBrowsableObjectInfo Parent => _parent ?? (_parent=GetParent());
+#else
+        public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
+#endif
 
         public override string LocalizedName => "N/A";
 
@@ -75,6 +80,7 @@ namespace WinCopies.IO
         /// </summary>
         public override string Name => System.IO.Path.GetFileName(Path);
 
+        #region BitmapSources
         /// <summary>
         /// Gets the small <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
@@ -94,23 +100,7 @@ namespace WinCopies.IO
         /// Gets the extra large <see cref="BitmapSource"/> of this <see cref="ArchiveItemInfo"/>.
         /// </summary>
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
-
-        /// <summary>
-        /// Gets a value that indicates whether this <see cref="ArchiveItemInfo"/> is browsable.
-        /// </summary>
-        public override bool IsBrowsable => If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.Drive, FileType.Archive);
-
-        //IShellObjectInfo IArchiveItemInfoProvider.ArchiveShellObject => ArchiveShellObjectOverride;
-
-        /// <summary>
-        /// The <see cref="SevenZip.ArchiveFileInfo"/> that this <see cref="IArchiveItemInfo"/> represents.
-        /// </summary>
-        public ArchiveFileInfo? ArchiveFileInfo { get; private set; }
-
-        /// <summary>
-        /// The parent <see cref="IShellObjectInfo"/> of the current archive item.
-        /// </summary>
-        public override IShellObjectInfo ArchiveShellObject { get; }
+        #endregion
 
         public override string ItemTypeName => GetItemTypeName(System.IO.Path.GetExtension(Path), FileType);
 
@@ -133,16 +123,28 @@ namespace WinCopies.IO
             }
         }
 
-#if NETFRAMEWORK
+        public override bool IsSpecialItem
+        {
+            get
+            {
+                if (ArchiveFileInfo.HasValue)
+                {
+                    var value = (Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes)ArchiveFileInfo.Value.Attributes;
 
-        public override IBrowsableObjectInfo Parent => _parent ?? (_parent=GetParent());
+                    return value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.Hidden) || value.HasFlag(Microsoft.WindowsAPICodePack.Win32Native.Shell.FileAttributes.System);
+                }
 
-#else
+                else
 
-        public override IBrowsableObjectInfo Parent => _parent ??= GetParent();
+                    return false;
+            }
+        }
 
-#endif
-
+        /// <summary>
+        /// The parent <see cref="IShellObjectInfo"/> of the current archive item.
+        /// </summary>
+        public override IShellObjectInfo ArchiveShellObject { get; }
+        #endregion
         #endregion
 
         private ArchiveItemInfo(in string path, in FileType fileType, in IShellObjectInfo archiveShellObject, in ArchiveFileInfo? archiveFileInfo/*, DeepClone<ArchiveFileInfo?> archiveFileInfoDelegate*/) : base(path, fileType)
@@ -153,7 +155,7 @@ namespace WinCopies.IO
         }
 
         #region Methods
-
+        #region Construction helpers
         ///// <summary>
         ///// Initializes a new instance of the <see cref="ArchiveItemInfo"/> class using a custom factory for <see cref="ArchiveItemInfo"/>s.
         ///// </summary>
@@ -161,7 +163,6 @@ namespace WinCopies.IO
         ///// <param name="path">The full path to this archive item</param>
         ///// <param name="fileType">The file type of this archive item</param>
         public static ArchiveItemInfo From(in IShellObjectInfo archiveShellObjectInfo, in ArchiveFileInfo archiveFileInfo)
-
         {
             ThrowIfNull(archiveShellObjectInfo, nameof(archiveShellObjectInfo));
 
@@ -176,6 +177,7 @@ namespace WinCopies.IO
 
             return new ArchiveItemInfo(System.IO.Path.Combine(archiveShellObjectInfo.Path, archiveFilePath), FileType.Folder, archiveShellObjectInfo, null);
         }
+        #endregion
 
         private IBrowsableObjectInfo GetParent()
         {
@@ -201,11 +203,13 @@ namespace WinCopies.IO
             return result;
         }
 
+        #region GetItems
         public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func) => func is null ? throw GetArgumentNullException(nameof(func)) : GetArchiveItemInfoItems(func);
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetArchiveItemInfoItems(null);
 
         private IEnumerable<IBrowsableObjectInfo> GetArchiveItemInfoItems(Predicate<ArchiveFileInfoEnumeratorStruct> func) => new Enumerable<IBrowsableObjectInfo>(() => new ArchiveItemInfoEnumerator(this, func));
+        #endregion
 
         protected override void Dispose(in bool disposing)
         {
@@ -215,7 +219,6 @@ namespace WinCopies.IO
 
                 ArchiveFileInfo = null;
         }
-
         #endregion
     }
 }

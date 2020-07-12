@@ -18,6 +18,7 @@
 using System;
 using System.Globalization;
 using WinCopies.Collections;
+using WinCopies.IO.ObjectModel;
 using WinCopies.Util;
 
 namespace WinCopies.IO
