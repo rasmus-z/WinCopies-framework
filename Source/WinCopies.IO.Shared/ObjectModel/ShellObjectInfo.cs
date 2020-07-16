@@ -15,12 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.COMNative.PortableDevices.PropertySystem;
 using Microsoft.WindowsAPICodePack.COMNative.Shell;
 using Microsoft.WindowsAPICodePack.PortableDevices;
+using Microsoft.WindowsAPICodePack.PropertySystem;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -166,10 +169,10 @@ namespace WinCopies.IO.ObjectModel
         ///// <param name="fileType">The file type of this <see cref="ShellObjectInfo"/>.</param>
         ///// <param name="specialFolder">The special folder type of this <see cref="ShellObjectInfo"/>. <see cref="WinCopies.IO.SpecialFolder.None"/> if this <see cref="ShellObjectInfo"/> is a casual file system item.</param>
         ///// <param name="shellObject">The <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that this <see cref="ShellObjectInfo"/> represents.</param>
-        private ShellObjectInfo(string path, FileType fileType, ShellObject shellObject) : base(path, fileType) => ShellObject = shellObject;
+        private ShellObjectInfo(in string path, in FileType fileType, in ShellObject shellObject, in ClientVersion clientVersion) : base(path, fileType, clientVersion) => ShellObject = shellObject;
 
         #region Methods
-        public static ShellObjectInfo From(ShellObject shellObject)
+        public static ShellObjectInfo From(in ShellObject shellObject, in ClientVersion clientVersion)
         {
             if ((shellObject ?? throw GetArgumentNullException(nameof(shellObject))) is ShellFolder shellFolder)
             {
@@ -177,27 +180,28 @@ namespace WinCopies.IO.ObjectModel
                 {
                     (string path, FileType fileType) = shellFileSystemFolder is FileSystemKnownFolder ? (shellObject.ParsingName, FileType.KnownFolder) : (shellFileSystemFolder.Path, FileType.Folder);
 
-                    return System.IO.Directory.GetParent(path) is null
-                        ? new ShellObjectInfo(path, FileType.Drive, shellObject)
-                        : new ShellObjectInfo(path, fileType, shellObject);
+                    return new ShellObjectInfo(path, System.IO.Directory.GetParent(path) is null ? FileType.Drive : fileType, shellObject, clientVersion);
                 }
 
                 switch (shellObject)
                 {
                     case NonFileSystemKnownFolder nonFileSystemKnownFolder:
-                        return new ShellObjectInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder, shellObject);
+
+                        return new ShellObjectInfo(nonFileSystemKnownFolder.Path, FileType.KnownFolder, shellObject, clientVersion);
+
                     case ShellNonFileSystemFolder _:
-                        return new ShellObjectInfo(shellObject.ParsingName, FileType.Folder, shellObject);
+
+                        return new ShellObjectInfo(shellObject.ParsingName, FileType.Folder, shellObject, clientVersion);
                 }
             }
 
             if (shellObject is ShellLink shellLink)
 
-                return new ShellObjectInfo(shellLink.Path, FileType.Link, shellObject);
+                return new ShellObjectInfo(shellLink.Path, FileType.Link, shellObject, clientVersion);
 
             if (shellObject is ShellFile shellFile)
 
-                return new ShellObjectInfo(shellFile.Path, IsSupportedArchiveFormat(System.IO.Path.GetExtension(shellFile.Path)) ? FileType.Archive : shellFile.IsLink ? FileType.Link : System.IO.Path.GetExtension(shellFile.Path) == ".library-ms" ? FileType.Library : FileType.File, shellObject);
+                return new ShellObjectInfo(shellFile.Path, IsSupportedArchiveFormat(System.IO.Path.GetExtension(shellFile.Path)) ? FileType.Archive : shellFile.IsLink ? FileType.Link : System.IO.Path.GetExtension(shellFile.Path) == ".library-ms" ? FileType.Library : FileType.File, shellObject, clientVersion);
 
             throw new ArgumentException($"The given {nameof(Microsoft.WindowsAPICodePack.Shell.ShellObject)} is not supported.");
         }
@@ -223,6 +227,24 @@ namespace WinCopies.IO.ObjectModel
         #endregion
 
         #region GetItems
+        private bool PortableDevicePredicate(in IPortableDevice portableDevice, in Predicate<ShellObjectInfoEnumeratorStruct> func)
+        {
+            Debug.Assert(portableDevice != null);
+            Debug.Assert(func != null);
+
+            try
+            {
+                portableDevice.Open(ClientVersion.Value, new PortableDeviceOpeningOptions(Microsoft.WindowsAPICodePack.Win32Native.GenericRights.Read, Microsoft.WindowsAPICodePack.Win32Native.FileShareOptions.Read, false));
+
+                return (portableDevice.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Device.Type, out Property value) ? (DeviceTypeValues)value.GetValue(out Type valueType) != DeviceTypeValues.Generic : true) && func(new ShellObjectInfoEnumeratorStruct(portableDevice));
+            }
+
+            catch (Exception)
+            {
+                return true;
+            }
+        }
+
         public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ShellObjectInfoEnumeratorStruct> func)
         {
             ThrowIfNull(func, nameof(func));
@@ -237,7 +259,7 @@ namespace WinCopies.IO.ObjectModel
 
                     default:
 
-                        IEnumerable<IBrowsableObjectInfo> shellObjects = ((IEnumerable<ShellObject>)ShellObject).WherePredicate(item => func(new ShellObjectInfoEnumeratorStruct(item))).Select(shellObject => From(shellObject));
+                        IEnumerable<IBrowsableObjectInfo> shellObjects = ((IEnumerable<ShellObject>)ShellObject).Where(item => func(new ShellObjectInfoEnumeratorStruct(item))).Select(shellObject => From(shellObject, ClientVersion.Value));
 
                         if (ShellObject.ParsingName == Computer.ParsingName)
                         {
@@ -245,7 +267,7 @@ namespace WinCopies.IO.ObjectModel
 
                             portableDeviceManager.GetDevices();
 
-                            IEnumerable<IBrowsableObjectInfo> portableDevices = portableDeviceManager.PortableDevices.WherePredicate(item => func(new ShellObjectInfoEnumeratorStruct(item))).Select(portableDevice => new PortableDeviceInfo(portableDevice));
+                            IEnumerable<IBrowsableObjectInfo> portableDevices = portableDeviceManager.PortableDevices.Where(item => PortableDevicePredicate(item, func)).Select(portableDevice => new PortableDeviceInfo(portableDevice, ClientVersion.Value));
 
                             if (shellObjects == null) return portableDevices;
 
@@ -260,7 +282,7 @@ namespace WinCopies.IO.ObjectModel
             else return null;
         }
 
-        public virtual IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<ArchiveFileInfoEnumeratorStruct> func)
+        public virtual IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<ArchiveFileInfoEnumeratorStruct> func)
         {
             ThrowIfNull(func, nameof(func));
 
@@ -317,11 +339,11 @@ namespace WinCopies.IO.ObjectModel
         {
             if (If(IfCT.Or, IfCM.Logical, IfComp.Equal, FileType, FileType.Folder, FileType.Archive) || (FileType == FileType.KnownFolder && ShellObject.IsFileSystemObject) || (FileType == FileType.KnownFolder && ((IKnownFolder)ShellObject).FolderId.ToString() != Microsoft.WindowsAPICodePack.Shell.Guids.KnownFolders.Computer))
 
-                return From(ShellObject.Parent);
+                return From(ShellObject.Parent, ClientVersion.Value);
 
             else if (FileType == FileType.Drive)
 
-                return new ShellObjectInfo(Computer.Path, FileType.KnownFolder, ShellObject.FromParsingName(Computer.ParsingName));
+                return new ShellObjectInfo(Computer.Path, FileType.KnownFolder, ShellObject.FromParsingName(Computer.ParsingName), ClientVersion.Value);
 
             else return null;
         }

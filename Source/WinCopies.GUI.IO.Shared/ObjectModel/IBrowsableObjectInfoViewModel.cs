@@ -16,21 +16,23 @@
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Runtime.Serialization;
+using System.Collections.ObjectModel;
+
 using WinCopies.IO.ObjectModel;
 
-namespace WinCopies.IO
+namespace WinCopies.GUI.IO.ObjectModel
 {
-    public class PathTooLongException : System.IO.PathTooLongException
+    public interface IBrowsableObjectInfoViewModelCommon
     {
-        public IBrowsableObjectInfo Path { get; }
+        bool IsSelected { get; set; }
+    }
 
-        public PathTooLongException(IBrowsableObjectInfo path) : base() => Path = path;
+    public interface IBrowsableObjectInfoViewModel : IBrowsableObjectInfo, IBrowsableObjectInfoViewModelCommon
+    {
+        ObservableCollection<IBrowsableObjectInfoViewModel> Items { get; }
 
-        public PathTooLongException(string message, IBrowsableObjectInfo path) : base(message) => Path = path;
+        IBrowsableObjectInfo InnerBrowsableObjectInfo { get; }
 
-        public PathTooLongException(string message, Exception innerException, IBrowsableObjectInfo path) : base(message, innerException) => Path = path;
-
-        protected PathTooLongException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        Comparison<IBrowsableObjectInfoViewModel> SortComparison { get; set; } 
     }
 }

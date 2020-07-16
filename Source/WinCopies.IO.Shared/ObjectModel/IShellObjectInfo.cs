@@ -24,14 +24,14 @@ namespace WinCopies.IO.ObjectModel
     {
         Stream ArchiveFileStream { get; }
 
-        void OpenArchive(Stream stream);
-
-        void CloseArchive();
-
         /// <summary>
         /// Gets a <see cref="Microsoft.WindowsAPICodePack.Shell.ShellObject"/> that represents this <see cref="IShellObjectInfo"/>.
         /// </summary>
         ShellObject ShellObject { get; }
+
+        void OpenArchive(Stream stream);
+
+        void CloseArchive();
 
         ///// <summary>
         ///// Gets a <see cref="FileSystemInfo"/> object that provides info for the folders and files. This property returns <see langword="null"/> when this <see cref="IShellObjectInfo"/> is not a folder, drive or file. See the <see cref="IFileSystemObjectInfo.FileType"/> property for more details.

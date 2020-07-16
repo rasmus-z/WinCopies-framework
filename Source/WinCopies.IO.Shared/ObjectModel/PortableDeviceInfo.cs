@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using WinCopies.Linq;
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -42,7 +43,7 @@ namespace WinCopies.IO.ObjectModel
 
         public override Size? Size => null;
 
-        public override IBrowsableObjectInfo Parent => ShellObjectInfo.From(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName));
+        public override IBrowsableObjectInfo Parent => ShellObjectInfo.From(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName), ClientVersion.Value);
 
         public override string LocalizedName => "N/A";
 
@@ -50,9 +51,9 @@ namespace WinCopies.IO.ObjectModel
 
         public override FileSystemType ItemFileSystemType => FileSystemType.PortableDevice;
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice) : base(portableDevice.DeviceFriendlyName) => PortableDevice = portableDevice;
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion) => PortableDevice = portableDevice;
 
-        private BitmapSource TryGetBitmapSource(int size)
+        private BitmapSource TryGetBitmapSource(in int size)
         {
 #if NETFRAMEWORK
 
@@ -69,6 +70,6 @@ namespace WinCopies.IO.ObjectModel
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IPortableDeviceObject> predicate) => (predicate == null ? PortableDevice : PortableDevice.WherePredicate(predicate)).Select(portableDeviceObject => new PortableDeviceItemInfo(portableDeviceObject, this));
+        public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<IPortableDeviceObject> predicate) => (predicate == null ? PortableDevice : PortableDevice.WherePredicate(predicate)).Select(portableDeviceObject => new PortableDeviceItemInfo(portableDeviceObject, this));
     }
 }

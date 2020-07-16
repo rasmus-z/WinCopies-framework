@@ -15,22 +15,23 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
-using System.Runtime.Serialization;
-using WinCopies.IO.ObjectModel;
+using System.Collections.ObjectModel;
+using System.Windows.Controls;
 
-namespace WinCopies.IO
+namespace WinCopies.GUI.IO.ObjectModel
 {
-    public class PathTooLongException : System.IO.PathTooLongException
+    public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon
     {
-        public IBrowsableObjectInfo Path { get; }
+        ObservableCollection<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
 
-        public PathTooLongException(IBrowsableObjectInfo path) : base() => Path = path;
+        string Text { get; set; }
 
-        public PathTooLongException(string message, IBrowsableObjectInfo path) : base(message) => Path = path;
+        IBrowsableObjectInfoViewModel Path { get; set; }
 
-        public PathTooLongException(string message, Exception innerException, IBrowsableObjectInfo path) : base(message, innerException) => Path = path;
+        IBrowsableObjectInfoFactory Factory { get; set; }
 
-        protected PathTooLongException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        SelectionMode SelectionMode { get; set; }
+
+        bool IsCheckBoxVisible { get; set; }
     }
 }

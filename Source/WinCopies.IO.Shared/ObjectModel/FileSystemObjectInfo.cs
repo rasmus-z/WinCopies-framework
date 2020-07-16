@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
@@ -51,8 +52,10 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         public abstract FileType FileType { get; }
 
+        protected FileSystemObjectInfo(in string path) : this(path, null) { }
+
         // /// <param name="fileType">The <see cref="FileType"/> of this <see cref="BrowsableObjectInfo"/>.</param>
-        protected FileSystemObjectInfo(in string path) : base(path) { }
+        protected FileSystemObjectInfo(in string path, in ClientVersion? clientVersion) : base(path, clientVersion) { }
 
         #region Methods
         #region Helpers

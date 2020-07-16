@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.PortableDevices;
 using System;
 
 namespace WinCopies.IO.ObjectModel
@@ -42,12 +43,14 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         public abstract IShellObjectInfo ArchiveShellObject { get; }
 
+        protected ArchiveItemInfoProvider(in string path, in FileType fileType) : this(path, fileType, null) { }
+
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="ArchiveItemInfoProvider"/> class.
         /// </summary>
         /// <param name="path">The path of this <see cref="ArchiveItemInfoProvider"/>.</param>
         /// <param name="fileType">The <see cref="FileType"/> of this <see cref="ArchiveItemInfoProvider"/>.</param>
         /// <exception cref="InvalidOperationException">The given factory has already been added to a <see cref="BrowsableObjectInfo"/>.</exception>
-        protected ArchiveItemInfoProvider(in string path, in FileType fileType) : base(path) => FileType = fileType;
+        protected ArchiveItemInfoProvider(in string path, in FileType fileType, ClientVersion? clientVersion) : base(path, clientVersion) => FileType = fileType;
     }
 }

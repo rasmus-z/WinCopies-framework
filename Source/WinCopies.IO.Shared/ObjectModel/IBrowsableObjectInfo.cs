@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack.PortableDevices;
 using System.Collections.Generic;
 using System.Windows.Media.Imaging;
 
@@ -67,6 +68,8 @@ namespace WinCopies.IO.ObjectModel
         Size? Size { get; }
 
         bool IsSpecialItem { get; }
+
+        ClientVersion? ClientVersion { get; }
 
         ///// <summary>
         ///// Gets or sets the factory for this <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>. This factory is used to create new <see cref="IBrowsableObjectInfo"/>s from the current <see cref="BrowsableObjectInfo{TParent, TItems, TFactory}"/>.

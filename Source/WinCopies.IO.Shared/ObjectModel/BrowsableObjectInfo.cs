@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+
+using Microsoft.WindowsAPICodePack.PortableDevices;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -81,12 +84,16 @@ namespace WinCopies.IO.ObjectModel
         /// Gets a value that indicates whether the current object is disposed.
         /// </summary>
         public bool IsDisposed { get; internal set; }
+
+        public ClientVersion? ClientVersion { get; private set; }
         #endregion
 
         /// <summary>
         /// When called from a derived class, initializes a new instance of the <see cref="BrowsableObjectInfo"/> class.
         /// </summary>
-        protected BrowsableObjectInfo(string path) : base(path) { }
+        protected BrowsableObjectInfo(in string path) : this(path, null) { }
+
+        protected BrowsableObjectInfo(in string path, in ClientVersion? clientVersion) : base(path) => ClientVersion = clientVersion;
 
         #region Methods
         internal static Icon TryGetIcon(in int iconIndex, in string dll, in System.Drawing.Size size) => new IconExtractor(IO.Path.GetRealPathFromEnvironmentVariables("%SystemRoot%\\System32\\" + dll)).GetIcon(iconIndex).Split()?.TryGetIcon(size, 32, true, true);

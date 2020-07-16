@@ -17,6 +17,7 @@
 
 using System;
 using System.Runtime.Serialization;
+using WinCopies.IO.ObjectModel;
 
 namespace WinCopies.IO
 {
