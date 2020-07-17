@@ -19,27 +19,6 @@ using System;
 
 namespace WinCopies.IO
 {
-    /// <summary>
-    /// The WMI item type.
-    /// </summary>
-    public enum WMIItemType
-    {
-        /// <summary>
-        /// The WMI item is a namespace.
-        /// </summary>
-        Namespace,
-
-        /// <summary>
-        /// The WMI item is a class.
-        /// </summary>
-        Class,
-
-        /// <summary>
-        /// The WMI item is an instance.
-        /// </summary>
-        Instance
-    }
-
     ///// <summary>
     ///// Determines the WMI items to load.
     ///// </summary>

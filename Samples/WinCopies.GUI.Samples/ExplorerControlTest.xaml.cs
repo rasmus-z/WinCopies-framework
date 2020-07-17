@@ -54,7 +54,9 @@ namespace WinCopies.GUI.Samples
             DataContext = this;
         }
 
-        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\"), ClientVersion)), GetShellItemsTreeViewItems(), true, SelectionMode.Extended, true) } };
+        public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\"), ClientVersion)), GetShellItemsTreeViewItems(), true, SelectionMode.Extended, true) } };
+
+        private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo) { SortComparison = BrowsableObjectInfoViewModel.DefaultComparison };
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo, in ObservableCollection<IBrowsableObjectInfoViewModel> treeViewItems, in bool isSelected, in SelectionMode selectionMode, in bool isCheckBoxVisible)
         {

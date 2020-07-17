@@ -34,7 +34,7 @@ namespace WinCopies.IO.ObjectModel
     /// <summary>
     /// The base class for <see cref="ArchiveItemInfoProvider"/>s objects.
     /// </summary>
-    public abstract class ArchiveItemInfoProvider/*<TItems, TFactory>*/ : FileSystemObjectInfo/*<TItems, TFactory>*/, IArchiveItemInfoProvider // where TItems : BrowsableObjectInfo, IFileSystemObjectInfo    where TFactory : IBrowsableObjectInfoFactory
+    public abstract class ArchiveItemInfoProvider : FileSystemObjectInfo, IArchiveItemInfoProvider
     {
         public override FileType FileType { get; }
 

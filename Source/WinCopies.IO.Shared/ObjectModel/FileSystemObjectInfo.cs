@@ -19,7 +19,6 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 
-using System;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Interop;
@@ -27,7 +26,7 @@ using System.Windows.Media.Imaging;
 
 using TsudaKageyu;
 
-using static WinCopies.Util.Util;
+using WinCopies.Collections;
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -59,11 +58,11 @@ namespace WinCopies.IO.ObjectModel
 
         #region Methods
         #region Helpers
-        /// <summary>
+        /*/// <summary>
         /// Gets a default comparer for <see cref="FileSystemObjectInfo"/>s.
         /// </summary>
         /// <returns>A default comparer for <see cref="FileSystemObjectInfo"/>s.</returns>
-        public static FileSystemObjectInfoComparer<IFileSystemObjectInfo> GetDefaultComparer() => new FileSystemObjectInfoComparer<IFileSystemObjectInfo>();
+        public static FileSystemObjectInfoComparer<IFileSystemObjectInfo> GetDefaultComparer() => new FileSystemObjectInfoComparer<IFileSystemObjectInfo>();*/
 
         public static string GetItemTypeName(string extension, FileType fileType) => fileType == FileType.Folder
                     ? FileOperation.GetFileInfo(string.Empty, FileAttributes.Directory, GetFileInfoOptions.TypeName).TypeName
@@ -72,7 +71,7 @@ namespace WinCopies.IO.ObjectModel
 
         #region TryGetIcon/BitmapSource
         #region Helpers
-        private static Icon TryGetIcon(in int index, in System.Drawing.Size size) => TryGetIcon(index, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, size);
+        private static Icon TryGetIcon(in int index, in System.Drawing.Size size) => TryGetIcon(index, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
 
         public static Icon TryGetIcon(in string extension, in FileType fileType, in System.Drawing.Size size) =>
 
@@ -100,21 +99,15 @@ namespace WinCopies.IO.ObjectModel
 
         public BitmapSource TryGetBitmapSource(in int size) => TryGetBitmapSource(System.IO.Path.GetExtension(Path), FileType, new System.Drawing.Size(size, size));
 
-        #region Equatable methods
+        /*#region Equatable methods
         /// <summary>
         /// Determines whether the specified <see cref="IFileSystemObjectInfo"/> is equal to the current object by calling the <see cref="Equals(object)"/> method.
         /// </summary>
         /// <param name="fileSystemObjectInfo">The <see cref="IFileSystemObjectInfo"/> to compare with the current object.</param>
         /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public virtual bool Equals(IFileSystemObjectInfo fileSystemObjectInfo) => Equals(fileSystemObjectInfo as object);
+        public virtual bool Equals(IFileSystemObjectInfo fileSystemObjectInfo) => fileSystemObjectInfo is null ? false : ReferenceEquals(this, fileSystemObjectInfo) || (FileType == fileSystemObjectInfo.FileType && Path.ToLower(CultureInfo.CurrentCulture) == fileSystemObjectInfo.Path.ToLower(CultureInfo.CurrentCulture));
 
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether both objects's references are equal, <paramref name="obj"/> implements the <see cref="IFileSystemObjectInfo"/> interface and <see cref="FileType"/> and <see cref="FileSystemObject.Path"/> properties are equal.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public override bool Equals(object obj) => obj is null ? false : ReferenceEquals(this, obj)
-|| (obj is IFileSystemObjectInfo _obj && FileType == _obj.FileType && Path.ToLower() == _obj.Path.ToLower());
+        public override bool Equals(IFileSystemObject fileSystemObject) => fileSystemObject is IFileSystemObjectInfo fileSystemObjectInfo && Equals(fileSystemObjectInfo) ;
         #endregion
 
         /// <summary>
@@ -122,10 +115,10 @@ namespace WinCopies.IO.ObjectModel
         /// </summary>
         /// <param name="fileSystemObjectInfo">The <see cref="FileSystemObjectInfo"/> to compare with.</param>
         /// <returns>The comparison result. See <see cref="IComparable{T}.CompareTo(T)"/> for more details.</returns>
-        public virtual int CompareTo(IFileSystemObjectInfo fileSystemObjectInfo) => GetDefaultComparer().Compare(this, fileSystemObjectInfo);
+        public virtual int CompareTo(IFileSystemObjectInfo fileSystemObjectInfo) => GetDefaultComparer().Compare(this, fileSystemObjectInfo);*/
 
         #region Overrides
-        /// <summary>
+        /*/// <summary>
         /// Gets an hash code for this <see cref="FileSystemObjectInfo"/>.
         /// </summary>
         /// <returns>The hash code of the <see cref="FileType"/> and the <see cref="FileSystemObject.Path"/> property.</returns>
@@ -135,7 +128,11 @@ namespace WinCopies.IO.ObjectModel
         /// Gets a string representation of this <see cref="FileSystemObjectInfo"/>.
         /// </summary>
         /// <returns>The <see cref="FileSystemObject.LocalizedName"/> of this <see cref="FileSystemObjectInfo"/>.</returns>
-        public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
+        public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;*/
+
+        public override IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new FileSystemObjectInfoEqualityComparer<IFileSystemObject>();
+
+        public override System.Collections.Generic.IComparer<IFileSystemObject> GetDefaultComparer() => new FileSystemObjectInfoComparer<IFileSystemObject>();
         #endregion
         #endregion
 

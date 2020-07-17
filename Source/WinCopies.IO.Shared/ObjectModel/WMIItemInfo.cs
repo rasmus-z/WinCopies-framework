@@ -16,22 +16,44 @@
  * along with the WinCopies Framework.If not, see<https://www.gnu.org/licenses/>. */
 
 using System;
-using System.Windows.Media.Imaging;
-using static WinCopies.Util.Util;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
 using System.Management;
 using System.Windows;
 using System.Windows.Interop;
-using System.Drawing;
-using System.Globalization;
-using WinCopies.Util;
-using System.Collections.Generic;
-using System.Linq;
-using WinCopies.Linq;
+using System.Windows.Media.Imaging;
+
 using WinCopies.Collections;
+using WinCopies.Linq;
+using WinCopies.Util;
+
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel
 {
-    public class WMIItemInfo/*<TItems, TFactory>*/ : BrowsableObjectInfo/*<TItems, TFactory>*/, IWMIItemInfo // where TItems : BrowsableObjectInfo<TItems, TFactory>, IWMIItemInfo where TFactory : BrowsableObjectInfoFactory, IWMIItemInfoFactory
+    /// <summary>
+    /// The WMI item type.
+    /// </summary>
+    public enum WMIItemType
+    {
+        /// <summary>
+        /// The WMI item is a namespace.
+        /// </summary>
+        Namespace,
+
+        /// <summary>
+        /// The WMI item is a class.
+        /// </summary>
+        Class,
+
+        /// <summary>
+        /// The WMI item is an instance.
+        /// </summary>
+        Instance
+    }
+
+    public class WMIItemInfo : BrowsableObjectInfo, IWMIItemInfo
     {
         #region Consts
 
@@ -298,7 +320,7 @@ namespace WinCopies.IO.ObjectModel
             return new WMIItemInfo(path, WMIItemType.Namespace, new ManagementClass(path)/*, managementObject => DefaultManagementClassDeepCloneDelegate((ManagementClass)managementObject, null)*/);
         }
 
-        public override bool Equals(object obj) => ReferenceEquals(this, obj) || (obj is IWMIItemInfo _obj && WMIItemType == _obj.WMIItemType && Path.ToLower() == _obj.Path.ToLower());
+        /*public override bool Equals(object obj) => ReferenceEquals(this, obj) || (obj is IWMIItemInfo _obj && WMIItemType == _obj.WMIItemType && Path.ToLower() == _obj.Path.ToLower());
 
         //public int CompareTo(IWMIItemInfo other) => GetDefaultWMIItemInfoComparer().Compare(this, other);
 
@@ -313,7 +335,7 @@ namespace WinCopies.IO.ObjectModel
         /// Gets an hash code for this <see cref="WMIItemInfo"/>.
         /// </summary>
         /// <returns>The hash code returned by the <see cref="FileSystemObject.GetHashCode"/> and the hash code of the <see cref="WMIItemType"/>.</returns>
-        public override int GetHashCode() => base.GetHashCode() ^ WMIItemType.GetHashCode();
+        public override int GetHashCode() => base.GetHashCode() ^ WMIItemType.GetHashCode();*/
 
         #endregion
 
@@ -343,7 +365,7 @@ namespace WinCopies.IO.ObjectModel
 
                     path = Path.Substring(0, Path.IndexOf(':'));
 
-                    int splitIndex = path.LastIndexOf(WinCopies.IO.Path.PathSeparator) ; 
+                    int splitIndex = path.LastIndexOf(WinCopies.IO.Path.PathSeparator);
 
                     path = $"{path.Substring(0, splitIndex)}:{path.Substring(splitIndex + 1)}";
 
@@ -383,11 +405,11 @@ namespace WinCopies.IO.ObjectModel
 
 #if NETFRAMEWORK
 
-            using (Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, size))
+            using (Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size))
 
 #else
 
-            using Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, size);
+            using Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, size);
 
 #endif
 
@@ -487,5 +509,9 @@ namespace WinCopies.IO.ObjectModel
                     managementClass.Dispose();
             }
         }
+
+        public override Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new WMIItemInfoEqualityComparer<IFileSystemObject>();
+
+        public override System.Collections.Generic.IComparer<IFileSystemObject> GetDefaultComparer() => new WMIItemInfoComparer<IFileSystemObject>();
     }
 }

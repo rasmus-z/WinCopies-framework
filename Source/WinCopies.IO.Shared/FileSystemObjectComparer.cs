@@ -17,81 +17,215 @@
 
 using System;
 using System.Globalization;
+
 using WinCopies.Collections;
 using WinCopies.IO.ObjectModel;
 using WinCopies.Util;
+
+using static WinCopies.Util.Util;
 
 namespace WinCopies.IO
 {
     public class FileSystemObjectComparer<T> : Comparer<T>, IFileSystemObjectComparer<T> where T : IFileSystemObject
     {
-        public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
+        //public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
 
-        protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer) { }
+        //protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer) { }
 
-        protected virtual FileSystemObjectComparer<T> DeepCloneOverride() => new FileSystemObjectComparer<T>(_stringComparerDelegate);
+        //protected virtual FileSystemObjectComparer<T> DeepCloneOverride() => new FileSystemObjectComparer<T>(_stringComparerDelegate);
 
-        public object DeepClone()
-        {
-            FileSystemObjectComparer<T> fileSystemObjectComparer = DeepCloneOverride();
+        //public object DeepClone()
+        //{
+        //    FileSystemObjectComparer<T> fileSystemObjectComparer = DeepCloneOverride();
 
-            OnDeepClone(fileSystemObjectComparer);
+        //    OnDeepClone(fileSystemObjectComparer);
 
-            return fileSystemObjectComparer;
-        }
+        //    return fileSystemObjectComparer;
+        //}
 
-        private readonly DeepClone<StringComparer> _stringComparerDelegate;
+        //private readonly DeepClone<StringComparer> _stringComparerDelegate;
 
         public StringComparer StringComparer { get; }
 
-        public FileSystemObjectComparer() : this(stringComparer => StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
+        public FileSystemObjectComparer() : this(StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
 
-        public FileSystemObjectComparer(DeepClone<StringComparer> stringComparerDelegate)
+        public FileSystemObjectComparer(StringComparer stringComparer) => StringComparer = stringComparer;
+
+        public int? Validate(in T x, in T y)
         {
-            _stringComparerDelegate = stringComparerDelegate;
+            if (x.ItemFileSystemType != y.ItemFileSystemType) return CompareLocalizedNames(x, y);
 
-            StringComparer = stringComparerDelegate(null);
+            if (x == null) return y == null ? 0 : -1;
+
+            if (y == null) return 1;
+
+            return null;
         }
 
-        protected override int CompareOverride(T x, T y) => StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents());
+        public int CompareLocalizedNames(in T x, in T y) => StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents());
+
+        // public int Compare(T x, IFileSystemObject y) => y is T _y ? CompareOverride(x, _y) : CompareFileSystemTypesLocalizedNames(x, y);
+
+        protected override int CompareOverride(T x, T y)
+        {
+            int? result = Validate(x, y);
+
+            return result.HasValue ? result.Value : CompareLocalizedNames(x, y);
+        }
     }
 
-    public class FileSystemObjectInfoComparer<T> : FileSystemObjectComparer<T>, IFileSystemObjectComparer<T> where T : IFileSystemObjectInfo
+    public class FileSystemObjectInfoComparer<T> : FileSystemObjectComparer<T>, IFileSystemObjectComparer<T> where T : IFileSystemObject
     {
-        public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
+        //public virtual bool NeedsObjectsOrValuesReconstruction => true; // True because of the StirngComparer property.
 
-        protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer) { }
+        //protected virtual void OnDeepClone(FileSystemObjectComparer<T> fileSystemObjectComparer) { }
 
-        protected virtual FileSystemObjectComparer<T> DeepCloneOverride() => new FileSystemObjectComparer<T>(_stringComparerDelegate);
+        //protected virtual FileSystemObjectComparer<T> DeepCloneOverride() => new FileSystemObjectComparer<T>(_stringComparerDelegate);
 
-        public object DeepClone()
+        //public object DeepClone()
+        //{
+        //    FileSystemObjectComparer<T> fileSystemObjectComparer = DeepCloneOverride();
+
+        //    OnDeepClone(fileSystemObjectComparer);
+
+        //    return fileSystemObjectComparer;
+        //}
+
+        //private readonly DeepClone<StringComparer> _stringComparerDelegate;
+
+        //public StringComparer StringComparer { get; }
+
+        public FileSystemObjectInfoComparer() : base() { }
+
+        public FileSystemObjectInfoComparer(StringComparer stringComparer) : base(stringComparer) { }
+
+        protected override int CompareOverride(T x, T y)
         {
-            FileSystemObjectComparer<T> fileSystemObjectComparer = DeepCloneOverride();
+            int? result = Validate(x, y);
 
-            OnDeepClone(fileSystemObjectComparer);
+            if (result.HasValue)
 
-            return fileSystemObjectComparer;
+                return result.Value;
+
+            if (x is IFileSystemObjectInfo _x && y is IFileSystemObjectInfo _y)
+            {
+                if (_x.FileType == _y.FileType) return CompareLocalizedNames(x, y);
+
+                if (_x.FileType.IsValidEnumValue())
+                {
+#if !CS7
+                    static
+#endif
+                        FileType[] getFileItemTypes() => new FileType[] { FileType.File, FileType.Archive, FileType.Library, FileType.Link };
+
+                    if (_y.FileType.IsValidEnumValue())
+                    {
+                        FileType[] fileTypes = getFileItemTypes();
+
+                        if (_x.FileType.IsValidEnumValue(true, fileTypes))
+
+                            return _y.FileType.IsValidEnumValue(true, fileTypes) ? CompareLocalizedNames(x, y) : 1;
+
+                        fileTypes = new FileType[] { FileType.Folder, FileType.KnownFolder, FileType.Drive, FileType.Other };
+
+                        if (_x.FileType.IsValidEnumValue(true, fileTypes))
+
+                            return _y.FileType.IsValidEnumValue(true, fileTypes) ? CompareLocalizedNames(x, y) : -1;
+                    }
+
+                    return 1;
+                }
+
+                if (_y.FileType.IsValidEnumValue()) return -1;
+            }
+
+            return CompareLocalizedNames(x, y);
         }
+    }
 
-        private readonly DeepClone<StringComparer> _stringComparerDelegate;
-
-        public StringComparer StringComparer { get; }
-
-        public FileSystemObjectInfoComparer() : this(stringComparer => StringComparer.Create(CultureInfo.CurrentCulture, true)) { }
-
-        public FileSystemObjectInfoComparer(DeepClone<StringComparer> stringComparerDelegate)
+    public class RegistryItemInfoComparer<T> : FileSystemObjectComparer<T> where T : IFileSystemObject
+    {
+        protected override int CompareOverride(T x, T y)
         {
-            _stringComparerDelegate = stringComparerDelegate;
+            int? result = Validate(x, y);
 
-            StringComparer = stringComparerDelegate(null);
+            if (result.HasValue)
+
+                return result.Value;
+
+            if (x is IRegistryItemInfo _x && y is IRegistryItemInfo _y)
+            {
+                if (_x.RegistryItemType == _y.RegistryItemType) return CompareLocalizedNames(x, y);
+
+                if (_x.RegistryItemType.IsValidEnumValue())
+                {
+                    if (_y.RegistryItemType.IsValidEnumValue())
+
+                        switch (_x.RegistryItemType)
+                        {
+                            case RegistryItemType.Key:
+
+                                return _y.RegistryItemType == RegistryItemType.Value ? -1 : 1;
+
+                            case RegistryItemType.Value:
+
+                                return _y.RegistryItemType == RegistryItemType.Key ? 1 : -1;
+
+                            case RegistryItemType.Root:
+
+                                return -1;
+                        }
+
+                    return 1;
+                }
+
+                if (_y.RegistryItemType.IsValidEnumValue()) return -1;
+            }
+
+            return CompareLocalizedNames(x, y);
         }
+    }
 
-        protected override int CompareOverride(T x, T y) => x.FileType == y.FileType || (x.FileType == FileType.File && (y.FileType == FileType.Link || y.FileType == FileType.Archive)) || (y.FileType == FileType.File && (x.FileType == FileType.Link || x.FileType == FileType.Archive))
-                ? StringComparer.Compare(x.LocalizedName.RemoveAccents(), y.LocalizedName.RemoveAccents())
-                : (x.FileType == FileType.Folder || x.FileType == FileType.Drive) && (y.FileType == FileType.File || y.FileType == FileType.Archive || y.FileType == FileType.Link)
-                ? -1
-                : (x.FileType == FileType.File || x.FileType == FileType.Archive || x.FileType == FileType.Link) && (y.FileType == FileType.Folder || y.FileType == FileType.Drive)
-                ? 1
-                : 0;
+    public class WMIItemInfoComparer<T> : FileSystemObjectComparer<T> where T : IFileSystemObject
+    {
+        protected override int CompareOverride(T x, T y)
+        {
+            int? result = Validate(x, y);
+
+            if (result.HasValue)
+
+                return result.Value;
+
+            if (x is IWMIItemInfo _x && y is IWMIItemInfo _y)
+            {
+                if (_x.WMIItemType == _y.WMIItemType) return CompareLocalizedNames(x, y);
+
+                if (_x.WMIItemType.IsValidEnumValue())
+                {
+                    if (_y.WMIItemType.IsValidEnumValue())
+
+                        switch (_x.WMIItemType)
+                        {
+                            case WMIItemType.Class:
+
+                                return _y.WMIItemType == WMIItemType.Instance ? -1 : 1;
+
+                            case WMIItemType.Instance:
+
+                                return _y.WMIItemType == WMIItemType.Class ? 1 : -1;
+
+                            case WMIItemType.Namespace:
+
+                                return -1;
+                        }
+
+                    return 1;
+                }
+
+                if (_y.WMIItemType.IsValidEnumValue()) return -1;
+            }
+
+            return CompareLocalizedNames(x, y);
+        }
     }
 }

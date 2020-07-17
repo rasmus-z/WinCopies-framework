@@ -1,5 +1,23 @@
-﻿using Microsoft.WindowsAPICodePack.PortableDevices;
+﻿/* Copyright © Pierre Sprimont, 2020
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,7 +25,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+
 using WinCopies.Linq;
+
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel
@@ -57,11 +77,11 @@ namespace WinCopies.IO.ObjectModel
         {
 #if NETFRAMEWORK
 
-            using (Icon icon = TryGetIcon(PortableDeviceIcon, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, new System.Drawing.Size(size, size)))
+            using (Icon icon = TryGetIcon(PortableDeviceIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, new System.Drawing.Size(size, size)))
 
 #else
 
-            using Icon icon = TryGetIcon(PortableDeviceIcon, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, new System.Drawing.Size(size, size));
+            using Icon icon = TryGetIcon(PortableDeviceIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, new System.Drawing.Size(size, size));
 
 #endif
 

@@ -15,11 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System.Collections.Generic;
-using WinCopies.IO.ObjectModel;
-using WinCopies.Util;
-
 namespace WinCopies.IO
 {
-    public interface IFileSystemObjectComparer<in T> : IComparer<T> where T : IFileSystemObject { }
+    public interface IPathInfo
+    {
+        string Path { get; }
+
+        bool IsDirectory { get; }
+    }
+
+    public readonly struct PathInfo : IPathInfo
+    {
+        public string Path { get; }
+
+        public bool IsDirectory { get; }
+
+        public PathInfo(in string path, bool isDirectory)
+        {
+            Path = path;
+
+            IsDirectory = isDirectory;
+        }
+    }
 }

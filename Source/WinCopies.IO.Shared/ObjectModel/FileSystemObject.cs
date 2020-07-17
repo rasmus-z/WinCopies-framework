@@ -16,7 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
-
+using System.Collections.Generic;
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel
@@ -49,25 +49,27 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="path">The path of this <see cref="FileSystemObject"/>.</param>
         protected FileSystemObject(string path) => Path = path;
 
-        /// <summary>
-        /// Determines whether the specified <see cref="IFileSystemObject"/> is equal to the current object by calling the <see cref="Equals(object)"/> method.
-        /// </summary>
-        /// <param name="fileSystemObject">The <see cref="IFileSystemObject"/> to compare with the current object.</param>
-        /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public virtual bool Equals(IFileSystemObject fileSystemObject) => Equals(fileSystemObject as object);
+        public virtual WinCopies.Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new FileSystemObjectEqualityComparer<IFileSystemObject>();
 
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object by testing the following things, in order: whether both objects's references are equal, <paramref name="obj"/> implements the <see cref="IFileSystemObject"/> interface and <see cref="Path"/> properties are equal.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public override bool Equals(object obj) => obj is null ? false : ReferenceEquals(this, obj) || (obj is IFileSystemObject _obj && Path.ToLower() == _obj.Path.ToLower());
+        ///// <summary>
+        ///// Determines whether the specified <see cref="IFileSystemObject"/> is equal to the current object by calling the <see cref="Equals(object)"/> method.
+        ///// </summary>
+        ///// <param name="fileSystemObject">The <see cref="IFileSystemObject"/> to compare with the current object.</param>
+        ///// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
+        public virtual bool Equals(IFileSystemObject fileSystemObject) => GetDefaultEqualityComparer().Equals(this, fileSystemObject);
+
+        ///// <summary>
+        ///// Determines whether the specified object is equal to the current object by testing the following things, in order: whether both objects's references are equal, <paramref name="obj"/> implements the <see cref="IFileSystemObject"/> interface and <see cref="Path"/> properties are equal.
+        ///// </summary>
+        ///// <param name="obj">The object to compare with the current object.</param>
+        ///// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
+        public override bool Equals(object obj) => GetDefaultEqualityComparer().Equals(this, obj);
 
         /// <summary>
         /// Gets an hash code for this <see cref="FileSystemObject"/>.
         /// </summary>
         /// <returns>The hash code of the <see cref="Path"/> property.</returns>
-        public override int GetHashCode() => Path.ToLower().GetHashCode();
+        public override int GetHashCode() => GetDefaultEqualityComparer().GetHashCode(this);
 
         /// <summary>
         /// Gets a string representation of this <see cref="FileSystemObject"/>.
@@ -75,6 +77,7 @@ namespace WinCopies.IO.ObjectModel
         /// <returns>The <see cref="LocalizedName"/> of this <see cref="FileSystemObject"/>.</returns>
         public override string ToString() => IsNullEmptyOrWhiteSpace(LocalizedName) ? Path : LocalizedName;
 
+        #region Operators
         /// <summary>
         /// Checks if two <see cref="FileSystemObject"/>s are equal.
         /// </summary>
@@ -122,12 +125,9 @@ namespace WinCopies.IO.ObjectModel
         /// <param name="right">Right operand.</param>
         /// <returns>A <see cref="bool"/> value that indicates whether the given <see cref="FileSystemObject"/> is greater or equal to the <see cref="FileSystemObject"/> to compare with.</returns>
         public static bool operator >=(FileSystemObject left, FileSystemObject right) => left is null ? right is null : left.CompareTo(right) >= 0;
+        #endregion
 
-        /// <summary>
-        /// Gets a default comparer for <see cref="FileSystemObject"/>s.
-        /// </summary>
-        /// <returns>A default comparer for <see cref="FileSystemObject"/>s.</returns>
-        public static FileSystemObjectComparer<IFileSystemObject> GetDefaultComparer() => new FileSystemObjectComparer<IFileSystemObject>();
+        public virtual IComparer<IFileSystemObject> GetDefaultComparer() => new FileSystemObjectComparer<IFileSystemObject>();
 
         /// <summary>
         /// Compares the current object to a given <see cref="FileSystemObject"/>.

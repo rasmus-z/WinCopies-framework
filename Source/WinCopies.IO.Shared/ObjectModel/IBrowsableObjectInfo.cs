@@ -26,7 +26,7 @@ namespace WinCopies.IO.ObjectModel
     /// <summary>
     /// Provides interoperability for interacting with browsable items.
     /// </summary>
-    public interface IBrowsableObjectInfo : IFileSystemObject, /*IDeepCloneable,*/ IDisposable
+    public interface IBrowsableObjectInfo : IFileSystemObject, IDisposable
     {
         /// <summary>
         /// Gets a value that indicates whether this <see cref="IBrowsableObjectInfo"/> is browsable.
@@ -90,6 +90,8 @@ namespace WinCopies.IO.ObjectModel
         //IReadOnlyCollection<IBrowsableObjectInfo> Items { get; }
 
         IEnumerable<IBrowsableObjectInfo> GetItems();
+
+        IComparer<IFileSystemObject> GetDefaultComparer();
 
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 

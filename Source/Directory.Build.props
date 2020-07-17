@@ -11,7 +11,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
-    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net472</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net472;net48</TargetFrameworks>
     <VersionPrefix>2.5.9</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>2.5.9</AssemblyVersion>

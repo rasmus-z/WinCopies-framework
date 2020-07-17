@@ -1,186 +1,165 @@
-﻿/* Copyright © Pierre Sprimont, 2020
- *
- * This file is part of the WinCopies Framework.
- *
- * The WinCopies Framework is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * The WinCopies Framework is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+﻿//* Copyright © Pierre Sprimont, 2020
+// *
+// * This file is part of the WinCopies Framework.
+// *
+// * The WinCopies Framework is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * The WinCopies Framework is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-namespace WinCopies.IO
-{
-    public interface IPathInfo
-    {
-        string Path { get; }
+//namespace WinCopies.IO
+//{
+//    //public class FileInfoLoader
+//    //{
 
-        bool IsDirectory { get; }
-    }
+//    //    ///// <summary>
+//    //    ///// Gets the paths to browse.
+//    //    ///// </summary>
+//    //    //public PathCollection Paths { get; }
 
-    public readonly struct PathInfo : IPathInfo
-    {
-        public string Path { get; }
+//    //    //public Size TotalSize { get; private set; } = new Size(0ul);
 
-        public bool IsDirectory { get; }
+//    //    //private System.Collections.ObjectModel.ObservableCollection<FileSystemInfo> _pathsLoaded { get; /*private*/ set; } = null;
 
-        public PathInfo(in string path, bool isDirectory)
-        {
-            Path = path;
+//    //    //public System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo> PathsLoaded { get; private set; } = null;
 
-            IsDirectory = isDirectory;
-        }
-    }
+//    //    //public List<string> Hidden_Folders_With_Subpaths = new List<string>();
 
-    //public class FileInfoLoader
-    //{
+//    //    // private readonly ActionType actionType = ActionType.Unknown;
 
-    //    ///// <summary>
-    //    ///// Gets the paths to browse.
-    //    ///// </summary>
-    //    //public PathCollection Paths { get; }
+//    //    /// <summary>
+//    //    /// Gets or sets the <see cref="FileProcesses. ActionType"/> of this <see cref="FilesInfoLoader"/>.
+//    //    /// </summary>
+//    //    public ActionType ActionType
+//    //    {
 
-    //    //public Size TotalSize { get; private set; } = new Size(0ul);
+//    //        get => actionType;
 
-    //    //private System.Collections.ObjectModel.ObservableCollection<FileSystemInfo> _pathsLoaded { get; /*private*/ set; } = null;
+//    //        set => OnPropertyChangedWhenNotBusy(nameof(ActionType), nameof(actionType), value, typeof(FilesInfoLoader));
 
-    //    //public System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo> PathsLoaded { get; private set; } = null;
+//    //    }
 
-    //    //public List<string> Hidden_Folders_With_Subpaths = new List<string>();
+//    //    //private readonly Search_Terms_Properties search_Terms = null;
 
-    //    // private readonly ActionType actionType = ActionType.Unknown;
+//    //    //public Search_Terms_Properties Search_Terms
+//    //    //{
 
-    //    /// <summary>
-    //    /// Gets or sets the <see cref="FileProcesses. ActionType"/> of this <see cref="FilesInfoLoader"/>.
-    //    /// </summary>
-    //    public ActionType ActionType
-    //    {
+//    //    //    get => search_Terms;
 
-    //        get => actionType;
+//    //    //    set => OnPropertyChangedWhenNotBusy(nameof(Search_Terms), nameof(search_Terms), value, typeof(FilesInfoLoader), true);
 
-    //        set => OnPropertyChangedWhenNotBusy(nameof(ActionType), nameof(actionType), value, typeof(FilesInfoLoader));
+//    //    //}
 
-    //    }
+//    //    //private bool loadOnlyItemsWithSearchTermsForAllActions = false;
 
-    //    //private readonly Search_Terms_Properties search_Terms = null;
+//    //    //public bool LoadOnlyItemsWithSearchTermsForAllActions { get => loadOnlyItemsWithSearchTermsForAllActions; set => OnPropertyChanged(nameof(LoadOnlyItemsWithSearchTermsForAllActions), nameof(loadOnlyItemsWithSearchTermsForAllActions), value, typeof(FilesInfoLoader)); }
 
-    //    //public Search_Terms_Properties Search_Terms
-    //    //{
+//    //    // TODO : avec un setter ? gérer les exceptions pour différents répertoires racines
 
-    //    //    get => search_Terms;
+//    //    // private IList<FileSystemInfo> paths = null;
 
-    //    //    set => OnPropertyChangedWhenNotBusy(nameof(Search_Terms), nameof(search_Terms), value, typeof(FilesInfoLoader), true);
+//    //    // private FileSystemInfo _FileSystemInfoThatIsLoading = null;
 
-    //    //}
+//    //    // TODO : vraiment utile ?
 
-    //    //private bool loadOnlyItemsWithSearchTermsForAllActions = false;
+//    //    //TODO : utile ?
 
-    //    //public bool LoadOnlyItemsWithSearchTermsForAllActions { get => loadOnlyItemsWithSearchTermsForAllActions; set => OnPropertyChanged(nameof(LoadOnlyItemsWithSearchTermsForAllActions), nameof(loadOnlyItemsWithSearchTermsForAllActions), value, typeof(FilesInfoLoader)); }
+//    //    // public ObservableCollection<FileSystemInfo> _pathsLoaded = null;
 
-    //    // TODO : avec un setter ? gérer les exceptions pour différents répertoires racines
+//    //    // TODO : vraiment utile ?
 
-    //    // private IList<FileSystemInfo> paths = null;
+//    //    // private long totalFolders_ = 0;
 
-    //    // private FileSystemInfo _FileSystemInfoThatIsLoading = null;
+//    //    // private long _totalFolders = 0;
 
-    //    // TODO : vraiment utile ?
+//    //    // public long TotalFolders { get=>_totalFolders; private set=>OnPropertyChanged(nameof(TotalFolders), nameof(_totalFolders), value, typeof(FilesInfoLoader)); } 
 
-    //    //TODO : utile ?
+//    //    // private readonly bool _IsLoaded = false;
 
-    //    // public ObservableCollection<FileSystemInfo> _pathsLoaded = null;
+//    //    public bool IsLoaded { get => _IsLoaded; private set => OnPropertyChanged(nameof(IsLoaded), nameof(_IsLoaded), value, typeof(FilesInfoLoader)); }
 
-    //    // TODO : vraiment utile ?
+//    //    /// <summary>
+//    //    /// Occurs when a property value changes.
+//    //    /// </summary>
+//    //    public event PropertyChangedEventHandler PropertyChanged;
 
-    //    // private long totalFolders_ = 0;
+//    //    protected void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
 
-    //    // private long _totalFolders = 0;
+//    //    {
 
-    //    // public long TotalFolders { get=>_totalFolders; private set=>OnPropertyChanged(nameof(TotalFolders), nameof(_totalFolders), value, typeof(FilesInfoLoader)); } 
+//    //        (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
 
-    //    // private readonly bool _IsLoaded = false;
+//    //        if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
-    //    public bool IsLoaded { get => _IsLoaded; private set => OnPropertyChanged(nameof(IsLoaded), nameof(_IsLoaded), value, typeof(FilesInfoLoader)); }
+//    //    }
 
-    //    /// <summary>
-    //    /// Occurs when a property value changes.
-    //    /// </summary>
-    //    public event PropertyChangedEventHandler PropertyChanged;
+//    //    protected void OnPropertyChangedWhenNotBusy(string propertyName, string fieldName, object newValue, Type declaringType)
 
-    //    protected void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
+//    //    {
 
-    //    {
+//    //        (bool propertyChanged, object oldValue) = WinCopies.Util.Util.SetPropertyWhenNotBusy(this, propertyName, fieldName, newValue, declaringType);
 
-    //        (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
+//    //        if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
-    //        if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
+//    //    }
 
-    //    }
+//    //    protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    //    protected void OnPropertyChangedWhenNotBusy(string propertyName, string fieldName, object newValue, Type declaringType)
+//    //    // /// <summary>
+//    //    // /// Événement déclenché quand la recherche est terminée.
+//    //    // /// </summary>
+//    //    // public event EventHandler<FileInfoLoadedEventArgs> FileInfoLoaded;
 
-    //    {
+//    //    /// <summary>
+//    //    /// Initializes a new instance of the <see cref="FilesInfoLoader"/> class.
+//    //    /// </summary>
+//    //    public FilesInfoLoader() => SetProperties();
 
-    //        (bool propertyChanged, object oldValue) = WinCopies.Util.Util.SetPropertyWhenNotBusy(this, propertyName, fieldName, newValue, declaringType);
+//    //    /// <summary>
+//    //    /// Initializes a new instance of the <see cref="FilesInfoLoader"/> class using custom parameters.
+//    //    /// </summary>
+//    //    /// <param name="paths">The paths to browse.</param>
+//    //    /// <param name="actionType">The <see cref="WinCopies.IO.FileProcesses. ActionType"/> to set this <see cref="FilesInfoLoader"/> for.</param>
+//    //    public FilesInfoLoader(IList<FileSystemInfo> paths, ActionType actionType)
+//    //    {
 
-    //        if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
+//    //        SetProperties();
 
-    //    }
+//    //        Paths = paths;
 
-    //    protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+//    //        ActionType = actionType;
 
-    //    // /// <summary>
-    //    // /// Événement déclenché quand la recherche est terminée.
-    //    // /// </summary>
-    //    // public event EventHandler<FileInfoLoadedEventArgs> FileInfoLoaded;
+//    //    } // end FilesInfoLoader
 
-    //    /// <summary>
-    //    /// Initializes a new instance of the <see cref="FilesInfoLoader"/> class.
-    //    /// </summary>
-    //    public FilesInfoLoader() => SetProperties();
+//    //    private void SetProperties()
+//    //    {
+//    //        //TODO:
+//    //        /*ActionType = ActionType.Unknown;
 
-    //    /// <summary>
-    //    /// Initializes a new instance of the <see cref="FilesInfoLoader"/> class using custom parameters.
-    //    /// </summary>
-    //    /// <param name="paths">The paths to browse.</param>
-    //    /// <param name="actionType">The <see cref="WinCopies.IO.FileProcesses. ActionType"/> to set this <see cref="FilesInfoLoader"/> for.</param>
-    //    public FilesInfoLoader(IList<FileSystemInfo> paths, ActionType actionType)
-    //    {
+//    //        Search_Terms = null;
 
-    //        SetProperties();
+//    //        LoadOnlyItemsWithSearchTermsForAllActions = false;*/
 
-    //        Paths = paths;
+//    //        _pathsLoaded = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
 
-    //        ActionType = actionType;
+//    //        PathsLoaded = new System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo>(_pathsLoaded);
 
-    //    } // end FilesInfoLoader
+//    //        OnPropertyChanged(nameof(PathsLoaded), null, PathsLoaded);
 
-    //    private void SetProperties()
-    //    {
-    //        //TODO:
-    //        /*ActionType = ActionType.Unknown;
+//    //    } // end void
 
-    //        Search_Terms = null;
 
-    //        LoadOnlyItemsWithSearchTermsForAllActions = false;*/
 
-    //        _pathsLoaded = new System.Collections.ObjectModel.ObservableCollection<FileSystemInfo>();
+//    //    // protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    //        PathsLoaded = new System.Collections.ObjectModel.ReadOnlyObservableCollection<FileSystemInfo>(_pathsLoaded);
 
-    //        OnPropertyChanged(nameof(PathsLoaded), null, PathsLoaded);
-
-    //    } // end void
-
-
-
-    //    // protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-
-    //}
-}
+//    //}
+//}

@@ -18,6 +18,7 @@
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.COMNative.Shell;
 using Microsoft.WindowsAPICodePack.Shell;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -28,8 +29,10 @@ using System.Text;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+
 using WinCopies.Linq;
 using WinCopies.Util;
+
 using static WinCopies.Util.Util;
 
 namespace WinCopies.IO.ObjectModel
@@ -443,11 +446,11 @@ namespace WinCopies.IO.ObjectModel
 
 #if NETFRAMEWORK
 
-            using (Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, new System.Drawing.Size(size, size)))
+            using (Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, new System.Drawing.Size(size, size)))
 
 #else
 
-            using Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Shell32, new System.Drawing.Size(size, size));
+            using Icon icon = TryGetIcon(iconIndex, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, new System.Drawing.Size(size, size));
 
 #endif
 
@@ -641,5 +644,9 @@ namespace WinCopies.IO.ObjectModel
 
             // }
         }
+
+        public override Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => new RegistryItemInfoEqualityComparer<IFileSystemObject>();
+
+        public override IComparer<IFileSystemObject> GetDefaultComparer() => new RegistryItemInfoComparer<IFileSystemObject>();
     }
 }

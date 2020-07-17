@@ -17,6 +17,7 @@
 
 #if !WinCopies2
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace WinCopies.Collections
@@ -37,13 +38,81 @@ namespace WinCopies.Collections
     /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
     public delegate bool EqualityComparison(object x, object y);
 
-    /// <summary>
-    /// Delegate for a generic equality comparison.
-    /// </summary>
-    /// <param name="x">First parameter to compare</param>
-    /// <param name="y">Second parameter to compare</param>
-    /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
-    public delegate bool EqualityComparison<in T>(T x, T y);
+    namespace Generic
+    {
+        /// <summary>
+        /// Delegate for a generic equality comparison.
+        /// </summary>
+        /// <param name="x">First parameter to compare</param>
+        /// <param name="y">Second parameter to compare</param>
+        /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
+        public delegate bool EqualityComparison<in T>(T x, T y);
+
+        public interface IComparer<in T> : System.Collections.Generic.IComparer<T>
+        {
+            SortingType SortingType { get; set; }
+        }
+
+        public abstract class Comparer<T> : System.Collections.Generic.Comparer<T>, IComparer<T>
+        {
+            public SortingType SortingType { get; set; }
+
+            protected abstract int CompareOverride(T x, T y);
+
+            public sealed override int Compare(T x, T y)
+            {
+                int result = CompareOverride(x, y);
+
+                return SortingType == SortingType.Ascending ? result : -result;
+            }
+        }
+
+        public interface IEqualityComparer<in T> : System.Collections.Generic.IEqualityComparer<T>
+        {
+            bool Equals(
+#if !CS7
+                [AllowNull]
+#endif
+            T x,
+#if !CS7
+                [AllowNull]
+#endif
+            object y);
+        }
+
+        public abstract class EqualityComparer<T> : System.Collections.Generic.EqualityComparer<T>, IEqualityComparer<T>
+        {
+            public bool Equals(
+#if !CS7
+                [AllowNull]
+#endif
+            T x,
+#if !CS7
+                [AllowNull]
+#endif
+            object y) => y is T _y && EqualsOverride(x, _y);
+
+            public sealed override bool Equals(
+#if !CS7
+                [AllowNull]
+#endif
+            T x,
+#if !CS7
+                [AllowNull]
+#endif
+            T y) => EqualsOverride(x, y);
+
+            protected abstract bool EqualsOverride(
+#if !CS7
+                [AllowNull]
+#endif
+            T x,
+#if !CS7
+                [AllowNull]
+#endif
+            T y);
+        }
+    }
 
     public enum SortingType
     {
@@ -73,25 +142,6 @@ namespace WinCopies.Collections
         {
 
             int result = _comparer.Compare(x, y);
-
-            return SortingType == SortingType.Ascending ? result : -result;
-        }
-    }
-
-    public interface IComparer<in T> : System.Collections.Generic.IComparer<T>
-    {
-        SortingType SortingType { get; set; }
-    }
-
-    public abstract class Comparer<T> : System.Collections.Generic.Comparer<T>, IComparer<T>
-    {
-        public SortingType SortingType { get; set; }
-
-        protected abstract int CompareOverride(T x, T y);
-
-        public sealed override int Compare(T x, T y)
-        {
-            int result = CompareOverride(x, y);
 
             return SortingType == SortingType.Ascending ? result : -result;
         }

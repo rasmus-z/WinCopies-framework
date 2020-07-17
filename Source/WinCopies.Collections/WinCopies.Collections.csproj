@@ -15,7 +15,7 @@
   <Import Project="..\WinCopies.Collections.Shared\WinCopies.Collections.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.Util" Version="2.5.8-preview" />
+    <PackageReference Include="WinCopies.Util" Version="2.5.9" />
   </ItemGroup>
 
   <ItemGroup>

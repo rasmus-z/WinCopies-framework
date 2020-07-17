@@ -12,10 +12,10 @@ Updates
 ??/??/???? 2.5.9-preview
 ========================
 
-WinCopies.IO
-------------
+WinCopies.IO & WinCopies.GUI.IO 2.5.9-preview
+---------------------------------------------
 
-Update BrowsableObjectInfo API.
+Misc BrowsableObjectInfo API updates, such as (equality) comparison.
 
 07/06/2020 2.5.8-preview1
 =========================

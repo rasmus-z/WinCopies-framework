@@ -15,13 +15,26 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System;
 using System.Management;
-using WinCopies.Util;
 
 namespace WinCopies.IO.ObjectModel
 {
-    public class WMIItemInfoFactory : IWMIItemInfoFactory // where TItems : BrowsableObjectInfo, IWMIItemInfo
+    public interface IWMIItemInfoFactory
+    {
+        IWMIItemInfoFactoryOptions Options { get; }
+
+        /// <summary>
+        /// Gets a new instance of the <see cref="IBrowsableObjectInfo"/> class.
+        /// </summary>
+        /// <returns>A new instance of the <see cref="IBrowsableObjectInfo"/> class.</returns>
+        IBrowsableObjectInfo GetBrowsableObjectInfo();
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject);
+
+        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType);
+    }
+
+    public class WMIItemInfoFactory : IWMIItemInfoFactory 
     {
         public WMIItemInfoFactoryOptions Options { get; set; }
 
@@ -46,21 +59,6 @@ namespace WinCopies.IO.ObjectModel
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType) => GetBrowsableObjectInfo(path, wmiItemType, new ManagementObject(new ManagementScope(path, Options?.ConnectionOptions is null ? null : Options?.ConnectionOptions), new ManagementPath(path), Options?.ObjectGetOptions is null ? null : Options?.ObjectGetOptions));
 
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject) => new WMIItemInfo(path, wmiItemType, managementObject);
-    }
-
-    public interface IWMIItemInfoFactory
-    {
-        IWMIItemInfoFactoryOptions Options { get; }
-
-        /// <summary>
-        /// Gets a new instance of the <see cref="IBrowsableObjectInfo"/> class.
-        /// </summary>
-        /// <returns>A new instance of the <see cref="IBrowsableObjectInfo"/> class.</returns>
-        IBrowsableObjectInfo GetBrowsableObjectInfo();
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType, ManagementBaseObject managementObject);
-
-        IBrowsableObjectInfo GetBrowsableObjectInfo(string path, WMIItemType wmiItemType);
     }
 
     public interface IWMIItemInfoFactoryOptions

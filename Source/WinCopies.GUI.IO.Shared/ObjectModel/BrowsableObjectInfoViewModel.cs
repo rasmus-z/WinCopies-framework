@@ -39,7 +39,9 @@ namespace WinCopies.GUI.IO.ObjectModel
 
     public class BrowsableObjectInfoViewModel : ViewModel<IBrowsableObjectInfo>, IBrowsableObjectInfoViewModel
     {
-        public static Predicate<IBrowsableObjectInfo> Predicate => _browsableObjectInfo => _browsableObjectInfo.IsBrowsable;
+        public static Predicate<IBrowsableObjectInfo> Predicate { get; } = browsableObjectInfo => browsableObjectInfo.IsBrowsable;
+
+        public static Comparison<IBrowsableObjectInfoViewModel> DefaultComparison { get; } = (left, right) => left.CompareTo(right);
 
         private Predicate<IBrowsableObjectInfo> _filter;
 

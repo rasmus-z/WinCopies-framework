@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System;
+using System.Collections.Generic;
 
 namespace WinCopies.IO.ObjectModel
 {
@@ -40,5 +41,9 @@ namespace WinCopies.IO.ObjectModel
         string Name { get; }
 
         FileSystemType ItemFileSystemType { get; }
+
+        WinCopies.Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer();
+
+        IComparer<IFileSystemObject> GetDefaultComparer();
     }
 }

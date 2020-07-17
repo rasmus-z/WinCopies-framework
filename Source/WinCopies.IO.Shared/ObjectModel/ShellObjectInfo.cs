@@ -29,7 +29,6 @@ using System.Linq;
 using System.Windows.Media.Imaging;
 
 using WinCopies.Collections;
-using WinCopies.Linq;
 using WinCopies.Util;
 
 using static Microsoft.WindowsAPICodePack.Shell.KnownFolders;
