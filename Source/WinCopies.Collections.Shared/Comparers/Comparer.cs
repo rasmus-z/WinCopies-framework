@@ -15,39 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-#if !WinCopies2
-
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace WinCopies.Collections
 {
-    /// <summary>
-    /// Delegate for a non-generic comparison.
-    /// </summary>
-    /// <param name="x">First parameter to compare</param>
-    /// <param name="y">Second parameter to compare</param>
-    /// <returns>An <see cref="int"/> which is lesser than 0 if x is lesser than y, 0 if x is equal to y and greater than 0 if x is greater than y.</returns>
-    public delegate int Comparison(object x, object y);
-
-    /// <summary>
-    /// Delegate for a non-generic equality comparison.
-    /// </summary>
-    /// <param name="x">First parameter to compare</param>
-    /// <param name="y">Second parameter to compare</param>
-    /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
-    public delegate bool EqualityComparison(object x, object y);
-
     namespace Generic
     {
-        /// <summary>
-        /// Delegate for a generic equality comparison.
-        /// </summary>
-        /// <param name="x">First parameter to compare</param>
-        /// <param name="y">Second parameter to compare</param>
-        /// <returns><see langword="true"/> if x is equal to y, otherwise <see langword="false"/>.</returns>
-        public delegate bool EqualityComparison<in T>(T x, T y);
-
         public interface IComparer<in T> : System.Collections.Generic.IComparer<T>
         {
             SortingType SortingType { get; set; }
@@ -147,5 +121,3 @@ namespace WinCopies.Collections
         }
     }
 }
-
-#endif

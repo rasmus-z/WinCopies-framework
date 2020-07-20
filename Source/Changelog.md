@@ -9,7 +9,7 @@ CHANGELOG
 Updates
 -------
 
-??/??/2020 3.0.0-preview
+??/??/???? 3.0.0-preview
 ========================
 
 WinCopies.Collections 3.0.0-preview
