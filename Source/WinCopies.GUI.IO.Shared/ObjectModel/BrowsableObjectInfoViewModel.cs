@@ -111,7 +111,9 @@ namespace WinCopies.GUI.IO.ObjectModel
                     (Exception ex)
 #endif
                     {
+#if DEBUG
                         Debug.WriteLine(ex.Message);
+#endif
                     }
 
                 _itemsLoaded = true;
