@@ -15,7 +15,12 @@ Updates
 WinCopies.IO & WinCopies.GUI.IO 2.5.9-preview
 ---------------------------------------------
 
-Misc BrowsableObjectInfo API updates, such as (equality) comparison and portable device browsing.
+Misc BrowsableObjectInfo API updates, such as:
+
+- (equality) comparison
+- portable device browsing.
+- PortableDeviceItemInfo is now called PortableDeviceObjectInfo in order to have the same nomenclature as the ShellObjectInfo class.
+- PortableDevice(Object)Info.LocalizedName now return the same value as the Name property.
 
 07/06/2020 2.5.8-preview1
 =========================

@@ -38,6 +38,6 @@ namespace WinCopies.Data
             Parameters = parameters;
         }
 
-        private void Init(string query) => Query = IsNullEmptyOrWhiteSpace(query) ? throw new ArgumentException(string.Format(Util.Resources.ExceptionMessages.StringParameterEmptyOrWhiteSpace, nameof(query))) : query;
+        private void Init(string query) => Query = IsNullEmptyOrWhiteSpace(query) ? throw new ArgumentException(string.Format(Util.Resources.ExceptionMessages.StringParameterEmptyOrWhiteSpaces, nameof(query))) : query;
     }
 }
