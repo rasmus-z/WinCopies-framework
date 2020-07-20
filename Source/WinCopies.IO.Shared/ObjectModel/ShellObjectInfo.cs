@@ -309,11 +309,11 @@ namespace WinCopies.IO.ObjectModel
 
                                   foreach (IPortableDevice portableDevice in portableDevices)
 
-                                      if (item.ParsingName.EndsWith(portableDevice.DeviceId))
+                                      if (item.ParsingName.EndsWith(portableDevice.DeviceId, StringComparison.InvariantCultureIgnoreCase))
 
                                           return false;
 
-                              return true;//   return func(new ShellObjectInfoEnumeratorStruct(item));
+                              return func(new ShellObjectInfoEnumeratorStruct(item));
                           }).Select(shellObject => From(shellObject, ClientVersion.Value));
 
                         IEnumerable<IBrowsableObjectInfo> getPortableDevices() => portableDevices.Where(item =>
@@ -322,9 +322,9 @@ namespace WinCopies.IO.ObjectModel
                               {
                                   foreach (ShellObject shellObject in shellObjects)
 
-                                      if (shellObject.ParsingName.EndsWith(item.DeviceId))
+                                      if (shellObject.ParsingName.EndsWith(item.DeviceId, StringComparison.InvariantCultureIgnoreCase))
 
-                                          return true;// return _where(item);
+                                          return _where(item);
 
                                   return false;
                               }
