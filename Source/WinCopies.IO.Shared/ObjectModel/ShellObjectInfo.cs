@@ -225,6 +225,12 @@ namespace WinCopies.IO.ObjectModel
         }
         #endregion
 
+#if DEBUG
+
+        static int count = 0;
+
+#endif
+
         #region GetItems
         private bool PortableDevicePredicate(in IPortableDevice portableDevice, in Predicate<ShellObjectInfoEnumeratorStruct> func)
         {
@@ -235,7 +241,42 @@ namespace WinCopies.IO.ObjectModel
             {
                 portableDevice.Open(ClientVersion.Value, new PortableDeviceOpeningOptions(Microsoft.WindowsAPICodePack.Win32Native.GenericRights.Read, Microsoft.WindowsAPICodePack.Win32Native.FileShareOptions.Read, false));
 
-                return (portableDevice.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Device.Type, out Property value) ? (DeviceTypeValues)value.GetValue(out Type valueType) != DeviceTypeValues.Generic : true) && func(new ShellObjectInfoEnumeratorStruct(portableDevice));
+                //#if DEBUG 
+
+                //                Queue<PropertyKey> queue = new Queue<PropertyKey>();
+
+                //                foreach (var key in portableDevice.Properties.Keys)
+
+                //                    queue.Enqueue(key);
+
+                //                string id=portableDevice.DeviceId;
+
+                //                if (count++>0&&portableDevice.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Category, out Property _value))
+                //                {
+                //                    object ____value = _value.GetValue(out _);
+
+                //                    string guid = ((Guid)____value).ToString();
+
+                //                    string guid1 = Microsoft.WindowsAPICodePack.PortableDevices.Guids.PropertySystem.FunctionalCategory.Device;
+
+                //                    bool bool1 = guid.ToLower() == guid1.ToLower();
+
+                //                    string guid2 = Microsoft.WindowsAPICodePack.PortableDevices.Guids.PropertySystem.FunctionalCategory.Storage;
+
+                //                    bool bool2 = guid.ToLower() == guid2.ToLower();
+                //                }
+
+                //                bool value1 = portableDevice.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Device.Type, out _value);
+
+                //                object ___value = _value.GetValue(out _);
+
+                //                bool value2 = (DeviceTypeValues)___value == DeviceTypeValues.Generic;
+
+                //                bool __value = !(value1 && value2);
+
+                //#endif
+
+                return !(portableDevice.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Device.Type, out Property value) && (DeviceTypeValues)value.GetValue(out Type _) == DeviceTypeValues.Generic) && func(new ShellObjectInfoEnumeratorStruct(portableDevice));
             }
 
             catch (Exception)
@@ -258,7 +299,42 @@ namespace WinCopies.IO.ObjectModel
 
                     default:
 
-                        IEnumerable<IBrowsableObjectInfo> shellObjects = ((IEnumerable<ShellObject>)ShellObject).Where(item => func(new ShellObjectInfoEnumeratorStruct(item))).Select(shellObject => From(shellObject, ClientVersion.Value));
+                        IEnumerable<ShellObject> shellObjects = null;
+
+                        IEnumerable<IPortableDevice> portableDevices = null;
+
+                        IEnumerable<IBrowsableObjectInfo> getShellObjects() => shellObjects.Where(item =>
+                          {
+                              if (portableDevices != null)
+
+                                  foreach (IPortableDevice portableDevice in portableDevices)
+
+                                      if (item.ParsingName.EndsWith(portableDevice.DeviceId))
+
+                                          return false;
+
+                              return true;//   return func(new ShellObjectInfoEnumeratorStruct(item));
+                          }).Select(shellObject => From(shellObject, ClientVersion.Value));
+
+                        IEnumerable<IBrowsableObjectInfo> getPortableDevices() => portableDevices.Where(item =>
+                          {
+                              if (shellObjects != null)
+                              {
+                                  foreach (ShellObject shellObject in shellObjects)
+
+                                      if (shellObject.ParsingName.EndsWith(item.DeviceId))
+
+                                          return true;// return _where(item);
+
+                                  return false;
+                              }
+
+                              bool _where(IPortableDevice _item) => PortableDevicePredicate(_item, func);
+
+                              return _where(item);
+                          }).Select(portableDevice => new PortableDeviceInfo(portableDevice, ClientVersion.Value));
+
+                        shellObjects = (IEnumerable<ShellObject>)ShellObject;
 
                         if (ShellObject.ParsingName == Computer.ParsingName)
                         {
@@ -266,16 +342,16 @@ namespace WinCopies.IO.ObjectModel
 
                             portableDeviceManager.GetDevices();
 
-                            IEnumerable<IBrowsableObjectInfo> portableDevices = portableDeviceManager.PortableDevices.Where(item => PortableDevicePredicate(item, func)).Select(portableDevice => new PortableDeviceInfo(portableDevice, ClientVersion.Value));
+                            portableDevices = portableDeviceManager.PortableDevices;
 
-                            if (shellObjects == null) return portableDevices;
+                            if (shellObjects == null) return getPortableDevices();
 
-                            else if (portableDevices == null) return shellObjects;
+                            else if (portableDevices == null) return getShellObjects();
 
-                            return shellObjects.AppendValues(portableDevices);
+                            return getShellObjects().AppendValues(getPortableDevices());
                         }
 
-                        else return shellObjects;
+                        else return getShellObjects();
                 }
 
             else return null;

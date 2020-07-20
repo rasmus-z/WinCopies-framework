@@ -56,7 +56,7 @@ namespace WinCopies.GUI.Samples
 
         public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetShellItems() => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { GetExplorerControlBrowsableObjectInfoViewModel(GetBrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName("C:\\"), ClientVersion)), GetShellItemsTreeViewItems(), true, SelectionMode.Extended, true) } };
 
-        private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo) { SortComparison = BrowsableObjectInfoViewModel.DefaultComparison };
+        private static IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo) { Factory = new BrowsableObjectInfoFactory(ClientVersion) { SortComparison = BrowsableObjectInfoViewModel.DefaultComparison }, SortComparison = BrowsableObjectInfoViewModel.DefaultComparison };
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfoViewModel browsableObjectInfo, in ObservableCollection<IBrowsableObjectInfoViewModel> treeViewItems, in bool isSelected, in SelectionMode selectionMode, in bool isCheckBoxVisible)
         {
@@ -72,7 +72,7 @@ namespace WinCopies.GUI.Samples
 
         private static ObservableCollection<IBrowsableObjectInfoViewModel> GetShellItemsTreeViewItems() => new ObservableCollection<IBrowsableObjectInfoViewModel>() { { GetShellTreeViewItem("C:\\Users", true) }, { GetShellTreeViewItem(KnownFolders.Computer.ParsingName) }, { GetShellTreeViewItem(KnownFolders.RecycleBin.ParsingName) } };
 
-        private static IBrowsableObjectInfoViewModel GetShellTreeViewItem(in string parsingName, in bool isSelected = false) => new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(parsingName), ClientVersion), BrowsableObjectInfoViewModel.Predicate) { IsSelected = isSelected };
+        private static IBrowsableObjectInfoViewModel GetShellTreeViewItem(in string parsingName, in bool isSelected = false) => new BrowsableObjectInfoViewModel(ShellObjectInfo.From(ShellObject.FromParsingName(parsingName), ClientVersion), BrowsableObjectInfoViewModel.Predicate) { Factory = new BrowsableObjectInfoFactory(ClientVersion) { SortComparison = BrowsableObjectInfoViewModel.DefaultComparison }, SortComparison = BrowsableObjectInfoViewModel.DefaultComparison, IsSelected = isSelected };
 
         public static ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> GetRegistryItems() => new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { { GetExplorerControlBrowsableObjectInfoViewModel(new BrowsableObjectInfoViewModel(new RegistryItemInfo()), new ObservableCollection<IBrowsableObjectInfoViewModel>() { { new BrowsableObjectInfoViewModel(new RegistryItemInfo()) { IsSelected = true } } }, true, SelectionMode.Extended, true) } };
 

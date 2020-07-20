@@ -22,13 +22,11 @@ using System.Runtime.InteropServices;
 
 namespace WinCopies.GUI.IO
 {
-    public static class Directory
+    internal static class Directory
     {
-
-        [DllImport(Microsoft.WindowsAPICodePack.Win32Native.Consts.DllNames.Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport(Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Kernel32, SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CreateDirectoryW([In, MarshalAs(UnmanagedType.LPWStr)] string lpPathName, [In] IntPtr lpSecurityAttributes);
-
     }
 }
 

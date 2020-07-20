@@ -41,7 +41,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IWMIItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Path.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\PortableDeviceObjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Registry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\RegistryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\RegistryItemInfo.cs" />

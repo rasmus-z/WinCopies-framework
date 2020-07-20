@@ -9,13 +9,13 @@ CHANGELOG
 Updates
 -------
 
-??/??/???? 2.5.9-preview
+07/20/2020 2.5.9-preview
 ========================
 
 WinCopies.IO & WinCopies.GUI.IO 2.5.9-preview
 ---------------------------------------------
 
-Misc BrowsableObjectInfo API updates, such as (equality) comparison.
+Misc BrowsableObjectInfo API updates, such as (equality) comparison and portable device browsing.
 
 07/06/2020 2.5.8-preview1
 =========================

@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 
@@ -22,7 +23,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 {
     public interface IExplorerControlBrowsableObjectInfoViewModel : IBrowsableObjectInfoViewModelCommon
     {
-        ObservableCollection<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
+        IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get; set; }
 
         string Text { get; set; }
 

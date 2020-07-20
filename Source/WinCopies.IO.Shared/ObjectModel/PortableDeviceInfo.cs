@@ -17,7 +17,7 @@
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
-
+using Microsoft.WindowsAPICodePack.Win32Native;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -35,11 +35,14 @@ namespace WinCopies.IO.ObjectModel
     public interface IPortableDeviceInfo : IFileSystemObjectInfo
     {
         IPortableDevice PortableDevice { get; }
+
+        PortableDeviceOpeningOptions OpeningOptions { get; set; }
     }
 
     public class PortableDeviceInfo : FileSystemObjectInfo, IPortableDeviceInfo
     {
         private const int PortableDeviceIcon = 42;
+        private const string PortableDeviceIconDllName = "imageres.dll";
 
         public IPortableDevice PortableDevice { get; }
 
@@ -55,7 +58,7 @@ namespace WinCopies.IO.ObjectModel
 
         public override BitmapSource ExtraLargeBitmapSource => TryGetBitmapSource(ExtraLargeIconSize);
 
-        public override bool IsBrowsable => false;
+        public override bool IsBrowsable => true;
 
         public override string ItemTypeName => "Portable device";
 
@@ -65,23 +68,41 @@ namespace WinCopies.IO.ObjectModel
 
         public override IBrowsableObjectInfo Parent => ShellObjectInfo.From(ShellObject.FromParsingName(KnownFolders.Computer.ParsingName), ClientVersion.Value);
 
-        public override string LocalizedName => "N/A";
+        public override string LocalizedName => Name;
 
         public override string Name => PortableDevice.DeviceFriendlyName;
 
         public override FileSystemType ItemFileSystemType => FileSystemType.PortableDevice;
 
-        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion) => PortableDevice = portableDevice;
+        public PortableDeviceOpeningOptions OpeningOptions { get; set; }
+
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion) : this(portableDevice, clientVersion, new PortableDeviceOpeningOptions(GenericRights.Read, FileShareOptions.Read, true)) { }
+
+        public PortableDeviceInfo(in IPortableDevice portableDevice, in ClientVersion clientVersion, in PortableDeviceOpeningOptions openingOptions) : base((portableDevice ?? throw GetArgumentNullException(nameof(portableDevice))).DeviceFriendlyName, clientVersion)
+        {
+            PortableDevice = portableDevice;
+
+            OpeningOptions = openingOptions;
+        }
 
         private BitmapSource TryGetBitmapSource(in int size)
         {
+            using
 #if NETFRAMEWORK
 
-            using (Icon icon = TryGetIcon(PortableDeviceIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, new System.Drawing.Size(size, size)))
+            (
 
+#endif
+
+            Icon icon = TryGetIcon(PortableDeviceIcon, PortableDeviceIconDllName, new System.Drawing.Size(size, size))
+
+#if NETFRAMEWORK
+            
+            )
+            
 #else
 
-            using Icon icon = TryGetIcon(PortableDeviceIcon, Microsoft.WindowsAPICodePack.NativeAPI.Consts.DllNames.Shell32, new System.Drawing.Size(size, size));
+            ;
 
 #endif
 
@@ -90,6 +111,11 @@ namespace WinCopies.IO.ObjectModel
 
         public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
-        public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<IPortableDeviceObject> predicate) => (predicate == null ? PortableDevice : PortableDevice.WherePredicate(predicate)).Select(portableDeviceObject => new PortableDeviceItemInfo(portableDeviceObject, this));
+        public IEnumerable<IBrowsableObjectInfo> GetItems(in Predicate<IPortableDeviceObject> predicate)
+        {
+            PortableDevice.Open(ClientVersion.Value, OpeningOptions);
+
+            return (predicate == null ? PortableDevice : PortableDevice.WherePredicate(predicate)).Select(portableDeviceObject => new PortableDeviceObjectInfo(portableDeviceObject, this));
+        }
     }
 }

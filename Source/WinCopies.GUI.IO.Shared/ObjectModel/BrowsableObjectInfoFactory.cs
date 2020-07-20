@@ -27,6 +27,8 @@ namespace WinCopies.GUI.IO.ObjectModel
     {
         ClientVersion ClientVersion { get; }
 
+        Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
+
         IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo);
 
         IBrowsableObjectInfo GetBrowsableObjectInfo(string path);
@@ -34,12 +36,28 @@ namespace WinCopies.GUI.IO.ObjectModel
 
     public class BrowsableObjectInfoFactory : IBrowsableObjectInfoFactory
     {
+        /// <summary>
+        /// Gets the <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value associated to this factory. This value is used for <see cref="PortableDeviceInfo"/> and <see cref="PortableDeviceItemInfo"/> creation when browsing the Computer folder with a <see cref="ShellObjectInfo"/> item.
+        /// </summary>
         public ClientVersion ClientVersion { get; }
 
+        public Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BrowsableObjectInfoFactory"/> class.
+        /// </summary>
+        /// <param name="clientVersion">The <see cref="Microsoft.WindowsAPICodePack.PortableDevices.ClientVersion"/> value for PortableDevice items creation. See <see cref="ClientVersion"/>.</param>
         public BrowsableObjectInfoFactory(ClientVersion clientVersion) => ClientVersion = clientVersion;
 
-        public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo);
+        public virtual IBrowsableObjectInfoViewModel GetBrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) => new BrowsableObjectInfoViewModel(browsableObjectInfo) { SortComparison = SortComparison };
 
+        /// <summary>
+        /// Creates an <see cref="IBrowsableObjectInfo"/> for a given path. See Remarks section.
+        /// </summary>
+        /// <param name="path">The path of the <see cref="IBrowsableObjectInfo"/> to create.</param>
+        /// <returns>An <see cref="IBrowsableObjectInfo"/> for <paramref name="path"/>.</returns>
+        /// <remarks>This method cannot create <see cref="IBrowsableObjectInfo"/> for WMI paths.</remarks>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is not a Shell or a Registry path.</exception>
         public virtual IBrowsableObjectInfo GetBrowsableObjectInfo(string path)
         {
             if (Path.IsFileSystemPath(path))

@@ -25,14 +25,16 @@ using System.Windows.Media.Imaging;
 
 using WinCopies.Linq;
 
+using static Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common;
+
 namespace WinCopies.IO.ObjectModel
 {
-    public interface IPortableDeviceItemInfo : IFileSystemObjectInfo
+    public interface IPortableDeviceObjectInfo : IFileSystemObjectInfo
     {
         IPortableDeviceObject PortableDeviceObject { get; }
     }
 
-    public class PortableDeviceItemInfo : FileSystemObjectInfo, IPortableDeviceItemInfo
+    public class PortableDeviceObjectInfo : FileSystemObjectInfo, IPortableDeviceObjectInfo
     {
         public IPortableDeviceObject PortableDeviceObject { get; }
 
@@ -46,7 +48,7 @@ namespace WinCopies.IO.ObjectModel
 
                     return _isSpecialItem.Value;
 
-                bool result = (PortableDeviceObject.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.IsSystem, out Property value) && value.TryGetValue(out bool _value) && _value) || (PortableDeviceObject.Properties.TryGetValue(Microsoft.WindowsAPICodePack.PortableDevices.PropertySystem.Properties.Legacy.Object.Common.IsHidden, out Property __value) && __value.TryGetValue(out bool ___value) && ___value);
+                bool result = (PortableDeviceObject.Properties.TryGetValue(IsSystem, out Property value) && value.TryGetValue(out bool _value) && _value) || (PortableDeviceObject.Properties.TryGetValue(IsHidden, out Property __value) && __value.TryGetValue(out bool ___value) && ___value);
 
                 _isSpecialItem = result;
 
@@ -108,7 +110,7 @@ namespace WinCopies.IO.ObjectModel
 
         public override IBrowsableObjectInfo Parent { get; }
 
-        public override string LocalizedName => "N/A";
+        public override string LocalizedName => Name;
 
         private bool _isNameLoaded;
 
@@ -141,31 +143,24 @@ namespace WinCopies.IO.ObjectModel
             return portableDeviceFileType == PortableDeviceFileType.Folder ? FileType.Folder : extension == ".lnk" ? FileType.Link : extension == ".library.ms" ? FileType.Library : FileType.File;
         }
 
-        internal PortableDeviceItemInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfo parentPortableDevice) : base($"{parentPortableDevice.Path}{WinCopies.IO.Path.PathSeparator}{portableDeviceObject.Name}")
+        internal PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceInfo parentPortableDevice) : this($"{parentPortableDevice.Path}{IO.Path.PathSeparator}{portableDeviceObject.Name}", portableDeviceObject) => Parent = parentPortableDevice;
+
+        private PortableDeviceObjectInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceObjectInfo parent) : this($"{parent.Path}{IO.Path.PathSeparator}{portableDeviceObject.Name}", portableDeviceObject) => Parent = parent;
+
+        private PortableDeviceObjectInfo(in string path, in IPortableDeviceObject portableDeviceObject) : base(path)
         {
             PortableDeviceObject = portableDeviceObject;
 
             FileType = GetFileType(portableDeviceObject.FileType, Path);
-
-            Parent = parentPortableDevice;
         }
 
-        private PortableDeviceItemInfo(in IPortableDeviceObject portableDeviceObject, in IPortableDeviceItemInfo parent) : base($"{parent.Path}{WinCopies.IO.Path.PathSeparator}{portableDeviceObject.Name}")
-        {
-            PortableDeviceObject = portableDeviceObject;
-
-            FileType = GetFileType(portableDeviceObject.FileType, Path);
-
-            Parent = parent;
-        }
-
-        public override IEnumerable<IBrowsableObjectInfo> GetItems() => throw new NotImplementedException();
+        public override IEnumerable<IBrowsableObjectInfo> GetItems() => GetItems(null);
 
         public IEnumerable<IBrowsableObjectInfo> GetItems(Predicate<IPortableDeviceObject> predicate)
         {
             if (PortableDeviceObject is IEnumerablePortableDeviceObject enumerablePortableDeviceObject)
 
-                return (predicate == null ? enumerablePortableDeviceObject : enumerablePortableDeviceObject).WherePredicate(predicate).Select(portableDeviceObject => new PortableDeviceItemInfo(portableDeviceObject, this));
+                return (predicate == null ? enumerablePortableDeviceObject : enumerablePortableDeviceObject.WherePredicate(predicate)).Select(portableDeviceObject => new PortableDeviceObjectInfo(portableDeviceObject, this));
 
             return null;
         }

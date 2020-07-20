@@ -206,20 +206,6 @@
             </summary>
             <param name="path">The path of this <see cref="T:WinCopies.IO.ObjectModel.FileSystemObject"/>.</param>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.FileSystemObject.Equals(WinCopies.IO.ObjectModel.IFileSystemObject)">
-            <summary>
-            Determines whether the specified <see cref="T:WinCopies.IO.ObjectModel.IFileSystemObject"/> is equal to the current object by calling the <see cref="M:WinCopies.IO.ObjectModel.FileSystemObject.Equals(System.Object)"/> method.
-            </summary>
-            <param name="fileSystemObject">The <see cref="T:WinCopies.IO.ObjectModel.IFileSystemObject"/> to compare with the current object.</param>
-            <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.FileSystemObject.Equals(System.Object)">
-            <summary>
-            Determines whether the specified object is equal to the current object by testing the following things, in order: whether both objects's references are equal, <paramref name="obj"/> implements the <see cref="T:WinCopies.IO.ObjectModel.IFileSystemObject"/> interface and <see cref="P:WinCopies.IO.ObjectModel.FileSystemObject.Path"/> properties are equal.
-            </summary>
-            <param name="obj">The object to compare with the current object.</param>
-            <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        </member>
         <member name="M:WinCopies.IO.ObjectModel.FileSystemObject.GetHashCode">
             <summary>
             Gets an hash code for this <see cref="T:WinCopies.IO.ObjectModel.FileSystemObject"/>.
@@ -280,12 +266,6 @@
             <param name="right">Right operand.</param>
             <returns>A <see cref="T:System.Boolean"/> value that indicates whether the given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObject"/> is greater or equal to the <see cref="T:WinCopies.IO.ObjectModel.FileSystemObject"/> to compare with.</returns>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.FileSystemObject.GetDefaultComparer">
-            <summary>
-            Gets a default comparer for <see cref="T:WinCopies.IO.ObjectModel.FileSystemObject"/>s.
-            </summary>
-            <returns>A default comparer for <see cref="T:WinCopies.IO.ObjectModel.FileSystemObject"/>s.</returns>
-        </member>
         <member name="M:WinCopies.IO.ObjectModel.FileSystemObject.CompareTo(WinCopies.IO.ObjectModel.IFileSystemObject)">
             <summary>
             Compares the current object to a given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObject"/>.
@@ -302,45 +282,6 @@
             <summary>
             The file type of this <see cref="T:WinCopies.IO.ObjectModel.FileSystemObject"/>.
             </summary>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo.GetDefaultComparer">
-            <summary>
-            Gets a default comparer for <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo"/>s.
-            </summary>
-            <returns>A default comparer for <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo"/>s.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo.Equals(WinCopies.IO.ObjectModel.IFileSystemObjectInfo)">
-            <summary>
-            Determines whether the specified <see cref="T:WinCopies.IO.ObjectModel.IFileSystemObjectInfo"/> is equal to the current object by calling the <see cref="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo.Equals(System.Object)"/> method.
-            </summary>
-            <param name="fileSystemObjectInfo">The <see cref="T:WinCopies.IO.ObjectModel.IFileSystemObjectInfo"/> to compare with the current object.</param>
-            <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo.Equals(System.Object)">
-            <summary>
-            Determines whether the specified object is equal to the current object by testing the following things, in order: whether both objects's references are equal, <paramref name="obj"/> implements the <see cref="T:WinCopies.IO.ObjectModel.IFileSystemObjectInfo"/> interface and <see cref="P:WinCopies.IO.ObjectModel.FileSystemObjectInfo.FileType"/> and <see cref="P:WinCopies.IO.ObjectModel.FileSystemObject.Path"/> properties are equal.
-            </summary>
-            <param name="obj">The object to compare with the current object.</param>
-            <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo.CompareTo(WinCopies.IO.ObjectModel.IFileSystemObjectInfo)">
-            <summary>
-            Compares the current object to a given <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo"/>.
-            </summary>
-            <param name="fileSystemObjectInfo">The <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo"/> to compare with.</param>
-            <returns>The comparison result. See <see cref="M:System.IComparable`1.CompareTo(`0)"/> for more details.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo.GetHashCode">
-            <summary>
-            Gets an hash code for this <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo"/>.
-            </summary>
-            <returns>The hash code of the <see cref="P:WinCopies.IO.ObjectModel.FileSystemObjectInfo.FileType"/> and the <see cref="P:WinCopies.IO.ObjectModel.FileSystemObject.Path"/> property.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo.ToString">
-            <summary>
-            Gets a string representation of this <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo"/>.
-            </summary>
-            <returns>The <see cref="P:WinCopies.IO.ObjectModel.FileSystemObject.LocalizedName"/> of this <see cref="T:WinCopies.IO.ObjectModel.FileSystemObjectInfo"/>.</returns>
         </member>
         <member name="M:WinCopies.IO.ObjectModel.FileSystemObjectInfo.op_Equality(WinCopies.IO.ObjectModel.FileSystemObjectInfo@,WinCopies.IO.ObjectModel.FileSystemObjectInfo@)">
             <summary>
@@ -626,6 +567,26 @@
             </summary>
             <returns>The parent of this <see cref="T:WinCopies.IO.ObjectModel.ShellObjectInfo"/>.</returns>
         </member>
+        <member name="T:WinCopies.IO.ObjectModel.WMIItemType">
+            <summary>
+            The WMI item type.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.ObjectModel.WMIItemType.Namespace">
+            <summary>
+            The WMI item is a namespace.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.ObjectModel.WMIItemType.Class">
+            <summary>
+            The WMI item is a class.
+            </summary>
+        </member>
+        <member name="F:WinCopies.IO.ObjectModel.WMIItemType.Instance">
+            <summary>
+            The WMI item is an instance.
+            </summary>
+        </member>
         <member name="P:WinCopies.IO.ObjectModel.WMIItemInfo.IsRootNode">
             <summary>
             Gets a value that indicates whether this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> represents a root node.
@@ -676,34 +637,27 @@
             Initializes a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class as the root WMI item.
             </summary>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetName(System.Management.ManagementBaseObject,WinCopies.IO.WMIItemType)">
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetName(System.Management.ManagementBaseObject,WinCopies.IO.ObjectModel.WMIItemType)">
             <summary>
             Gets the name of the given <see cref="T:System.Management.ManagementBaseObject"/>.
             </summary>
             <param name="managementObject">The <see cref="T:System.Management.ManagementBaseObject"/> for which get the name.</param>
-            <param name="wmiItemType">The <see cref="T:WinCopies.IO.WMIItemType"/> of <paramref name="managementObject"/>.</param>
+            <param name="wmiItemType">The <see cref="!:IO.WMIItemType"/> of <paramref name="managementObject"/>.</param>
             <returns>The name of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetPath(System.Management.ManagementBaseObject,WinCopies.IO.WMIItemType)">
+        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetPath(System.Management.ManagementBaseObject,WinCopies.IO.ObjectModel.WMIItemType)">
             <summary>
             Gets the path of the given <see cref="T:System.Management.ManagementBaseObject"/>.
             </summary>
             <param name="managementObject">The <see cref="T:System.Management.ManagementBaseObject"/> for which get the path.</param>
-            <param name="wmiItemType">The <see cref="T:WinCopies.IO.WMIItemType"/> of <paramref name="managementObject"/>.</param>
+            <param name="wmiItemType">The <see cref="!:IO.WMIItemType"/> of <paramref name="managementObject"/>.</param>
             <returns>The path of the given <see cref="T:System.Management.ManagementBaseObject"/>.</returns>
         </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.Equals(WinCopies.IO.ObjectModel.IWMIItemInfo)">
+        <member name="M:WinCopies.IO.ObjectModel.IWMIItemInfoFactory.GetBrowsableObjectInfo">
             <summary>
-            Determines whether the specified <see cref="T:WinCopies.IO.ObjectModel.IWMIItemInfo"/> is equal to the current object by calling the <see cref="M:WinCopies.IO.ObjectModel.WMIItemInfo.Equals(System.Object)"/> method.
+            Gets a new instance of the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> class.
             </summary>
-            <param name="wmiItemInfo">The <see cref="T:WinCopies.IO.ObjectModel.IWMIItemInfo"/> to compare with the current object.</param>
-            <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.WMIItemInfo.GetHashCode">
-            <summary>
-            Gets an hash code for this <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/>.
-            </summary>
-            <returns>The hash code returned by the <see cref="M:WinCopies.IO.ObjectModel.FileSystemObject.GetHashCode"/> and the hash code of the <see cref="P:WinCopies.IO.ObjectModel.WMIItemInfo.WMIItemType"/>.</returns>
+            <returns>A new instance of the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> class.</returns>
         </member>
         <member name="M:WinCopies.IO.ObjectModel.WMIItemInfoFactory.#ctor">
             <summary>
@@ -720,12 +674,6 @@
             Gets a new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class.
             </summary>
             <returns>A new instance of the <see cref="T:WinCopies.IO.ObjectModel.WMIItemInfo"/> class.</returns>
-        </member>
-        <member name="M:WinCopies.IO.ObjectModel.IWMIItemInfoFactory.GetBrowsableObjectInfo">
-            <summary>
-            Gets a new instance of the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> class.
-            </summary>
-            <returns>A new instance of the <see cref="T:WinCopies.IO.ObjectModel.IBrowsableObjectInfo"/> class.</returns>
         </member>
         <member name="T:WinCopies.IO.FileType">
             <summary>
@@ -1283,26 +1231,6 @@
             <param name="s1">Left size</param>
             <param name="s2">Right size</param>
             <returns>A <see cref="T:WinCopies.IO.Size"/> with the remainder of <paramref name="s1"/> by <paramref name="s2"/></returns>
-        </member>
-        <member name="T:WinCopies.IO.WMIItemType">
-            <summary>
-            The WMI item type.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.WMIItemType.Namespace">
-            <summary>
-            The WMI item is a namespace.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.WMIItemType.Class">
-            <summary>
-            The WMI item is a class.
-            </summary>
-        </member>
-        <member name="F:WinCopies.IO.WMIItemType.Instance">
-            <summary>
-            The WMI item is an instance.
-            </summary>
         </member>
     </members>
 </doc>

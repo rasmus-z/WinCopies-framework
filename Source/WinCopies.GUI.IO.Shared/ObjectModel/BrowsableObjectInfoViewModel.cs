@@ -19,6 +19,7 @@ using Microsoft.WindowsAPICodePack.PortableDevices;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -41,7 +42,7 @@ namespace WinCopies.GUI.IO.ObjectModel
     {
         public static Predicate<IBrowsableObjectInfo> Predicate { get; } = browsableObjectInfo => browsableObjectInfo.IsBrowsable;
 
-        public static Comparison<IBrowsableObjectInfoViewModel> DefaultComparison { get; } = (left, right) => left.CompareTo(right);
+        public static Comparison<IBrowsableObjectInfo> DefaultComparison { get; } = (left, right) => left.CompareTo(right);
 
         private Predicate<IBrowsableObjectInfo> _filter;
 
@@ -79,7 +80,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public IEnumerable<IBrowsableObjectInfo> GetItems() => Items;
 
-        public Comparison<IBrowsableObjectInfoViewModel> SortComparison { get; set; }
+        public Comparison<IBrowsableObjectInfo> SortComparison { get; set; }
 
         public ObservableCollection<IBrowsableObjectInfoViewModel> Items
         {
@@ -95,7 +96,9 @@ namespace WinCopies.GUI.IO.ObjectModel
                     {
                         IEnumerable<IBrowsableObjectInfo> items = _filter == null ? InnerBrowsableObjectInfo.GetItems() : InnerBrowsableObjectInfo.GetItems().WherePredicate(_filter);
 
-                        var __items = new List<IBrowsableObjectInfoViewModel>(items.Select(_browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo, _filter) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));
+                        var __items = new List<IBrowsableObjectInfoViewModel>(items.Select(
+
+                            _browsableObjectInfo => _factory == null ? new BrowsableObjectInfoViewModel(_browsableObjectInfo, _filter) : _factory.GetBrowsableObjectInfoViewModel(_browsableObjectInfo)));
 
                         if (SortComparison != null)
 
@@ -103,7 +106,13 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                         _items = new ObservableCollection<IBrowsableObjectInfoViewModel>(__items);
                     }
-                    catch { }
+                    catch
+#if DEBUG
+                    (Exception ex)
+#endif
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
 
                 _itemsLoaded = true;
 
@@ -149,9 +158,16 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public ClientVersion? ClientVersion => InnerBrowsableObjectInfo.ClientVersion;
 
-        public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) : base(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo))) { }
+        public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo) : base(browsableObjectInfo ?? throw GetArgumentNullException(nameof(browsableObjectInfo))) =>
 
-        public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, Predicate<IBrowsableObjectInfo> filter) : this(browsableObjectInfo) => _filter = filter;
+            Debug.Assert(!(browsableObjectInfo is IBrowsableObjectInfoViewModel));
+
+        public BrowsableObjectInfoViewModel(IBrowsableObjectInfo browsableObjectInfo, Predicate<IBrowsableObjectInfo> filter) : this(browsableObjectInfo)
+        {
+            Debug.Assert(!(browsableObjectInfo is IBrowsableObjectInfoViewModel));
+
+            _filter = filter;
+        }
 
         public int CompareTo(
 #if !NETFRAMEWORK
@@ -164,6 +180,10 @@ namespace WinCopies.GUI.IO.ObjectModel
             [AllowNull]
         #endif
         IFileSystemObject other) => InnerBrowsableObjectInfo.Equals(other);
+
+        public Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => InnerBrowsableObjectInfo.GetDefaultEqualityComparer();
+
+        public IComparer<IFileSystemObject> GetDefaultComparer() => InnerBrowsableObjectInfo.GetDefaultComparer();
 
         #region IDisposable Support
 

@@ -91,8 +91,6 @@ namespace WinCopies.IO.ObjectModel
 
         IEnumerable<IBrowsableObjectInfo> GetItems();
 
-        IComparer<IFileSystemObject> GetDefaultComparer();
-
         // IBrowsableObjectInfo GetBrowsableObjectInfo(IBrowsableObjectInfo browsableObjectInfo);
 
         // IPathModifier<IBrowsableObjectInfo, IBrowsableObjectInfo> RegisterLoader(IBrowsableObjectInfoLoader browsableObjectInfoLoader);

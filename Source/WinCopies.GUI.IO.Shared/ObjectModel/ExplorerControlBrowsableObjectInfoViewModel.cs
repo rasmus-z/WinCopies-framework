@@ -15,9 +15,8 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.PortableDevices;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Controls;
 
@@ -46,9 +45,9 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         public string Text { get => _text; set { _text = value; OnPropertyChanged(nameof(Text)); } }
 
-        private ObservableCollection<IBrowsableObjectInfoViewModel> _treeViewItems;
+        private IEnumerable<IBrowsableObjectInfoViewModel> _treeViewItems;
 
-        public ObservableCollection<IBrowsableObjectInfoViewModel> TreeViewItems { get => _treeViewItems; set { _treeViewItems = value; OnPropertyChanged(nameof(TreeViewItems)); } }
+        public IEnumerable<IBrowsableObjectInfoViewModel> TreeViewItems { get => _treeViewItems; set { _treeViewItems = value; OnPropertyChanged(nameof(TreeViewItems)); } }
 
         private IBrowsableObjectInfoViewModel _path;
 
@@ -80,7 +79,7 @@ namespace WinCopies.GUI.IO.ObjectModel
 
                 else
 
-                    Path = new BrowsableObjectInfoViewModel(browsableObjectInfo);
+                    Path = browsableObjectInfo;
             });
 
             _factory = factory;

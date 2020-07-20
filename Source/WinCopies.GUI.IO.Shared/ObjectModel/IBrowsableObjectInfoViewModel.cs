@@ -33,6 +33,6 @@ namespace WinCopies.GUI.IO.ObjectModel
 
         IBrowsableObjectInfo InnerBrowsableObjectInfo { get; }
 
-        Comparison<IBrowsableObjectInfoViewModel> SortComparison { get; set; } 
+        Comparison<IBrowsableObjectInfo> SortComparison { get; set; } 
     }
 }
