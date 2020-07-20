@@ -11,10 +11,11 @@ README
 Description
 -----------
 
-Some utilities to extend the .NET framework I/O operations capabilities, such as:
+Some utilities to extend the .NET framework I/O operations capabilities, such as wrappers compatible with a unique interface:
 
-- Windows API Code Pack's ShellObject wrapper with advanced features,
-- SevenZipSharp's ArchiveFileInfo wrapper with advanced features,
+- Windows API Code Pack's ShellObject;
+- SevenZipSharp's ArchiveFileInfo;
+- Windows API Code Pack's PortableDevice.
 
 Project link
 ------------

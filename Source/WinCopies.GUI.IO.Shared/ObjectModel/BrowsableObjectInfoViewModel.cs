@@ -111,7 +111,9 @@ namespace WinCopies.GUI.IO.ObjectModel
                     (Exception ex)
 #endif
                     {
+#if DEBUG
                         Debug.WriteLine(ex.Message);
+#endif
                     }
 
                 _itemsLoaded = true;
@@ -172,20 +174,20 @@ namespace WinCopies.GUI.IO.ObjectModel
         public int CompareTo(
 #if !NETFRAMEWORK
             [AllowNull]
-        #endif
+#endif
         IFileSystemObject other) => InnerBrowsableObjectInfo.CompareTo(other);
 
         public bool Equals(
 #if !NETFRAMEWORK
             [AllowNull]
-        #endif
+#endif
         IFileSystemObject other) => InnerBrowsableObjectInfo.Equals(other);
 
         public Collections.IEqualityComparer<IFileSystemObject> GetDefaultEqualityComparer() => InnerBrowsableObjectInfo.GetDefaultEqualityComparer();
 
         public IComparer<IFileSystemObject> GetDefaultComparer() => InnerBrowsableObjectInfo.GetDefaultComparer();
 
-        #region IDisposable Support
+#region IDisposable Support
 
         public bool IsDisposed => InnerBrowsableObjectInfo.IsDisposed;
 
@@ -218,6 +220,6 @@ namespace WinCopies.GUI.IO.ObjectModel
         public static bool operator >(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is object && left.CompareTo(right) > 0;
 
         public static bool operator >=(BrowsableObjectInfoViewModel left, BrowsableObjectInfoViewModel right) => left is null ? right is null : left.CompareTo(right) >= 0;
-        #endregion
+#endregion
     }
 }
