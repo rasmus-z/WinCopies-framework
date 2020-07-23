@@ -19,7 +19,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace WinCopies.GUI.IO
+namespace WinCopies.GUI.IO.Controls
 {
     public class ExplorerControlTreeViewItem : TreeViewItem, ICommandSource
     {

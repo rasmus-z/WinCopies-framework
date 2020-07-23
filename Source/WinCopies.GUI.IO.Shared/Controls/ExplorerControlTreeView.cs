@@ -18,35 +18,10 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace WinCopies.GUI.IO
+namespace WinCopies.GUI.IO.Controls
 {
-    //    public enum ViewStyle
-    //    {
-
-    //        SizeOne = 0,
-
-    //        SizeTwo = 1,
-
-    //        SizeThree = 2,
-
-    //        SizeFour = 3,
-
-    //        List = 4,
-
-    //        Details = 5,
-
-    //        Tiles = 6,
-
-    //        Content = 7
-
-    //    }
-
-    public class ExplorerControlListView : ListView
+    public class ExplorerControlTreeView:TreeView
     {
-        //public static readonly DependencyProperty ViewStyleProperty = DependencyProperty.Register(nameof(ViewStyle), typeof(ViewStyle), typeof(ExplorerControlListView));
-
-        //public ViewStyle ViewStyle { get => (ViewStyle)GetValue(ViewStyleProperty); set => SetValue(ViewStyleProperty, value); }
-
-        protected override DependencyObject GetContainerForItemOverride() => new ExplorerControlListViewItem();
+        protected override DependencyObject GetContainerForItemOverride() => new ExplorerControlTreeViewItem();
     }
 }

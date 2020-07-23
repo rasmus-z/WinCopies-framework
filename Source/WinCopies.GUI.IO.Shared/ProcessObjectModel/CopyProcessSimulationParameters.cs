@@ -18,11 +18,9 @@
 #if DEBUG
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using WinCopies.IO;
 
-namespace WinCopies.GUI.IO
+namespace WinCopies.GUI.IO.Process
 {
 
     public delegate bool CopyFileEx(string lpExistingFileName, string lpNewFileName, CopyProgressRoutine lpProgressRoutine, IntPtr lpData, ref bool pbCancel, CopyFileFlags dwCopyFlags);
@@ -34,12 +32,30 @@ namespace WinCopies.GUI.IO
         Destination
     }
 
-    public class CopyProcessSimulationParameters
+    public abstract class ProcessSimulationParameters
     {
         private bool? _sourcePathRootExists;
         private bool? _sourceDriveReady;
+
+        protected InvalidOperationException GetInvalidOperationException() => new InvalidOperationException("Value cannot be null.");
+
+        public bool SourcePathRootExists { get => _sourcePathRootExists ?? throw GetInvalidOperationException(); set => _sourcePathRootExists = value; }
+
+        public bool SourceDriveReady { get => _sourceDriveReady ?? throw GetInvalidOperationException(); set => _sourceDriveReady = value; }
+    }
+
+    public abstract class PathToPathProcessSimulationParameters : ProcessSimulationParameters 
+    {
         private bool? _destPathRootExists;
         private bool? _destDriveReady;
+
+        public bool DestPathRootExists { get => _destPathRootExists ?? throw GetInvalidOperationException(); set => _destPathRootExists = value; }
+
+        public bool DestDriveReady { get => _destDriveReady ?? throw GetInvalidOperationException(); set => _destDriveReady = value; }
+    }
+
+    public class CopyProcessSimulationParameters : PathToPathProcessSimulationParameters 
+    {
         private long? _destDriveTotalFreeSpace;
         private FileSystemEntryEnumeratorProcessSimulation _fileSystemEntryEnumeratorProcessSimulation;
         private Func<WinCopies.IO.IPathInfo, IPathInfo> _ioPathInfoToGUIIOPathInfoAction;
@@ -49,16 +65,6 @@ namespace WinCopies.GUI.IO
         private Func<string, bool> _destPathExistsAction;
         private Func<string, PathDirectoryType, Exception> _creatingFileStreamSucceedsAction;
         private Func<string, string, Func<bool>, bool?> _isDuplicateAction;
-
-        private InvalidOperationException GetInvalidOperationException() => new InvalidOperationException("Value cannot be null.");
-
-        public bool SourcePathRootExists { get => _sourcePathRootExists ?? throw GetInvalidOperationException(); set => _sourcePathRootExists = value; }
-
-        public bool SourceDriveReady { get => _sourceDriveReady ?? throw GetInvalidOperationException(); set => _sourceDriveReady = value; }
-
-        public bool DestPathRootExists { get => _destPathRootExists ?? throw GetInvalidOperationException(); set => _destPathRootExists = value; }
-
-        public bool DestDriveReady { get => _destDriveReady ?? throw GetInvalidOperationException(); set => _destDriveReady = value; }
 
         public long DestDriveTotalFreeSpace { get => _destDriveTotalFreeSpace ?? throw GetInvalidOperationException(); set => _destDriveTotalFreeSpace = value; }
 

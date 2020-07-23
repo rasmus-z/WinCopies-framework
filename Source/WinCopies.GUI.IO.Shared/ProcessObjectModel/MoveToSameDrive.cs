@@ -15,18 +15,17 @@
 * You should have received a copy of the GNU General Public License
 * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-//using System;
-//using System.Globalization;
-//using WinCopies.Util.Data;
+#if MoveToSameDrive
 
-//namespace WinCopies.GUI.IO.Data
-//{
-    // todo: replace by WinCopies.Util.Data.MultiStringBindingConverter
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-    //public class MultiStringConverter : MultiConverterBase
-    //{
-    //    public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) => string.Format(culture, (string)parameter, values);
+namespace WinCopies.GUI.IO.Process
+{
+    public class MoveToSameDrive : Process<WinCopies.IO.IPathInfo>
+    {
+    }
+}
 
-    //    public override object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new InvalidOperationException();
-    //}
-//}
+#endif

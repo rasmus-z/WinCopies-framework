@@ -19,7 +19,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace WinCopies.GUI.IO
+namespace WinCopies.GUI.IO.Controls
 {
     public class ExplorerControlTreeViewItemHeader : Control
     {

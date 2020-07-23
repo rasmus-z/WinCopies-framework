@@ -21,7 +21,7 @@ using System.Windows.Input;
 using WinCopies.Util;
 using WinCopies.Util.Data;
 
-namespace WinCopies.GUI.IO
+namespace WinCopies.GUI.IO.Controls
 {
     public class ExplorerControl : Control
     {

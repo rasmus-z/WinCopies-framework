@@ -23,82 +23,103 @@ using static WinCopies.Util.Util;
 
 namespace WinCopies.GUI.IO
 {
-    public sealed class PathCollection : ICollection<WinCopies.IO.IPathInfo>, IList<WinCopies.IO.IPathInfo>
+    public abstract class PathCollection<T> : ICollection<T>, IList<T> where T : WinCopies.IO.IPathInfo
     {
-        private readonly IList<WinCopies.IO.IPathInfo> _list;
+        protected IList<T> InnerList { get; }
 
         public string Path { get; }
 
-        public int Count => _list.Count;
+        public int Count => InnerList.Count;
 
         public bool IsReadOnly => false;
 
-        public WinCopies.IO.IPathInfo this[int index]
+        protected virtual void SetItem(int index, T item)
         {
-            get => _list[index]; set
-            {
-                ValidatePath(value);
+            ValidatePath(item);
 
-                _list[index] = value;
-            }
+            InnerList[index] = item;
         }
 
-        public PathCollection(string path) : this(path, new List<WinCopies.IO.IPathInfo>()) { }
+        public T this[int index] { get => InnerList[index]; set => SetItem(index, value); }
 
-        public PathCollection(string path, IList<WinCopies.IO.IPathInfo> list)
+        protected abstract Func<T> GetNewEmptyEnumeratorPathInfoDelegate { get; }
+
+        protected abstract Func<T, T> GetNewEnumeratorPathInfoDelegate { get; }
+
+        public abstract Func<T, Size?> GetPathSizeDelegate { get; } 
+
+        public string GetConcatenatedPath(WinCopies.IO.IPathInfo pathInfo) => pathInfo == null ? throw GetArgumentNullException(nameof(pathInfo)) : $"{Path}{WinCopies.IO.Path.PathSeparator}{pathInfo.Path}";
+
+        protected PathCollection(string path) : this(path, new List<T>()) { }
+
+        protected PathCollection(string path, IList<T> list)
         {
-            Path = path == null ? string.Empty : path.Length == 0 ? string.Empty : System.IO.Path.IsPathRooted(path) ? path : throw new ArgumentException($"{nameof(path)} must be null, empty or rooted.");
+            Path = path == null || path.Length == 0 ? string.Empty : System.IO.Path.IsPathRooted(path) ? path : throw new ArgumentException($"{nameof(path)} must be null, empty or rooted.");
 
-            foreach (WinCopies.IO.IPathInfo _path in list)
+            ThrowIfNull(list, nameof(list));
+
+            foreach (T _path in list)
 
                 ValidatePath(_path);
 
-            _list = list;
+            InnerList = list;
         }
 
-        private void ValidatePath(WinCopies.IO.IPathInfo item)
+        protected virtual void ValidatePath(T item)
         {
             if ((Path.Length > 1 && System.IO.Path.IsPathRooted(item.Path)) || (Path.Length == 0 && !System.IO.Path.IsPathRooted(item.Path)))
 
                 throw new ArgumentException("The path to add must be relative.");
         }
 
-        public void Add(WinCopies.IO.IPathInfo item)
+        public void Add(T item) => InsertItem(Count, item);
+
+        protected virtual void InsertItem(int index, T item)
         {
             ValidatePath(item);
 
-            _list.Add(item);
+            InnerList.Add(item);
         }
 
-        public void Clear() => _list.Clear();
+        public void Clear() => ClearItems();
 
-        public bool Contains(WinCopies.IO.IPathInfo item) => _list.Contains(item);
+        protected virtual void ClearItems() => InnerList.Clear();
 
-        public void CopyTo(WinCopies.IO.IPathInfo[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
+        public bool Contains(T item) => InnerList.Contains(item);
 
-        public bool Remove(WinCopies.IO.IPathInfo item) => _list.Remove(item);
+        public void CopyTo(T[] array, int arrayIndex) => InnerList.CopyTo(array, arrayIndex);
 
-        public IEnumerator<WinCopies.IO.IPathInfo> GetEnumerator() => new PathCollectionEnumerator(this);
+        public bool Remove(T item)
+        {
+            int itemIndex = InnerList.IndexOf(item);
+
+            if (itemIndex == -1)
+
+                return false;
+
+            RemoveItemAt(itemIndex);
+
+            return true;
+        }
+
+        protected virtual void RemoveItemAt(int index) => InnerList.RemoveAt(index);
+
+        public IEnumerator<T> GetEnumerator() => new PathCollectionEnumerator(this);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public int IndexOf(WinCopies.IO.IPathInfo item) => _list.IndexOf(item);
+        public int IndexOf(T item) => InnerList.IndexOf(item);
 
-        public void Insert(int index, WinCopies.IO.IPathInfo item)
+        public void Insert(int index, T item) => InsertItem(index, item);
+
+        public void RemoveAt(int index) => InnerList.RemoveAt(index);
+
+        public class PathCollectionEnumerator : WinCopies.Collections.Enumerator<T, T>
         {
-            ValidatePath(item);
-
-            _list.Add(item);
-        }
-
-        public void RemoveAt(int index) => _list.RemoveAt(index);
-
-        public class PathCollectionEnumerator : WinCopies.Collections.Enumerator<WinCopies.IO.IPathInfo, WinCopies.IO.IPathInfo>
-        {
-            private PathCollection _pathCollection;
+            private PathCollection<T> _pathCollection;
             private bool _completed = false;
 
-            public PathCollectionEnumerator(PathCollection pathCollection) : base((pathCollection ?? throw GetArgumentNullException(nameof(pathCollection)))._list) => _pathCollection = pathCollection;
+            public PathCollectionEnumerator(PathCollection<T> pathCollection) : base((pathCollection ?? throw GetArgumentNullException(nameof(pathCollection))).InnerList) => _pathCollection = pathCollection;
 
             protected override void Dispose(bool disposing)
             {
@@ -113,7 +134,7 @@ namespace WinCopies.GUI.IO
 
                 if (_pathCollection.Count == 0)
                 {
-                    Current = new WinCopies.IO.PathInfo(_pathCollection.Path, System.IO.Directory.Exists(_pathCollection.Path));
+                    Current = _pathCollection.GetNewEmptyEnumeratorPathInfoDelegate();
 
                     _completed = true;
 
@@ -122,7 +143,7 @@ namespace WinCopies.GUI.IO
 
                 if (InnerEnumerator.MoveNext())
                 {
-                    Current = new WinCopies.IO.PathInfo($"{_pathCollection.Path}{WinCopies.IO.Path.PathSeparator}{InnerEnumerator.Current.Path}", InnerEnumerator.Current.IsDirectory);
+                    Current = _pathCollection.GetNewEnumeratorPathInfoDelegate(InnerEnumerator.Current);
 
                     return true;
                 }

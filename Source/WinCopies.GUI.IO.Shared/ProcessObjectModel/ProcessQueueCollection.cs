@@ -19,7 +19,7 @@ using System.Collections.Specialized;
 using WinCopies.Collections.DotNetFix;
 using Size = WinCopies.IO.Size;
 
-namespace WinCopies.GUI.IO
+namespace WinCopies.GUI.IO.Process
 {
     public sealed class ProcessQueueCollection : ReadOnlyObservableQueueCollection<IPathInfo>
     {

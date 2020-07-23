@@ -9,6 +9,14 @@ CHANGELOG
 Updates
 -------
 
+??/??/???? 2.6-preview
+======================
+
+WinCopies.GUI.IO 2.6-preview
+----------------------------
+
+- Update namespace structure and (Copy)Process and PathCollection implementation.
+
 07/20/2020 2.5.9-preview
 ========================
 

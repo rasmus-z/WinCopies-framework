@@ -20,7 +20,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.Util;
 
-namespace WinCopies.GUI.IO
+namespace WinCopies.GUI.IO.Controls
 {
     public class ExplorerControlListViewItem : ListViewItem, ICommandSource
     {

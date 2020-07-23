@@ -24,40 +24,43 @@ namespace WinCopies.GUI.IO
         Size? Size { get; }
     }
 
-    public interface IErrorPathInfo
+    namespace Process
     {
-        IPathInfo Path { get; }
-
-        ProcessError Error { get; }
-    }
-
-    public readonly struct PathInfo : IPathInfo
-    {
-        public string Path { get; }
-
-        public Size? Size { get; }
-
-        public bool IsDirectory => !Size.HasValue;
-
-        public PathInfo(string path, Size? size)
+        public interface IErrorPathInfo
         {
-            Path = path;
+            IPathInfo Path { get; }
 
-            Size = size;
+            ProcessError Error { get; }
         }
-    }
 
-    public struct ErrorPathInfo : IErrorPathInfo
-    {
-        public IPathInfo Path { get; }
-
-        public ProcessError Error { get; }
-
-        public ErrorPathInfo(IPathInfo path, ProcessError error)
+        public readonly struct PathInfo : IPathInfo
         {
-            Path = path;
+            public string Path { get; }
 
-            Error = error;
+            public Size? Size { get; }
+
+            public bool IsDirectory => !Size.HasValue;
+
+            public PathInfo(string path, Size? size)
+            {
+                Path = path;
+
+                Size = size;
+            }
+        }
+
+        public struct ErrorPathInfo : IErrorPathInfo
+        {
+            public IPathInfo Path { get; }
+
+            public ProcessError Error { get; }
+
+            public ErrorPathInfo(IPathInfo path, ProcessError error)
+            {
+                Path = path;
+
+                Error = error;
+            }
         }
     }
 }
