@@ -18,12 +18,14 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 
 using WinCopies.Collections.DotNetFix;
 using WinCopies.Util.Data;
 using WinCopies.Util.DotNetFix;
 
 using static WinCopies.Util.Util;
+using static WinCopies.Util.Desktop.ThrowHelper;
 
 using Size = WinCopies.IO.Size;
 
@@ -31,46 +33,52 @@ namespace WinCopies.GUI.IO.Process
 {
     public abstract class Process<T> : ViewModelBase where T : WinCopies.IO.IPathInfo
     {
-        public static string GetSourcePathFromPathCollection(in PathCollection<T> paths) => (paths ?? throw GetArgumentNullException(nameof(paths))).Path;
+        #region Private fields
+
+        private Size _initialSize;
+        private int _initialItemCount;
+        private bool _completed = false;
+        private bool _pathsLoaded = false;
+        private readonly ObservableQueueCollection<IErrorPathInfo> _errorPaths = new ObservableQueueCollection<IErrorPathInfo>();
+        private int _progressPercentage = 0;
+        private IPathInfo _currentPath;
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// Gets the inner background worker.
         /// </summary>
         protected PausableBackgroundWorker BackgroundWorker { get; } = new PausableBackgroundWorker();
 
-        private Size _initialSize;
-
         /// <summary>
         /// Gets or sets (protected) the initial total item size.
         /// </summary>
         public Size InitialItemSize
         {
-            get => _initialSize; protected set
-            {
-                if (value != _initialSize)
-                {
-                    _initialSize = value;
+            get => _initialSize;
 
-                    OnPropertyChanged(nameof(InitialItemSize));
-                }
+            private set
+            {
+                _initialSize = value;
+
+                OnPropertyChanged(nameof(InitialItemSize));
             }
         }
-
-        private int _initialItemCount;
 
         /// <summary>
         /// Gets or sets (protected) the initial total item count.
         /// </summary>
         public int InitialItemCount
         {
-            get => _initialItemCount; protected set
-            {
-                if (value != _initialItemCount)
-                {
-                    _initialItemCount = value;
+            get => _initialItemCount;
 
-                    OnPropertyChanged(nameof(InitialItemCount));
-                }
+            private set
+            {
+                _initialItemCount = value;
+
+                OnPropertyChanged(nameof(InitialItemCount));
             }
         }
 
@@ -81,21 +89,18 @@ namespace WinCopies.GUI.IO.Process
         /// </summary>
         public ProcessQueueCollection Paths { get; }
 
-        private bool _completed = false;
-
         /// <summary>
         /// Gets a value that indicates whether the process has completed.
         /// </summary>
         public bool IsCompleted
         {
-            get => _completed; protected set
-            {
-                if (value != _completed)
-                {
-                    _completed = value;
+            get => _completed;
 
-                    OnPropertyChanged(nameof(IsCompleted));
-                }
+            private set
+            {
+                _completed = value;
+
+                OnPropertyChanged(nameof(IsCompleted));
             }
         }
 
@@ -104,21 +109,18 @@ namespace WinCopies.GUI.IO.Process
         /// </summary>
         public string SourcePath { get; }
 
-        private bool _pathsLoaded = false;
-
         /// <summary>
         /// Gets a value that indicates whether all the paths and subpaths are loaded.
         /// </summary>
         public bool ArePathsLoaded
         {
-            get => _pathsLoaded; protected set
-            {
-                if (value != _pathsLoaded)
-                {
-                    _pathsLoaded = value;
+            get => _pathsLoaded;
 
-                    OnPropertyChanged(nameof(ArePathsLoaded));
-                }
+            private set
+            {
+                _pathsLoaded = value;
+
+                OnPropertyChanged(nameof(ArePathsLoaded));
             }
         }
 
@@ -131,7 +133,7 @@ namespace WinCopies.GUI.IO.Process
             {
                 if (IsBusy)
 
-                    throw new InvalidOperationException("The BackgroundWorker is busy.");
+                    ThrowBackgroundWorkerIsBusyException();
 
                 if (value != BackgroundWorker.WorkerSupportsCancellation)
                 {
@@ -151,7 +153,7 @@ namespace WinCopies.GUI.IO.Process
             {
                 if (IsBusy)
 
-                    throw new InvalidOperationException("The BackgroundWorker is busy.");
+                    ThrowBackgroundWorkerIsBusyException();
 
                 if (value != BackgroundWorker.WorkerReportsProgress)
                 {
@@ -179,9 +181,11 @@ namespace WinCopies.GUI.IO.Process
         {
             get => BackgroundWorker.WorkerSupportsPausing; set
             {
+                bool oldValue = BackgroundWorker.WorkerSupportsPausing;
+
                 BackgroundWorker.WorkerSupportsPausing = value;
 
-                if (value != BackgroundWorker.WorkerSupportsPausing) // We make this test after trying to update the inner BackgroundWorker property because this property checks if the BackgroundWorker is busy before updating the underlying value. Because this check has to be performed even if the new value is the same as the old one, in order to let the user know even in this case if there is a bug, and because this check is performed in the inner BackgroundWorker property, to make the check of this line here makes possible to let the user know if there is a bug in all cases, without performing the is-busy check twice.
+                if (value != oldValue) // We make this test after trying to update the inner BackgroundWorker property because this property checks if the BackgroundWorker is busy before updating the underlying value. Because this check has to be performed even if the new value is the same as the old one, in order to let the user know even in this case if there is a bug, and because this check is performed in the inner BackgroundWorker property, to make the check of this line here makes possible to let the user know if there is a bug in all cases, without performing the is-busy check twice.
 
                     OnPropertyChanged(nameof(WorkerSupportsPausing));
             }
@@ -192,16 +196,12 @@ namespace WinCopies.GUI.IO.Process
         /// </summary>
         public bool PausePending => BackgroundWorker.PausePending;
 
-        private ObservableQueueCollection<IErrorPathInfo> _ErrorPaths { get; } = new ObservableQueueCollection<IErrorPathInfo>();
-
         public ReadOnlyObservableQueueCollection<IErrorPathInfo> ErrorPaths { get; }
 
         /// <summary>
         /// Gets the global process error, if any.
         /// </summary>
         public ProcessError Error { get; private set; }
-
-        private IPathInfo _currentPath;
 
         /// <summary>
         /// Gets the current processed <see cref="IPathInfo"/>.
@@ -218,8 +218,6 @@ namespace WinCopies.GUI.IO.Process
                 }
             }
         }
-
-        private int _progressPercentage = 0;
 
         /// <summary>
         /// Gets the progress percentage of the current process.
@@ -241,9 +239,15 @@ namespace WinCopies.GUI.IO.Process
 
         protected PathCollection<T> PathCollection { get; }
 
+        #endregion
+
+        #region Events
+
         public event ProgressChangedEventHandler ProgressChanged;
 
         public event RunWorkerCompletedEventHandler RunWorkerCompleted;
+
+        #endregion
 
         ///// <summary>
         ///// Initializes a new instance of the <see cref="Process"/> class.
@@ -266,8 +270,12 @@ namespace WinCopies.GUI.IO.Process
 
             PathCollection = paths;
 
-            ErrorPaths = new ReadOnlyObservableQueueCollection<IErrorPathInfo>(_ErrorPaths);
+            ErrorPaths = new ReadOnlyObservableQueueCollection<IErrorPathInfo>(_errorPaths);
         }
+
+        #region Methods
+
+        public static string GetSourcePathFromPathCollection(in PathCollection<T> paths) => (paths ?? throw GetArgumentNullException(nameof(paths))).Path;
 
         protected void ThrowIfCompleted()
         {
@@ -342,14 +350,16 @@ namespace WinCopies.GUI.IO.Process
 
         protected virtual void OnDoWork(DoWorkEventArgs e)
         {
+            ThrowIfCompleted();
+
             OnPropertyChanged(nameof(IsBusy));
 
             LoadPaths(e);
 
-            OnProcessDoWork(e);
+            _DoWork(e);
         }
 
-        private void LoadPaths(DoWorkEventArgs e)
+        protected void LoadPaths(DoWorkEventArgs e)
         {
             if ((Error = OnLoadPaths(e)) == ProcessError.None)
             {
@@ -358,23 +368,25 @@ namespace WinCopies.GUI.IO.Process
                 InitialItemCount = _Paths.Count;
 
                 ArePathsLoaded = true;
-
-                _DoWork(e);
             }
         }
 
         protected abstract ProcessError OnLoadPaths(DoWorkEventArgs e);
 
-        private void _DoWork(DoWorkEventArgs e)
+        protected void _DoWork(DoWorkEventArgs e)
         {
-            if ((Error = OnProcessDoWork(e)) == ProcessError.None)
+            Error = OnProcessDoWork(e);
+
+            CurrentPath = null;
+
+            if (Error == ProcessError.None && _errorPaths.Count == 0)
 
                 IsCompleted = true;
         }
 
         protected void DequeueErrorPath(ProcessError error)
         {
-            _ErrorPaths.Enqueue(new ErrorPathInfo(CurrentPath, error));
+            _errorPaths.Enqueue(new ErrorPathInfo(CurrentPath, error));
 
             _ = _Paths.Dequeue();
         }
@@ -416,5 +428,20 @@ namespace WinCopies.GUI.IO.Process
         //protected virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
         //protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        public string[] PathsToStringArray()
+        {
+            string[] paths = new string[_Paths.Count];
+
+            int i = 0;
+
+            foreach (string path in _Paths.Select(_path => _path.Path))
+
+                paths[i++] = path;
+
+            return paths;
+        }
+
+        #endregion
     }
 }

@@ -46,7 +46,7 @@ namespace WinCopies.GUI.IO
 
         protected abstract Func<T, T> GetNewEnumeratorPathInfoDelegate { get; }
 
-        public abstract Func<T, Size?> GetPathSizeDelegate { get; } 
+        public abstract Func<T, Size?> GetPathSizeDelegate { get; }
 
         public string GetConcatenatedPath(WinCopies.IO.IPathInfo pathInfo) => pathInfo == null ? throw GetArgumentNullException(nameof(pathInfo)) : $"{Path}{WinCopies.IO.Path.PathSeparator}{pathInfo.Path}";
 
@@ -67,6 +67,8 @@ namespace WinCopies.GUI.IO
 
         protected virtual void ValidatePath(T item)
         {
+            ThrowIfNull(item, nameof(item));
+
             if ((Path.Length > 1 && System.IO.Path.IsPathRooted(item.Path)) || (Path.Length == 0 && !System.IO.Path.IsPathRooted(item.Path)))
 
                 throw new ArgumentException("The path to add must be relative.");

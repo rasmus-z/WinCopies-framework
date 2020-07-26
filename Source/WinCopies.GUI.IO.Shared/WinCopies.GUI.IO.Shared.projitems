@@ -18,9 +18,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\BrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProcessError.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\Compression.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\Copy.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\CopyProcessSimulationParameters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\PathInfoPathCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Compression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Copy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathInfoPathToPathProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\SevenZipProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessSimulationParameters\CopyProcessSimulationParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Directory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\ExplorerControlListView.cs" />
@@ -35,18 +38,20 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObjectModel\IExplorerControlBrowsableObjectInfoViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PathInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\Deletion.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\DuplicateFinding.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\Extraction.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\MoveToDifferentDrive.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\MoveToSameDrive.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\Process.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\ProcessControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\ProcessQueueCollection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessObjectModel\Recycling.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Deletion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\DuplicateFinding.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Extraction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\MoveToDifferentDrive.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\MoveToSameDrive.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\PathToPathProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ProcessControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessCollections\ProcessQueueCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Process\ProcessObjectModel\Recycling.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Temp.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Controls\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Process\ProcessSimulationParameters\" />
   </ItemGroup>
 </Project>

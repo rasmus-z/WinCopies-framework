@@ -1,19 +1,19 @@
 ﻿/* Copyright © Pierre Sprimont, 2020
-*
-* This file is part of the WinCopies Framework.
-*
-* The WinCopies Framework is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* The WinCopies Framework is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.Win32Native;
 using Microsoft.WindowsAPICodePack.Win32Native.Shell;
@@ -27,6 +27,8 @@ using System.Globalization;
 using System.Security;
 
 using WinCopies.Util;
+
+using static WinCopies.Util.Desktop.ThrowHelper;
 
 using Size = WinCopies.IO.Size;
 
@@ -55,70 +57,6 @@ namespace WinCopies.GUI.IO.Process
         }
     }
 
-    public abstract class PathToPathProcess<T> : Process<T> where T : WinCopies.IO.IPathInfo
-    {
-
-
-        /// <summary>
-        /// Gets the destination root path.
-        /// </summary>
-        public string DestPath { get; }
-
-        protected PathToPathProcess(in PathCollection<T> paths, in string destPath) : base(paths) => DestPath = WinCopies.IO.Path.IsFileSystemPath(destPath) && System.IO.Path.IsPathRooted(destPath) ? destPath : throw new ArgumentException($"{nameof(destPath)} is not a valid path.");
-
-        protected virtual ProcessError CheckIfDrivesAreReady(
-#if DEBUG
-            in CopyProcessSimulationParameters simulationParameters
-#endif
-            )
-        {
-            if (CheckIfEnoughSpace())
-            {
-                string drive = System.IO.Path.GetPathRoot(SourcePath);
-
-                if (
-#if DEBUG
-                    simulationParameters?.SourcePathRootExists ??
-#endif
-                    System.IO.Directory.Exists(drive))
-                {
-                    var driveInfo = new DriveInfo(drive);
-
-                    if (
-#if DEBUG
-                    simulationParameters?.SourceDriveReady ??
-#endif
-                    driveInfo.IsReady)
-
-                        if (drive == (drive = System.IO.Path.GetPathRoot(DestPath)) || (
-#if DEBUG
-                        (simulationParameters?.DestPathRootExists ??
-#endif
-                        System.IO.Directory.Exists(drive)) && new DriveInfo(drive).IsReady))
-                        {
-                            if (((
-#if DEBUG
-                        simulationParameters?.DestDriveTotalFreeSpace ??
-#endif
-                    driveInfo.TotalFreeSpace
-#if DEBUG
-                    )
-#endif
-                    >= Paths.Size.ValueInBytes))
-
-                                return ProcessError.None;
-
-                            return ProcessError.NotEnoughSpace;
-                        }
-                }
-
-                return ProcessError.DriveNotReady;
-            }
-
-            return ProcessError.NotEnoughSpace;
-        }
-    }
-
     public class Copy : PathToPathProcess<WinCopies.IO.IPathInfo>
     {
         private IEnumerator<WinCopies.IO.IPathInfo> _pathsToLoadEnumerator;
@@ -134,11 +72,11 @@ namespace WinCopies.GUI.IO.Process
         /// <summary>
         /// Gets a value that indicates whether files are automatically renamed when they conflict with existing paths.
         /// </summary>
-        public bool AutoRenameFiles { get => _autoRenameFiles; set => _autoRenameFiles = BackgroundWorker.IsBusy ? throw new InvalidOperationException("The BackgroundWorker is busy.") : value; }
+        public bool AutoRenameFiles { get => _autoRenameFiles; set => _autoRenameFiles = BackgroundWorker.IsBusy ? throw GetBackgroundWorkerIsBusyException() : value; }
 
         private int _bufferLength;
 
-        public int BufferLength { get => _bufferLength; set => _bufferLength = BackgroundWorker.IsBusy ? throw new InvalidOperationException("The BackgroundWorker is busy.") : value < 0 ? throw new ArgumentOutOfRangeException($"{nameof(value)} cannot be less than zero.") : value; }
+        public int BufferLength { get => _bufferLength; set => _bufferLength = BackgroundWorker.IsBusy ? throw GetBackgroundWorkerIsBusyException() : value < 0 ? throw new ArgumentOutOfRangeException($"{nameof(value)} cannot be less than zero.") : value; }
 
         public Copy(in CopyProcessPathCollection pathsToLoad, in string destPath
 #if DEBUG
@@ -149,7 +87,7 @@ namespace WinCopies.GUI.IO.Process
 #if DEBUG
             SimulationParameters = simulationParameters;
 #endif
-
+            
             // BackgroundWorker.DoWork += (object sender, DoWorkEventArgs e) => OnDoWork(e);
 
             // BackgroundWorker.RunWorkerAsync(pathsToLoad);
@@ -210,8 +148,6 @@ namespace WinCopies.GUI.IO.Process
 
         protected override ProcessError OnProcessDoWork(DoWorkEventArgs e)
         {
-            ThrowIfCompleted();
-
             ProcessError error = CheckIfDrivesAreReady(
 #if DEBUG
                  SimulationParameters
